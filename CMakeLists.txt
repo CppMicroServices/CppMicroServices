@@ -893,9 +893,15 @@ export(TARGETS ${US_RCC_EXECUTABLE_TARGET}
 
 add_subdirectory(util)
 add_subdirectory(framework)
-add_subdirectory(httpservice)
-add_subdirectory(webconsole)
-add_subdirectory(shellservice)
+
+# temporarily don't build these, they are experimental and probably
+# shouldn't be built by default
+if(US_NEVER_GOING_TO_BE_DEFINED)
+	add_subdirectory(httpservice)
+	add_subdirectory(webconsole)
+	add_subdirectory(shellservice)
+	add_subdirectory(tools/shell)
+endif()
 
 # Declarative Services requires threading to function.
 # Static linkage is not yet supported for declarative services.
@@ -905,7 +911,6 @@ else()
   add_subdirectory(compendium/LogService)
 endif()
 
-add_subdirectory(tools/shell)
 
 #-----------------------------------------------------------------------------
 # Documentation

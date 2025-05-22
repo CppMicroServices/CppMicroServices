@@ -11,6 +11,7 @@ env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
   BUILD_DIR: ${{github.workspace}}/build
+  BUILD_OS: ${{matrix.os}}
   BUILD_CONFIGURATION: 0
   WITH_COVERAGE: 1
   MY_COVERAGE: gcov

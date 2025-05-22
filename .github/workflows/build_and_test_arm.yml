@@ -1,0 +1,51 @@
+name: BuildAndTestARM
+
+on:
+  push:
+    branches: [ development ]
+  pull_request:
+    branches: [ development ]
+  workflow_dispatch:
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Release
+  BUILD_DIR: ${{github.workspace}}/build
+  BUILD_CONFIGURATION: 0
+  WITH_COVERAGE: 1
+  MY_COVERAGE: gcov
+
+jobs:
+  build_arm:
+    name: Build and Test on ARM [${{matrix.os}},Configuration=${{matrix.buildconfiguration}}]
+    runs-on: ${{matrix.os}}
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ubuntu-22.04-arm, windows-11-arm]
+        # build configurations:
+        # 0 = threading ON / shared lib ON
+        # 1 = threading ON / shared lib OFF
+        # 2 = threading OFF / shared lib ON
+        # 3 = threading OFF/ shared lib OFF
+        buildconfiguration: [0,1]
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+         submodules: true
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y valgrind
+      if: ${{matrix.os == 'ubuntu-22.04-arm'}}
+
+    - name: Build And Test
+      run: ctest -VV -S ${{github.workspace}}/cmake/usCTestScript_github.cmake
+      env: 
+         BUILD_CONFIGURATION: ${{matrix.buildconfiguration}}
+         BUILD_DIR: ${{github.workspace}}/build_${{matrix.buildconfiguration}}
+      
+    - name: Code Coverage
+      run: bash <(curl -s https://codecov.io/bash) -X gcov -s ${{github.workspace}}/build_${{matrix.buildconfiguration}}

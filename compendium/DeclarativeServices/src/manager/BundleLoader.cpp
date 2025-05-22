@@ -105,14 +105,15 @@ namespace cppmicroservices
             } 
             bundleBinariesType bundleBinaries = any_cast<bundleBinariesType>(bundleBinariesAny); ///< map of bundle location and handle pairs
             auto const bundleLoc = fromBundle.GetLocation();
-
             void* handle = nullptr;
-            if (bundleBinaries->lock()->count(bundleLoc) != 0u)
             {
-                handle = bundleBinaries->lock()->at(bundleLoc);
+                auto &lockedBundleBinaries = bundleBinaries->lock();
+                if (auto it = lockedBundleBinaries->find(bundleLoc); it != std::end(*lockedBundleBinaries))
+                {
+                    handle = it->second;
+                }
             }
-            else
-            {
+            if (!handle) {
                 Any func = fromBundle.GetBundleContext().GetProperty(
                     cppmicroservices::Constants::FRAMEWORK_BUNDLE_VALIDATION_FUNC);
                 try

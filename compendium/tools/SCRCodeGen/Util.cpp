@@ -32,6 +32,7 @@ namespace codegen
             Json::Value root;
             Json::CharReaderBuilder rbuilder;
             rbuilder["rejectDupKeys"] = true;
+            rbuilder["allowComments"] = true;
             std::string errs;
 
             if (!Json::parseFromStream(rbuilder, jsonStream, &root, &errs))

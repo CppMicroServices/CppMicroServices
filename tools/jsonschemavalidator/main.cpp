@@ -52,7 +52,7 @@ ReadJSONDocument(std::string const& filePath)
     }
     rapidjson::IStreamWrapper streamWrapper(fileStream);
     rapidjson::Document doc;
-    doc.ParseStream(streamWrapper);
+    doc.ParseStream<rapidjson::ParseFlag::kParseCommentsFlag>(streamWrapper);
     if (doc.HasParseError())
     {
         throw std::runtime_error("File '" + filePath + "' is not a valid JSON\n Error(offset "

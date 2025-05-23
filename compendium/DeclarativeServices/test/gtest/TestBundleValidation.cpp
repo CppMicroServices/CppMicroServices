@@ -484,7 +484,7 @@ TEST(TestBundleValidation, BundleValidationPerFramework)
 {
     using validationFuncType = std::function<bool(cppmicroservices::Bundle const&)>;
 
-    validationFuncType validationFuncTrue = [](cppmicroservices::Bundle const& b) -> bool
+    validationFuncType validationFuncTrue = [](cppmicroservices::Bundle const& ) -> bool
     {
         return true;
     };

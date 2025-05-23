@@ -295,7 +295,9 @@ namespace
         MOCK_METHOD1(DisableComponent, void(std::string const&));
         MOCK_CONST_METHOD2(LocateServices, std::vector<std::shared_ptr<void>>(std::string const&, std::string const&));
         MOCK_CONST_METHOD2(LocateService, std::shared_ptr<void>(std::string const&, std::string const&));
+        MOCK_CONST_METHOD2(LocateService, std::shared_ptr<void>(std::string const&, cppmicroservices::ServiceReferenceBase const&));
     };
+    using ::testing::An;
 
     /**
      * This test point is used to verify the ComponentInstanceImpl works properly
@@ -310,8 +312,11 @@ namespace
         auto compObj = compInstance.GetInstance();
         ASSERT_FALSE(compObj);
         auto mockContext = std::make_shared<MockComponentContext>();
-        EXPECT_CALL(*(mockContext.get()), LocateService(testing::_, testing::_))
-            .Times(0); // ensure the mock context never gets a call to LocateService
+
+        EXPECT_CALL(*mockContext, LocateService(An<const std::string&>(), An<const cppmicroservices::ServiceReferenceBase&>()))
+            .Times(0);
+        EXPECT_CALL(*mockContext, LocateService(An<const std::string&>(), An<const std::string&>()))
+            .Times(0);
         compInstance.CreateInstance(mockContext);
         compInstance.BindReferences(mockContext);
         compObj = compInstance.GetInstance();
@@ -329,8 +334,10 @@ namespace
         auto compObj = compInstance.GetInstance();
         ASSERT_FALSE(compObj);
         auto mockContext = std::make_shared<MockComponentContext>();
-        EXPECT_CALL(*(mockContext.get()), LocateService(testing::_, testing::_))
-            .Times(0); // ensure the mock context never gets a call to LocateService
+        EXPECT_CALL(*mockContext, LocateService(An<const std::string&>(), An<const cppmicroservices::ServiceReferenceBase&>()))
+            .Times(0);
+        EXPECT_CALL(*mockContext, LocateService(An<const std::string&>(), An<const std::string&>()))
+            .Times(0);
         compInstance.CreateInstance(mockContext);
         compInstance.BindReferences(mockContext);
         compObj = compInstance.GetInstance();
@@ -344,8 +351,10 @@ namespace
     {
         ComponentInstanceImpl<TestServiceImplWithDefaultCtor, std::tuple<TestServiceInterface1>> compInstance;
         auto mockContext = std::make_shared<MockComponentContext>();
-        EXPECT_CALL(*(mockContext.get()), LocateService(testing::_, testing::_))
-            .Times(0); // ensure the mock context never gets a call to LocateService
+        EXPECT_CALL(*mockContext, LocateService(An<const std::string&>(), An<const cppmicroservices::ServiceReferenceBase&>()))
+            .Times(0);
+        EXPECT_CALL(*mockContext, LocateService(An<const std::string&>(), An<const std::string&>()))
+            .Times(0);
         compInstance.CreateInstance(mockContext);
         ASSERT_EQ(compInstance.GetInstance()->defCon(), true);
 
@@ -366,8 +375,10 @@ namespace
         ASSERT_EQ(iMap->size(), size_t(1));
         ASSERT_EQ(iMap->count(us_service_interface_iid<TestServiceInterface1>()), size_t(1));
         auto mockContext = std::make_shared<MockComponentContext>();
-        EXPECT_CALL(*(mockContext.get()), LocateService(testing::_, testing::_))
-            .Times(0); // ensure the mock context never gets a call to LocateService
+        EXPECT_CALL(*mockContext, LocateService(An<const std::string&>(), An<const cppmicroservices::ServiceReferenceBase&>()))
+            .Times(0);
+        EXPECT_CALL(*mockContext, LocateService(An<const std::string&>(), An<const std::string&>()))
+            .Times(0);
         compInstance.CreateInstance(mockContext);
         compInstance.BindReferences(mockContext);
         auto compObj = compInstance.GetInstance();
@@ -385,8 +396,10 @@ namespace
         ASSERT_EQ(iMap->size(), size_t(1));
         ASSERT_EQ(iMap->count(us_service_interface_iid<TestServiceInterface1>()), size_t(1));
         auto mockContext = std::make_shared<MockComponentContext>();
-        EXPECT_CALL(*(mockContext.get()), LocateService(testing::_, testing::_))
-            .Times(0); // ensure the mock context never gets a call to LocateService
+        EXPECT_CALL(*mockContext, LocateService(An<const std::string&>(), An<const cppmicroservices::ServiceReferenceBase&>()))
+            .Times(0);
+        EXPECT_CALL(*mockContext, LocateService(An<const std::string&>(), An<const std::string&>()))
+            .Times(0);
         compInstance.CreateInstance(mockContext);
         compInstance.BindReferences(mockContext);
         auto compObj = compInstance.GetInstance();
@@ -410,8 +423,10 @@ namespace
         ASSERT_EQ(iMap->count(us_service_interface_iid<TestServiceInterface1>()), size_t(1));
         ASSERT_EQ(iMap->count(us_service_interface_iid<TestServiceInterface2>()), size_t(1));
         auto mockContext = std::make_shared<MockComponentContext>();
-        EXPECT_CALL(*(mockContext.get()), LocateService(testing::_, testing::_))
-            .Times(0); // ensure the mock context never gets a call to LocateService
+        EXPECT_CALL(*mockContext, LocateService(An<const std::string&>(), An<const cppmicroservices::ServiceReferenceBase&>()))
+            .Times(0);
+        EXPECT_CALL(*mockContext, LocateService(An<const std::string&>(), An<const std::string&>()))
+            .Times(0);
         compInstance.CreateInstance(mockContext);
         compInstance.BindReferences(mockContext);
         auto compObj = compInstance.GetInstance();
@@ -430,8 +445,10 @@ namespace
         ASSERT_EQ(iMap->count(us_service_interface_iid<TestServiceInterface1>()), size_t(1));
         ASSERT_EQ(iMap->count(us_service_interface_iid<TestServiceInterface2>()), size_t(1));
         auto mockContext = std::make_shared<MockComponentContext>();
-        EXPECT_CALL(*(mockContext.get()), LocateService(testing::_, testing::_))
-            .Times(0); // ensure the mock context never gets a call to LocateService
+        EXPECT_CALL(*mockContext, LocateService(An<const std::string&>(), An<const cppmicroservices::ServiceReferenceBase&>()))
+            .Times(0);
+        EXPECT_CALL(*mockContext, LocateService(An<const std::string&>(), An<const std::string&>()))
+            .Times(0);
         compInstance.CreateInstance(mockContext);
         compInstance.BindReferences(mockContext);
         auto compObj = compInstance.GetInstance();

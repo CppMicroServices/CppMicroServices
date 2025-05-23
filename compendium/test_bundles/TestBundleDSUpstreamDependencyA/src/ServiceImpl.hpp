@@ -5,7 +5,7 @@
 #include "cppmicroservices/servicecomponent/ComponentContext.hpp"
 
 #include "TestInterfaces/Interfaces.hpp"
-#include <iostream>
+
 namespace dependent
 {
     class TestBundleDSUpstreamDependencyImpl : public test::TestBundleDSUpstreamDependency
@@ -18,7 +18,6 @@ namespace dependent
         Activate(std::shared_ptr<cppmicroservices::service::component::ComponentContext> const& context)
         {
             ctx = context->GetBundleContext();
-            std::cout << "DEP ACTIVATE RAN: " << this <<std::endl;
         }
 
         void

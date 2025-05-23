@@ -273,7 +273,8 @@ namespace cppmicroservices
         }
 
         std::shared_ptr<void>
-        ComponentContextImpl::LocateService(std::string const& name, cppmicroservices::ServiceReferenceBase const& sRef) const
+        ComponentContextImpl::LocateService(std::string const& refName,
+                                            cppmicroservices::ServiceReferenceBase const& sRef) const
         {
             auto const configManagerPtr = configManager.lock();
             if (!configManagerPtr)
@@ -281,7 +282,7 @@ namespace cppmicroservices
                 throw ComponentException("Context is invalid");
             }
             auto boundServicesCacheHandle = boundServicesCache.lock();
-            auto serviceMapItr = boundServicesCacheHandle->find(name);
+            auto serviceMapItr = boundServicesCacheHandle->find(refName);
             if (serviceMapItr != boundServicesCacheHandle->end())
             {
                 // vector of serviceInterfaceMapConstPtr
@@ -296,7 +297,7 @@ namespace cppmicroservices
                 if (matchingServiceInterfaceMapPtr != services.end())
                 {
                     // returns the service at the interfacemap::begin() position
-                    return GetServicePointer(configManagerPtr, matchingServiceInterfaceMapPtr->second, name, "");
+                    return GetServicePointer(configManagerPtr, matchingServiceInterfaceMapPtr->second, refName, "");
                 }
             }
 
@@ -304,7 +305,7 @@ namespace cppmicroservices
         }
 
         std::vector<std::shared_ptr<void>>
-        ComponentContextImpl::LocateServices(std::string const& name, std::string const& type) const
+        ComponentContextImpl::LocateServices(std::string const& refName, std::string const& type) const
         {
             auto const configManagerPtr = configManager.lock();
             if (!configManagerPtr)
@@ -313,18 +314,18 @@ namespace cppmicroservices
             }
             std::vector<std::shared_ptr<void>> services;
             auto boundServicesCacheHandle = boundServicesCache.lock();
-            auto serviceMapItr = boundServicesCacheHandle->find(name);
+            auto serviceMapItr = boundServicesCacheHandle->find(refName);
             if (serviceMapItr != boundServicesCacheHandle->end())
             {
                 auto& serviceInfos = serviceMapItr->second;
                 std::for_each(
                     serviceInfos.begin(),
                     serviceInfos.end(),
-                    [&services, &configManagerPtr, &name, &type](
+                    [&services, &configManagerPtr, &refName, &type](
                         std::pair<cppmicroservices::ServiceReferenceBase, InterfaceMapConstPtr> const& serviceInfo)
                     {
                         auto const& intMapPtr = serviceInfo.second;
-                        auto const servicePtr = GetServicePointer(configManagerPtr, intMapPtr, name, type);
+                        auto const servicePtr = GetServicePointer(configManagerPtr, intMapPtr, refName, type);
                         if (servicePtr)
                         {
                             services.push_back(servicePtr);

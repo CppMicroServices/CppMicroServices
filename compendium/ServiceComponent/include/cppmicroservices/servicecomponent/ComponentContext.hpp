@@ -173,7 +173,7 @@ namespace cppmicroservices
                 }
 
                 /**
-                 * Returns the service object from the cache matching the passed in
+                 * Returns the bound service object matching the passed in
                  * serviceReferenceBase and reference name
                  *
                  * @param refName The name of a reference as specified in a \c reference
@@ -242,7 +242,7 @@ namespace cppmicroservices
                 virtual std::shared_ptr<void> LocateService(std::string const& name, std::string const& type) const = 0;
 
                 /**
-                 * Returns the service object from the cache matching the passed in
+                 * Returns the bound service object matching the passed in
                  * serviceReferenceBase and reference name
                  *
                  * @param refName The name of a reference as specified in a \c reference

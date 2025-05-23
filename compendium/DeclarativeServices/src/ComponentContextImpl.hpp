@@ -97,7 +97,7 @@ namespace cppmicroservices
              *         exception while activating the bound service or if this
              *         {@link ComponentContext} is invalid
              */
-            std::shared_ptr<void> LocateService(std::string const& name, std::string const& type) const override;
+            std::shared_ptr<void> LocateService(std::string const& refName, std::string const& type) const override;
 
             /**
              * Returns the service object from the cache matching the passed in serviceReferenceBase
@@ -129,7 +129,7 @@ namespace cppmicroservices
              *         exception while activating a bound service or if this
              *         {@link ComponentContext} is invalid
              */
-            std::vector<std::shared_ptr<void>> LocateServices(std::string const& name,
+            std::vector<std::shared_ptr<void>> LocateServices(std::string const& refName,
                                                               std::string const& type) const override;
 
             /**

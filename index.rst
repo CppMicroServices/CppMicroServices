@@ -33,8 +33,6 @@ Start reading at the top for a quick start.
    :name: bundles_tools
 
    /doc/man/cppmicroservices.7
-   /doc/man/cppmicroservices-httpservice.7
-   /doc/man/cppmicroservices-webconsole.7
    /doc/man/cppmicroservices-shellservice.7
    /doc/man/usResourceCompiler3.1
    /doc/man/usShell3.1
@@ -49,8 +47,6 @@ Start reading at the top for a quick start.
    /doc/man/cppmicroservices-configadmin.3
    /doc/man/cppmicroservices-logservice.3
    /doc/man/cppmicroservices-asyncworkservice.3
-   /doc/man/cppmicroservices-httpservice.3
-   /doc/man/cppmicroservices-webconsole.3
    /doc/man/cppmicroservices-shellservice.3
    
 .. toctree::

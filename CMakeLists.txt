@@ -893,8 +893,6 @@ export(TARGETS ${US_RCC_EXECUTABLE_TARGET}
 
 add_subdirectory(util)
 add_subdirectory(framework)
-add_subdirectory(httpservice)
-add_subdirectory(webconsole)
 add_subdirectory(shellservice)
 
 # Declarative Services requires threading to function.

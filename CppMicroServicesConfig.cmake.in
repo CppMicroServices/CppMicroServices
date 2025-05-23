@@ -87,11 +87,9 @@ set(US_LIBRARIES )
 set(US_RUNTIME_LIBRARY_DIRS )
 
 # Components support
-set(US_BUNDLES Framework HttpService WebConsole ShellService DeclarativeServices) # ConfigAdmin EventAdmin ...
+set(US_BUNDLES Framework ShellService DeclarativeServices) # ConfigAdmin EventAdmin ...
 
 set(US_Framework_BUNDLE_DEPS )
-set(US_HttpService_BUNDLE_DEPS Framework)
-set(US_WebConsole_BUNDLE_DEPS ${US_HttpService_BUNDLE_DEPS} HttpService)
 set(US_ShellService_BUNDLE_DEPS Framework)
 set(US_DeclarativeServices_BUNDLE_DEPS Framework)
 

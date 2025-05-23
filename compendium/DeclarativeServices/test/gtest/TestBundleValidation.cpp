@@ -476,3 +476,69 @@ TEST(TestBundleValidation, BundleValidationReinstall)
     framework.Stop();
     framework.WaitForStop(std::chrono::milliseconds::zero());
 }
+
+/*
+ * Verfiy bundle validation happens per-framework
+ */
+TEST(TestBundleValidation, BundleValidationPerFramework)
+{
+    using validationFuncType = std::function<bool(cppmicroservices::Bundle const&)>;
+
+    validationFuncType validationFuncTrue = [](cppmicroservices::Bundle const& b) -> bool
+    {
+        return true;
+    };
+    validationFuncType validationFuncFalse = [](cppmicroservices::Bundle const& b) -> bool
+    {
+        if (b.GetSymbolicName() == "declarative_services" || b.GetSymbolicName() == "configuration_admin")
+        {
+            return true;
+        }
+        return false;
+    };
+
+    cppmicroservices::FrameworkConfiguration frameworkConfigurationValidTrue {
+        { cppmicroservices::Constants::FRAMEWORK_BUNDLE_VALIDATION_FUNC, validationFuncTrue }
+    };
+    cppmicroservices::FrameworkConfiguration frameworkConfigurationValidFalse {
+        { cppmicroservices::Constants::FRAMEWORK_BUNDLE_VALIDATION_FUNC, validationFuncFalse }
+    };
+    auto framework1 = cppmicroservices::FrameworkFactory().NewFramework(std::move(frameworkConfigurationValidTrue));
+    ASSERT_NO_THROW(framework1.Start());
+
+    test::InstallAndStartDS(framework1.GetBundleContext());
+    test::InstallLib(framework1.GetBundleContext(), "TestBundleDSTBV5");
+
+    auto bundles1 = framework1.GetBundleContext().GetBundles();
+    auto bundleIter1
+        = std::find_if(bundles1.begin(),
+                       bundles1.end(),
+                       [](cppmicroservices::Bundle const& b) { return (b.GetSymbolicName() == "TestBundleDSTBV5"); });
+
+    ASSERT_NO_THROW(bundleIter1->Start());
+    ASSERT_EQ(bundleIter1->GetState(), cppmicroservices::Bundle::State::STATE_ACTIVE);
+
+    // new framework with a validation func that should fail for all bundles other than DS and CA
+    auto framework2 = cppmicroservices::FrameworkFactory().NewFramework(std::move(frameworkConfigurationValidFalse));
+    ASSERT_NO_THROW(framework2.Start());
+
+    // install the bundles
+    test::InstallAndStartDS(framework2.GetBundleContext());
+    test::InstallLib(framework2.GetBundleContext(), "TestBundleDSTBV5");
+
+    // find the bundle in question (already installed in framework1 succesfully)
+    auto bundles2 = framework2.GetBundleContext().GetBundles();
+    auto bundleIter2
+        = std::find_if(bundles2.begin(),
+                       bundles2.end(),
+                       [](cppmicroservices::Bundle const& b) { return (b.GetSymbolicName() == "TestBundleDSTBV5"); });
+
+    // starting it should throw even though it was valid in framework1
+    ASSERT_THROW(bundleIter2->Start(), cppmicroservices::SecurityException);
+    ASSERT_EQ(bundleIter2->GetState(), cppmicroservices::Bundle::State::STATE_RESOLVED);
+
+    framework1.Stop();
+    framework1.WaitForStop(std::chrono::milliseconds::zero());
+    framework2.Stop();
+    framework2.WaitForStop(std::chrono::milliseconds::zero());
+}

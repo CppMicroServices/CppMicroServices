@@ -107,7 +107,7 @@ namespace cppmicroservices
             auto const bundleLoc = fromBundle.GetLocation();
             void* handle = nullptr;
             {
-                auto &lockedBundleBinaries = bundleBinaries->lock();
+                auto const& lockedBundleBinaries = bundleBinaries->lock();
                 if (auto it = lockedBundleBinaries->find(bundleLoc); it != std::end(*lockedBundleBinaries))
                 {
                     handle = it->second;

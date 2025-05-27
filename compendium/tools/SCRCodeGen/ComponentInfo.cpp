@@ -21,19 +21,10 @@
   =============================================================================*/
 
 #include <iterator>
+#include <regex>
 #include <sstream>
 
 #include "ComponentInfo.hpp"
-
-namespace {
-inline std::string replace_doublecolon_with_underscore(std::string target) {
-    for(auto pos = target.find("::"); pos != target.npos; pos = target.find("::", pos)) {
-        target.replace(pos, 2u, "_");
-        ++pos; // move past the replacement to avoid rechecking
-    }
-    return target;
-}
-}
 
 namespace codegen
 {
@@ -47,7 +38,7 @@ namespace codegen
         GetComponentNameStr(ComponentInfo const& compInfo)
         {
             auto const name = compInfo.name.empty() ? compInfo.implClassName : compInfo.name;
-            return replace_doublecolon_with_underscore(name);
+            return std::regex_replace(name, std::regex("(::)"), "_");
         }
 
         std::string

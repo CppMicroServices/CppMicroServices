@@ -29,17 +29,7 @@
 #include "cppmicroservices/SharedLibraryException.h"
 
 #include "BundleLoader.hpp"
-
-namespace {
-inline std::string replace_doublecolon_with_underscore(std::string target) {
-    for(auto pos = target.find("::"); pos != target.npos; pos = target.find("::", pos)) {
-        target.replace(pos, 2u, "_");
-        ++pos; // move past the replacement to avoid rechecking
-    }
-    return target;
-}
-}
-
+#include <regex>
 #if defined(_WIN32)
 #    include <Windows.h>
 #else
@@ -174,7 +164,7 @@ namespace cppmicroservices
                 bundleBinaries.lock()->emplace(bundleLoc, handle);
             }
 
-            std::string const symbolName = replace_doublecolon_with_underscore(compName);
+            std::string const symbolName = std::regex_replace(compName, std::regex("::"), "_");
             std::string const newInstanceFuncName("NewInstance_" + symbolName);
             std::string const deleteInstanceFuncName("DeleteInstance_" + symbolName);
 

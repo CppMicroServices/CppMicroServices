@@ -1,0 +1,7 @@
+usFunctionCreateDSTestBundle(TestBundleDSUpstreamDependencyC)
+
+usFunctionCreateTestBundleWithResources(TestBundleDSUpstreamDependencyC
+  SOURCES src/ServiceImpl.cpp ${_glue_file}
+  RESOURCES manifest.json
+  BUNDLE_SYMBOLIC_NAME TestBundleDSUpstreamDependencyC
+  OTHER_LIBRARIES usTestInterfaces usServiceComponent)

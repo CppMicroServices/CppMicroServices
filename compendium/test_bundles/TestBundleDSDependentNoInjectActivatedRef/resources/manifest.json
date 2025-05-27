@@ -1,0 +1,25 @@
+{
+    "bundle.symbolic_name": "TestBundleDSDependentNoInjectActivatedRef",
+    "bundle.name": "TestBundleDSDependentNoInjectActivatedRef",
+    "scr": {
+        "version": 1,
+        "components": [
+            {
+                "inject-references": false,
+                "implementation-class": "dependent::TestBundleDSDependentNoInjectVerifyRefActive",
+                "service": {
+                    "interfaces": [
+                        "test::TestBundleDSDependent"
+                    ]
+                },
+                "references": [
+                    {
+                        "cardinality": "1..1",
+                        "name": "testbundledsupstreamdependencyisactivated",
+                        "interface": "test::TestBundleDSUpstreamDependencyIsActivated"
+                    }
+                ]
+            }
+        ]
+    }
+}

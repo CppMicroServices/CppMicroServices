@@ -87,10 +87,9 @@ set(US_LIBRARIES )
 set(US_RUNTIME_LIBRARY_DIRS )
 
 # Components support
-set(US_BUNDLES Framework ShellService DeclarativeServices) # ConfigAdmin EventAdmin ...
+set(US_BUNDLES Framework DeclarativeServices) # ConfigAdmin EventAdmin ...
 
 set(US_Framework_BUNDLE_DEPS )
-set(US_ShellService_BUNDLE_DEPS Framework)
 set(US_DeclarativeServices_BUNDLE_DEPS Framework)
 
 if(NOT @PROJECT_NAME@_FIND_COMPONENTS)

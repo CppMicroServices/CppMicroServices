@@ -66,24 +66,6 @@ Patches
  * Disable Windows warnings C4244 and C4267.
  * Do not use dllexport/dllimport specs on Windows
 
-Linenoise
----------
-
-BSD license
-
-https://github.com/msteveb/linenoise
-0f2343d2bc763b735b6242b5831be611703965a1
-
-This is a fork of the original antirez/linenoise project
-which contains Windows support and a few additional features.
-
-Patches
-
- * Don't depend on utf8.h because it is not supported
-   on Windows.
- * Disable Windows warnings C4244 and C4267.
- * Do not define snprintf for MSC_VER 1900 or higher
-
 The Lean Mean C++ Option Parser
 -------------------------------
 

@@ -27,18 +27,9 @@
 #include "cppmicroservices/Constants.h"
 #include "cppmicroservices/SharedLibrary.h"
 #include "cppmicroservices/SharedLibraryException.h"
+#include "cppmicroservices/StringReplace.h"
 
 #include "BundleLoader.hpp"
-
-namespace {
-inline std::string replace_doublecolon_with_underscore(std::string target) {
-    for(auto pos = target.find("::"); pos != target.npos; pos = target.find("::", pos)) {
-        target.replace(pos, 2u, "_");
-        ++pos; // move past the replacement to avoid rechecking
-    }
-    return target;
-}
-}
 
 #if defined(_WIN32)
 #    include <Windows.h>
@@ -174,7 +165,7 @@ namespace cppmicroservices
                 bundleBinaries.lock()->emplace(bundleLoc, handle);
             }
 
-            std::string const symbolName = replace_doublecolon_with_underscore(compName);
+            std::string const symbolName = cppmicroservices::replace_doublecolon_with_underscore(compName);
             std::string const newInstanceFuncName("NewInstance_" + symbolName);
             std::string const deleteInstanceFuncName("DeleteInstance_" + symbolName);
 

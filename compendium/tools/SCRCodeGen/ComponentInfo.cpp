@@ -24,15 +24,7 @@
 #include <sstream>
 
 #include "ComponentInfo.hpp"
-
-namespace {
-inline void replace_doublecolon_with_underscore_in_place(std::string &target) {
-    for(auto pos = target.find("::"); pos != target.npos; pos = target.find("::", pos)) {
-        target.replace(pos, 2u, "_");
-        ++pos; // move past the replacement to avoid rechecking
-    }
-}
-}
+#include "cppmicroservices/StringReplace.h"
 
 namespace codegen
 {
@@ -46,8 +38,7 @@ namespace codegen
         GetComponentNameStr(ComponentInfo const& compInfo)
         {
             auto name = compInfo.name.empty() ? compInfo.implClassName : compInfo.name;
-            replace_doublecolon_with_underscore_in_place(name);
-            return name;
+            return cppmicroservices::replace_doublecolon_with_underscore(name);
         }
 
         std::string

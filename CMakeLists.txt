@@ -140,7 +140,8 @@ STRING(SUBSTRING "${CMAKE_SYSTEM_PROCESSOR}" 0 3 SYSTEM_PROCESSOR_SUBSTR)
 if("${SYSTEM_PROCESSOR_SUBSTR}" STREQUAL "arm")
   if(US_COMPILER_GNU)
     set(US_COMPILER_GNU_ARM 1)
-endif()
+  endif()
+  set(US_SYSTEM_PROCESSOR_IS_ARM 1)
 endif()
 
 
@@ -894,14 +895,15 @@ export(TARGETS ${US_RCC_EXECUTABLE_TARGET}
 add_subdirectory(util)
 add_subdirectory(framework)
 
-# temporarily don't build these, they are experimental and probably
-# shouldn't be built by default
-if(US_NEVER_GOING_TO_BE_DEFINED)
-	add_subdirectory(httpservice)
-	add_subdirectory(webconsole)
-	add_subdirectory(shellservice)
-	add_subdirectory(tools/shell)
+# Don't build these, they currently don't build on ARM. 
+# They are experimental and probably shouldn't be built by default at all
+if(NOT US_SYSTEM_PROCESSOR_IS_ARM)
+  add_subdirectory(httpservice)
+  add_subdirectory(webconsole)
 endif()
+
+add_subdirectory(shellservice)
+add_subdirectory(tools/shell)
 
 # Declarative Services requires threading to function.
 # Static linkage is not yet supported for declarative services.

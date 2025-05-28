@@ -419,6 +419,24 @@ ZipArchive::CheckAndAddToArchivedNames(std::string const& archiveEntry)
 void
 ZipArchive::AddManifestFile(Json::Value const& manifest)
 {
+    auto bname = manifest.get("bundle.symbolic_name", "");
+    if (bname.isString()) {
+        auto bnameStr = bname.asString();
+        if (!bundleName.empty()) {
+            if (bnameStr != bundleName) {
+                throw std::runtime_error("Bundle name in manifest "
+                                         + bnameStr
+                                         + " does not match value supplied on command line "
+                                         + bundleName);
+            }
+        }
+        else {
+            bundleName = bnameStr;
+        }
+    }
+    if (bundleName.empty()) {
+      throw std::runtime_error("Bundle name is required.");
+    }
     std::string styledManifestJson(manifest.toStyledString());
     std::string archiveEntry(bundleName + "/manifest.json");
 
@@ -796,10 +814,9 @@ checkSanity(option::Parser& parse, option::Option* options)
     }
 
     // If either --manifest-add or --res-add is given, --bundle-name must also be given.
-    if ((options[MANIFESTADD] || options[RESADD]) && !options[BUNDLENAME])
+    if (options[RESADD] && !options[BUNDLENAME])
     {
-        std::cerr << "If either --manifest-add or --res-add is provided, "
-                     "--bundle-name must be provided."
+        std::cerr << "If --res-add is provided, --bundle-name must be provided."
                   << std::endl;
         return_code = EXIT_FAILURE;
     }

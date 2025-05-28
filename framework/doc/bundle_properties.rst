@@ -17,7 +17,8 @@ Bundle authors must always add the following property to their bundle's
 ``manifest.json`` file:
 
 -  ``bundle.symbolic_name`` - The human readable name of the bundle (type
-   ``std::string``)
+   ``std::string``). The name must start with either an underscore or
+   letter and contain only underscores, letters, or numbers.
 
 C++ Micro Services will not install any bundle which doesn't contain a
 valid 'bundle.symbolic_name' property in its ``manifest.json`` file.

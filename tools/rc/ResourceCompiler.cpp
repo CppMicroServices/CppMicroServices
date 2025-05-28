@@ -416,6 +416,7 @@ ZipArchive::AddManifestFile(Json::Value const& manifest)
     std::string styledManifestJson(manifest.toStyledString());
     std::string archiveEntry(bundleName + "/manifest.json");
 
+    // Issue 161.1: Check for file exists first and throw a more desriptive runtime error
     CheckAndAddToArchivedNames(archiveEntry);
 
     if (MZ_FALSE
@@ -435,6 +436,8 @@ ZipArchive::AddResourceFile(std::string const& resFileName, bool isManifest)
 {
     std::string archiveName = resFileName;
 
+    // Issue 161.3: check to see if resFileName is relative or not, and exit early if it is not.
+    
     // This check exists solely to maintain a deprecated way of adding manifest.json
     // through the --res-add option.
     if (isManifest || resFileName == std::string("manifest.json"))
@@ -535,6 +538,8 @@ ZipArchive::AddResourcesFromArchive(std::string const& archiveFileName)
         {
             if (numBytes > 1)
             {
+                // Issue 161.2: change to use mz_zip_read_is_file_a_directory() instead of checking
+                // for the format ofo the string.
                 if (archiveName[numBytes - 2] != '/') // The last character is '\0' in the array
                 {
                     if (!archivedNames.insert(archiveName).second)

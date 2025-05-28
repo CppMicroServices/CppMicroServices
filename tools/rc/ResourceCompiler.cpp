@@ -36,7 +36,12 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
+
+#ifndef __MINGW32__
 #include <filesystem>
+#else
+#include <Shlwapi.h>
+#endif
 
 #include <nowide/args.hpp>
 #include <nowide/fstream.hpp>
@@ -437,9 +442,16 @@ ZipArchive::AddResourceFile(std::string const& resFileName, bool isManifest)
 {
     std::string archiveName = resFileName;
 
+    bool pathToResIsAbsolute = false;
+#ifndef __MINGW32__
     // Issue 161.3: check to see if resFileName is relative or not, and exit early if it is not.
     std::filesystem::path pathToResFile { resFileName };
-    if (pathToResFile.is_absolute()) {
+    pathToResIsAbsolute = pathToResFile.is_absolute();
+#else
+    pathToResIsAbsolute = !PathIsRelativeA(resFileName.c_str());
+#endif
+    
+    if (pathToResIsAbsolute) {
         throw std::runtime_error("Relatvie path to resource file required. " + resFileName + " is absolute");
     }
 

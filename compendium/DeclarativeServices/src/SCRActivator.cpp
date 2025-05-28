@@ -99,6 +99,7 @@ namespace cppmicroservices
         void
         SCRActivator::Stop(cppmicroservices::BundleContext context)
         {
+            WriteLock l(notificationLock);
             try
             {
                 // remove the bundle listener
@@ -207,6 +208,7 @@ namespace cppmicroservices
         void
         SCRActivator::BundleChanged(cppmicroservices::BundleEvent const& evt)
         {
+            ReadLock l(notificationLock);
             auto bundle = evt.GetBundle();
             auto const eventType = evt.GetType();
             if (bundle == runtimeContext.GetBundle()) // skip events for this (runtime) bundle

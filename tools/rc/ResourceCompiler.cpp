@@ -541,7 +541,7 @@ ZipArchive::AddResourcesFromArchive(std::string const& archiveFileName)
                 // Issue 161.2: change to use mz_zip_read_is_file_a_directory() instead of checking
                 // for the format ofo the string.
                 // if (archiveName[numBytes - 2] != '/') // The last character is '\0' in the array
-                if (mz_zip_reader_is_file_a_directory(&currZipArchive, currZipIndex))
+                if (MZ_FALSE == mz_zip_reader_is_file_a_directory(&currZipArchive, currZipIndex))
                 {
                     if (!archivedNames.insert(archiveName).second)
                     {

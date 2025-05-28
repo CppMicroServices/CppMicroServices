@@ -36,6 +36,7 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
+#include <filesystem>
 
 #include <nowide/args.hpp>
 #include <nowide/fstream.hpp>
@@ -437,7 +438,11 @@ ZipArchive::AddResourceFile(std::string const& resFileName, bool isManifest)
     std::string archiveName = resFileName;
 
     // Issue 161.3: check to see if resFileName is relative or not, and exit early if it is not.
-    
+    std::filesystem::path pathToResFile { resFileName };
+    if (pathToResFile.is_absolute()) {
+        throw std::runtime_error("Relatvie path to resource file required. " + resFileName + " is absolute");
+    }
+
     // This check exists solely to maintain a deprecated way of adding manifest.json
     // through the --res-add option.
     if (isManifest || resFileName == std::string("manifest.json"))
@@ -539,8 +544,7 @@ ZipArchive::AddResourcesFromArchive(std::string const& archiveFileName)
             if (numBytes > 1)
             {
                 // Issue 161.2: change to use mz_zip_read_is_file_a_directory() instead of checking
-                // for the format ofo the string.
-                // if (archiveName[numBytes - 2] != '/') // The last character is '\0' in the array
+                // for the format of the string.
                 if (MZ_FALSE == mz_zip_reader_is_file_a_directory(&currZipArchive, currZipIndex))
                 {
                     if (!archivedNames.insert(archiveName).second)

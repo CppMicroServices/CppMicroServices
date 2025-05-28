@@ -37,6 +37,12 @@
 #include <utility>
 #include <vector>
 
+#ifndef __MINGW32__
+#include <filesystem>
+#else
+#include <Shlwapi.h>
+#endif
+
 #include <nowide/args.hpp>
 #include <nowide/fstream.hpp>
 
@@ -415,6 +421,7 @@ ZipArchive::AddManifestFile(Json::Value const& manifest)
     std::string styledManifestJson(manifest.toStyledString());
     std::string archiveEntry(bundleName + "/manifest.json");
 
+    // Issue 161.1: Check for file exists first and throw a more desriptive runtime error
     CheckAndAddToArchivedNames(archiveEntry);
 
     if (MZ_FALSE
@@ -433,6 +440,19 @@ void
 ZipArchive::AddResourceFile(std::string const& resFileName, bool isManifest)
 {
     std::string archiveName = resFileName;
+
+    bool pathToResIsAbsolute = false;
+#ifndef __MINGW32__
+    // Issue 161.3: check to see if resFileName is relative or not, and exit early if it is not.
+    std::filesystem::path pathToResFile { resFileName };
+    pathToResIsAbsolute = pathToResFile.is_absolute();
+#else
+    pathToResIsAbsolute = !PathIsRelativeA(resFileName.c_str());
+#endif
+    
+    if (pathToResIsAbsolute) {
+        throw std::runtime_error("Relatvie path to resource file required. " + resFileName + " is absolute");
+    }
 
     // This check exists solely to maintain a deprecated way of adding manifest.json
     // through the --res-add option.
@@ -534,7 +554,9 @@ ZipArchive::AddResourcesFromArchive(std::string const& archiveFileName)
         {
             if (numBytes > 1)
             {
-                if (archiveName[numBytes - 2] != '/') // The last character is '\0' in the array
+                // Issue 161.2: change to use mz_zip_read_is_file_a_directory() instead of checking
+                // for the format of the string.
+                if (MZ_FALSE == mz_zip_reader_is_file_a_directory(&currZipArchive, currZipIndex))
                 {
                     if (!archivedNames.insert(archiveName).second)
                     {

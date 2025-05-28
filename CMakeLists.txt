@@ -178,6 +178,11 @@ if (US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG)
   if (HAS_MISSING_BRACES_FLAG)
     add_compile_options(-Wno-missing-braces)
   endif()
+  
+  check_cxx_compiler_flag(-Wno-missing-template-arg-list-after-template-kw HAS_MISSING_TEMPLATE_KW_FLAG)
+  if (HAS_MISSING_TEMPLATE_KW_FLAG)
+    add_compile_options(-Wno-missing-template-arg-list-after-template-kw)
+  endif()
 endif()
 
 if(US_BUILD_TESTING)

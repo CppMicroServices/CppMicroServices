@@ -69,10 +69,20 @@ namespace cppmicroservices
 
             // Create configuration object notifier
             configNotifier = std::make_shared<ConfigurationNotifier>(context, logger, asyncWorkService, bundleRegistry);
+            activatorStopped = std::make_shared<bool>(false);
+            notificationLock = std::make_shared<std::shared_mutex>();
+            std::shared_ptr<bool> activatorStoppedCopy = activatorStopped;
+            std::shared_ptr<std::shared_mutex> notificationLockCopy = notificationLock;
 
             // Add bundle listener
             bundleListenerToken
-                = context.AddBundleListener(std::bind(&SCRActivator::BundleChanged, this, std::placeholders::_1));
+                = context.AddBundleListener([this, activatorStoppedCopy, notificationLockCopy] (cppmicroservices::BundleEvent const& evt) {
+                    ReadLock l(*notificationLockCopy);
+                    if (*activatorStoppedCopy){
+                        return;
+                    }
+                    this->BundleChanged(evt);
+                });
             // HACK: Workaround for lack of Bundle Tracker. Iterate over all bundles and call the tracker method
             // manually
             for (auto const& bundle : context.GetBundles())
@@ -99,7 +109,8 @@ namespace cppmicroservices
         void
         SCRActivator::Stop(cppmicroservices::BundleContext context)
         {
-            WriteLock l(notificationLock);
+            WriteLock l(*notificationLock);
+            *activatorStopped = true;
             try
             {
                 // remove the bundle listener
@@ -208,7 +219,6 @@ namespace cppmicroservices
         void
         SCRActivator::BundleChanged(cppmicroservices::BundleEvent const& evt)
         {
-            ReadLock l(notificationLock);
             auto bundle = evt.GetBundle();
             auto const eventType = evt.GetType();
             if (bundle == runtimeContext.GetBundle()) // skip events for this (runtime) bundle

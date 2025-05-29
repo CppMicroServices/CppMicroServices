@@ -81,8 +81,11 @@ namespace cppmicroservices
             cppmicroservices::ServiceRegistration<ServiceComponentRuntime> scrServiceReg;
             std::shared_ptr<ComponentRegistry> componentRegistry;
             std::shared_ptr<SCRLogger> logger;
-            std::shared_mutex notificationLock;
+
+            std::shared_ptr<std::shared_mutex> notificationLock;
+            std::shared_ptr<bool> activatorStopped;
             std::shared_ptr<SCRExtensionRegistry> bundleRegistry;
+
             ListenerToken bundleListenerToken;
             std::shared_ptr<SCRAsyncWorkService> asyncWorkService;
             cppmicroservices::ServiceRegistration<cppmicroservices::service::cm::ConfigurationListener>

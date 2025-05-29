@@ -372,13 +372,19 @@ TEST_F(ResourceCompilerTest, testManifestAdd)
     
     createDirHierarchy(tempdir, manifest_json);
 
+    std::ostringstream badcmd;
+    badcmd << rcbinpath
+        << " --bundle-name mismatched_bundle_name"
+        << " --out-file \"" << tempdir << "Example.zip\""
+        << " --manifest-add \"" << tempdir << "manifest.json\"";
+    // Test that Cmdline invocation in testManifestAdd returns 0
+    ASSERT_NE(EXIT_SUCCESS, runExecutable(badcmd.str()));
+    
     std::ostringstream cmd;
-    cmd << rcbinpath;
-    cmd << " --bundle-name "
-        << "mybundle";
-    cmd << " --out-file \"" << tempdir << "Example.zip\"";
-    cmd << " --manifest-add \"" << tempdir << "manifest.json\"";
-
+    cmd << rcbinpath
+        << " --bundle-name mybundle"
+        << " --out-file \"" << tempdir << "Example.zip\""
+        << " --manifest-add \"" << tempdir << "manifest.json\"";
     // Test that Cmdline invocation in testManifestAdd returns 0
     ASSERT_EQ(EXIT_SUCCESS, runExecutable(cmd.str()));
 

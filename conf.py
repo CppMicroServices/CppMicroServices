@@ -370,20 +370,13 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     ('doc/man/cppmicroservices.7', 'cppmicroservices', u'CppMicroServices Documentation', [author], 7),
-    ('doc/man/cppmicroservices-httpservice.7', 'cppmicroservices-httpservice', u'Http Service', [author], 7),
-    ('doc/man/cppmicroservices-webconsole.7', 'cppmicroservices-webconsole', u'Web Console', [author], 7),
-    ('doc/man/cppmicroservices-shellservice.7', 'cppmicroservices-shellservice', u'Shell Service', [author], 7),
     ('doc/man/cppmicroservices.3', 'cppmicroservices', u'CppMicroServices', [author], 3),
     ('doc/man/cppmicroservices-framework.3', 'cppmicroservices-framework', u'CppMicroServices Framework API', [author], 3),
     ('doc/man/cppmicroservices-ds.3', 'cppmicroservices-ds', u'CppMicroServices Declarative Services API', [author], 3),
     ('doc/man/cppmicroservices-configadmin.3', 'cppmicroservices-configadmin', u'CppMicroServices Configuration Admin API', [author], 3),
     ('doc/man/cppmicroservices-logservice.3', 'cppmicroservices-logservice', u'CppMicroServices Log Service API', [author], 3),
     ('doc/man/cppmicroservices-asyncworkservice.3', 'cppmicroservices-asyncworkservice', u'CppMicroServices Asynchronous Work Service API', [author], 3),
-    ('doc/man/cppmicroservices-httpservice.3', 'cppmicroservices-httpservice', u'CppMicroServices Http Service API', [author], 3),
-    ('doc/man/cppmicroservices-webconsole.3', 'cppmicroservices-webconsole', u'CppMicroServices Web Console API', [author], 3),
-    ('doc/man/cppmicroservices-shellservice.3', 'cppmicroservices-shellservice', u'CppMicroServices Shell Service API', [author], 3),
     ('doc/man/usResourceCompiler3.1', 'usResourceCompiler3', u'CppMicroServices Resource Compiler', [author], 1),
-    ('doc/man/usShell3.1', 'usShell3', u'CppMicroServices Shell', [author], 1),
 ]
 
 # If true, show URL addresses after external links.

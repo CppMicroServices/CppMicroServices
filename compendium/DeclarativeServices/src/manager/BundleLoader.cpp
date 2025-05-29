@@ -100,12 +100,12 @@ namespace cppmicroservices
             // cannot use bundle id as key because id is reused when the framework is restarted.
             // strings are not optimal but will work fine as long as a binary is not unloaded
             // from the process.
-            static bundleBinariesType BundleBinariesByFramework; // map of all frameworks to their valid bundles
+            static bundleBinariesType BundleBinariesByFramework; // map of framework id to map of bundleloc to valid bundle
             Any frameworkUUIDAny = fromBundle.GetBundleContext().GetProperty(Constants::FRAMEWORK_UUID);
             if (frameworkUUIDAny.Empty()){
                     throw SecurityException { "Framework UUID not available", fromBundle };
             } 
-            std::string frameworkUUID = any_cast<std::string>(frameworkUUIDAny); ///< map of bundle location and handle pairs
+            std::string frameworkUUID = any_cast<std::string>(frameworkUUIDAny);
 
             auto const bundleLoc = fromBundle.GetLocation();
             void* handle = nullptr;

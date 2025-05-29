@@ -1,4 +1,0 @@
-WebConsoleDefaultVariableResolver
----------------------------------
-
-.. doxygenclass:: cppmicroservices::WebConsoleDefaultVariableResolver

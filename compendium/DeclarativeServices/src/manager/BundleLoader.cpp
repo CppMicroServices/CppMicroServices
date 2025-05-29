@@ -28,7 +28,6 @@
 #include "cppmicroservices/SharedLibrary.h"
 #include "cppmicroservices/SharedLibraryException.h"
 #include "cppmicroservices/GuardedObject.h"
-#include <iostream>
 
 #include "BundleLoader.hpp"
 #include <regex>

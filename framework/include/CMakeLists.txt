@@ -62,6 +62,7 @@ set(_public_headers
   cppmicroservices/BundleTrackerCustomizer.h
   cppmicroservices/Constants.h
   cppmicroservices/GetBundleContext.h
+  cppmicroservices/GuardedObject.h
   cppmicroservices/detail/BundleTrackerPrivate.h
   cppmicroservices/detail/BundleAbstractTracked.h
   cppmicroservices/detail/BundleAbstractTracked.hpp

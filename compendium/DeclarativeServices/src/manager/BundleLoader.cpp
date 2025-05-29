@@ -27,6 +27,7 @@
 #include "cppmicroservices/Constants.h"
 #include "cppmicroservices/SharedLibrary.h"
 #include "cppmicroservices/SharedLibraryException.h"
+#include "cppmicroservices/GuardedObject.h"
 
 #include "BundleLoader.hpp"
 #include <regex>
@@ -36,6 +37,10 @@
 #    include <cerrno>
 #    include <dlfcn.h>
 #endif
+
+// map of [core bundle UUID] -> 
+//    map of [bundle location] -> handle
+using bundleBinariesType = cppmicroservices::Guarded<std::unordered_map<std::string, std::unordered_map<std::string, void*>>>;
 
 namespace cppmicroservices
 {
@@ -95,16 +100,25 @@ namespace cppmicroservices
             // cannot use bundle id as key because id is reused when the framework is restarted.
             // strings are not optimal but will work fine as long as a binary is not unloaded
             // from the process.
-            static Guarded<std::map<std::string, void*>> bundleBinaries; ///< map of bundle location and handle pairs
-            auto const bundleLoc = fromBundle.GetLocation();
+            static bundleBinariesType BundleBinariesByFramework; // map of framework id to map of bundleloc to valid bundle
+            Any frameworkUUIDAny = fromBundle.GetBundleContext().GetProperty(Constants::FRAMEWORK_UUID);
+            if (frameworkUUIDAny.Empty()){
+                    throw SecurityException { "Framework UUID not available", fromBundle };
+            } 
+            std::string frameworkUUID = any_cast<std::string>(frameworkUUIDAny);
 
+            auto const bundleLoc = fromBundle.GetLocation();
             void* handle = nullptr;
-            if (bundleBinaries.lock()->count(bundleLoc) != 0u)
             {
-                handle = bundleBinaries.lock()->at(bundleLoc);
+                auto const lockedBundleBinaries = BundleBinariesByFramework.lock();
+                // retrieve map for this framework (creating one if not already there)
+                auto const& bundleBinaries = (*lockedBundleBinaries)[frameworkUUID];
+                if (auto it = bundleBinaries.find(bundleLoc); it != std::end(bundleBinaries))
+                {
+                    handle = it->second;
+                }
             }
-            else
-            {
+            if (!handle) {
                 Any func = fromBundle.GetBundleContext().GetProperty(
                     cppmicroservices::Constants::FRAMEWORK_BUNDLE_VALIDATION_FUNC);
                 try
@@ -161,7 +175,7 @@ namespace cppmicroservices
                     throw cppmicroservices::SharedLibraryException(ex.code(), ex.what(), fromBundle);
                 }
                 handle = sh.GetHandle();
-                bundleBinaries.lock()->emplace(bundleLoc, handle);
+                BundleBinariesByFramework.lock()->at(frameworkUUID).emplace(bundleLoc, handle);
             }
 
             std::string const symbolName = std::regex_replace(compName, std::regex("::"), "_");

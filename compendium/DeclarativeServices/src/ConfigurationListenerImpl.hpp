@@ -25,7 +25,6 @@
 
 #include "SCRLogger.hpp"
 #include "cppmicroservices/cm/ConfigurationListener.hpp"
-#include "manager/ConcurrencyUtil.hpp"
 #include "manager/ConfigurationNotifier.hpp"
 
 namespace cppmicroservices

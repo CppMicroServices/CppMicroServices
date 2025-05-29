@@ -43,65 +43,6 @@ namespace cppmicroservices
             return (futObj.wait_for(std::chrono::seconds::zero()) == std::future_status::ready);
         }
 
-        /**
-         * Utility class to help developers avoid mistakes with locking data members
-         * in a class. This code is based on the Guarded idiom as described in
-         * "Mastering the C++17 STL" by Arthur O'Dwyer
-         */
-        template <class Data>
-        class Guarded
-        {
-            std::mutex mtx;
-            Data data;
-            class Handle
-            {
-                std::unique_lock<std::mutex> lk;
-                Data* ptr;
-
-              public:
-                Handle(std::unique_lock<std::mutex> lk, Data* p) : lk(std::move(lk)), ptr(p) {}
-
-                Handle(Handle const&) = delete;
-                Handle& operator=(Handle const&) = delete;
-
-                Handle(Handle&& rhs) : lk(std::move(rhs.lk)), ptr(std::move(rhs.ptr)) {}
-
-                Handle&
-                operator=(Handle&& rhs)
-                {
-                    lk = std::move(rhs.lk);
-                    ptr = std::move(rhs.ptr);
-                }
-
-                ~Handle() = default;
-
-                Data*
-                operator->() const
-                {
-                    return ptr;
-                }
-                Data&
-                operator*() const
-                {
-                    return *ptr;
-                }
-            };
-
-          public:
-            /**
-             * Locks the member mutex and returns an RAII object responsible for
-             * unlocking the mutex.
-             *
-             * \return a RAII style wrapper object used to access the data
-             */
-            Handle
-            lock()
-            {
-                std::unique_lock<std::mutex> lock(mtx);
-                return Handle { std::move(lock), &data };
-            }
-        };
-
     } // namespace scrimpl
 } // namespace cppmicroservices
 

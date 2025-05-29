@@ -24,7 +24,7 @@
 #define BUNDLEORPROTOTYPECOMPONENTCONFIGURATIONIMPL_HPP
 
 #include "ComponentConfigurationImpl.hpp"
-#include "ConcurrencyUtil.hpp"
+#include "cppmicroservices/GuardedObject.h"
 #include <cppmicroservices/ServiceFactory.h>
 
 namespace cppmicroservices
@@ -121,7 +121,7 @@ namespace cppmicroservices
              */
             void DeactivateComponentInstance(InstanceContextPair const& instCtxt);
 
-            Guarded<std::vector<InstanceContextPair>>
+            cppmicroservices::Guarded<std::vector<InstanceContextPair>>
                 compInstanceMap; ///< map of component instance and context objects associated with this configuration
         };
     } // namespace scrimpl

@@ -106,7 +106,7 @@ namespace cppmicroservices
                     throw SecurityException { "Framework UUID not available", fromBundle };
             } 
             std::string frameworkUUID = any_cast<std::string>(frameworkUUIDAny); ///< map of bundle location and handle pairs
-            std::cout << "FINDME " << frameworkUUID << std::endl;
+
             auto const bundleLoc = fromBundle.GetLocation();
             void* handle = nullptr;
             {

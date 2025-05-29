@@ -317,12 +317,6 @@ namespace cppmicroservices
         US_Framework_EXPORT extern const std::string
             FRAMEWORK_BUNDLE_VALIDATION_FUNC; // = "org.cppmicroservices.framework.bundle.validation.function"
 
-        /**
-         * Framework bundle validation property specifying a all bundles validated by this framework
-         */
-        US_Framework_EXPORT extern const std::string
-            FRAMEORK_BUNDLES_VALIDATED; // = "org.cppmicroservices.framework.bundle.validated.bundles"
-
         /*
          * Service properties.
          */

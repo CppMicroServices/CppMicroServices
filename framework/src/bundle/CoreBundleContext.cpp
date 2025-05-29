@@ -28,7 +28,6 @@ US_MSVC_DISABLE_WARNING(4355)
 
 #include "cppmicroservices/BundleInitialization.h"
 #include "cppmicroservices/Constants.h"
-#include "cppmicroservices/GuardedObject.h"
 #include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/GetBundleContext.h"
 
@@ -138,6 +137,7 @@ namespace cppmicroservices
         ss << sid_base << std::setfill('0') << std::setw(8) << std::hex << static_cast<int32_t>(id * 65536 + initCount);
 
         frameworkProperties[Constants::FRAMEWORK_UUID] = ss.str();
+
         // $TODO we only support non-persistent (main memory) storage yet
         storage = std::make_unique<BundleStorageMemory>();
         //  if (frameworkProperties[FWProps::READ_ONLY_PROP] == true)

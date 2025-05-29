@@ -419,6 +419,10 @@ ZipArchive::CheckAndAddToArchivedNames(std::string const& archiveEntry)
 void
 ZipArchive::AddManifestFile(Json::Value const& manifest)
 {
+    // Check to make sure that the bundleName passed on the command line and the
+    // bundle.symbolic_name in the manifest file match. If the bundleName is not passed in on the
+    // command line, use the name specified in the manifest. If there's a mismatch or if no
+    // bundleName is supplied in either location, it's an error.
     auto bname = manifest.get("bundle.symbolic_name", "");
     if (bname.isString()) {
         auto bnameStr = bname.asString();

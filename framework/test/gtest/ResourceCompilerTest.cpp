@@ -72,12 +72,6 @@ namespace
       protected:
         std::string rcbinpath;
         std::string tempdir;
-
-        const std::string manifest_json = R"({
-    "bundle.symbolic_name" : "main",
-    "bundle.version" : "0.1.0",
-    "bundle.activator" : true
-    })";
     };
 
     // A zip file containing only a manifest.
@@ -370,6 +364,12 @@ TEST_F(ResourceCompilerTest, testEscapePath)
 
 TEST_F(ResourceCompilerTest, testManifestAdd)
 {
+    const std::string manifest_json = R"({
+      "bundle.symbolic_name" : "mybundle",
+      "bundle.version" : "0.1.0",
+      "bundle.activator" : true
+    })";
+    
     createDirHierarchy(tempdir, manifest_json);
 
     std::ostringstream cmd;
@@ -549,10 +549,17 @@ TEST_F(ResourceCompilerTest, testZipAddTwice)
  */
 TEST_F(ResourceCompilerTest, testBundleManifestZipAdd)
 {
+    const std::string manifest_json = R"({
+      "bundle.symbolic_name" : "anotherbundle",
+      "bundle.version" : "0.1.0",
+      "bundle.activator" : true
+    })";
+    createManifestFile(tempdir, manifest_json, "manifest2.json");
+    
     std::ostringstream cmd;
     cmd << rcbinpath;
-    cmd << " --bundle-name anotherbundle ";
-    cmd << " --manifest-add \"" << tempdir << "manifest.json\" ";
+    //    cmd << " --bundle-name anotherbundle ";
+    cmd << " --manifest-add \"" << tempdir << "manifest2.json\" ";
     cmd << " --bundle-file \"" << tempdir << "sample1.dll\" ";
     cmd << " --zip-add \"" << tempdir << "tomerge.zip\" ";
     cmd << " --zip-add \"" << tempdir << "Example2.zip\"";
@@ -645,7 +652,7 @@ TEST_F(ResourceCompilerTest, testDuplicateManifestFileAdd)
 {
     std::ostringstream cmd;
     cmd << rcbinpath;
-    cmd << " --bundle-name multiple_dups ";
+    cmd << " --bundle-name mybundle ";
     cmd << " --manifest-add \"" << tempdir << "manifest.json\" ";
     cmd << " --manifest-add \"" << tempdir << "manifest.json\" ";
     cmd << " --out-file \"" << tempdir << "testDuplicateManifestFileAdd.zip\" ";
@@ -857,6 +864,7 @@ TEST_F(ResourceCompilerTest, testManifestAddWithInvalidJSON)
 
 TEST_F(ResourceCompilerTest, testUnicodeBundleFile)
 {
+  
     std::ostringstream cmd;
     cmd << rcbinpath;
     cmd << " --bundle-file \"" << tempdir << u8"ｆｏｏｂａｒ/myArchive00.zip\"";
@@ -915,13 +923,20 @@ TEST_F(ResourceCompilerTest, testUnicodeZipAdd)
 
 TEST_F(ResourceCompilerTest, testUnicodeManifestAdd)
 {
+    const std::string manifest_json = u8R"({
+      "bundle.symbolic_name" : "myunicodebundle02-V",
+      "bundle.version" : "0.1.0",
+      "bundle.activator" : true
+    })";
+    createManifestFile(tempdir, manifest_json, "manifest3.json");
+    
     auto origdir = util::GetCurrentWorkingDirectory();
     ChangeDirectory(tempdir);
     std::ostringstream cmd;
     cmd << rcbinpath;
     cmd << " --bundle-file " << u8"ｆｏｏｂａｒ/myArchive05.zip";
     cmd << " --out-file unicodeResAdd02.zip";
-    cmd << " --manifest-add " << u8"ｆｏｏｂａｒ/manifest.json";
+    cmd << " --manifest-add " << u8"manifest3.json";
     cmd << " --bundle-name myunicodebundle02";
     cmd << "-V";
 
@@ -941,6 +956,7 @@ TEST_F(ResourceCompilerTest, testManifestAddWithJSONComments)
     std::string jsonCommentSyntax(R"(
 		{ /* no, no, no. */
 		 "bundle.name": "foo",
+		 "bundle.symbolic_name": "mybundle",
 		 "bundle.version" : "1.0.2",
 		 "bundle.description" : "This bundle shouldn't have comments!",
 		 "authors" : ["John Doe", "Douglas Reynolds", "Daniel Cannady"],
@@ -948,14 +964,13 @@ TEST_F(ResourceCompilerTest, testManifestAddWithJSONComments)
 		} 
     )");
 
-    createManifestFile(tempdir, jsonCommentSyntax);
+    createManifestFile(tempdir, jsonCommentSyntax, "manifest4.json");
 
     std::ostringstream cmd;
     cmd << rcbinpath;
-    cmd << " --bundle-name "
-        << "mybundle";
+    cmd << " --bundle-name mybundle";
     cmd << " --out-file \"" << tempdir << "json_comment_syntax.zip\"";
-    cmd << " --manifest-add \"" << tempdir << "manifest.json\"";
+    cmd << " --manifest-add \"" << tempdir << "manifest4.json\"";
     // Test embedding a manifest containing JSON comments.
     ASSERT_EQ(EXIT_SUCCESS, runExecutable(cmd.str()));
 }
@@ -1320,7 +1335,8 @@ TEST_F(ResourceCompilerTest, testMultipleManifestConcatenation)
 TEST_F(ResourceCompilerTest, testManifestWithNullTerminator)
 {
     const std::string manifest_json = R"({
-    "test" : { 
+    "bundle.symbolic_name" : "main",
+    "test" : {
         "bar" : "baz\\0bar",
         "foo\\0bar" : [1, 2, 5, 7]
     }})";

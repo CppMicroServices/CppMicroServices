@@ -138,7 +138,6 @@ namespace cppmicroservices
         ss << sid_base << std::setfill('0') << std::setw(8) << std::hex << static_cast<int32_t>(id * 65536 + initCount);
 
         frameworkProperties[Constants::FRAMEWORK_UUID] = ss.str();
-        frameworkProperties[Constants::FRAMEORK_BUNDLES_VALIDATED] = std::make_shared<cppmicroservices::Guarded<std::map<std::string, void*>>>();
         // $TODO we only support non-persistent (main memory) storage yet
         storage = std::make_unique<BundleStorageMemory>();
         //  if (frameworkProperties[FWProps::READ_ONLY_PROP] == true)

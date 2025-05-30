@@ -74,8 +74,10 @@ namespace cppmicroservices
 
             // Add bundle listener
             bundleListenerToken
-                = context.AddBundleListener([this, activatorStoppedCopy = activatorStopped, notificationLockCopy = notificationLock] (cppmicroservices::BundleEvent const& evt) {                    ReadLock l(*notificationLockCopy);
-                    if (*activatorStoppedCopy){
+                = context.AddBundleListener([this, activatorStoppedCopy = activatorStopped, notificationLockCopy = notificationLock](cppmicroservices::BundleEvent
+                    const& evt) {
+                    ReadLock l(*notificationLockCopy);
+                    if (*activatorStoppedCopy) {
                         return;
                     }
                     this->BundleChanged(evt);

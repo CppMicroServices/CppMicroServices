@@ -1,4 +1,0 @@
-ShellService
-------------
-
-.. doxygenclass:: cppmicroservices::ShellService

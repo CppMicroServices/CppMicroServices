@@ -71,13 +71,10 @@ namespace cppmicroservices
             configNotifier = std::make_shared<ConfigurationNotifier>(context, logger, asyncWorkService, bundleRegistry);
             activatorStopped = std::make_shared<bool>(false);
             notificationLock = std::make_shared<std::shared_mutex>();
-            std::shared_ptr<bool> activatorStoppedCopy = activatorStopped;
-            std::shared_ptr<std::shared_mutex> notificationLockCopy = notificationLock;
 
             // Add bundle listener
             bundleListenerToken
-                = context.AddBundleListener([this, activatorStoppedCopy, notificationLockCopy] (cppmicroservices::BundleEvent const& evt) {
-                    ReadLock l(*notificationLockCopy);
+                = context.AddBundleListener([this, activatorStoppedCopy = activatorStopped, notificationLockCopy = notificationLock] (cppmicroservices::BundleEvent const& evt) {                    ReadLock l(*notificationLockCopy);
                     if (*activatorStoppedCopy){
                         return;
                     }

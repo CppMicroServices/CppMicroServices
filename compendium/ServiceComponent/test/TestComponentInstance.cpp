@@ -295,7 +295,9 @@ namespace
         MOCK_METHOD1(DisableComponent, void(std::string const&));
         MOCK_CONST_METHOD2(LocateServices, std::vector<std::shared_ptr<void>>(std::string const&, std::string const&));
         MOCK_CONST_METHOD2(LocateService, std::shared_ptr<void>(std::string const&, std::string const&));
+        MOCK_CONST_METHOD2(LocateService, std::shared_ptr<void>(std::string const&, cppmicroservices::ServiceReferenceBase const&));
     };
+    using ::testing::An;
 
     /**
      * This test point is used to verify the ComponentInstanceImpl works properly
@@ -310,8 +312,11 @@ namespace
         auto compObj = compInstance.GetInstance();
         ASSERT_FALSE(compObj);
         auto mockContext = std::make_shared<MockComponentContext>();
-        EXPECT_CALL(*(mockContext.get()), LocateService(testing::_, testing::_))
-            .Times(0); // ensure the mock context never gets a call to LocateService
+
+        EXPECT_CALL(*mockContext, LocateService(An<const std::string&>(), An<const cppmicroservices::ServiceReferenceBase&>()))
+            .Times(0);
+        EXPECT_CALL(*mockContext, LocateService(An<const std::string&>(), An<const std::string&>()))
+            .Times(0);
         compInstance.CreateInstance(mockContext);
         compInstance.BindReferences(mockContext);
         compObj = compInstance.GetInstance();
@@ -329,8 +334,10 @@ namespace
         auto compObj = compInstance.GetInstance();
         ASSERT_FALSE(compObj);
         auto mockContext = std::make_shared<MockComponentContext>();
-        EXPECT_CALL(*(mockContext.get()), LocateService(testing::_, testing::_))
-            .Times(0); // ensure the mock context never gets a call to LocateService
+        EXPECT_CALL(*mockContext, LocateService(An<const std::string&>(), An<const cppmicroservices::ServiceReferenceBase&>()))
+            .Times(0);
+        EXPECT_CALL(*mockContext, LocateService(An<const std::string&>(), An<const std::string&>()))
+            .Times(0);
         compInstance.CreateInstance(mockContext);
         compInstance.BindReferences(mockContext);
         compObj = compInstance.GetInstance();
@@ -344,8 +351,10 @@ namespace
     {
         ComponentInstanceImpl<TestServiceImplWithDefaultCtor, std::tuple<TestServiceInterface1>> compInstance;
         auto mockContext = std::make_shared<MockComponentContext>();
-        EXPECT_CALL(*(mockContext.get()), LocateService(testing::_, testing::_))
-            .Times(0); // ensure the mock context never gets a call to LocateService
+        EXPECT_CALL(*mockContext, LocateService(An<const std::string&>(), An<const cppmicroservices::ServiceReferenceBase&>()))
+            .Times(0);
+        EXPECT_CALL(*mockContext, LocateService(An<const std::string&>(), An<const std::string&>()))
+            .Times(0);
         compInstance.CreateInstance(mockContext);
         ASSERT_EQ(compInstance.GetInstance()->defCon(), true);
 
@@ -366,8 +375,10 @@ namespace
         ASSERT_EQ(iMap->size(), size_t(1));
         ASSERT_EQ(iMap->count(us_service_interface_iid<TestServiceInterface1>()), size_t(1));
         auto mockContext = std::make_shared<MockComponentContext>();
-        EXPECT_CALL(*(mockContext.get()), LocateService(testing::_, testing::_))
-            .Times(0); // ensure the mock context never gets a call to LocateService
+        EXPECT_CALL(*mockContext, LocateService(An<const std::string&>(), An<const cppmicroservices::ServiceReferenceBase&>()))
+            .Times(0);
+        EXPECT_CALL(*mockContext, LocateService(An<const std::string&>(), An<const std::string&>()))
+            .Times(0);
         compInstance.CreateInstance(mockContext);
         compInstance.BindReferences(mockContext);
         auto compObj = compInstance.GetInstance();
@@ -385,8 +396,10 @@ namespace
         ASSERT_EQ(iMap->size(), size_t(1));
         ASSERT_EQ(iMap->count(us_service_interface_iid<TestServiceInterface1>()), size_t(1));
         auto mockContext = std::make_shared<MockComponentContext>();
-        EXPECT_CALL(*(mockContext.get()), LocateService(testing::_, testing::_))
-            .Times(0); // ensure the mock context never gets a call to LocateService
+        EXPECT_CALL(*mockContext, LocateService(An<const std::string&>(), An<const cppmicroservices::ServiceReferenceBase&>()))
+            .Times(0);
+        EXPECT_CALL(*mockContext, LocateService(An<const std::string&>(), An<const std::string&>()))
+            .Times(0);
         compInstance.CreateInstance(mockContext);
         compInstance.BindReferences(mockContext);
         auto compObj = compInstance.GetInstance();
@@ -410,8 +423,10 @@ namespace
         ASSERT_EQ(iMap->count(us_service_interface_iid<TestServiceInterface1>()), size_t(1));
         ASSERT_EQ(iMap->count(us_service_interface_iid<TestServiceInterface2>()), size_t(1));
         auto mockContext = std::make_shared<MockComponentContext>();
-        EXPECT_CALL(*(mockContext.get()), LocateService(testing::_, testing::_))
-            .Times(0); // ensure the mock context never gets a call to LocateService
+        EXPECT_CALL(*mockContext, LocateService(An<const std::string&>(), An<const cppmicroservices::ServiceReferenceBase&>()))
+            .Times(0);
+        EXPECT_CALL(*mockContext, LocateService(An<const std::string&>(), An<const std::string&>()))
+            .Times(0);
         compInstance.CreateInstance(mockContext);
         compInstance.BindReferences(mockContext);
         auto compObj = compInstance.GetInstance();
@@ -430,8 +445,10 @@ namespace
         ASSERT_EQ(iMap->count(us_service_interface_iid<TestServiceInterface1>()), size_t(1));
         ASSERT_EQ(iMap->count(us_service_interface_iid<TestServiceInterface2>()), size_t(1));
         auto mockContext = std::make_shared<MockComponentContext>();
-        EXPECT_CALL(*(mockContext.get()), LocateService(testing::_, testing::_))
-            .Times(0); // ensure the mock context never gets a call to LocateService
+        EXPECT_CALL(*mockContext, LocateService(An<const std::string&>(), An<const cppmicroservices::ServiceReferenceBase&>()))
+            .Times(0);
+        EXPECT_CALL(*mockContext, LocateService(An<const std::string&>(), An<const std::string&>()))
+            .Times(0);
         compInstance.CreateInstance(mockContext);
         compInstance.BindReferences(mockContext);
         auto compObj = compInstance.GetInstance();
@@ -492,14 +509,13 @@ namespace
         ASSERT_TRUE(compObj->GetFoo());
         ASSERT_TRUE(compObj->GetBar());
 
-        EXPECT_THROW(compInstance.InvokeBindMethod("foo", fc.GetServiceReference<ServiceDependency1>()),
-                     std::out_of_range);
-        EXPECT_THROW(compInstance.InvokeBindMethod("bar", fc.GetServiceReference<ServiceDependency2>()),
-                     std::out_of_range);
-        EXPECT_THROW(compInstance.InvokeUnbindMethod("foo", fc.GetServiceReference<ServiceDependency1>()),
-                     std::out_of_range);
-        EXPECT_THROW(compInstance.InvokeUnbindMethod("bar", fc.GetServiceReference<ServiceDependency2>()),
-                     std::out_of_range);
+        auto s1 = fc.GetService<ServiceDependency1>(fc.GetServiceReference<ServiceDependency1>());
+        auto s2 = fc.GetService<ServiceDependency2>(fc.GetServiceReference<ServiceDependency2>());
+
+        EXPECT_THROW(compInstance.InvokeBindMethod("foo", s1), std::out_of_range);
+        EXPECT_THROW(compInstance.InvokeBindMethod("bar", s2), std::out_of_range);
+        EXPECT_THROW(compInstance.InvokeUnbindMethod("foo", s1), std::out_of_range);
+        EXPECT_THROW(compInstance.InvokeUnbindMethod("bar", s2), std::out_of_range);
 
         f.Stop();
         f.WaitForStop(std::chrono::milliseconds::zero());
@@ -566,13 +582,13 @@ namespace
         // ensure only dynamic dependencies can be re-bound.
         // The runtime calls the wrapper object with the name of the reference and the ServiceReference object to use
         // for binding.
-        EXPECT_THROW(compInstance.InvokeUnbindMethod("bar", fc.GetServiceReference<ServiceDependency2>()),
-                     std::out_of_range);
-        EXPECT_THROW(compInstance.InvokeBindMethod("bar", fc.GetServiceReference<ServiceDependency2>()),
-                     std::out_of_range);
-        EXPECT_NO_THROW(compInstance.InvokeUnbindMethod("foo", fc.GetServiceReference<ServiceDependency1>()));
+        auto s1 = fc.GetService<ServiceDependency1>(fc.GetServiceReference<ServiceDependency1>());
+        auto s2 = fc.GetService<ServiceDependency2>(fc.GetServiceReference<ServiceDependency2>());
+        EXPECT_THROW(compInstance.InvokeUnbindMethod("bar", s2), std::out_of_range);
+        EXPECT_THROW(compInstance.InvokeBindMethod("bar", s2), std::out_of_range);
+        EXPECT_NO_THROW(compInstance.InvokeUnbindMethod("foo", s1));
         ASSERT_EQ(compObj->GetFoo(), nullptr);
-        EXPECT_NO_THROW(compInstance.InvokeBindMethod("foo", fc.GetServiceReference<ServiceDependency1>()));
+        EXPECT_NO_THROW(compInstance.InvokeBindMethod("foo", s1));
         ASSERT_NE(compObj->GetFoo(), nullptr);
 
         f.Stop();
@@ -625,9 +641,12 @@ namespace
         auto f = cppmicroservices::FrameworkFactory().NewFramework();
         f.Start();
         auto fc = f.GetBundleContext();
-        auto reg = fc.RegisterService<ServiceDependency1>(std::make_shared<ServiceDependency1>());
-        auto reg1 = fc.RegisterService<ServiceDependency2>(std::make_shared<ServiceDependency2>());
-        auto reg2 = fc.RegisterService<ServiceDependency3>(std::make_shared<ServiceDependency3>());
+        auto s1 = std::make_shared<ServiceDependency1>();
+        auto s2 = std::make_shared<ServiceDependency2>();
+        auto s3 = std::make_shared<ServiceDependency3>();
+        auto reg = fc.RegisterService<ServiceDependency1>(s1);
+        auto reg1 = fc.RegisterService<ServiceDependency2>(s2);
+        auto reg2 = fc.RegisterService<ServiceDependency3>(s3);
 
         ComponentInstanceImpl<TestServiceImpl2,
                               std::tuple<>,
@@ -693,18 +712,12 @@ namespace
         ASSERT_TRUE(compObj->GetDep2());
         ASSERT_TRUE(compObj->GetDep3().size() > 0);
 
-        EXPECT_THROW(compInstance.InvokeBindMethod("dep1", fc.GetServiceReference<ServiceDependency1>()),
-                     std::out_of_range);
-        EXPECT_THROW(compInstance.InvokeBindMethod("dep2", fc.GetServiceReference<ServiceDependency2>()),
-                     std::out_of_range);
-        EXPECT_THROW(compInstance.InvokeBindMethod("dep3", fc.GetServiceReference<ServiceDependency2>()),
-                     std::out_of_range);
-        EXPECT_THROW(compInstance.InvokeUnbindMethod("dep1", fc.GetServiceReference<ServiceDependency1>()),
-                     std::out_of_range);
-        EXPECT_THROW(compInstance.InvokeUnbindMethod("dep2", fc.GetServiceReference<ServiceDependency2>()),
-                     std::out_of_range);
-        EXPECT_THROW(compInstance.InvokeUnbindMethod("dep3", fc.GetServiceReference<ServiceDependency2>()),
-                     std::out_of_range);
+        EXPECT_THROW(compInstance.InvokeBindMethod("dep1", s1), std::out_of_range);
+        EXPECT_THROW(compInstance.InvokeBindMethod("dep2", s2), std::out_of_range);
+        EXPECT_THROW(compInstance.InvokeBindMethod("dep3", s2), std::out_of_range);
+        EXPECT_THROW(compInstance.InvokeUnbindMethod("dep1", s1), std::out_of_range);
+        EXPECT_THROW(compInstance.InvokeUnbindMethod("dep2", s2), std::out_of_range);
+        EXPECT_THROW(compInstance.InvokeUnbindMethod("dep3", s2), std::out_of_range);
 
         f.Stop();
         f.WaitForStop(std::chrono::milliseconds::zero());
@@ -794,17 +807,21 @@ namespace
         // ensure only dynamic dependencies can be re-bound.
         // The runtime calls the wrapper object with the name of the reference and the ServiceReference object to use
         // for binding.
-        EXPECT_THROW(compInstance.InvokeUnbindMethod("dep1", fc.GetServiceReference<ServiceDependency1>()),
-                     std::out_of_range);
-        EXPECT_THROW(compInstance.InvokeBindMethod("dep1", fc.GetServiceReference<ServiceDependency1>()),
-                     std::out_of_range);
-        EXPECT_THROW(compInstance.InvokeUnbindMethod("dep2", fc.GetServiceReference<ServiceDependency2>()),
-                     std::out_of_range);
-        EXPECT_THROW(compInstance.InvokeBindMethod("dep2", fc.GetServiceReference<ServiceDependency2>()),
-                     std::out_of_range);
-        EXPECT_NO_THROW(compInstance.InvokeUnbindMethod("dep3", fc.GetServiceReference<ServiceDependency3>()));
+        auto sRef = fc.GetServiceReference<ServiceDependency1>();
+        auto s = fc.GetService<ServiceDependency1>(sRef);
+        EXPECT_THROW(compInstance.InvokeUnbindMethod("dep1", s), std::out_of_range);
+        EXPECT_THROW(compInstance.InvokeBindMethod("dep1", s), std::out_of_range);
+
+        sRef = fc.GetServiceReference<ServiceDependency2>();
+        auto s2 = fc.GetService<ServiceDependency2>(sRef);
+        EXPECT_THROW(compInstance.InvokeUnbindMethod("dep2", s2), std::out_of_range);
+        EXPECT_THROW(compInstance.InvokeBindMethod("dep2", s2), std::out_of_range);
+
+        sRef = fc.GetServiceReference<ServiceDependency3>();
+        auto s3 = fc.GetService<ServiceDependency3>(sRef);
+        EXPECT_NO_THROW(compInstance.InvokeUnbindMethod("dep3", s3));
         ASSERT_EQ(compObj->GetDep3().size(), 0);
-        EXPECT_NO_THROW(compInstance.InvokeBindMethod("dep3", fc.GetServiceReference<ServiceDependency3>()));
+        EXPECT_NO_THROW(compInstance.InvokeBindMethod("dep3", s3));
         ASSERT_EQ(compObj->GetDep3().size(), 1);
 
         f.Stop();

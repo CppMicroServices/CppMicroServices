@@ -37,7 +37,7 @@ add_compile_definitions(BOOST_DATE_TIME_NO_LIB)
 add_compile_definitions(BOOST_REGEX_NO_LIB)
 
 usMacroCreateBundle(ConfigurationAdmin
-  VERSION "1.3.9"
+  VERSION "1.3.11"
   DEPENDS Framework
   TARGET ConfigurationAdmin
   SYMBOLIC_NAME configuration_admin

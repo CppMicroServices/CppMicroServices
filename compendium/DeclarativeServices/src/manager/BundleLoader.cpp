@@ -113,7 +113,7 @@ namespace cppmicroservices
                         && !any_cast<std::function<bool(cppmicroservices::Bundle const&)>>(func)(fromBundle))
                     {
                         std::string errMsg("Bundle at location " + bundleLoc + " failed bundle validation.");
-                        throw SecurityException{ std::move(errMsg), fromBundle };
+                        throw SecurityException { std::move(errMsg), fromBundle };
                     }
                 }
                 catch (cppmicroservices::SecurityException const&)
@@ -122,7 +122,7 @@ namespace cppmicroservices
                 }
                 catch (...)
                 {
-                    throw SecurityException { "The bundle validation callback threw an exception", fromBundle};
+                    throw SecurityException { "The bundle validation callback threw an exception", fromBundle };
                 }
 
                 SharedLibrary sh(bundleLoc);
@@ -136,12 +136,13 @@ namespace cppmicroservices
 
                     sh.Load(any_cast<int>(opts));
 
-                    // Message timestamps are used for approximately measuring the time it takes to load the library file
+                    // Message timestamps are used for approximately measuring the time it takes to load the library
+                    // file
                     logger->Log(logservice::SeverityLevel::LOG_INFO,
                                 "Finished loading shared library for Bundle #" + ToString(fromBundle.GetBundleId())
                                     + " (location=" + bundleLoc + ")");
 
-                    const std::string fname_setcontext = US_STR(US_SET_CTX_PREFIX) + fromBundle.GetSymbolicName();
+                    std::string const fname_setcontext = US_STR(US_SET_CTX_PREFIX) + fromBundle.GetSymbolicName();
                     void* setcontext_addr = fromBundle.GetSymbol(sh.GetHandle(), fname_setcontext);
                     SetBundleContextFn setcontext = reinterpret_cast<void (*)(BundleContextPrivate*)>(setcontext_addr);
                     if (setcontext)
@@ -163,9 +164,9 @@ namespace cppmicroservices
                 bundleBinaries.lock()->emplace(bundleLoc, handle);
             }
 
-            const std::string symbolName = std::regex_replace(compName, std::regex("::"), "_");
-            const std::string newInstanceFuncName("NewInstance_" + symbolName);
-            const std::string deleteInstanceFuncName("DeleteInstance_" + symbolName);
+            std::string const symbolName = std::regex_replace(compName, std::regex("::"), "_");
+            std::string const newInstanceFuncName("NewInstance_" + symbolName);
+            std::string const deleteInstanceFuncName("DeleteInstance_" + symbolName);
 
             void* newsym = fromBundle.GetSymbol(handle, newInstanceFuncName);
             void* delsym = fromBundle.GetSymbol(handle, deleteInstanceFuncName);

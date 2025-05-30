@@ -57,14 +57,14 @@ general compiles out of the box.
 
      USE_PLIST
      Enables property lists (not Standard Scheme stuff). Off by default.
-
+     
      USE_NO_FEATURES
      Shortcut to disable USE_MATH, USE_CHAR_CLASSIFIERS, USE_ASCII_NAMES,
      USE_STRING_PORTS, USE_ERROR_HOOK, USE_TRACING, USE_COLON_HOOK,
      USE_DL.
 
      USE_SCHEME_STACK
-     Enables 'cons' stack (the alternative is a faster calling scheme, which
+     Enables 'cons' stack (the alternative is a faster calling scheme, which 
      breaks continuations). Undefine it if you don't care about strict compatibility
      but you do care about faster execution.
 
@@ -85,7 +85,7 @@ tinyscheme-1.32-new/dynload.c
 24c24
 < #define SUN_DL
 ---
->
+> 
 Only in tinyscheme-1.32-new/: dynload.o
 Only in tinyscheme-1.32-new/: libtinyscheme.a Only in tinyscheme-1.32-new/: libtinyscheme.so diff -r tinyscheme-1.32/makefile tinyscheme-1.32-new/makefile
 33,34c33,43
@@ -97,7 +97,7 @@ Only in tinyscheme-1.32-new/: libtinyscheme.a Only in tinyscheme-1.32-new/: libt
 > #DEBUG=-g -Wno-char-subscripts -O
 > #SYS_LIBS= -ldl
 > #PLATFORM_FEATURES= -DSUN_DL=1
->
+> 
 > # Mac OS X
 > CC = gcc
 > CFLAGS = -I/usr/local/fink/include
@@ -114,7 +114,7 @@ $(DL_FLAGS) $<
 >       $(CC) $(CFLAGS) -I. -c $(DEBUG)
 $(FEATURES) $(DL_FLAGS) $<
 66c75
-<       $(CC) -o $@ $(DEBUG) $(OBJS) $(SYS_LIBS)
+<       $(CC) -o $@ $(DEBUG) $(OBJS) $(SYS_LIBS) 
 ---
 >       $(CC) $(LDFLAGS) -o $@ $(DEBUG) $(OBJS)
 $(SYS_LIBS)

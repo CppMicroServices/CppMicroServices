@@ -165,12 +165,12 @@ namespace cppmicroservices
             EXPECT_NO_THROW({
                 SCRBundleExtension bundleExt = SCRBundleExtension(GetFramework(), mockRegistry, fakeLogger, notifier);
                 bundleExt.Initialize(scr, asyncWorkService);
-                EXPECT_EQ(bundleExt.managers->size(), 0u);
+                EXPECT_EQ(bundleExt.managers.size(), 0u);
             });
             EXPECT_NO_THROW({
                 SCRBundleExtension bundleExt(GetFramework(), mockRegistry, fakeLogger, notifier);
                 bundleExt.Initialize(scr, asyncWorkService);
-                EXPECT_EQ(bundleExt.managers->size(), 1u);
+                EXPECT_EQ(bundleExt.managers.size(), 1u);
             });
         }
 

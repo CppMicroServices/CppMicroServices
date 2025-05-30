@@ -2,21 +2,123 @@
     "bundle.symbolic_name" : "TestBundleDSFAC1",
     "scr" : {
         "version" : 1,
-         "components" : [{
-            "enabled" : true,
-            "immediate": false,
-            "implementation-class": "sample::ServiceAImpl",
-            "configuration-policy" : "require",
-            "configuration-pid" : ["ServiceA"],
-            "factory" : "ServiceA Factory",
-            "inject-references" : true,
-            "references":[{
-                "name": "ServiceB",
-                "interface" : "test::ServiceBInt"
-            }],
-            "service": {
-                "interfaces": ["test::ServiceAInt"]
+        "components" : [
+            {
+                "enabled" : true,
+                "immediate": false,
+                "implementation-class": "sample::ServiceAImpl",
+                "configuration-policy" : "require",
+                "configuration-pid" : ["ServiceA"],
+                "factory" : "ServiceA Factory",
+                "inject-references" : true,
+                "references":[{
+                    "name": "ServiceB",
+                    "interface" : "test::ServiceBInt"
+                }],
+                "service": {
+                    "interfaces": ["test::ServiceAInt"]
+                }
+            },
+            {
+                "enabled" : true,
+                "immediate": true,
+                "implementation-class": "sample::ServiceAImpl2",
+                "configuration-policy" : "require",
+                "configuration-pid" : ["ServiceA2"],
+                "factory" : "ServiceA2 Factory",
+                "inject-references" : true,
+                "references":[{
+                    "name": "ServiceB",
+                    "interface" : "test::ServiceBInt"
+                }],
+                "service": {
+                    "interfaces": ["test::ServiceAInt"]
+                }
+            },
+            {
+                "enabled" : true,
+                "immediate": true,
+                "implementation-class": "sample::ServiceAImpl3",
+                "configuration-policy" : "require",
+                "configuration-pid" : ["ServiceA3"],
+                "factory" : "ServiceA3 Factory",
+                "inject-references" : true,
+                "references":[{
+                    "name": "ServiceC",
+                    "interface" : "test::ServiceCInt"
+                }],
+                "service": {
+                    "interfaces": ["test::ServiceAInt"]
+                }
+            },
+            {
+                "enabled" : true,
+                "immediate": true,
+                "implementation-class": "sample::ServiceAImpl4",
+                "configuration-policy" : "require",
+                "configuration-pid" : ["ServiceA4"],
+                "factory" : "ServiceA4 Factory",
+                "inject-references" : true,
+                "references":[{
+                    "name": "ServiceB",
+                    "interface" : "test::ServiceBInt",
+                    "target": "(ServiceBId={{valueFromConfig}})"
+                }],
+                "service": {
+                    "interfaces": ["test::ServiceAInt"]
+                }
+            },
+            {
+                "enabled" : true,
+                "immediate": true,
+                "implementation-class": "sample::ServiceAImpl5",
+                "configuration-policy" : "require",
+                "configuration-pid" : ["sharedConfiguration"],
+                "factory" : "ServiceA5 Factory",
+                "inject-references" : true,
+                "references":[{
+                    "name": "ServiceB",
+                    "interface" : "test::ServiceBInt",
+                    "target": "(sharedConfigurationKey={{sharedConfigurationKey}})"
+                }],
+                "service": {
+                    "interfaces": ["test::ServiceAInt"]
+                }
+            },
+            {
+                "enabled" : true,
+                "immediate": true,
+                "implementation-class": "sample::ServiceBImpl3",
+                "configuration-policy" : "require",
+                "factory" : "ServiceB3 Factory",
+                "configuration-pid" : ["sharedConfiguration"],
+                "service": {
+                    "interfaces": ["test::ServiceBInt"],
+                    "scope" : "singleton"
+                }
+            },
+            {
+                "enabled" : true,
+                "immediate": true,
+                "implementation-class": "sample::ServiceBImpl2",
+                "configuration-policy" : "require",
+                "configuration-pid" : ["scopetestpid"],
+                "service": {
+                    "interfaces": ["test::ServiceBInt"],
+                    "scope" : "singleton"
+                }
+            },
+            {
+                "enabled" : true,
+                "immediate": true,
+                "implementation-class": "sample::ServiceCImpl2",
+                "configuration-policy" : "require",
+                "configuration-pid" : ["scopetestpid"],
+                "service": {
+                    "interfaces": ["test::ServiceCInt"],
+                    "scope" : "prototype"
+                }
             }
-        }]
+        ]
     }
 }

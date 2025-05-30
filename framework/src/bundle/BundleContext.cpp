@@ -78,7 +78,11 @@ namespace cppmicroservices
         return *this ? (rhs ? (d < rhs.d) : true) : false;
     }
 
-    BundleContext::operator bool() const { return d && d->IsValid(); }
+    BundleContext::
+    operator bool() const
+    {
+        return d && d->IsValid();
+    }
 
     BundleContext&
     BundleContext::operator=(std::nullptr_t)
@@ -243,7 +247,6 @@ namespace cppmicroservices
 
         d->CheckValid();
         auto b = GetAndCheckBundlePrivate(d);
-
         auto serviceHolder = new ServiceHolder<void>(b, reference, reference.d.Load()->GetService(b.get()), nullptr);
         std::shared_ptr<ServiceHolder<void>> h(serviceHolder, CustomServiceDeleter { serviceHolder });
         return std::shared_ptr<void>(h, h->service.get());

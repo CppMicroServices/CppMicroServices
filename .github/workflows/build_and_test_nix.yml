@@ -41,8 +41,8 @@ jobs:
         CXX: g++-11
 
   linux_clang_build:
-    name: Build and Test [ubuntu-20.04, Supported Clang]
-    runs-on: ubuntu-20.04
+    name: Build and Test [ubuntu-22.04, Supported Clang]
+    runs-on: ubuntu-22.04
     env:
       BUILD_CONFIGURATION: 0
       WITH_COVERAGE: 0

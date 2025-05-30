@@ -143,11 +143,10 @@ namespace cppmicroservices
                               cppmicroservices::logservice::SeverityLevel,
                               std::string const&,
                               std::exception_ptr const));
-	    MOCK_CONST_METHOD1(getLogger,
-                     std::shared_ptr<cppmicroservices::logservice::Logger>(const std::string&));
-	    MOCK_CONST_METHOD2(getLogger,
-                     std::shared_ptr<cppmicroservices::logservice::Logger>(const cppmicroservices::Bundle&, const std::string&));
-
+            MOCK_CONST_METHOD1(getLogger, std::shared_ptr<cppmicroservices::logservice::Logger>(std::string const&));
+            MOCK_CONST_METHOD2(getLogger,
+                               std::shared_ptr<cppmicroservices::logservice::Logger>(cppmicroservices::Bundle const&,
+                                                                                     std::string const&));
         };
 
 #ifdef _MSC_VER
@@ -180,13 +179,13 @@ namespace cppmicroservices
                 std::exception_ptr const) override
             {
             }
-	    [[nodiscard]] std::shared_ptr<cppmicroservices::logservice::Logger> 
-	    getLogger(const std::string&) const override
-	    {
-		return nullptr;
-	    }
-	    [[nodiscard]] std::shared_ptr<cppmicroservices::logservice::Logger>
-            getLogger(const cppmicroservices::Bundle&, const std::string&) const override
+            [[nodiscard]] std::shared_ptr<cppmicroservices::logservice::Logger>
+            getLogger(std::string const&) const override
+            {
+                return nullptr;
+            }
+            [[nodiscard]] std::shared_ptr<cppmicroservices::logservice::Logger>
+            getLogger(cppmicroservices::Bundle const&, std::string const&) const override
             {
                 return nullptr;
             }
@@ -324,8 +323,8 @@ namespace cppmicroservices
             MOCK_METHOD0(Activate, void(void));
             MOCK_METHOD0(Deactivate, void(void));
             MOCK_METHOD0(Modified, void(void));
-            MOCK_METHOD2(InvokeUnbindMethod, void(std::string const&, cppmicroservices::ServiceReferenceBase const&));
-            MOCK_METHOD2(InvokeBindMethod, void(std::string const&, cppmicroservices::ServiceReferenceBase const&));
+            MOCK_METHOD2(InvokeUnbindMethod, void(std::string const&, std::shared_ptr<void>));
+            MOCK_METHOD2(InvokeBindMethod, void(std::string const&, std::shared_ptr<void>));
             MOCK_METHOD0(GetInterfaceMap, cppmicroservices::InterfaceMapPtr(void));
             MOCK_METHOD0(DoesModifiedMethodExist, bool(void));
         };
@@ -341,6 +340,7 @@ namespace cppmicroservices
             MOCK_METHOD1(DisableComponent, void(std::string const&));
             MOCK_CONST_METHOD0(GetServiceReference, cppmicroservices::ServiceReferenceBase(void));
             MOCK_CONST_METHOD2(LocateService, std::shared_ptr<void>(std::string const&, std::string const&));
+            MOCK_CONST_METHOD2(LocateService, std::shared_ptr<void>(std::string const&, cppmicroservices::ServiceReferenceBase const&));
             MOCK_CONST_METHOD2(LocateServices,
                                std::vector<std::shared_ptr<void>>(std::string const&, std::string const&));
         };

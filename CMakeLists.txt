@@ -178,6 +178,11 @@ if (US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG)
   if (HAS_MISSING_BRACES_FLAG)
     add_compile_options(-Wno-missing-braces)
   endif()
+  
+  check_cxx_compiler_flag(-Wno-missing-template-arg-list-after-template-kw HAS_MISSING_TEMPLATE_KW_FLAG)
+  if (HAS_MISSING_TEMPLATE_KW_FLAG)
+    add_compile_options(-Wno-missing-template-arg-list-after-template-kw)
+  endif()
 endif()
 
 if(US_BUILD_TESTING)
@@ -692,7 +697,6 @@ endif()
 #-----------------------------------------------------------------------------
 # Compile libraries here if you do not want -Werror or /WX on
 #-----------------------------------------------------------------------------
-add_subdirectory(third_party/absl)
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared libraries" FORCE)
 add_subdirectory(third_party/boost/nowide)
 set(BUILD_SHARED_LIBS ${_us_build_shared} CACHE BOOL "Build shared libraries" FORCE)
@@ -898,9 +902,6 @@ export(TARGETS ${US_RCC_EXECUTABLE_TARGET}
 
 add_subdirectory(util)
 add_subdirectory(framework)
-add_subdirectory(httpservice)
-add_subdirectory(webconsole)
-add_subdirectory(shellservice)
 
 # Declarative Services requires threading to function.
 # Static linkage is not yet supported for declarative services.
@@ -910,7 +911,6 @@ else()
   add_subdirectory(compendium/LogService)
 endif()
 
-add_subdirectory(tools/shell)
 
 #-----------------------------------------------------------------------------
 # Documentation

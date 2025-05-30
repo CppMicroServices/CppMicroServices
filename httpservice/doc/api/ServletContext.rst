@@ -1,4 +1,0 @@
-ServletContext
---------------
-
-.. doxygenclass:: cppmicroservices::ServletContext

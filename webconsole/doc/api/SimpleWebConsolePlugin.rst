@@ -1,4 +1,0 @@
-SimpleWebConsolePlugin
-----------------------
-
-.. doxygenclass:: cppmicroservices::SimpleWebConsolePlugin

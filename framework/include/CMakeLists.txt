@@ -13,7 +13,6 @@ set(_public_headers
   cppmicroservices/ListenerToken.h
   cppmicroservices/ListenerFunctors.h
   cppmicroservices/ThreadpoolSafeFuture.h
-  cppmicroservices/StringReplace.h
   cppmicroservices/SecurityException.h
   cppmicroservices/SharedLibrary.h
   cppmicroservices/SharedLibraryException.h

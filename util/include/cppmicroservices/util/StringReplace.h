@@ -35,7 +35,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <string>
 
-namespace cppmicroservices
+namespace cppmicroservices::util
 {
 inline std::string replace_doublecolon_with_underscore(std::string target) {
     for(auto pos = target.find("::"); pos != target.npos; pos = target.find("::", pos)) {

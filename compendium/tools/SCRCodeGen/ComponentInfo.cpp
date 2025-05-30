@@ -24,7 +24,7 @@
 #include <sstream>
 
 #include "ComponentInfo.hpp"
-#include "cppmicroservices/StringReplace.h"
+#include "cppmicroservices/util/StringReplace.h"
 
 namespace codegen
 {
@@ -38,7 +38,7 @@ namespace codegen
         GetComponentNameStr(ComponentInfo const& compInfo)
         {
             auto name = compInfo.name.empty() ? compInfo.implClassName : compInfo.name;
-            return cppmicroservices::replace_doublecolon_with_underscore(name);
+            return cppmicroservices::util::replace_doublecolon_with_underscore(name);
         }
 
         std::string

@@ -27,7 +27,7 @@
 #include "cppmicroservices/Constants.h"
 #include "cppmicroservices/SharedLibrary.h"
 #include "cppmicroservices/SharedLibraryException.h"
-#include "cppmicroservices/StringReplace.h"
+#include "cppmicroservices/util/StringReplace.h"
 
 #include "BundleLoader.hpp"
 
@@ -165,7 +165,7 @@ namespace cppmicroservices
                 bundleBinaries.lock()->emplace(bundleLoc, handle);
             }
 
-            std::string const symbolName = cppmicroservices::replace_doublecolon_with_underscore(compName);
+            std::string const symbolName = cppmicroservices::util::replace_doublecolon_with_underscore(compName);
             std::string const newInstanceFuncName("NewInstance_" + symbolName);
             std::string const deleteInstanceFuncName("DeleteInstance_" + symbolName);
 

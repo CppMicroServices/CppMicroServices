@@ -369,7 +369,6 @@ TEST_F(ResourceCompilerTest, testManifestAdd)
       "bundle.version" : "0.1.0",
       "bundle.activator" : true
     })";
-    
     createDirHierarchy(tempdir, manifest_json);
 
     std::ostringstream badcmd;
@@ -377,9 +376,9 @@ TEST_F(ResourceCompilerTest, testManifestAdd)
         << " --bundle-name mismatched_bundle_name"
         << " --out-file \"" << tempdir << "Example.zip\""
         << " --manifest-add \"" << tempdir << "manifest.json\"";
-    // Test that Cmdline invocation in testManifestAdd returns 0
+    // Test that invoking command with --bundle-name different from that in the manifest fails.
     ASSERT_NE(EXIT_SUCCESS, runExecutable(badcmd.str()));
-    
+
     std::ostringstream cmd;
     cmd << rcbinpath
         << " --bundle-name mybundle"
@@ -564,7 +563,6 @@ TEST_F(ResourceCompilerTest, testBundleManifestZipAdd)
     
     std::ostringstream cmd;
     cmd << rcbinpath;
-    //    cmd << " --bundle-name anotherbundle ";
     cmd << " --manifest-add \"" << tempdir << "manifest2.json\" ";
     cmd << " --bundle-file \"" << tempdir << "sample1.dll\" ";
     cmd << " --zip-add \"" << tempdir << "tomerge.zip\" ";

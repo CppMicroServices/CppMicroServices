@@ -55,7 +55,6 @@ namespace cppmicroservices
             {
                 throw std::invalid_argument("Invalid parameters passed to SCRBundleExtension constructor");
             }
-            managers = std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
         }
 
         void
@@ -84,7 +83,10 @@ namespace cppmicroservices
                                                                               configNotifier);
                     if (registry->AddComponentManager(compManager))
                     {
-                        managers->push_back(compManager);
+                        {
+                            std::unique_lock<std::mutex> l(managersMutex);
+                            managers.push_back(compManager);
+                        }
                         compManager->Initialize();
                     }
                 }
@@ -94,8 +96,9 @@ namespace cppmicroservices
                 }
                 catch (cppmicroservices::SecurityException const&)
                 {
+                    std::unique_lock<std::mutex> l(managersMutex);
                     DisableAndRemoveAllComponentManagers();
-                    managers->clear();
+                    managers.clear();
                     throw;
                 }
                 catch (std::exception const&)
@@ -112,17 +115,21 @@ namespace cppmicroservices
 
         SCRBundleExtension::~SCRBundleExtension()
         {
-            try
             {
-                DisableAndRemoveAllComponentManagers();
+                std::unique_lock<std::mutex> l(managersMutex);
+                try
+                {
+                    DisableAndRemoveAllComponentManagers();
+                }
+                catch (...)
+                {
+                    logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
+                                "Exception while removing component managers for bundle " + bundle_.GetSymbolicName(),
+                                std::current_exception());
+                }
+
+                managers.clear();
             }
-            catch (...)
-            {
-                logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
-                            "Exception while removing component managers for bundle " + bundle_.GetSymbolicName(),
-                            std::current_exception());
-            }
-            managers->clear();
             registry.reset();
         }
 
@@ -131,7 +138,7 @@ namespace cppmicroservices
         {
             logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
                         "Deleting instance of SCRBundleExtension for " + bundle_.GetSymbolicName());
-            for (auto& compManager : *managers)
+            for (auto& compManager : managers)
             {
                 auto singleInvoke = std::make_shared<SingleInvokeTask>();
                 auto fut = compManager->Disable(singleInvoke);
@@ -156,7 +163,8 @@ namespace cppmicroservices
         void
         SCRBundleExtension::AddComponentManager(std::shared_ptr<ComponentManager> compManager)
         {
-            managers->push_back(std::move(compManager));
+            std::unique_lock<std::mutex> l(managersMutex);
+            managers.push_back(std::move(compManager));
         }
 
     } // namespace scrimpl

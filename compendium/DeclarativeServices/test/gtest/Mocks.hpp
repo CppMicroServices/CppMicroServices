@@ -323,8 +323,8 @@ namespace cppmicroservices
             MOCK_METHOD0(Activate, void(void));
             MOCK_METHOD0(Deactivate, void(void));
             MOCK_METHOD0(Modified, void(void));
-            MOCK_METHOD2(InvokeUnbindMethod, void(std::string const&, cppmicroservices::ServiceReferenceBase const&));
-            MOCK_METHOD2(InvokeBindMethod, void(std::string const&, cppmicroservices::ServiceReferenceBase const&));
+            MOCK_METHOD2(InvokeUnbindMethod, void(std::string const&, std::shared_ptr<void>));
+            MOCK_METHOD2(InvokeBindMethod, void(std::string const&, std::shared_ptr<void>));
             MOCK_METHOD0(GetInterfaceMap, cppmicroservices::InterfaceMapPtr(void));
             MOCK_METHOD0(DoesModifiedMethodExist, bool(void));
         };
@@ -340,6 +340,7 @@ namespace cppmicroservices
             MOCK_METHOD1(DisableComponent, void(std::string const&));
             MOCK_CONST_METHOD0(GetServiceReference, cppmicroservices::ServiceReferenceBase(void));
             MOCK_CONST_METHOD2(LocateService, std::shared_ptr<void>(std::string const&, std::string const&));
+            MOCK_CONST_METHOD2(LocateService, std::shared_ptr<void>(std::string const&, cppmicroservices::ServiceReferenceBase const&));
             MOCK_CONST_METHOD2(LocateServices,
                                std::vector<std::shared_ptr<void>>(std::string const&, std::string const&));
         };

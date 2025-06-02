@@ -27,9 +27,10 @@
 #include "cppmicroservices/Constants.h"
 #include "cppmicroservices/SharedLibrary.h"
 #include "cppmicroservices/SharedLibraryException.h"
+#include "cppmicroservices/util/StringReplace.h"
 
 #include "BundleLoader.hpp"
-#include <regex>
+
 #if defined(_WIN32)
 #    include <Windows.h>
 #else
@@ -164,7 +165,7 @@ namespace cppmicroservices
                 bundleBinaries.lock()->emplace(bundleLoc, handle);
             }
 
-            std::string const symbolName = std::regex_replace(compName, std::regex("::"), "_");
+            std::string const symbolName = cppmicroservices::util::replace_doublecolon_with_underscore(compName);
             std::string const newInstanceFuncName("NewInstance_" + symbolName);
             std::string const deleteInstanceFuncName("DeleteInstance_" + symbolName);
 

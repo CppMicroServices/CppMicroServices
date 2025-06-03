@@ -118,7 +118,7 @@ namespace cppmicroservices
         /**
          * The thread that performs shutdown of this framework instance.
          */
-        std::vector<std::thread> shutdownThreads;
+        std::thread shutdownThread;
 
         AnyMap headers;
     };

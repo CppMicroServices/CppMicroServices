@@ -53,11 +53,9 @@ namespace cppmicroservices
 
     FrameworkPrivate::~FrameworkPrivate() noexcept
     {
-        for(auto& t : shutdownThreads) {
-            if (t.joinable())
-            {
-                t.join();
-            }
+        if (shutdownThread.joinable())
+        {
+            shutdownThread.join();
         }
     }
 
@@ -129,6 +127,10 @@ namespace cppmicroservices
             }
             if (!stopEvent.valid)
             {
+                if (shutdownThread.joinable())
+                {
+                    shutdownThread.join();
+                }
                 return FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WAIT_TIMEDOUT,
                                       MakeBundle(this->shared_from_this()),
                                       std::string(),
@@ -143,6 +145,10 @@ namespace cppmicroservices
                                                  FrameworkEvent::Type::FRAMEWORK_STOPPED,
                                                  std::string(),
                                                  std::exception_ptr() };
+        }
+        if (shutdownThread.joinable())
+        {
+            shutdownThread.join();
         }
         return FrameworkEvent(stopEvent.type, MakeBundle(this->shared_from_this()), stopEvent.msg, stopEvent.excPtr);
     }
@@ -166,7 +172,10 @@ namespace cppmicroservices
             {
                 bool const wa = wasActive;
 #ifdef US_ENABLE_THREADING_SUPPORT
-                shutdownThreads.emplace_back(std::thread(std::bind(&FrameworkPrivate::Shutdown0, this, restart, wa)));
+                if (!shutdownThread.joinable())
+                {
+                    shutdownThread = std::thread(std::bind(&FrameworkPrivate::Shutdown0, this, restart, wa));
+                }
 #else
                 Shutdown0(restart, wa);
 #endif

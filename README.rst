@@ -2,11 +2,11 @@
 .. rubric:: Continuous Integration Status
 
 +-------------+---------------------------+--------------------------------------+----------------------------------------+
-| Branch      | GCC 7.5.0 and 9.4.0       | Visual Studio 2019                   |                                        |
+| Branch      | GCC 7.5.0 and 9.4.0       | Visual Studio 2022                   |                                        |
 |             +---------------------------+--------------------------------------+----------------------------------------+
-|             | Clang 9.0                 | Visual Studio 2022                   |                                        |
+|             | Clang 9.0                 | MinGW-w64                            |                                        |
 |             +---------------------------+--------------------------------------+----------------------------------------+
-|             | Xcode 15.2                | MinGW-w64                            |                                        |
+|             | Xcode 15.2                |                                      |                                        |
 |             +---------------------------+--------------------------------------+----------------------------------------+
 |             | Xcode 15.4                |                                      |                                        |
 +=============+===========================+======================================+========================================+
@@ -69,7 +69,7 @@ the following compilers:
 - GCC 11.3.0
 - Clang 11.0
 - Clang from Xcode 15.2 and 15.4
-- Visual Studio 2019 and 2022
+- Visual Studio 2022
 
 Recommended minimum required CMake version:
 
@@ -85,8 +85,8 @@ use, please see the following resources:
 - `ubuntu-22.04 Runner Information <https://github.com/actions/runner-images/blob/main/images/ubuntu/Ubuntu2204-Readme.md>`_
 - `macos-13 Runner Information <https://github.com/actions/runner-images/blob/main/images/macos/macos-13-Readme.md>`_
 - `macos-14 Runner Information <https://github.com/actions/runner-images/blob/main/images/macos/macos-14-Readme.md>`_
-- `windows-2019 Runner Information <https://github.com/actions/runner-images/blob/main/images/windows/Windows2019-Readme.md>`_
 - `windows-2022 Runner Information <https://github.com/actions/runner-images/blob/main/images/windows/Windows2022-Readme.md>`_
+- `windows-2025 Runner Information <https://github.com/actions/runner-images/blob/main/images/windows/Windows2025-Readme.md>`_
 
 Below is a list of tested compiler/OS combinations:
 

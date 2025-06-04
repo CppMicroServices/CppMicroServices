@@ -26,6 +26,7 @@
 #include <memory>
 #include <mutex>
 #include <unordered_map>
+#include <shared_mutex>
 
 #include "cppmicroservices/BundleActivator.h"
 #include "cppmicroservices/BundleContext.h"
@@ -42,6 +43,9 @@ namespace cppmicroservices
 {
     namespace cmimpl
     {
+        using WriteLock = std::unique_lock<std::shared_mutex>;
+        using ReadLock = std::shared_lock<std::shared_mutex>;
+
         class CMActivator final : public cppmicroservices::BundleActivator
         {
           public:
@@ -79,6 +83,8 @@ namespace cppmicroservices
             std::shared_ptr<CMAsyncWorkService> asyncWorkService;
             std::shared_ptr<ConfigurationAdminImpl> configAdminImpl;
             std::mutex bundleRegMutex;
+            std::shared_ptr<std::shared_mutex> notificationLock;
+            std::shared_ptr<bool> activatorStopped;
             std::unordered_map<long, std::unique_ptr<CMBundleExtension>> bundleRegistry;
             cppmicroservices::ListenerToken bundleListenerToken;
             cppmicroservices::ServiceRegistration<cppmicroservices::service::cm::ConfigurationAdmin> configAdminReg;

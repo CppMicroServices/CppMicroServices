@@ -147,15 +147,15 @@ namespace cppmicroservices
             auto currAsync = asyncWorkService;
             ServiceReferenceComparator comp;
             std::shared_ptr<AWSInt> newService;
-            // if the new ref exists and:
-                // we are using the fallback OR
-                // our current < new (based on ranking and id), reassign
-            if (reference && (usingFallback || comp(currRef, reference)))
+            if (reference)
             {
                 try
                 {
                     newService = scrContext.GetService<AWSInt>(reference);
-                    if (newService)
+                    // if the new ref exists and:
+                        // we are using the fallback OR
+                        // our current < new (based on ranking and id), reassign
+                    if (newService && (usingFallback || comp(currRef, reference)))
                     {
                         asyncWorkService = newService;
                     }

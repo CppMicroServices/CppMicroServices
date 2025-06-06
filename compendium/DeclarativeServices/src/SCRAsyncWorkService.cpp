@@ -106,8 +106,8 @@ namespace cppmicroservices
             : scrContext(context)
             , serviceTracker(
                   std::make_unique<cppmicroservices::ServiceTracker<AWSInt>>(context, this))
-            , asyncWorkService(nullptr)
             , usingFallback(true)
+            , asyncWorkService(nullptr)
             , logger(logger_)
         {
             {

@@ -26,6 +26,7 @@
 #include "CMLogger.hpp"
 #include <cppmicroservices/ServiceTracker.h>
 #include <cppmicroservices/asyncworkservice/AsyncWorkService.hpp>
+#include "ServiceReferenceComparator.hpp"
 
 #include <future>
 
@@ -33,7 +34,7 @@ namespace cppmicroservices
 {
     namespace cmimpl
     {
-
+        using AWSInt = cppmicroservices::async::AsyncWorkService;
         /**
          * This class is used to track the availability of AsyncWorkService in the
          * framework. If a AsyncWorkService is available, the calls to "post" are forwarded
@@ -43,8 +44,8 @@ namespace cppmicroservices
          * testing purposes.
          */
         class CMAsyncWorkService final
-            : public cppmicroservices::async::AsyncWorkService
-            , public cppmicroservices::ServiceTrackerCustomizer<cppmicroservices::async::AsyncWorkService>
+            : public AWSInt
+            , public cppmicroservices::ServiceTrackerCustomizer<AWSInt>
         {
           public:
             explicit CMAsyncWorkService(cppmicroservices::BundleContext context,
@@ -55,16 +56,16 @@ namespace cppmicroservices
             CMAsyncWorkService& operator=(CMAsyncWorkService&&) noexcept = delete;
             ~CMAsyncWorkService() noexcept override;
 
-            // methods from the cppmicroservices::async::AsyncWorkService interface
+            // methods from the AWSInt interface
             void post(std::packaged_task<void()>&& task) override;
 
             // methods from the cppmicroservices::ServiceTrackerCustomizer interface
             std::shared_ptr<TrackedParamType> AddingService(
-                ServiceReference<cppmicroservices::async::AsyncWorkService> const& reference) override;
-            void ModifiedService(ServiceReference<cppmicroservices::async::AsyncWorkService> const& reference,
-                                 std::shared_ptr<cppmicroservices::async::AsyncWorkService> const& service) override;
-            void RemovedService(ServiceReference<cppmicroservices::async::AsyncWorkService> const& reference,
-                                std::shared_ptr<cppmicroservices::async::AsyncWorkService> const& service) override;
+                ServiceReference<AWSInt> const& reference) override;
+            void ModifiedService(ServiceReference<AWSInt> const& reference,
+                                 std::shared_ptr<AWSInt> const& service) override;
+            void RemovedService(ServiceReference<AWSInt> const& reference,
+                                std::shared_ptr<AWSInt> const& service) override;
 
             // method to stop tracking the AsyncWorkService. This must be called from the SCR
             // BundleActivate's Stop method. Not thread-safe. Must not be called simultaneously from
@@ -73,8 +74,12 @@ namespace cppmicroservices
 
           private:
             cppmicroservices::BundleContext scrContext;
-            std::unique_ptr<cppmicroservices::ServiceTracker<cppmicroservices::async::AsyncWorkService>> serviceTracker;
-            std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkService;
+            std::unique_ptr<cppmicroservices::ServiceTracker<AWSInt>> serviceTracker;
+
+            std::mutex m;
+            bool usingFallback;
+            ServiceReference<AWSInt> currRef;
+            std::shared_ptr<AWSInt> asyncWorkService;
             std::shared_ptr<cppmicroservices::logservice::LogService> logger;
         };
     } // namespace cmimpl

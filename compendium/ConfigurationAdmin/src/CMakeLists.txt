@@ -19,6 +19,7 @@ set(_private_headers
   ConfigurationAdminPrivate.hpp
   ConfigurationImpl.hpp
   ConfigurationPrivate.hpp
+  ServiceReferenceComparator.hpp
   ThreadpoolSafeFuturePrivate.hpp
   SingleInvokeTask.hpp
   metadata/ConfigurationMetadata.hpp

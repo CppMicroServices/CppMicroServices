@@ -665,6 +665,9 @@ if(MINGW)
   set(US_CXX_FLAGS "-D_WIN32_WINNT=0x0600 -DNTDDI_VERSION=0x06000000 ${US_CXX_FLAGS}")
   # silence ignored attributes warnings
   add_compile_options(-Wno-attributes)
+  # silence maybe-uninitialized warnings for mingw.
+  # @todo: limit this compile option only to the offending file, jasoncpp.cpp, or fix the warning in code
+  add_compile_options(-Wno-error=maybe-uninitialized)
 endif()
 
 # Include the selected sanitizer's flags in US_CXX_FLAGS if the compiler supports the required flags

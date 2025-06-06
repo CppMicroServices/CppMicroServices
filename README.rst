@@ -94,7 +94,6 @@ Below is a list of tested compiler/OS combinations:
 - Clang 14.0.0 (Ubuntu 22.04)
 - Apple Clang from Xcode 15.2.0 (OS X 13.3.0)
 - Apple Clang from Xcode 15.4.0 (OS X 14.5.0)
-- Visual Studio 2019
 - Visual Studio 2022
 - MinGW-w64
 

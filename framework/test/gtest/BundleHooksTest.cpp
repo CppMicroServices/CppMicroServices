@@ -200,6 +200,7 @@ TEST_F(BundleHooksTest, TestFindHookBundleInstall)
     // install to get diff bundleContext than framework
     auto bundleB = cppmicroservices::testing::InstallLib(framework.GetBundleContext(), "TestBundleB");
     ASSERT_TRUE(bundleB);
+    bundleB.Start();
 
     auto findHookReg
         = framework.GetBundleContext().RegisterService<BundleFindHook>(std::make_shared<TestBundleFindHook>());
@@ -210,9 +211,14 @@ TEST_F(BundleHooksTest, TestFindHookBundleInstall)
     ASSERT_EQ(bundleA.GetSymbolicName(), "TestBundleA");
 
     // now that it exists, if installed with non-system bundle it will fail
-    bundleA = cppmicroservices::testing::InstallLib(bundleB.GetBundleContext(), "TestBundleA");
-    ASSERT_FALSE(bundleA);
-    ASSERT_EQ(bundleA.GetSymbolicName(), "TestBundleA");
+    bool caught = false;
+    try {
+        bundleA = cppmicroservices::testing::InstallLib(bundleB.GetBundleContext(), "TestBundleA");
+    }
+    catch (...) {
+        caught = true;
+    }
+    ASSERT_TRUE(caught);
 
     // if installed with system, it should still succeed because no filtering
     bundleA = cppmicroservices::testing::InstallLib(framework.GetBundleContext(), "TestBundleA");

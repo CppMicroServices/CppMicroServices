@@ -143,7 +143,7 @@ class BundleHooksTest : public ::testing::Test
     }
 };
 
-TEST_F(BundleHooksTest, TestFindHook)
+TEST_F(BundleHooksTest, TestFindHookBasic)
 {
     auto bundleA = cppmicroservices::testing::InstallLib(framework.GetBundleContext(), "TestBundleA");
     ASSERT_TRUE(bundleA);
@@ -161,23 +161,72 @@ TEST_F(BundleHooksTest, TestFindHook)
 
     // Test for non-filtered GetBundle(long) result
     ASSERT_TRUE(framework.GetBundleContext().GetBundle(bundleAId));
+    ASSERT_TRUE(bundleA.GetBundleContext().GetBundle(bundleAId));
 
     auto findHookReg
         = framework.GetBundleContext().RegisterService<BundleFindHook>(std::make_shared<TestBundleFindHook>());
 
     // Test for filtered GetBundle(long) result
-    ASSERT_FALSE(framework.GetBundleContext().GetBundle(bundleAId));
+    ASSERT_TRUE(framework.GetBundleContext().GetBundle(bundleAId)); // framework context should NEVER filter
+    ASSERT_FALSE(bundleA.GetBundleContext().GetBundle(bundleAId));
 
     auto bundles = framework.GetBundleContext().GetBundles();
+    bool foundBundle = false;
     for (auto const& i : bundles)
     {
-        ASSERT_NE(i.GetSymbolicName(), "TestBundleA");
+        if(i.GetSymbolicName() == "TestBundleA"){
+            foundBundle = true;
+        }
     }
+    ASSERT_TRUE(foundBundle);
+
+    bundles = bundleA.GetBundleContext().GetBundles();
+    foundBundle = false;
+    for (auto const& i : bundles)
+    {
+        if(i.GetSymbolicName() == "TestBundleA"){
+            foundBundle = true;
+        }
+    }
+    ASSERT_FALSE(foundBundle);
 
     findHookReg.Unregister();
 
     bundleA.Stop();
 }
+
+TEST_F(BundleHooksTest, TestFindHookBundleInstall)
+{
+    // install to get diff bundleContext than framework
+    auto bundleB = cppmicroservices::testing::InstallLib(framework.GetBundleContext(), "TestBundleB");
+    ASSERT_TRUE(bundleB);
+
+    auto findHookReg
+        = framework.GetBundleContext().RegisterService<BundleFindHook>(std::make_shared<TestBundleFindHook>());
+
+    // on first installation, the bundle will not exist and therefore will be installed regardless of hooks
+    auto bundleA = cppmicroservices::testing::InstallLib(bundleB.GetBundleContext(), "TestBundleA");
+    ASSERT_TRUE(bundleA);
+    ASSERT_EQ(bundleA.GetSymbolicName(), "TestBundleA");
+
+    // now that it exists, if installed with non-system bundle it will fail
+    bundleA = cppmicroservices::testing::InstallLib(bundleB.GetBundleContext(), "TestBundleA");
+    ASSERT_FALSE(bundleA);
+    ASSERT_EQ(bundleA.GetSymbolicName(), "TestBundleA");
+
+    // if installed with system, it should still succeed because no filtering
+    bundleA = cppmicroservices::testing::InstallLib(framework.GetBundleContext(), "TestBundleA");
+    ASSERT_TRUE(bundleA);
+    ASSERT_EQ(bundleA.GetSymbolicName(), "TestBundleA");
+
+    bundleA.Start();
+
+    findHookReg.Unregister();
+
+    bundleA.Stop();
+    bundleB.Stop();
+}
+
 
 TEST_F(BundleHooksTest, TestEventHook)
 {

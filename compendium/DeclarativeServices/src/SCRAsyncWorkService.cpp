@@ -111,7 +111,6 @@ namespace cppmicroservices
             , logger(logger_)
         {
             {
-                std::unique_lock<std::mutex> lock{ m };
                 if (auto asyncWSSRef = context.GetServiceReference<AWSInt>(); asyncWSSRef)
                 {
                     usingFallback = false;
@@ -145,7 +144,6 @@ namespace cppmicroservices
         {
             std::unique_lock<std::mutex> lock{m};
             auto currAsync = asyncWorkService;
-            ServiceReferenceComparator comp;
             std::shared_ptr<AWSInt> newService;
             if (reference)
             {
@@ -155,7 +153,7 @@ namespace cppmicroservices
                     // if the new ref exists and:
                         // we are using the fallback OR
                         // our current < new (based on ranking and id), reassign
-                    if (newService && (usingFallback || comp(currRef, reference)))
+                    if (newService && (usingFallback || currRef < reference))
                     {
                         asyncWorkService = newService;
                     }

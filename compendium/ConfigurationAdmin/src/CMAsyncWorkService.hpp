@@ -26,7 +26,6 @@
 #include "CMLogger.hpp"
 #include <cppmicroservices/ServiceTracker.h>
 #include <cppmicroservices/asyncworkservice/AsyncWorkService.hpp>
-#include "ServiceReferenceComparator.hpp"
 
 #include <future>
 

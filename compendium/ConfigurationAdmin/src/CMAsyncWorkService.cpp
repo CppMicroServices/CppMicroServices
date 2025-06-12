@@ -108,7 +108,6 @@ namespace cppmicroservices
             , logger(logger_)
         {
             {
-                std::unique_lock<std::mutex> lock{ m };
                 if (auto asyncWSSRef = context.GetServiceReference<AWSInt>(); asyncWSSRef)
                 {
                     usingFallback = false;
@@ -141,7 +140,6 @@ namespace cppmicroservices
         {
             std::unique_lock<std::mutex> lock{m};
             auto currAsync = asyncWorkService;
-            ServiceReferenceComparator comp;
             std::shared_ptr<AWSInt> newService;
             if (reference)
             {
@@ -151,7 +149,7 @@ namespace cppmicroservices
                     // if the new ref exists and:
                         // we are using the fallback OR
                         // our current < new (based on ranking and id), reassign
-                    if (newService && (usingFallback || comp(currRef, reference)))
+                    if (newService && (usingFallback || currRef < reference))
                     {
                         asyncWorkService = newService;
                     }
@@ -160,7 +158,7 @@ namespace cppmicroservices
                 {
                     auto exceptionPtr = std::current_exception();
                     std::string msg = "An exception was caught while retrieving an instance of "
-                                      "AWSInt. Falling "
+                                      "cppmicroservices::async::AsyncWorkService. Falling "
                                       "back to the default.";
                     logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING, msg, exceptionPtr);
                 }

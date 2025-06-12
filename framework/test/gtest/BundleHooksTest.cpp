@@ -204,11 +204,17 @@ TEST_F(BundleHooksTest, TestFindHookBundleInstall)
 
     auto findHookReg
         = framework.GetBundleContext().RegisterService<BundleFindHook>(std::make_shared<TestBundleFindHook>());
-
+    Bundle bundleA;
+    
+    // if NOT building shared_libs
+        // install just invokes getBundles which will filter always
+        // because it invoked getBundles, nothing is thrown... that only happens on an actual instal
+#if defined(US_BUILD_SHARED_LIBS)
     // on first installation, the bundle will not exist and therefore will be installed regardless of hooks
-    auto bundleA = cppmicroservices::testing::InstallLib(bundleB.GetBundleContext(), "TestBundleA");
+    bundleA = cppmicroservices::testing::InstallLib(bundleB.GetBundleContext(), "TestBundleA");
     ASSERT_TRUE(bundleA);
     ASSERT_EQ(bundleA.GetSymbolicName(), "TestBundleA");
+
 
     // now that it exists, if installed with non-system bundle it will fail
     bool caught = false;
@@ -219,7 +225,7 @@ TEST_F(BundleHooksTest, TestFindHookBundleInstall)
         caught = true;
     }
     ASSERT_TRUE(caught);
-
+#endif
     // if installed with system, it should still succeed because no filtering
     bundleA = cppmicroservices::testing::InstallLib(framework.GetBundleContext(), "TestBundleA");
     ASSERT_TRUE(bundleA);

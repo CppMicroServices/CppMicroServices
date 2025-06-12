@@ -317,6 +317,10 @@ TEST_F(BundleHooksTest, TestEventHookFailure)
 
 TEST_F(BundleHooksTest, TestFindHookFailure)
 {
+    auto bundleB = cppmicroservices::testing::InstallLib(framework.GetBundleContext(), "TestBundleB");
+    ASSERT_TRUE(bundleB);
+    bundleB.Start();
+
     auto eventHookReg
         = framework.GetBundleContext().RegisterService<BundleFindHook>(std::make_shared<TestBundleFindHookFailure>());
 
@@ -324,11 +328,11 @@ TEST_F(BundleHooksTest, TestFindHookFailure)
     auto fwkListenerToken = framework.GetBundleContext().AddFrameworkListener(
         std::bind(&TestFrameworkListener::Event, &listener, std::placeholders::_1));
 
-    auto bundleA = cppmicroservices::testing::InstallLib(framework.GetBundleContext(), "TestBundleA");
+    auto bundleA = cppmicroservices::testing::InstallLib(bundleB.GetBundleContext(), "TestBundleA");
     ASSERT_TRUE(bundleA);
     bundleA.Start();
 
-    framework.GetBundleContext().GetBundle(bundleA.GetBundleId());
+    bundleB.GetBundleContext().GetBundle(bundleA.GetBundleId());
 
     // bundle starting and bundle started events
     // Test for expected number of framework events
@@ -352,6 +356,7 @@ TEST_F(BundleHooksTest, TestFindHookFailure)
                   });
 
     bundleA.Stop();
+    bundleB.Stop();
     eventHookReg.Unregister();
     framework.GetBundleContext().RemoveListener(std::move(fwkListenerToken));
 }

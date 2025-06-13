@@ -217,14 +217,7 @@ TEST_F(BundleHooksTest, TestFindHookBundleInstall)
 
 
     // now that it exists, if installed with non-system bundle it will fail
-    bool caught = false;
-    try {
-        bundleA = cppmicroservices::testing::InstallLib(bundleB.GetBundleContext(), "TestBundleA");
-    }
-    catch (...) {
-        caught = true;
-    }
-    ASSERT_TRUE(caught);
+    ASSERT_THROW(cppmicroservices::testing::InstallLib(bundleB.GetBundleContext(), "TestBundleA"), std::runtime_error);
 #endif
     // if installed with system, it should still succeed because no filtering
     bundleA = cppmicroservices::testing::InstallLib(framework.GetBundleContext(), "TestBundleA");

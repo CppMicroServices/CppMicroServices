@@ -25,6 +25,7 @@
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/BundleEventHook.h"
+#include "cppmicroservices/BundleInstallHook.h"
 #include "cppmicroservices/BundleFindHook.h"
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/GetBundleContext.h"
@@ -84,6 +85,40 @@ namespace cppmicroservices
                 catch (...)
                 {
                     std::string message("Failed to call Bundle FindHook  # "
+                                        + sr.GetProperty(Constants::SERVICE_ID).ToString());
+                    coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING,
+                                                                         selfBundle,
+                                                                         message,
+                                                                         std::current_exception()));
+                }
+            }
+        }
+    }
+
+    
+    void
+    BundleHooks::InstallBundles(BundleContext const& context, std::vector<Bundle>& bundles) const
+    {
+        std::vector<ServiceRegistrationBase> srl;
+        coreCtx->services.Get(us_service_interface_iid<BundleInstallHook>(), srl);
+        ShrinkableVector<Bundle> filtered(bundles);
+
+        auto selfBundle = GetBundleContext().GetBundle();
+        std::sort(srl.begin(), srl.end());
+        for (auto srBaseIter = srl.rbegin(), srBaseEnd = srl.rend(); srBaseIter != srBaseEnd; ++srBaseIter)
+        {
+            ServiceReference<BundleInstallHook> sr = srBaseIter->GetReference();
+            std::shared_ptr<BundleInstallHook> ih
+                = std::static_pointer_cast<BundleInstallHook>(sr.d.Load()->GetService(GetPrivate(selfBundle).get()));
+            if (ih)
+            {
+                try
+                {
+                    ih->Install(context, filtered);
+                }
+                catch (...)
+                {
+                    std::string message("Failed to call BundleInstallHook  # "
                                         + sr.GetProperty(Constants::SERVICE_ID).ToString());
                     coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING,
                                                                          selfBundle,

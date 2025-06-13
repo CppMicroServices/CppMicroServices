@@ -20,39 +20,10 @@
 
 =============================================================================*/
 
-#ifndef CPPMICROSERVICES_BUNDLEHOOKS_H
-#define CPPMICROSERVICES_BUNDLEHOOKS_H
-
-#include "ServiceListeners.h"
-
-#include <memory>
-#include <vector>
+#include "cppmicroservices/BundleInstallHook.h"
 
 namespace cppmicroservices
 {
 
-    class CoreBundleContext;
-    class Bundle;
-    class BundleContext;
-    class BundleEvent;
-
-    class BundleHooks
-    {
-
-      private:
-        CoreBundleContext* const coreCtx;
-
-      public:
-        BundleHooks(CoreBundleContext* ctx);
-
-        Bundle FilterBundle(BundleContext const& context, Bundle const& bundle) const;
-
-        void FilterBundles(BundleContext const& context, std::vector<Bundle>& bundles) const;
-
-        void InstallBundles(BundleContext const& context, std::vector<Bundle>& bundles) const;
-
-        void FilterBundleEventReceivers(BundleEvent const& evt, ServiceListeners::BundleListenerMap& bundleListeners);
-    };
-} // namespace cppmicroservices
-
-#endif // CPPMICROSERVICES_BUNDLEHOOKS_H
+    BundleInstallHook::~BundleInstallHook() = default;
+}

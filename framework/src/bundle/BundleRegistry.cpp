@@ -42,6 +42,7 @@
 #include <deque>
 #include <functional>
 #include <map>
+#include <unordered_map>
 
 namespace
 {
@@ -139,7 +140,7 @@ namespace cppmicroservices
     }
 
     std::vector<Bundle>
-    BundleRegistry::Install(std::string const& location, BundlePrivate*, cppmicroservices::AnyMap const& bundleManifest)
+    BundleRegistry::Install(std::string const& location, BundlePrivate* installingBundle, cppmicroservices::AnyMap const& bundleManifest)
     {
         using namespace std::chrono_literals;
 
@@ -189,7 +190,7 @@ namespace cppmicroservices
                                                                 alreadyInstalled);
 
             // Perform the install
-            auto newBundles = Install0(location, resCont, alreadyInstalled, bundleManifest);
+            auto newBundles = Install0(installingBundle, location, resCont, alreadyInstalled, bundleManifest);
             resultingBundles.insert(resultingBundles.end(), newBundles.begin(), newBundles.end());
             if (resultingBundles.empty())
             {
@@ -239,7 +240,7 @@ namespace cppmicroservices
 
                     // Perform the install
                     auto resCont = std::make_shared<BundleResourceContainer>(location, bundleManifest);
-                    installedBundles = Install0(location, resCont, {}, bundleManifest);
+                    installedBundles = Install0(installingBundle, location, resCont, {}, bundleManifest);
                 }
                 return installedBundles;
             }
@@ -283,7 +284,7 @@ namespace cppmicroservices
                                                     { DecrementInitialBundleMapRef(l, location); });
 
                     // Perform the install
-                    newBundles = Install0(location, resCont, alreadyInstalled, bundleManifest);
+                    newBundles = Install0(installingBundle, location, resCont, alreadyInstalled, bundleManifest);
                 }
 
                 resultingBundles.insert(resultingBundles.end(), newBundles.begin(), newBundles.end());
@@ -297,7 +298,8 @@ namespace cppmicroservices
     }
 
     std::vector<Bundle>
-    BundleRegistry::Install0(std::string const& location,
+    BundleRegistry::Install0(BundlePrivate* installingBundle,
+                             std::string const& location,
                              std::shared_ptr<BundleResourceContainer> const& resCont,
                              std::vector<std::string> const& alreadyInstalled,
                              cppmicroservices::AnyMap const& bundleManifest)
@@ -308,7 +310,7 @@ namespace cppmicroservices
         using cppms::AnyMap;
 
         std::vector<Bundle> installedBundles;
-        std::vector<std::shared_ptr<BundleArchive>> barchives;
+        std::unordered_map<long, std::shared_ptr<BundleArchive>> barchives;
         std::unordered_set<std::string> exclude { alreadyInstalled.begin(), alreadyInstalled.end() };
         try
         {
@@ -341,17 +343,21 @@ namespace cppmicroservices
                     // Now, create a BundleArchive with the given manifest at 'entry' in the
                     // BundleResourceContainer, and remember the created BundleArchive here for later
                     // processing, including purging any items created if an exception is thrown.
-                    barchives.push_back(coreCtx->storage->CreateAndInsertArchive(resCont, symbolicName, manifest));
+                    auto archive = coreCtx->storage->CreateAndInsertArchive(resCont, symbolicName, manifest);
+                    barchives[archive->GetBundleId()] = archive;
                 }
             }
 
             // Now, create a BundlePrivate for each BundleArchive, and then add a Bundle to the results
             // that are returned, one for each BundlePrivate that's created.
-            for (auto const& ba : barchives)
+            for (auto const& baIt : barchives)
             {
-                auto d = std::make_shared<BundlePrivate>(coreCtx, ba);
+                auto d = std::make_shared<BundlePrivate>(coreCtx, baIt.second);
                 installedBundles.emplace_back(MakeBundle(d));
             }
+
+            coreCtx->bundleHooks.InstallBundles(MakeBundleContext(installingBundle->bundleContext.Load()),
+                                                                  installedBundles);
 
             // For each bundle that we created, add into the map of location->bundle, completing the
             // addition of the bundle into the registry with the given manifest.
@@ -360,8 +366,15 @@ namespace cppmicroservices
                 US_UNUSED(l);
                 for (auto& b : installedBundles)
                 {
+                    // erase archive from local var
+                    barchives.erase(b.GetBundleId());
                     bundles.v.insert(std::make_pair(location, b.d));
                 }
+            }
+
+            // purge archives of all bundles that were filtered out by the bundleInstallHook
+            for (auto& ba : barchives){
+                ba.second->Purge();
             }
 
             // Now fire off the bundle event listeners.
@@ -374,7 +387,7 @@ namespace cppmicroservices
         {
             for (auto& ba : barchives)
             {
-                ba->Purge();
+                ba.second->Purge();
             }
 
             throw std::runtime_error("Failed to install bundle library at " + location + ": "

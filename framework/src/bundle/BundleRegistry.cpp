@@ -310,7 +310,8 @@ namespace cppmicroservices
         using cppms::AnyMap;
 
         std::vector<Bundle> installedBundles;
-        std::unordered_map<long, std::shared_ptr<BundleArchive>> barchives;
+        std::vector<std::shared_ptr<BundleArchive>> barchives;
+        std::unordered_map<long, std::shared_ptr<BundleArchive>> barchivesMap;
         std::unordered_set<std::string> exclude { alreadyInstalled.begin(), alreadyInstalled.end() };
         try
         {
@@ -344,15 +345,16 @@ namespace cppmicroservices
                     // BundleResourceContainer, and remember the created BundleArchive here for later
                     // processing, including purging any items created if an exception is thrown.
                     auto archive = coreCtx->storage->CreateAndInsertArchive(resCont, symbolicName, manifest);
-                    barchives[archive->GetBundleId()] = archive;
+                    barchivesMap[archive->GetBundleId()] = archive;
+                    barchives.push_back(archive);
                 }
             }
 
             // Now, create a BundlePrivate for each BundleArchive, and then add a Bundle to the results
             // that are returned, one for each BundlePrivate that's created.
-            for (auto const& baIt : barchives)
+            for (auto const& ba : barchives)
             {
-                auto d = std::make_shared<BundlePrivate>(coreCtx, baIt.second);
+                auto d = std::make_shared<BundlePrivate>(coreCtx, ba);
                 installedBundles.emplace_back(MakeBundle(d));
             }
 
@@ -367,13 +369,13 @@ namespace cppmicroservices
                 for (auto& b : installedBundles)
                 {
                     // erase archive from local var
-                    barchives.erase(b.GetBundleId());
+                    barchivesMap.erase(b.GetBundleId());
                     bundles.v.insert(std::make_pair(location, b.d));
                 }
             }
 
             // purge archives of all bundles that were filtered out by the bundleInstallHook
-            for (auto& ba : barchives){
+            for (auto& ba : barchivesMap){
                 ba.second->Purge();
             }
 
@@ -387,7 +389,7 @@ namespace cppmicroservices
         {
             for (auto& ba : barchives)
             {
-                ba.second->Purge();
+                ba->Purge();
             }
 
             throw std::runtime_error("Failed to install bundle library at " + location + ": "

@@ -211,6 +211,7 @@ TEST_F(BundleHooksTest, TestFindHook)
     bundleA.Stop();
 }
 
+#if defined(US_BUILD_SHARED_LIBS)
 TEST_F(BundleHooksTest, TestInstallHook)
 {
     auto bundleA = cppmicroservices::testing::InstallLib(framework.GetBundleContext(), "TestBundleA");
@@ -233,11 +234,11 @@ TEST_F(BundleHooksTest, TestInstallHook)
 
     bundleA = cppmicroservices::testing::InstallLib(framework.GetBundleContext(), "TestBundleA");
     ASSERT_TRUE(bundleA);
-
     findHookReg.Unregister();
 
     bundleA.Stop();
 }
+#endif
 
 TEST_F(BundleHooksTest, TestEventHook)
 {

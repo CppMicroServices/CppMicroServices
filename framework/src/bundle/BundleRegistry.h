@@ -160,7 +160,8 @@ namespace cppmicroservices
             std::string const& location,
             cppmicroservices::AnyMap const& bundleManifest,
             std::vector<Bundle>& res,
-            std::vector<std::string>& alreadyInstalled);
+            std::vector<std::string>& alreadyInstalled,
+            bool filter);
 
         void DecrementInitialBundleMapRef(cppmicroservices::detail::MutexLockingStrategy<>::UniqueLock& l,
                                           std::string const& location);

@@ -31,6 +31,7 @@ namespace cppmicroservices
 {
     namespace scrimpl
     {
+        using AWSInt = cppmicroservices::async::AsyncWorkService;
 
         /**
          * FallbackAsyncWorkService represents the fallback strategy in the event
@@ -39,7 +40,7 @@ namespace cppmicroservices
          * a user-provided service was not given or if the user-provided service
          * which implements the AsyncWorkService interface was unregistered.
          */
-        class FallbackAsyncWorkService final : public cppmicroservices::async::AsyncWorkService
+        class FallbackAsyncWorkService final : public AWSInt
         {
           public:
             FallbackAsyncWorkService(std::shared_ptr<cppmicroservices::logservice::LogService> const& logger_)
@@ -69,7 +70,7 @@ namespace cppmicroservices
                     {
                         auto exceptionPtr = std::current_exception();
                         std::string msg = "An exception has occurred while trying to shutdown "
-                                          "the fallback cppmicroservices::async::AsyncWorkService "
+                                          "the fallback AWSInt "
                                           "instance.";
                         logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING, msg, exceptionPtr);
                     }
@@ -104,19 +105,23 @@ namespace cppmicroservices
             std::shared_ptr<cppmicroservices::logservice::LogService> const& logger_)
             : scrContext(context)
             , serviceTracker(
-                  std::make_unique<cppmicroservices::ServiceTracker<cppmicroservices::async::AsyncWorkService>>(context,
-                                                                                                                this))
+                  std::make_unique<cppmicroservices::ServiceTracker<AWSInt>>(context, this))
+            , usingFallback(true)
             , asyncWorkService(nullptr)
             , logger(logger_)
         {
-            if (auto asyncWSSRef = context.GetServiceReference<cppmicroservices::async::AsyncWorkService>();
-                asyncWSSRef)
             {
-                asyncWorkService = context.GetService<cppmicroservices::async::AsyncWorkService>(asyncWSSRef);
-            }
-            else
-            {
-                asyncWorkService = std::make_shared<FallbackAsyncWorkService>(logger_);
+                if (auto asyncWSSRef = context.GetServiceReference<AWSInt>(); asyncWSSRef)
+                {
+                    usingFallback = false;
+                    currRef = asyncWSSRef;
+                    asyncWorkService = context.GetService<AWSInt>(asyncWSSRef);
+                }
+                else
+                {
+                    usingFallback = true;
+                    asyncWorkService = std::make_shared<FallbackAsyncWorkService>(logger_);
+                }
             }
 
             serviceTracker->Open();
@@ -134,19 +139,23 @@ namespace cppmicroservices
             }
         }
 
-        std::shared_ptr<cppmicroservices::async::AsyncWorkService>
-        SCRAsyncWorkService::AddingService(ServiceReference<cppmicroservices::async::AsyncWorkService> const& reference)
+        std::shared_ptr<AWSInt>
+        SCRAsyncWorkService::AddingService(ServiceReference<AWSInt> const& reference)
         {
-            auto currAsync = std::atomic_load(&asyncWorkService);
-            std::shared_ptr<cppmicroservices::async::AsyncWorkService> newService;
+            std::unique_lock<std::mutex> lock{m};
+            auto currAsync = asyncWorkService;
+            std::shared_ptr<AWSInt> newService;
             if (reference)
             {
                 try
                 {
-                    newService = scrContext.GetService<cppmicroservices::async::AsyncWorkService>(reference);
-                    if (newService)
+                    newService = scrContext.GetService<AWSInt>(reference);
+                    // if the new ref exists and:
+                        // we are using the fallback OR
+                        // our current < new (based on ranking and id), reassign
+                    if (newService && (usingFallback || currRef < reference))
                     {
-                        std::atomic_store(&asyncWorkService, newService);
+                        asyncWorkService = newService;
                     }
                 }
                 catch (...)
@@ -163,32 +172,33 @@ namespace cppmicroservices
 
         void
         SCRAsyncWorkService::ModifiedService(
-            ServiceReference<cppmicroservices::async::AsyncWorkService> const& /* reference */,
-            std::shared_ptr<cppmicroservices::async::AsyncWorkService> const& /* service */)
+            ServiceReference<AWSInt> const& /* reference */,
+            std::shared_ptr<AWSInt> const& /* service */)
         {
             // no-op
         }
 
         void
         SCRAsyncWorkService::RemovedService(
-            ServiceReference<cppmicroservices::async::AsyncWorkService> const& /* reference */,
-            std::shared_ptr<cppmicroservices::async::AsyncWorkService> const& service)
+            ServiceReference<AWSInt> const& /* reference */,
+            std::shared_ptr<AWSInt> const& service)
         {
-            auto currAsync = std::atomic_load(&asyncWorkService);
+            std::unique_lock<std::mutex> lock{m};
+            auto currAsync = asyncWorkService;
             if (service == currAsync)
             {
-                // replace existing asyncWorkService with a nullptr asyncWorkService
-                std::shared_ptr<cppmicroservices::async::AsyncWorkService> newService
-                    = std::make_shared<FallbackAsyncWorkService>(logger);
-                std::atomic_store(&asyncWorkService, newService);
+                currRef = ServiceReference<AWSInt>();
+                usingFallback = true;
+                // replace existing asyncWorkService with a fallbackAsyncWorkService
+                asyncWorkService = std::make_shared<FallbackAsyncWorkService>(logger);
             }
         }
 
         void
         SCRAsyncWorkService::post(std::packaged_task<void()>&& task)
         {
-            auto currAsync = std::atomic_load(&asyncWorkService);
-            currAsync->post(std::move(task));
+            std::unique_lock<std::mutex> lock{m};
+            asyncWorkService->post(std::move(task));
         }
 
     } // namespace scrimpl

@@ -160,6 +160,9 @@ namespace cppmicroservices
         // Search the multimap for the current bundle location
         auto bundlesAtLocationRange = (bundles.Lock(), bundles.v.equal_range(location));
 
+        // bundles returned from the installation
+        std::vector<Bundle> resultingBundles;
+
         /*
           If the bundle is already installed, then execute the regular
           install process. In this case, there are no data races to worry about.
@@ -185,7 +188,6 @@ namespace cppmicroservices
         if (bundlesAtLocationRange.first != bundlesAtLocationRange.second)
         {
             l.UnLock();
-            std::vector<Bundle> resultingBundles;
             std::vector<std::string> alreadyInstalled;
             // Populate the resultingBundles and alreadyInstalled vectors with the appropriate data
             // based on what bundles are already installed
@@ -197,13 +199,12 @@ namespace cppmicroservices
                                                                 installingBundle->id != 0);
 
             // Perform the install
-            auto newBundles = Install0(installingBundle, location, resCont, alreadyInstalled, bundleManifest);
+            auto newBundles = Install0(location, resCont, alreadyInstalled, bundleManifest);
             resultingBundles.insert(resultingBundles.end(), newBundles.begin(), newBundles.end());
             if (resultingBundles.empty())
             {
                 throw std::runtime_error("All bundles rejected by a bundle hook");
             }
-            return resultingBundles;
         }
         else
         {
@@ -227,7 +228,6 @@ namespace cppmicroservices
                 initialBundleInstallMap.insert(std::make_pair(location, std::move(pairToInsert)));
                 l.UnLock();
 
-                std::vector<Bundle> installedBundles;
                 {
                     // create instance of clean-up object to ensure RAII
                     InitialBundleMapCleanup cleanup(
@@ -247,9 +247,8 @@ namespace cppmicroservices
 
                     // Perform the install
                     auto resCont = std::make_shared<BundleResourceContainer>(location, bundleManifest);
-                    installedBundles = Install0(installingBundle, location, resCont, {}, bundleManifest);
+                    resultingBundles = Install0(location, resCont, {}, bundleManifest);
                 }
-                return installedBundles;
             }
             else
             {
@@ -276,7 +275,6 @@ namespace cppmicroservices
                 bundlesAtLocationRange = (bundles.Lock(), bundles.v.equal_range(location));
                 l.UnLock();
 
-                std::vector<Bundle> resultingBundles;
                 std::vector<std::string> alreadyInstalled;
                 auto resCont = GetAlreadyInstalledBundlesAtLocation(bundlesAtLocationRange,
                                                                     location,
@@ -292,7 +290,7 @@ namespace cppmicroservices
                                                     { DecrementInitialBundleMapRef(l, location); });
 
                     // Perform the install
-                    newBundles = Install0(installingBundle, location, resCont, alreadyInstalled, bundleManifest);
+                    newBundles = Install0(location, resCont, alreadyInstalled, bundleManifest);
                 }
 
                 resultingBundles.insert(resultingBundles.end(), newBundles.begin(), newBundles.end());
@@ -300,14 +298,16 @@ namespace cppmicroservices
                 {
                     throw std::runtime_error("All bundles rejected by a bundle hook");
                 }
-                return resultingBundles;
             }
         }
+        
+        coreCtx->bundleHooks.InstallBundles(MakeBundleContext(installingBundle->bundleContext.Load()),
+                                                              resultingBundles);
+        return resultingBundles;
     }
 
     std::vector<Bundle>
-    BundleRegistry::Install0(BundlePrivate* installingBundle,
-                             std::string const& location,
+    BundleRegistry::Install0(std::string const& location,
                              std::shared_ptr<BundleResourceContainer> const& resCont,
                              std::vector<std::string> const& alreadyInstalled,
                              cppmicroservices::AnyMap const& bundleManifest)
@@ -319,7 +319,6 @@ namespace cppmicroservices
 
         std::vector<Bundle> installedBundles;
         std::vector<std::shared_ptr<BundleArchive>> barchives;
-        std::unordered_map<long, std::shared_ptr<BundleArchive>> barchivesMap;
         std::unordered_set<std::string> exclude { alreadyInstalled.begin(), alreadyInstalled.end() };
         try
         {
@@ -353,7 +352,6 @@ namespace cppmicroservices
                     // BundleResourceContainer, and remember the created BundleArchive here for later
                     // processing, including purging any items created if an exception is thrown.
                     auto archive = coreCtx->storage->CreateAndInsertArchive(resCont, symbolicName, manifest);
-                    barchivesMap[archive->GetBundleId()] = archive;
                     barchives.push_back(archive);
                 }
             }
@@ -366,9 +364,6 @@ namespace cppmicroservices
                 installedBundles.emplace_back(MakeBundle(d));
             }
 
-            coreCtx->bundleHooks.InstallBundles(MakeBundleContext(installingBundle->bundleContext.Load()),
-                                                                  installedBundles);
-
             // For each bundle that we created, add into the map of location->bundle, completing the
             // addition of the bundle into the registry with the given manifest.
             {
@@ -376,15 +371,8 @@ namespace cppmicroservices
                 US_UNUSED(l);
                 for (auto& b : installedBundles)
                 {
-                    // erase archive from local var
-                    barchivesMap.erase(b.GetBundleId());
                     bundles.v.insert(std::make_pair(location, b.d));
                 }
-            }
-
-            // purge archives of all bundles that were filtered out by the bundleInstallHook
-            for (auto& ba : barchivesMap){
-                ba.second->Purge();
             }
 
             // Now fire off the bundle event listeners.

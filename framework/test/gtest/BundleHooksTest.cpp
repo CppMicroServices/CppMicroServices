@@ -272,7 +272,7 @@ TEST_F(BundleHooksTest, TestInstallHook)
 
     bundleA.Start();
 
-    auto findHookReg
+    auto installHookReg
         = framework.GetBundleContext().RegisterService<BundleInstallHook>(std::make_shared<TestBundleInstallHook>());
 
     // for any bundle context (including system), install should NOT work on bundleB or bundleBA_00
@@ -287,7 +287,20 @@ TEST_F(BundleHooksTest, TestInstallHook)
 
     bundleA = cppmicroservices::testing::InstallLib(framework.GetBundleContext(), "TestBundleA");
     ASSERT_TRUE(bundleA);
-    findHookReg.Unregister();
+
+    // assert that the bundle WAS installed
+    auto bundles = framework.GetBundleContext().GetBundles();
+    int foundBundle = 0;
+    for (auto const& i : bundles)
+    {
+        if(i.GetSymbolicName() == "TestBundleB" || i.GetSymbolicName() == "TestBundleBA_00"){
+            foundBundle++;;
+        }
+    }
+    ASSERT_EQ(foundBundle, 2);
+
+
+    installHookReg.Unregister();
 
     bundleA.Stop();
 }

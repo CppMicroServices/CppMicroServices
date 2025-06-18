@@ -351,8 +351,7 @@ namespace cppmicroservices
                     // Now, create a BundleArchive with the given manifest at 'entry' in the
                     // BundleResourceContainer, and remember the created BundleArchive here for later
                     // processing, including purging any items created if an exception is thrown.
-                    auto archive = coreCtx->storage->CreateAndInsertArchive(resCont, symbolicName, manifest);
-                    barchives.push_back(archive);
+                    barchives.push_back(coreCtx->storage->CreateAndInsertArchive(resCont, symbolicName, manifest));
                 }
             }
 

@@ -34,109 +34,109 @@
 #    include <crtdbg.h>
 #    include <windows.h>
 #endif
+#include <array>
+#include <string>
 
-namespace cppmicroservices
+namespace {
+    constexpr std::size_t kErrorBufferSize = 128;
+}
+
+namespace cppmicroservices::util
 {
 
-    namespace util
-    {
-
 #ifdef US_PLATFORM_WINDOWS
-        std::string
-        GetLastWin32ErrorStr()
+    std::string
+    GetLastWin32ErrorStr()
+    {
+        DWORD errorCode = ::GetLastError();
+        LPWSTR wideMsgBuf = nullptr;
+
+        DWORD rc = FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM
+                                        | FORMAT_MESSAGE_IGNORE_INSERTS,
+                                    nullptr,
+                                    errorCode,
+                                    MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                                    reinterpret_cast<LPWSTR>(&wideMsgBuf),
+                                    0,
+                                    nullptr);
+
+        // If FormatMessage fails using FORMAT_MESSAGE_ALLOCATE_BUFFER
+        // it means that the size of the error message exceeds an internal
+        // buffer limit (128 kb according to MSDN) and lpMsgBuf will be
+        // uninitialized.
+        // Inform the caller that the error message couldn't be retrieved.
+        if (rc == 0)
         {
-            // Retrieve the system error message for the last-error code
-            LPVOID lpMsgBuf;
-            DWORD dw = GetLastError();
+            return std::string{"Failed to retrieve error message."};
+        }
 
-            DWORD rc = FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM
-                                          | FORMAT_MESSAGE_IGNORE_INSERTS,
-                                      NULL,
-                                      dw,
-                                      MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                                      reinterpret_cast<LPWSTR>(&lpMsgBuf),
-                                      0,
-                                      NULL);
+        std::wstring wideMsg(wideMsgBuf);
+        ::LocalFree(wideMsgBuf);
 
-            // If FormatMessage fails using FORMAT_MESSAGE_ALLOCATE_BUFFER
-            // it means that the size of the error message exceeds an internal
-            // buffer limit (128 kb according to MSDN) and lpMsgBuf will be
-            // uninitialized.
-            // Inform the caller that the error message couldn't be retrieved.
-            if (rc == 0)
+        return ToUTF8String(wideMsg);
+    }
+#endif
+
+    std::string
+    GetLastCErrorStr()
+    {
+        std::array<char, kErrorBufferSize> errorString{};
+#if ((_POSIX_C_SOURCE >= 200112L) && !_GNU_SOURCE) || defined(US_PLATFORM_APPLE)
+        // This is the XSI strerror_r version
+        int en = errno;
+        int r = strerror_r(errno, errorString.data(), errorString.size());
+        if (r)
+        {
+            std::string errMsg = "Unknown error " + util::ToString(en) + ": strerror_r failed with error code ";
+            if (r < 0)
             {
-                return std::string("Failed to retrieve error message.");
+                errMsg += util::ToString(static_cast<int>(errno));
             }
-
-            std::string errMsg(ToUTF8String(std::wstring(reinterpret_cast<LPCWSTR>(lpMsgBuf))));
-
-            LocalFree(lpMsgBuf);
+            else
+            {
+                errMsg += util::ToString(r);
+            }
             return errMsg;
         }
-#endif
-
-        std::string
-        GetLastCErrorStr()
-        {
-            char errorString[128];
-#if ((_POSIX_C_SOURCE >= 200112L) && !_GNU_SOURCE) || defined(US_PLATFORM_APPLE)
-            // This is the XSI strerror_r version
-            int en = errno;
-            int r = strerror_r(errno, errorString, sizeof errorString);
-            if (r)
-            {
-                std::string errMsg = "Unknown error " + util::ToString(en) + ": strerror_r failed with error code ";
-                if (r < 0)
-                {
-                    errMsg += util::ToString(static_cast<int>(errno));
-                }
-                else
-                {
-                    errMsg += util::ToString(r);
-                }
-                return errMsg;
-            }
-            return errorString;
+        return errorString;
 #elif defined(US_PLATFORM_WINDOWS)
-            if (strerror_s(errorString, sizeof errorString, errno))
-            {
-                return "Unknown error";
-            }
-            return errorString;
-#else
-            return strerror_r(errno, errorString, sizeof errorString);
-#endif
-        }
-
-        std::string
-        GetExceptionStr(std::exception_ptr const& exc)
+        if (strerror_s(errorString.data(), errorString.size(), errno))
         {
-            std::string excStr;
-            if (!exc)
-            {
-                return excStr;
-            }
+            return "Unknown error";
+        }
+        return {errorString.data()};
+#else
+        return strerror_r(errno, errorString.data(), errorString.size());
+#endif
+    }
 
-            try
-            {
-                std::rethrow_exception(exc);
-            }
-            catch (std::exception const& e)
-            {
-                excStr = e.what();
-            }
-            catch (...)
-            {
-                excStr = "unknown";
-            }
+    std::string
+    GetExceptionStr(std::exception_ptr const& exc)
+    {
+        std::string excStr;
+        if (!exc)
+        {
             return excStr;
         }
 
-        std::string
-        GetLastExceptionStr()
+        try
         {
-            return GetExceptionStr(std::current_exception());
+            std::rethrow_exception(exc);
         }
+        catch (std::exception const& e)
+        {
+            excStr = e.what();
+        }
+        catch (...)
+        {
+            excStr = "unknown";
+        }
+        return excStr;
+    }
 
-    } // namespace util
-} // namespace cppmicroservices
+    std::string
+    GetLastExceptionStr()
+    {
+        return GetExceptionStr(std::current_exception());
+    }
+} // namespace cppmicroservices::util

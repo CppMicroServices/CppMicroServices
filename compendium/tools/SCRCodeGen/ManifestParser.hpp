@@ -44,7 +44,7 @@ class ManifestParser
 {
   public:
     virtual ~ManifestParser() = default;
-    virtual std::vector<ComponentInfo> ParseAndGetComponentInfos(Json::Value const& scr) const = 0;
+    [[nodiscard]] virtual std::vector<ComponentInfo> ParseAndGetComponentInfos(Json::Value const& scr) const = 0;
 };
 
 #endif // MANIFESTPARSER_HPP

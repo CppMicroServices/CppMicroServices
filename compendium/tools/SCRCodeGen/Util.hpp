@@ -50,8 +50,8 @@ namespace codegen
             JsonValueValidator(Json::Value const& data, std::string name, Json::ValueType type)
                 : jsonName(std::move(name))
                 , msg("Invalid value for the name '" + jsonName + "'. Expected ")
+		, jsonVal(data[jsonName.c_str()])
             {
-                jsonVal = data[jsonName.c_str()];
                 if (Json::Value::nullRef == jsonVal)
                 {
                     std::string msg = "Mandatory name '" + jsonName + "' missing from the manifest";
@@ -71,10 +71,10 @@ namespace codegen
             JsonValueValidator(Json::Value const& data, std::string name, ValidChoices<S> const& choices)
                 : jsonName(std::move(name))
                 , msg("Invalid value for the name '" + jsonName + "'. Expected ")
+		, jsonVal(data[jsonName.c_str()])
             {
                 static_assert(S > 0, "Choices cannot be empty!");
 
-                jsonVal = data[jsonName.c_str()];
                 if (Json::Value::nullRef == jsonVal)
                 {
                     jsonVal = choices.front();
@@ -131,7 +131,7 @@ namespace codegen
             // Return the string representation of the Json value data[name]
             // Throw if data[name] is not of Json String type
             // (data and name are the Json data and name specified in the constructors)
-            std::string
+            [[nodiscard]] std::string
             GetString() const
             {
                 if (!jsonVal.isString())

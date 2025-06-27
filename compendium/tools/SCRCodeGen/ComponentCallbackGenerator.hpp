@@ -151,8 +151,8 @@ namespace codegen
             }
         }
 
-        std::vector<std::string> const mHeaderIncludes;
-        std::vector<ComponentInfo> const mComponentInfos;
+        std::vector<std::string> mHeaderIncludes;
+        std::vector<ComponentInfo> mComponentInfos;
         std::stringstream mStrStream;
     };
 

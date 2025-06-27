@@ -103,6 +103,9 @@ namespace cppmicroservices
                 // reference.target
                 ObjectValidator(metadata, "target", /*isOptional=*/true).AssignValueTo(refMetadata.target);
 
+                // reference.require-bind
+                ObjectValidator(metadata, "require-bind", /*isOptional=*/true).AssignValueTo(refMetadata.requireBind);
+
                 return refMetadata;
             }
 

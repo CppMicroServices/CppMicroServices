@@ -48,7 +48,7 @@ namespace cppmicroservices
             struct ReferenceMetadata
             {
                 // defaults for the data model
-                ReferenceMetadata() : cardinality("1..1"), policy("static"), policyOption("reluctant"), scope("bundle")
+                ReferenceMetadata() : cardinality("1..1"), policy("static"), policyOption("reluctant"), scope("bundle"), requireBind(true)
                 {
                 }
 
@@ -59,6 +59,7 @@ namespace cppmicroservices
                 std::string policy;
                 std::string policyOption;
                 std::string scope;
+                bool requireBind;
                 std::size_t minCardinality { 1 };
                 std::size_t maxCardinality { 1 };
 

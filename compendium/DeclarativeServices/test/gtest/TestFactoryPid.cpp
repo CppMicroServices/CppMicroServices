@@ -262,4 +262,32 @@ namespace test
         auto instances = GetInstances<test::CAInterface>();
         EXPECT_EQ(instances.size(), count);
     }
+
+    
+    TEST_F(tServiceComponent, TestServicePropsChangeForBind)
+    {
+        auto ctx = framework.GetBundleContext();
+        auto configAdmin = ctx.GetService<cppmicroservices::service::cm::ConfigurationAdmin>(  
+            ctx.GetServiceReference<cppmicroservices::service::cm::ConfigurationAdmin>());
+
+        auto bundle = StartTestBundle("TestBundleDSCA20");
+
+        auto bundle1  = StartTestBundle("TestBundleDSCA20_5");
+
+        std::string configID = "sample::ServiceComponentCA20";
+
+        cppmicroservices::AnyMap properties = cppmicroservices::AnyMap { cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS };
+        properties["someKey"] = true;
+        auto config = configAdmin->CreateFactoryConfiguration(configID);
+        config->Update(properties).get();
+
+        auto mainSvcRef = ctx.GetServiceReference<test::CAInterface1>();
+        ASSERT_TRUE(mainSvcRef);
+        auto mainSvc = ctx.GetService<test::CAInterface1>(mainSvcRef);
+        ASSERT_TRUE(mainSvc && mainSvc->isDependencyInjected());
+
+        properties["someKey"] = false;
+        config->Update(properties).get();
+        ASSERT_FALSE(mainSvc->isDependencyInjected());
+    }
 } // namespace test

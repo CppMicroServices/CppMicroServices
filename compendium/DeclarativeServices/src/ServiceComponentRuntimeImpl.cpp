@@ -98,6 +98,7 @@ namespace cppmicroservices
             refDTO.policyOption = refData.policyOption;
             refDTO.scope = refData.scope;
             refDTO.target = refData.target;
+            refDTO.requireBind = refData.requireBind;
             return refDTO;
         }
 

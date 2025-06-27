@@ -108,6 +108,16 @@ namespace cppmicroservices
                          * declare a target for the reference.
                          */
                         std::string target;
+/**
+                         * The require-bind of the reference.
+                         *
+                         * <p>
+                         * This is declared in the \c require-bind attribute of the \c reference
+                         * element. This specifies whether, for this specific reference, the service
+                         * must implement a \c bind and \c unbind method regardless of the whether
+                         * the \c inject-references property for the \c component is observed
+                         */
+                        bool requireBind;
 
                         /**
                          * The name of the bind method of the reference.

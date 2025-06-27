@@ -212,6 +212,7 @@ set(_test_bundles
   TestBundleDSCA12
   TestBundleDSCA16
   TestBundleDSCA20
+  TestBundleDSCA20_5
   TestBundleDSCA24
   TestBundleDSCA26
   TestBundleDSCA27

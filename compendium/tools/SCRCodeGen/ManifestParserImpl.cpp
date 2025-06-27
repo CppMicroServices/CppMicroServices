@@ -169,6 +169,12 @@ ManifestParserImplV1::ParseAndGetComponentInfos(Json::Value const& scr) const
                     refInfo.target
                         = JsonValueValidator(jsonRefInfo, "target", Json::ValueType::stringValue).GetString();
                 }
+
+                if (jsonRefInfo.isMember("require-bind")){
+                    auto const requireBind = JsonValueValidator(jsonRefInfo, "require-bind", Json::ValueType::booleanValue)();
+                    refInfo.require_bind = requireBind.asBool();
+                }
+
                 componentInfo.references.push_back(refInfo);
             }
 

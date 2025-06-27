@@ -1,0 +1,22 @@
+{
+    "bundle.symbolic_name" : "TestBundleDSCA20_5",
+    "scr" : {
+        "version" : 1,
+         "components" : [{
+            "immediate": true,
+            "implementation-class": "sample::ServiceComponentCA20_5",
+             "service": {
+                "interfaces": ["test::CAInterface1"]
+            },
+            "references" : [
+                {
+                    "name" : "ref1",
+                    "interface": "test::CAInterface",
+                    "target" : "(someKey=true)",
+                    "policy" : "dynamic",
+                    "require-bind" : false
+                }
+            ]
+        }]
+    }
+}

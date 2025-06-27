@@ -53,44 +53,44 @@ main(int argc, char const** argv, char**)
     int returnCode = 0;
     int const FailureReturnCode = -1;
 
-    std::vector<std::string> args(argv, argv + argc);
-
-    // Validate program options ordering.
-    // Return the iterator corresponding to the option argument.
-    // Error conditions:
-    // 1. the option doesn't exist
-    // 2. the option argument doesn't exist
-    // 3. the option argument starts with a '-'
-    auto findOrThrow = [&args](std::string const& key)
-    {
-        auto it = std::find(std::begin(args), std::end(args), key);
-        if (it == args.end())
-        {
-            throw std::runtime_error("Cannot find option " + key);
-        }
-        ++it;
-        if (it == args.end())
-        {
-            throw std::runtime_error("No argument provided for option " + key);
-        }
-        if (it->at(0) == '-')
-        {
-            throw std::runtime_error("The argument " + key + " cannot be an option i.e. it cannot start with -");
-        }
-        return it;
-    };
-
-    // Validate if file stream is open. Otherwise, throw
-    auto checkFileOpenOrThrow = [](auto const& fstream)
-    {
-        if (!fstream.is_open())
-        {
-            throw std::runtime_error("Failed to open manifest file");
-        }
-    };
-
     try
     {
+        std::vector<std::string> args(argv, argv + argc);
+
+    	// Validate program options ordering.
+	// Return the iterator corresponding to the option argument.
+    	// Error conditions:
+    	// 1. the option doesn't exist
+    	// 2. the option argument doesn't exist
+    	// 3. the option argument starts with a '-'
+    	auto findOrThrow = [&args](std::string const& key)
+    	{
+            auto it = std::find(std::begin(args), std::end(args), key);
+            if (it == args.end())
+            {
+                throw std::runtime_error("Cannot find option " + key);
+            }
+            ++it;
+            if (it == args.end())
+            {
+                throw std::runtime_error("No argument provided for option " + key);
+            }
+            if (it->at(0) == '-')
+            {
+                throw std::runtime_error("The argument " + key + " cannot be an option i.e. it cannot start with -");
+            }
+            return it;
+        };
+
+    	// Validate if file stream is open. Otherwise, throw
+    	auto checkFileOpenOrThrow = [](auto const& fstream)
+    	{
+            if (!fstream.is_open())
+            {
+                throw std::runtime_error("Failed to open manifest file");
+            }
+    	};
+
         auto it = findOrThrow("--manifest");
         std::string manifestFilePath = *it;
         it = findOrThrow("--out-file");

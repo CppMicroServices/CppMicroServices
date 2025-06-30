@@ -149,9 +149,11 @@ endif()
 #------------------------------------------------------------------------------
 
 set(US_CMAKE_DIR ${PROJECT_SOURCE_DIR}/cmake)
+set(US_CMAKE_CONAN_CONFIG_DIR ${PROJECT_SOURCE_DIR}/cmake/conan)
 
 set(CMAKE_MODULE_PATH
   ${US_CMAKE_DIR}
+  ${US_CMAKE_CONAN_CONFIG_DIR}
   ${CMAKE_MODULE_PATH}
   )
 
@@ -172,6 +174,7 @@ include(usMacroCreateBundle)
 include(usFunctionCreateTestBundle)
 include(usFunctionCreateDSTestBundle)
 include(usFunctionBoostPath)
+include(conan_setup)
 
 if (US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG)
   check_cxx_compiler_flag(-Wno-missing-braces HAS_MISSING_BRACES_FLAG)

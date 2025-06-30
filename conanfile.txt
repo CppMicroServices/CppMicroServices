@@ -1,0 +1,10 @@
+[requires]
+spdlog/1.15.3
+
+[generators]
+CMakeDeps
+CMakeToolchain
+
+
+[layout]
+cmake_layout

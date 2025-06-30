@@ -1,4 +1,5 @@
 # sources and headers
+find_package(spdlog REQUIRED)
 set(_srcs
   src/LogServiceImpl.cpp
   src/LoggerFactoryImpl.cpp
@@ -55,6 +56,10 @@ usMacroCreateBundle(LogServiceImpl
   BINARY_RESOURCES manifest.json
   )
 
+
+# find_or_add_third_party(spdlog spdlog spdlog/spdlog.h)
+
+# message(FATAL_ERROR "spdlog headers are ${SPDLOG_INCLUDE_DIR}")
 target_include_directories(LogService PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/src
   ${CppMicroServices_BINARY_DIR}/include
@@ -62,10 +67,15 @@ target_include_directories(LogService PRIVATE
   ${CppMicroServices_BINARY_DIR}/framework/include
   ${CppMicroServices_SOURCE_DIR}/compendium/LogService/include
   ${CppMicroServices_BINARY_DIR}/compendium/LogService/include
-  ${CppMicroServices_SOURCE_DIR}/third_party/spdlog/include
   ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googletest/include
   ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googlemock/include
+  
   )
+
+target_link_libraries(LogService PRIVATE spdlog::spdlog)
+
+get_target_property(tmp_includes LogService INCLUDE_DIRECTORIES)
+message(STATUS "LogService includes: ${tmp_includes}")
 
 if(APPLE)
   if(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "8.0.0")

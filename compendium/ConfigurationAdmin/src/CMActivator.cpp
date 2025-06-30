@@ -28,181 +28,173 @@
 
 using cppmicroservices::logservice::SeverityLevel;
 
-namespace cppmicroservices
+namespace cppmicroservices::cmimpl
 {
-    namespace cmimpl
+    void
+    CMActivator::Start(BundleContext context)
     {
-        void
-        CMActivator::Start(BundleContext context)
-        {
-            runtimeContext = context;
-            // Create the Logger object used by this runtime
-            logger = std::make_shared<CMLogger>(context);
-            logger->Log(SeverityLevel::LOG_DEBUG, "Starting CM bundle");
-            // Create the AsyncWorkService object used by this runtime
-            asyncWorkService = std::make_shared<CMAsyncWorkService>(context, logger);
-            // Create ConfigurationAdminImpl
-            configAdminImpl = std::make_shared<ConfigurationAdminImpl>(runtimeContext, logger, asyncWorkService);
-            activatorStopped = std::make_shared<bool>(false);
-            notificationLock = std::make_shared<std::shared_mutex>();
-            // Add bundle listener
-            bundleListenerToken
-                = context.AddBundleListener([this, activatorStoppedCopy = activatorStopped, notificationLockCopy = notificationLock](cppmicroservices::BundleEvent
-                    const & evt) {
-                    ReadLock l(*notificationLockCopy);
-                    if (*activatorStoppedCopy) {
-                        return;
-                    }
-                    this->BundleChanged(evt);
-                });
-            // HACK: Workaround for lack of Bundle Tracker. Iterate over all bundles and call the tracker method
-            // manually
-            for (auto const& bundle : context.GetBundles())
+        runtimeContext = context;
+        // Create the Logger object used by this runtime
+        logger = std::make_shared<CMLogger>(context);
+        logger->Log(SeverityLevel::LOG_DEBUG, "Starting CM bundle");
+        // Create the AsyncWorkService object used by this runtime
+        asyncWorkService = std::make_shared<CMAsyncWorkService>(context, logger);
+        // Create ConfigurationAdminImpl
+        configAdminImpl = std::make_shared<ConfigurationAdminImpl>(runtimeContext, logger, asyncWorkService);
+        activatorStopped = std::make_shared<bool>(false);
+        notificationLock = std::make_shared<std::shared_mutex>();
+        // Add bundle listener
+        bundleListenerToken = context.AddBundleListener(
+            [this, activatorStoppedCopy = activatorStopped, notificationLockCopy = notificationLock](
+                cppmicroservices::BundleEvent const& evt)
             {
-                if (cppmicroservices::Bundle::State::STATE_ACTIVE & bundle.GetState())
+                ReadLock l(*notificationLockCopy);
+                if (*activatorStoppedCopy)
                 {
-                    cppmicroservices::BundleEvent evt(cppmicroservices::BundleEvent::BUNDLE_STARTED, bundle);
-                    BundleChanged(evt);
+                    return;
                 }
-            }
-            // Publish ConfigurationAdmin service
-            configAdminReg
-                = context.RegisterService<cppmicroservices::service::cm::ConfigurationAdmin>(configAdminImpl);
-        }
-
-        void
-        CMActivator::Stop(cppmicroservices::BundleContext context)
+                this->BundleChanged(evt);
+            });
+        // HACK: Workaround for lack of Bundle Tracker. Iterate over all bundles and call the tracker method
+        // manually
+        for (auto const& bundle : context.GetBundles())
         {
-            WriteLock l(*notificationLock);
-            *activatorStopped = true;
-            try
+            if (cppmicroservices::Bundle::State::STATE_ACTIVE & bundle.GetState())
             {
-                // remove the bundle listener
-                context.RemoveListener(std::move(bundleListenerToken));
-                // remove the runtime service from the framework
-                configAdminReg.Unregister();
-                // clear bundle registry
-                {
-                    std::lock_guard<std::mutex> l(bundleRegMutex);
-                    bundleRegistry.clear();
-                }
-                // Clean up the ConfigurationAdminImpl
-                // WAITFOR all configAdmin work to stop
-                // dont queue any new work and wait for existing work
-                configAdminImpl->StopAndWaitForAllAsync();
-                configAdminImpl = nullptr;
-                logger->Log(SeverityLevel::LOG_DEBUG, "CM Bundle stopped.");
+                cppmicroservices::BundleEvent evt(cppmicroservices::BundleEvent::BUNDLE_STARTED, bundle);
+                BundleChanged(evt);
             }
-            catch (...)
-            {
-                logger->Log(SeverityLevel::LOG_DEBUG,
-                            "Exception while stopping the CM bundle",
-                            std::current_exception());
-            }
-            asyncWorkService->StopTracking();
-            logger = nullptr;
-            runtimeContext = nullptr;
         }
+        // Publish ConfigurationAdmin service
+        configAdminReg = context.RegisterService<cppmicroservices::service::cm::ConfigurationAdmin>(configAdminImpl);
+    }
 
-        void
-        CMActivator::CreateExtension(cppmicroservices::Bundle const& bundle)
+    void
+    CMActivator::Stop(cppmicroservices::BundleContext context)
+    {
+        WriteLock l(*notificationLock);
+        *activatorStopped = true;
+        try
         {
-            auto const& headers = bundle.GetHeaders();
-            // bundle has no "cm" configuration
-            if (headers.find(CMConstants::CM_KEY) == std::end(headers))
-            {
-                logger->Log(SeverityLevel::LOG_DEBUG,
-                            "No CM Configuration found in bundle " + bundle.GetSymbolicName());
-                return;
-            }
-
-            auto extensionFound = false;
+            // remove the bundle listener
+            context.RemoveListener(std::move(bundleListenerToken));
+            // remove the runtime service from the framework
+            configAdminReg.Unregister();
+            // clear bundle registry
             {
                 std::lock_guard<std::mutex> l(bundleRegMutex);
-                extensionFound = (bundleRegistry.find(bundle.GetBundleId()) != std::end(bundleRegistry));
+                bundleRegistry.clear();
             }
-            // This bundle's configuration has not been loaded, so create the extension which will load it
-            if (extensionFound)
-            {
-                logger->Log(SeverityLevel::LOG_DEBUG,
-                            "CM Configuration already loaded from bundle " + bundle.GetSymbolicName());
-                return;
-            }
+            // Clean up the ConfigurationAdminImpl
+            // WAITFOR all configAdmin work to stop
+            // dont queue any new work and wait for existing work
+            configAdminImpl->StopAndWaitForAllAsync();
+            configAdminImpl = nullptr;
+            logger->Log(SeverityLevel::LOG_DEBUG, "CM Bundle stopped.");
+        }
+        catch (...)
+        {
+            logger->Log(SeverityLevel::LOG_DEBUG, "Exception while stopping the CM bundle", std::current_exception());
+        }
+        asyncWorkService->StopTracking();
+        logger = nullptr;
+        runtimeContext = nullptr;
+    }
 
-            logger->Log(SeverityLevel::LOG_DEBUG, "Creating CMBundleExtension ... " + bundle.GetSymbolicName());
-            try
-            {
-                auto const& cmMetadata
-                    = cppmicroservices::ref_any_cast<cppmicroservices::AnyMap>(headers.at(CMConstants::CM_KEY));
-                auto be = std::make_unique<CMBundleExtension>(bundle.GetBundleContext(),
-                                                              cmMetadata,
-                                                              configAdminImpl,
-                                                              logger);
-                {
-                    std::lock_guard<std::mutex> l(bundleRegMutex);
-                    bundleRegistry.emplace(bundle.GetBundleId(), std::move(be));
-                }
-            }
-            catch (std::exception const&)
-            {
-                logger->Log(SeverityLevel::LOG_WARNING,
-                            "Failed to create CMBundleExtension for " + bundle.GetSymbolicName(),
-                            std::current_exception());
-            }
+    void
+    CMActivator::CreateExtension(cppmicroservices::Bundle const& bundle)
+    {
+        auto const& headers = bundle.GetHeaders();
+        // bundle has no "cm" configuration
+        if (headers.find(CMConstants::CM_KEY) == std::end(headers))
+        {
+            logger->Log(SeverityLevel::LOG_DEBUG, "No CM Configuration found in bundle " + bundle.GetSymbolicName());
+            return;
         }
 
-        void
-        CMActivator::RemoveExtension(cppmicroservices::Bundle const& bundle)
+        auto extensionFound = false;
         {
-            auto const& headers = bundle.GetHeaders();
-            // bundle has no "cm" configuration
-            if (headers.find(CMConstants::CM_KEY) == std::end(headers))
-            {
-                logger->Log(SeverityLevel::LOG_DEBUG,
-                            "No CM Configuration found in bundle " + bundle.GetSymbolicName());
-                return;
-            }
+            std::lock_guard<std::mutex> l(bundleRegMutex);
+            extensionFound = (bundleRegistry.find(bundle.GetBundleId()) != std::end(bundleRegistry));
+        }
+        // This bundle's configuration has not been loaded, so create the extension which will load it
+        if (extensionFound)
+        {
+            logger->Log(SeverityLevel::LOG_DEBUG,
+                        "CM Configuration already loaded from bundle " + bundle.GetSymbolicName());
+            return;
+        }
 
-            bool extensionFound = false;
+        logger->Log(SeverityLevel::LOG_DEBUG, "Creating CMBundleExtension ... " + bundle.GetSymbolicName());
+        try
+        {
+            auto const& cmMetadata
+                = cppmicroservices::ref_any_cast<cppmicroservices::AnyMap>(headers.at(CMConstants::CM_KEY));
+            auto be
+                = std::make_unique<CMBundleExtension>(bundle.GetBundleContext(), cmMetadata, configAdminImpl, logger);
             {
                 std::lock_guard<std::mutex> l(bundleRegMutex);
-                auto extensionIt = bundleRegistry.find(bundle.GetBundleId());
-                if (extensionIt != std::end(bundleRegistry))
-                {
-                    bundleRegistry.erase(extensionIt);
-                    extensionFound = true;
-                }
+                bundleRegistry.emplace(bundle.GetBundleId(), std::move(be));
             }
-            if (extensionFound)
-            {
-                logger->Log(SeverityLevel::LOG_DEBUG, "Removed CMBundleExtension for " + bundle.GetSymbolicName());
-                return;
-            }
-            logger->Log(SeverityLevel::LOG_DEBUG, "Found no CMBundleExtension for " + bundle.GetSymbolicName());
         }
-
-        void
-        CMActivator::BundleChanged(cppmicroservices::BundleEvent const& evt)
+        catch (std::exception const&)
         {
-            auto bundle = evt.GetBundle();
-            auto const eventType = evt.GetType();
-            if (bundle == runtimeContext.GetBundle()) // skip events for this (runtime) bundle
-            {
-                return;
-            }
-
-            // TODO: revisit to include LAZY_ACTIVATION when supported by the framework
-            if (cppmicroservices::BundleEvent::BUNDLE_STARTED & eventType)
-            {
-                CreateExtension(bundle);
-            }
-            else if (cppmicroservices::BundleEvent::BUNDLE_STOPPING & eventType)
-            {
-                RemoveExtension(bundle);
-            }
-            // else ignore
+            logger->Log(SeverityLevel::LOG_WARNING,
+                        "Failed to create CMBundleExtension for " + bundle.GetSymbolicName(),
+                        std::current_exception());
         }
-    } // namespace cmimpl
-} // namespace cppmicroservices
+    }
+
+    void
+    CMActivator::RemoveExtension(cppmicroservices::Bundle const& bundle)
+    {
+        auto const& headers = bundle.GetHeaders();
+        // bundle has no "cm" configuration
+        if (headers.find(CMConstants::CM_KEY) == std::end(headers))
+        {
+            logger->Log(SeverityLevel::LOG_DEBUG, "No CM Configuration found in bundle " + bundle.GetSymbolicName());
+            return;
+        }
+
+        bool extensionFound = false;
+        {
+            std::lock_guard<std::mutex> l(bundleRegMutex);
+            auto extensionIt = bundleRegistry.find(bundle.GetBundleId());
+            if (extensionIt != std::end(bundleRegistry))
+            {
+                bundleRegistry.erase(extensionIt);
+                extensionFound = true;
+            }
+        }
+        if (extensionFound)
+        {
+            logger->Log(SeverityLevel::LOG_DEBUG, "Removed CMBundleExtension for " + bundle.GetSymbolicName());
+            return;
+        }
+        logger->Log(SeverityLevel::LOG_DEBUG, "Found no CMBundleExtension for " + bundle.GetSymbolicName());
+    }
+
+    void
+    CMActivator::BundleChanged(cppmicroservices::BundleEvent const& evt)
+    {
+        auto bundle = evt.GetBundle();
+        auto const eventType = evt.GetType();
+        if (bundle == runtimeContext.GetBundle()) // skip events for this (runtime) bundle
+        {
+            return;
+        }
+
+        // TODO: revisit to include LAZY_ACTIVATION when supported by the framework
+        if (cppmicroservices::BundleEvent::BUNDLE_STARTED & eventType)
+        {
+            CreateExtension(bundle);
+        }
+        else if (cppmicroservices::BundleEvent::BUNDLE_STOPPING & eventType)
+        {
+            RemoveExtension(bundle);
+        }
+        // else ignore
+    }
+} // namespace cppmicroservices::cmimpl
 
 CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::cmimpl::CMActivator) // NOLINT

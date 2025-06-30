@@ -22,18 +22,9 @@
 
 #include "cppmicroservices/servicecomponent/runtime/ServiceComponentRuntime.hpp"
 
-namespace cppmicroservices
+namespace cppmicroservices::service::component::runtime
 {
-    namespace service
-    {
-        namespace component
-        {
-            namespace runtime
-            {
 
-                ServiceComponentRuntime::~ServiceComponentRuntime() noexcept {}
+    ServiceComponentRuntime::~ServiceComponentRuntime() noexcept {}
 
-            } // namespace runtime
-        }     // namespace component
-    }         // namespace service
-} // namespace cppmicroservices
+} // namespace cppmicroservices::service::component::runtime

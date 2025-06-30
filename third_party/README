@@ -165,10 +165,10 @@ https://github.com/abseil/abseil-cpp/releases/tag/20230125.3
 spdlog
 ------
 
-See https://github.com/gabime/spdlog/blob/v1.x/LICENSE for license information
+See https://github.com/gabime/spdlog/blob/v1.15.2/LICENSE for license information
 
 https://github.com/gabime/spdlog
-v1.12.0
+v1.15.2
 
 * We only use the include folder since we aren't statically linking to the library
 * version reflects the version from which we copied the include folder

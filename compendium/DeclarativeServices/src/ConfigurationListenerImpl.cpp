@@ -24,89 +24,82 @@
 #include "cppmicroservices/SecurityException.h"
 #include "cppmicroservices/cm/ConfigurationAdmin.hpp"
 
-namespace cppmicroservices
+namespace cppmicroservices::service::cm
 {
-    namespace service
+    ConfigurationListenerImpl::ConfigurationListenerImpl(
+        cppmicroservices::BundleContext const& context,
+        std::shared_ptr<cppmicroservices::logservice::LogService> logger,
+        std::shared_ptr<cppmicroservices::scrimpl::ConfigurationNotifier> configNotifier)
+        : bundleContext(std::move(context))
+        , logger(std::move(logger))
+        , configNotifier(std::move(configNotifier))
     {
-        namespace cm
+        if (!bundleContext || !(this->logger) || !(this->configNotifier))
         {
+            throw std::invalid_argument("ConfigurationListenerImpl Constructor "
+                                        "provided with invalid arguments");
+        }
+    }
 
-            ConfigurationListenerImpl::ConfigurationListenerImpl(
-                cppmicroservices::BundleContext const& context,
-                std::shared_ptr<cppmicroservices::logservice::LogService> logger,
-                std::shared_ptr<cppmicroservices::scrimpl::ConfigurationNotifier> configNotifier)
-                : bundleContext(context)
-                , logger(std::move(logger))
-                , configNotifier(std::move(configNotifier))
+    void
+    ConfigurationListenerImpl::configurationEvent(ConfigurationEvent const& event)
+    {
+        try
+        {
+            auto pid = (!event.getPid().empty()) ? event.getPid() : event.getFactoryPid();
+            if (pid.empty())
             {
-                if (!bundleContext || !(this->logger) || !(this->configNotifier))
+                return;
+            }
+            auto configAdminRef = event.getReference();
+            if (!configAdminRef)
+            {
+                logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                            "configurationEvent error. ConfigurationAdmin service "
+                            "reference is no longer valid");
+                return;
+            }
+            auto configAdmin
+                = bundleContext.GetService<cppmicroservices::service::cm::ConfigurationAdmin>(configAdminRef);
+            if (!configAdmin)
+            {
+                logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                            "configurationEvent error. ConfigurationAdmin service "
+                            "reference is no longer valid");
+                return;
+            }
+            cppmicroservices::AnyMap properties;
+            auto type = event.getType();
+            unsigned long changeCount = 0;
+            if (type == ConfigurationEventType::CM_UPDATED)
+            {
+                auto configObject = configAdmin->GetConfiguration(pid);
+                if (configObject)
                 {
-                    throw std::invalid_argument("ConfigurationListenerImpl Constructor "
-                                                "provided with invalid arguments");
+                    properties = configObject->GetProperties();
+                    changeCount = configObject->GetChangeCount();
                 }
             }
-
-            void
-            ConfigurationListenerImpl::configurationEvent(ConfigurationEvent const& event)
+            if (!configNotifier->AnyListenersForPid(pid, properties))
             {
-                try
-                {
-                    auto pid = (!event.getPid().empty()) ? event.getPid() : event.getFactoryPid();
-                    if (pid.empty())
-                    {
-                        return;
-                    }
-                    auto configAdminRef = event.getReference();
-                    if (!configAdminRef)
-                    {
-                        logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-                                    "configurationEvent error. ConfigurationAdmin service "
-                                    "reference is no longer valid");
-                        return;
-                    }
-                    auto configAdmin
-                        = bundleContext.GetService<cppmicroservices::service::cm::ConfigurationAdmin>(configAdminRef);
-                    if (!configAdmin)
-                    {
-                        logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-                                    "configurationEvent error. ConfigurationAdmin service "
-                                    "reference is no longer valid");
-                        return;
-                    }
-                    cppmicroservices::AnyMap properties;
-                    auto type = event.getType();
-                    unsigned long changeCount = 0;
-                    if (type == ConfigurationEventType::CM_UPDATED)
-                    {
-                        auto configObject = configAdmin->GetConfiguration(pid);
-                        if (configObject)
-                        {
-                            properties = configObject->GetProperties();
-                            changeCount = configObject->GetChangeCount();
-                        }
-                    }
-                    if (!configNotifier->AnyListenersForPid(pid, properties))
-                    {
-                        return;
-                    }
-                    auto ptr = std::make_shared<cppmicroservices::AnyMap>(properties);
-                    configNotifier->NotifyAllListeners(pid, type, ptr, changeCount);
-                }
-                catch (cppmicroservices::SecurityException const&)
-                {
-                    logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-                                "Security exception while executing "
-                                "ConfigurationListener::configEvent method.",
-                                std::current_exception());
-                    throw;
-                }
-                catch (...)
-                {
-                    logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-                                "Exception while executing ConfigurationListener::configEvent method.",
-                                std::current_exception());
-                }
+                return;
             }
-        } // namespace cm
-    }     // namespace service
-} // namespace cppmicroservices
+            auto ptr = std::make_shared<cppmicroservices::AnyMap>(properties);
+            configNotifier->NotifyAllListeners(pid, type, ptr, changeCount);
+        }
+        catch (cppmicroservices::SecurityException const&)
+        {
+            logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                        "Security exception while executing "
+                        "ConfigurationListener::configEvent method.",
+                        std::current_exception());
+            throw;
+        }
+        catch (...)
+        {
+            logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                        "Exception while executing ConfigurationListener::configEvent method.",
+                        std::current_exception());
+        }
+    }
+} // namespace cppmicroservices::service::cm

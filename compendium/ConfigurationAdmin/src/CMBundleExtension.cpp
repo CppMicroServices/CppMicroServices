@@ -28,53 +28,49 @@
 #include "metadata/MetadataParser.hpp"
 #include "metadata/MetadataParserFactory.hpp"
 
-namespace cppmicroservices
+namespace cppmicroservices::cmimpl
 {
-    namespace cmimpl
+    CMBundleExtension::CMBundleExtension(cppmicroservices::BundleContext context,
+                                         cppmicroservices::AnyMap const& cmMetadata,
+                                         std::shared_ptr<ConfigurationAdminPrivate> configAdmin,
+                                         std::shared_ptr<cppmicroservices::logservice::LogService> lggr)
+        : bundleContext(std::move(context))
+        , configAdminImpl(std::move(configAdmin))
+        , logger(std::move(lggr))
     {
-        CMBundleExtension::CMBundleExtension(cppmicroservices::BundleContext context,
-                                             cppmicroservices::AnyMap const& cmMetadata,
-                                             std::shared_ptr<ConfigurationAdminPrivate> configAdmin,
-                                             std::shared_ptr<cppmicroservices::logservice::LogService> lggr)
-            : bundleContext(std::move(context))
-            , configAdminImpl(std::move(configAdmin))
-            , logger(std::move(lggr))
+        if (!bundleContext || !configAdminImpl || !logger || cmMetadata.empty())
         {
-            if (!bundleContext || !configAdminImpl || !logger || cmMetadata.empty())
-            {
-                throw std::invalid_argument("Invalid parameters passed to CMBundleExtension constructor");
-            }
-
-            if (0u == cmMetadata.count(CMConstants::CM_VERSION))
-            {
-                throw std::runtime_error(std::string("Metadata is missing mandatory '") + CMConstants::CM_VERSION
-                                         + "' property");
-            }
-            auto version = cppmicroservices::any_cast<int>(cmMetadata.at(CMConstants::CM_VERSION));
-            auto metadataParser = metadata::MetadataParserFactory::Create(version, logger);
-            auto configurationMetadata = metadataParser->ParseAndGetConfigurationMetadata(cmMetadata);
-
-            pidsAndChangeCountsAndIDs = configAdminImpl->AddConfigurations(std::move(configurationMetadata));
-
-            logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
-                        "Created instance of CMBundleExtension for " + bundleContext.GetBundle().GetSymbolicName());
+            throw std::invalid_argument("Invalid parameters passed to CMBundleExtension constructor");
         }
 
-        CMBundleExtension::~CMBundleExtension()
+        if (0u == cmMetadata.count(CMConstants::CM_VERSION))
         {
-            try
-            {
-                logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
-                            "Deleting instance of CMBundleExtension for "
-                                + bundleContext.GetBundle().GetSymbolicName());
-                configAdminImpl->RemoveConfigurations(pidsAndChangeCountsAndIDs);
-            }
-            catch (std::exception const&)
-            {
-                logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-                            "Exception thrown while destroying CMBundleExtension object",
-                            std::current_exception());
-            }
-        };
-    } // namespace cmimpl
-} // namespace cppmicroservices
+            throw std::runtime_error(std::string("Metadata is missing mandatory '") + CMConstants::CM_VERSION
+                                     + "' property");
+        }
+        auto version = cppmicroservices::any_cast<int>(cmMetadata.at(CMConstants::CM_VERSION));
+        auto metadataParser = metadata::MetadataParserFactory::Create(version, logger);
+        auto configurationMetadata = metadataParser->ParseAndGetConfigurationMetadata(cmMetadata);
+
+        pidsAndChangeCountsAndIDs = configAdminImpl->AddConfigurations(std::move(configurationMetadata));
+
+        logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
+                    "Created instance of CMBundleExtension for " + bundleContext.GetBundle().GetSymbolicName());
+    }
+
+    CMBundleExtension::~CMBundleExtension()
+    {
+        try
+        {
+            logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
+                        "Deleting instance of CMBundleExtension for " + bundleContext.GetBundle().GetSymbolicName());
+            configAdminImpl->RemoveConfigurations(pidsAndChangeCountsAndIDs);
+        }
+        catch (std::exception const&)
+        {
+            logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                        "Exception thrown while destroying CMBundleExtension object",
+                        std::current_exception());
+        }
+    };
+} // namespace cppmicroservices::cmimpl

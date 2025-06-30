@@ -24,75 +24,65 @@
 
 #include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
 
-namespace cppmicroservices
-{
-    namespace service
-    {
-        namespace component
-        {
-
             /**
              * Defines standard names for Service Component constants.
              */
-            namespace ComponentConstants
-            {
-                /**
-                 * Name of the object that contains Service Component descriptions in
-                 * the bundle's metadata.
-                 * <p>
-                 * The value may be retrieved from the {@code cppmicroservices::AnyMap} object
-                 * returned by the {@code Bundle.GetHeaders} method.
-                 */
-                const std::string SERVICE_COMPONENT = "scr";
+namespace cppmicroservices::service::component::ComponentConstants
+{
+    /**
+     * Name of the object that contains Service Component descriptions in
+     * the bundle's metadata.
+     * <p>
+     * The value may be retrieved from the {@code cppmicroservices::AnyMap} object
+     * returned by the {@code Bundle.GetHeaders} method.
+     */
+    const std::string SERVICE_COMPONENT = "scr";
 
-                /**
-                 * A component property for a component configuration that contains the name
-                 * of the component as specified in the {@code name} attribute of the
-                 * {@code component} element. The value of this property must be of type
-                 * {@code std::string}.
-                 */
-                const std::string COMPONENT_NAME = "component.name";
+    /**
+     * A component property for a component configuration that contains the name
+     * of the component as specified in the {@code name} attribute of the
+     * {@code component} element. The value of this property must be of type
+     * {@code std::string}.
+     */
+    const std::string COMPONENT_NAME = "component.name";
 
-                /**
-                 * A component property that contains the generated id for a component
-                 * configuration. The value of this property must be of type {@code unsigned long}.
-                 *
-                 * <p>
-                 * The value of this property is assigned by Service Component Runtime when
-                 * a component configuration is created. Service Component Runtime assigns a
-                 * unique value that is larger than all previously assigned values since
-                 * Service Component Runtime was started. These values are NOT persistent
-                 * across restarts of Service Component Runtime.
-                 */
-                const std::string COMPONENT_ID = "component.id";
+    /**
+     * A component property that contains the generated id for a component
+     * configuration. The value of this property must be of type {@code unsigned long}.
+     *
+     * <p>
+     * The value of this property is assigned by Service Component Runtime when
+     * a component configuration is created. Service Component Runtime assigns a
+     * unique value that is larger than all previously assigned values since
+     * Service Component Runtime was started. These values are NOT persistent
+     * across restarts of Service Component Runtime.
+     */
+    const std::string COMPONENT_ID = "component.id";
 
-                /**
-                 * A service registration property for a Component Factory that contains the
-                 * value of the {@code factory} attribute. The value of this property must
-                 * be of type {@code std::string}.
-                 */
-                const std::string COMPONENT_FACTORY = "component.factory";
+    /**
+     * A service registration property for a Component Factory that contains the
+     * value of the {@code factory} attribute. The value of this property must
+     * be of type {@code std::string}.
+     */
+    const std::string COMPONENT_FACTORY = "component.factory";
 
-                /**
-                 * The suffix for reference target properties. These properties contain the
-                 * filter to select the target services for a reference. The value of this
-                 * property must be of type {@code std::string}.
-                 */
-                const std::string REFERENCE_TARGET_SUFFIX = ".target";
+    /**
+     * The suffix for reference target properties. These properties contain the
+     * filter to select the target services for a reference. The value of this
+     * property must be of type {@code std::string}.
+     */
+    const std::string REFERENCE_TARGET_SUFFIX = ".target";
 
-                /**
-                 * Scope to indicate the reference must be a servcie registered with PROTOTYPE scope.
-                 */
+    /**
+     * Scope to indicate the reference must be a servcie registered with PROTOTYPE scope.
+     */
 
-                const std::string REFERENCE_SCOPE_PROTOTYPE_REQUIRED = "prototype_required";
+    const std::string REFERENCE_SCOPE_PROTOTYPE_REQUIRED = "prototype_required";
 
-                /**
-                 * Constants used for ComponentMetadata Configuration Policy.
-                 */
-                const std::string CONFIG_POLICY_IGNORE = "ignore";
-                const std::string CONFIG_POLICY_REQUIRE = "require";
-                const std::string CONFIG_POLICY_OPTIONAL = "optional";
-            } // namespace ComponentConstants
-        }     // namespace component
-    }         // namespace service
-} // namespace cppmicroservices
+    /**
+     * Constants used for ComponentMetadata Configuration Policy.
+     */
+    const std::string CONFIG_POLICY_IGNORE = "ignore";
+    const std::string CONFIG_POLICY_REQUIRE = "require";
+    const std::string CONFIG_POLICY_OPTIONAL = "optional";
+} // namespace cppmicroservices::service::component::ComponentConstants

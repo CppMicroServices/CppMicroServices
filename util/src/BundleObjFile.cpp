@@ -24,17 +24,32 @@
 
 #include <cstring>
 #include <utility>
+#include <string>
+#include <array>
 
 US_MSVC_PUSH_DISABLE_WARNING(4996)
 
 namespace cppmicroservices
 {
+  namespace
+    {
+        constexpr std::size_t ErrorBufferSize = 256;
+    }
 
     InvalidObjFileException::InvalidObjFileException(std::string what, int errorNumber) : m_What(std::move(what))
     {
         if (errorNumber)
         {
-            m_What += std::string(": ") + strerror(errorNumber);
+            std::array<char, ErrorBufferSize> errBuf{};
+
+#ifdef _WIN32
+            strerror_s(errBuf.data(), errBuf.size(), errorNumber);
+#else
+            strerror_r(errorNumber, errBuf.data(), errBuf.size()); // POSIX version
+#endif
+
+            m_What += ": ";
+            m_What += errBuf.data(); // Safe conversion
         }
     }
 

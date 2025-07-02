@@ -43,7 +43,7 @@ namespace cppmicroservices
 
         void InitFilePath(std::string const& file);
 
-        const std::shared_ptr<BundleArchive const> archive;
+        std::shared_ptr<BundleArchive const> archive;
 
         BundleResourceContainer::Stat stat;
 
@@ -98,7 +98,7 @@ namespace cppmicroservices
 
     BundleResource::BundleResource() : d(std::make_shared<BundleResourcePrivate>(nullptr)) {}
 
-    BundleResource::BundleResource(BundleResource const& resource) : d(resource.d) {}
+    BundleResource::BundleResource(BundleResource const& resource) = default;
 
     BundleResource::BundleResource(std::string const& file, std::shared_ptr<BundleArchive const> const& archive)
         : d(std::make_shared<BundleResourcePrivate>(archive))
@@ -241,9 +241,7 @@ namespace cppmicroservices
         if (!IsValid() || !IsDir())
             return childResources;
 
-        for (std::vector<uint32_t>::const_iterator iter = d->childNodes.begin(), iterEnd = d->childNodes.end();
-             iter != iterEnd;
-             ++iter)
+        for (auto iter = d->childNodes.begin(), iterEnd = d->childNodes.end();
         {
             childResources.push_back(BundleResource(static_cast<int>(*iter), d->archive));
         }

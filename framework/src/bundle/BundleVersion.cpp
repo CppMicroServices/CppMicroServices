@@ -90,10 +90,7 @@ namespace cppmicroservices
     }
 
     BundleVersion::BundleVersion(std::string const& version)
-        : majorVersion(0)
-        , minorVersion(0)
-        , microVersion(0)
-        , undefined(true)
+        : undefined(true)
     {
         unsigned int maj = 0;
         unsigned int min = 0;
@@ -168,7 +165,7 @@ namespace cppmicroservices
             return EmptyVersion();
         }
 
-        return BundleVersion(version2);
+        return {version2};
     }
 
     bool

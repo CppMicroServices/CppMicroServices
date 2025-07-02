@@ -53,6 +53,12 @@ namespace
         InitialBundleMapCleanup(std::function<void()> cleanupFcn) : _cleanupFcn(std::move(cleanupFcn)) {}
         ~InitialBundleMapCleanup() { _cleanupFcn(); }
 
+        InitialBundleMapCleanup(const InitialBundleMapCleanup&) = delete;
+        InitialBundleMapCleanup& operator=(const InitialBundleMapCleanup&) = delete;
+
+        InitialBundleMapCleanup(InitialBundleMapCleanup&&) = default;
+        InitialBundleMapCleanup& operator=(InitialBundleMapCleanup&&) = default;
+
       private:
         std::function<void()> _cleanupFcn;
     };

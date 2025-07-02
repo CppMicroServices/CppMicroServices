@@ -81,6 +81,7 @@ namespace cppmicroservices
         }
         catch (std::exception const&)
         {
+            // ignored
         }
     }
 

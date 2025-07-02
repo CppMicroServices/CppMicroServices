@@ -52,7 +52,6 @@ cmake_minimum_required(VERSION ${US_CMAKE_MINIMUM_REQUIRED_VERSION})
 
 list(APPEND CMAKE_MODULE_PATH "@PACKAGE_CONFIG_CMAKE_DIR@")
 
-set(US_RCC_EXECUTABLE "@CMAKE_INSTALL_PREFIX@/bin/usResourceCompiler3" PARENT_SCOPE)
 set(US_BUNDLE_INIT_TEMPLATE "@PACKAGE_CONFIG_CMAKE_DIR@/BundleInit.cpp")
 set(US_RESOURCE_RC_TEMPLATE "@PACKAGE_CONFIG_CMAKE_DIR@/cppmicroservices_resources.rc.in")
 set(US_CMAKE_RESOURCE_DEPENDENCIES_CPP "@PACKAGE_CONFIG_CMAKE_DIR@/CMakeResourceDependencies.cpp")
@@ -134,6 +133,8 @@ foreach(component ${US_BUNDLES_NEEDED})
     endif()
   endif()
 endforeach()
+
+set(US_RCC_EXECUTABLE "@CMAKE_INSTALL_PREFIX@/bin/usResourceCompiler3")
 
 if(US_LIBRARIES)
   list(REMOVE_DUPLICATES US_LIBRARIES)

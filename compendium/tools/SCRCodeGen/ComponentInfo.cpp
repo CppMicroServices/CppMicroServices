@@ -21,10 +21,10 @@
   =============================================================================*/
 
 #include <iterator>
-#include <regex>
 #include <sstream>
 
 #include "ComponentInfo.hpp"
+#include "cppmicroservices/util/StringReplace.h"
 
 namespace codegen
 {
@@ -37,8 +37,8 @@ namespace codegen
         std::string
         GetComponentNameStr(ComponentInfo const& compInfo)
         {
-            auto const name = compInfo.name.empty() ? compInfo.implClassName : compInfo.name;
-            return std::regex_replace(name, std::regex("(::)"), "_");
+            auto name = compInfo.name.empty() ? compInfo.implClassName : compInfo.name;
+            return cppmicroservices::util::replace_doublecolon_with_underscore(name);
         }
 
         std::string

@@ -29,7 +29,6 @@
 #include <fstream>
 #include <iostream>
 #include <list>
-#include <memory>
 #include <set>
 #include <stdexcept>
 #include <string>
@@ -419,6 +418,28 @@ ZipArchive::CheckAndAddToArchivedNames(std::string const& archiveEntry)
 void
 ZipArchive::AddManifestFile(Json::Value const& manifest)
 {
+    // Check to make sure that the bundleName passed on the command line and the
+    // bundle.symbolic_name in the manifest file match. If the bundleName is not passed in on the
+    // command line, use the name specified in the manifest. If there's a mismatch or if no
+    // bundleName is supplied in either location, it's an error.
+    auto bname = manifest.get("bundle.symbolic_name", "");
+    if (bname.isString()) {
+        auto bnameStr = bname.asString();
+        if (!bundleName.empty()) {
+            if (bnameStr != bundleName) {
+                throw std::runtime_error("Bundle name in manifest "
+                                         + bnameStr
+                                         + " does not match value supplied on command line "
+                                         + bundleName);
+            }
+        }
+        else {
+            bundleName = bnameStr;
+        }
+    }
+    if (bundleName.empty()) {
+      throw std::runtime_error("Bundle name is required. Make sure that \"bundle.symbolic_name\" is set in the manifest.json file.");
+    }
     std::string styledManifestJson(manifest.toStyledString());
     std::string archiveEntry(bundleName + "/manifest.json");
 
@@ -748,7 +769,7 @@ const option::Descriptor usage[] = {
 
 // Check invalid invocations and errors
 static int
-checkSanity(option::Parser& parse, option::Option* options)
+checkSanity(option::Parser& parse, std::vector<option::Option>& options)
 {
     int return_code = EXIT_SUCCESS;
 
@@ -795,17 +816,16 @@ checkSanity(option::Parser& parse, option::Option* options)
         return_code = EXIT_FAILURE;
     }
 
-    // If either --manifest-add or --res-add is given, --bundle-name must also be given.
-    if ((options[MANIFESTADD] || options[RESADD]) && !options[BUNDLENAME])
+    // If --res-add is given, --bundle-name must also be given.
+    if (options[RESADD] && !options[BUNDLENAME])
     {
-        std::cerr << "If either --manifest-add or --res-add is provided, "
-                     "--bundle-name must be provided."
+        std::cerr << "If --res-add is provided, --bundle-name must be provided."
                   << std::endl;
         return_code = EXIT_FAILURE;
     }
 
     // Generate a warning that --bundle-name is not necessary in following invocation.
-    if (options[BUNDLENAME] && !options[MANIFESTADD] && !options[RESADD] && return_code != EXIT_FAILURE)
+    if (options[BUNDLENAME] && !options[RESADD] && return_code != EXIT_FAILURE)
     {
         std::clog << "Warning: --bundle-name option is unnecessary here." << std::endl;
     }
@@ -838,9 +858,9 @@ main(int argc, char** argv)
     argc -= (argc > 0);
     argv += (argc > 0); // skip program name argv[0]
     option::Stats stats(usage, argc, argv);
-    std::unique_ptr<option::Option[]> options(new option::Option[stats.options_max]);
-    std::unique_ptr<option::Option[]> buffer(new option::Option[stats.buffer_max]);
-    option::Parser parse(true, usage, argc, argv, options.get(), buffer.get());
+    std::vector<option::Option> options { stats.options_max };
+    std::vector<option::Option> buffer { stats.buffer_max };
+    option::Parser parse(true, usage, argc, argv, options.data(), buffer.data());
 
     if (argc == 0 || options[HELP])
     {
@@ -848,7 +868,7 @@ main(int argc, char** argv)
         return return_code;
     }
 
-    return_code = checkSanity(parse, options.get());
+    return_code = checkSanity(parse, options);
     if (return_code == EXIT_FAILURE)
     {
         return return_code;

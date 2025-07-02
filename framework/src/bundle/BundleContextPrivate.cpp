@@ -45,13 +45,13 @@ namespace cppmicroservices
     BundleContext
     MakeBundleContext(BundleContextPrivate* d)
     {
-        return BundleContext(d->shared_from_this());
+        return {d->shared_from_this()};
     }
 
     BundleContext
     MakeBundleContext(std::shared_ptr<BundleContextPrivate> const& d)
     {
-        return BundleContext(d);
+        return {d};
     }
 
     US_Framework_EXPORT std::shared_ptr<BundleContextPrivate>

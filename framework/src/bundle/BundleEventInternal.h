@@ -45,7 +45,7 @@ namespace cppmicroservices
     inline BundleEvent
     MakeBundleEvent(BundleEventInternal const& be)
     {
-        return BundleEvent(be.type, MakeBundle(be.bundle));
+        return {be.type, MakeBundle(be.bundle)};
     }
 } // namespace cppmicroservices
 

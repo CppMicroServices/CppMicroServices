@@ -35,7 +35,7 @@ namespace cppmicroservices
 
       public:
         BundleManifest();
-        explicit BundleManifest(AnyMap const& m);
+        explicit BundleManifest(AnyMap m);
 
         void Parse(std::istream& is);
 

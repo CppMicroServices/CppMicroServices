@@ -22,12 +22,9 @@
 
 #include "cppmicroservices/asyncworkservice/AsyncWorkService.hpp"
 
-namespace cppmicroservices
+namespace cppmicroservices::async
 {
-    namespace async
-    {
 
-        AsyncWorkService::~AsyncWorkService() = default;
+    AsyncWorkService::~AsyncWorkService() = default;
 
-    }
-} // namespace cppmicroservices
+} // namespace cppmicroservices::async

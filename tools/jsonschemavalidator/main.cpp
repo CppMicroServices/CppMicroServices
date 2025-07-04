@@ -111,7 +111,7 @@ struct Custom_Arg : public option::Arg
     NonEmpty(option::Option const& option, bool msg)
     {
         auto retVal = option::ARG_OK;
-        if (option.arg == 0 || option.arg[0] == 0)
+        if (option.arg == nullptr || std::char_traits<char>::length(option.arg) == 0)
         {
             retVal = option::ARG_ILLEGAL;
             if (msg)
@@ -140,7 +140,7 @@ const option::Descriptor usage[] = {
     {      HELP, 0, "h",        "help",     Custom_Arg::None,         " --help, -h  \tPrint usage and exit."},
     {SCHEMAFILE, 0, "s", "schema-file", Custom_Arg::NonEmpty,        " --schema-file, -s \tSchema file path"},
     {  JSONFILE, 0, "j",   "json-file", Custom_Arg::NonEmpty, " --json-file, -j \tJSON file to be validated"},
-    {         0, 0,   0,             0,                    0,                                              0}
+    {         0, 0,   nullptr,             nullptr,              nullptr,                           nullptr}
 };
 
 int
@@ -151,15 +151,15 @@ main(int argc, char* argv[])
         --argc;
         ++argv; // skip program name in argv[0]
     }
-    option::Stats stats(usage, argc, argv);
+    option::Stats stats(static_cast<const option::Descriptor*>(usage), argc, argv);
     std::unique_ptr<option::Option[]> options(new option::Option[stats.options_max]);
     std::unique_ptr<option::Option[]> buffer(new option::Option[stats.buffer_max]);
-    option::Parser parse(true, usage, argc, argv, options.get(), buffer.get());
+    option::Parser parse(true, static_cast<const option::Descriptor*>(usage), argc, argv, options.get(), buffer.get());
 
     auto retVal = EXIT_SUCCESS;
     if (argc == 0 || options[HELP])
     {
-        option::printUsage(std::clog, usage);
+        option::printUsage(std::clog, static_cast<const option::Descriptor*>(usage));
     }
     else if (!options[SCHEMAFILE])
     {

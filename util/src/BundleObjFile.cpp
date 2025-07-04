@@ -42,7 +42,7 @@ namespace cppmicroservices
         {
             std::array<char, ErrorBufferSize> errBuf{};
 
-#ifdef _WIN32
+#ifdef US_PLATFORM_WINDOWS
             strerror_s(errBuf.data(), errBuf.size(), errorNumber);
 #else
             strerror_r(errorNumber, errBuf.data(), errBuf.size()); // POSIX version

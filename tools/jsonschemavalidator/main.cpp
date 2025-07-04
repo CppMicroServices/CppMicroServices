@@ -111,7 +111,7 @@ struct Custom_Arg : public option::Arg
     NonEmpty(option::Option const& option, bool msg)
     {
         auto retVal = option::ARG_OK;
-        if (option.arg == nullptr|| std::char_traits<char>::length(option.arg) == 0)
+        if (option.arg == nullptr || std::char_traits<char>::length(option.arg) == 0)
         {
             retVal = option::ARG_ILLEGAL;
             if (msg)

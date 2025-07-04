@@ -115,13 +115,13 @@ namespace cppmicroservices::util
     }
 
 #ifndef MAXPATHLEN
-    constexpr std::size_t MAXPATHLEN = 1024;
+    constexpr std::size_t maxPathLen = 1024;
 #endif
 
     std::string
     GetExecutablePath()
     {
-        uint32_t bufsize = MAXPATHLEN;
+        uint32_t bufsize = maxPathLen;
 #ifdef US_PLATFORM_WINDOWS
         std::vector<wchar_t> wbuf(bufsize + 1, '\0');
         if (GetModuleFileNameW(nullptr, wbuf.data(), bufsize) == 0 || GetLastError() == ERROR_INSUFFICIENT_BUFFER)
@@ -154,7 +154,7 @@ namespace cppmicroservices::util
 #else
         // 'dlsym' does not work with symbol name 'main'
         throw std::runtime_error("GetExecutablePath failed");
-        return "";
+        return {};
 #endif
     }
 
@@ -372,6 +372,8 @@ namespace cppmicroservices::util
         }
 
         if (res)
+        {
             throw std::invalid_argument(GetLastCErrorStr());
+        }    
     }
 } // namespace cppmicroservices::util

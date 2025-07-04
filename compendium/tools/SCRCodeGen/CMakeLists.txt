@@ -5,16 +5,16 @@ set(_srcs
     Util.cpp
     ../../../third_party/jsoncpp.cpp)
 
-if(MINGW)
+  (MINGW)
   # Suppress warnings for specific files
   set_source_files_properties(
     ../../../third_party/jsoncpp.cpp
     PROPERTIES COMPILE_FLAGS -Wno-maybe-uninitialized
   )
 
-endif()
+     ()
 
-set(_private_headers
+   (_private_headers
     ComponentCallbackGenerator.hpp
     ComponentInfo.hpp
     ManifestParser.hpp
@@ -22,7 +22,7 @@ set(_private_headers
     ManifestParserImpl.hpp
     Util.hpp)
 
-include_directories(../../../third_party
+                   (../../../third_party
 		    ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googletest/include
 		    ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googlemock/include
         ${CppMicroServices_SOURCE_DIR}/framework/include
@@ -31,14 +31,14 @@ include_directories(../../../third_party
 set(US_SCRCODEGEN_EXECUTABLE_TARGET SCRCodeGen)
 set(US_SCRCODEGEN_EXECUTABLE_OUTPUT_NAME ${US_SCRCODEGEN_EXECUTABLE_TARGET}${US_GLOBAL_VERSION_SUFFIX})
 
-if(US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG)
+  (US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG)
   add_compile_options(-Wno-error=unneeded-internal-declaration)
-endif()
+      ()
 
 add_executable(${US_SCRCODEGEN_EXECUTABLE_TARGET} ${_srcs} ${_private_headers})
-if (US_BUILD_TESTING)
+   (US_BUILD_TESTING)
   target_compile_definitions(${US_SCRCODEGEN_EXECUTABLE_TARGET} PRIVATE USING_GTEST)
-endif()
+     ()
 
 set_property(TARGET ${US_SCRCODEGEN_EXECUTABLE_TARGET} PROPERTY OUTPUT_NAME ${US_SCRCODEGEN_EXECUTABLE_OUTPUT_NAME})
 

@@ -34,258 +34,258 @@
 #   undef REMOVE_LAST_NEWLINE_IN_TEXT_MODE
 #else
 #   undef DATA_NEEDS_NEWLINE_CONVERSION
-#   define REMOVE_LAST_NEWLINE_IN_TEXT_MODE 1     
+#   define REMOVE_LAST_NEWLINE_IN_TEXT_MODE 1
 #endif
 
 namespace cppmicroservices::detail
 {
 
-        class BundleResourceBufferPrivate
+    class BundleResourceBufferPrivate
+    {
+        public:
+        BundleResourceBufferPrivate(std::unique_ptr<void, void (*)(void*)> data,
+                                    std::size_t size,
+                                    char const* begin,
+                                    std::ios_base::openmode mode)
+            : begin(begin)
+            , end(std::next(begin, static_cast<std::ptrdiff_t>(size)))
+            , current(begin)
+            , mode(mode)
+            , uncompressedData(reinterpret_cast<unsigned char*>(data.release()), data.get_deleter())
+#ifdef DATA_NEEDS_NEWLINE_CONVERSION
+            , pos(0)
+#endif
         {
-            public:
-            BundleResourceBufferPrivate(std::unique_ptr<void, void (*)(void*)> data,
-                                        std::size_t size,
-                                        char const* begin,
-                                        std::ios_base::openmode mode)
-                : begin(begin)
-                , end(std::next(begin, static_cast<std::ptrdiff_t>(size)))
-                , current(begin)
-                , mode(mode)
-                , uncompressedData(reinterpret_cast<unsigned char*>(data.release()), data.get_deleter())
-    #ifdef DATA_NEEDS_NEWLINE_CONVERSION
-                , pos(0)
-    #endif
-            {
-            }
-
-            char const* const begin;
-            char const* const end;
-            char const* current;
-
-            const std::ios_base::openmode mode;
-
-            std::unique_ptr<unsigned char, void (*)(void*)> uncompressedData;
-
-    #ifdef DATA_NEEDS_NEWLINE_CONVERSION
-            // records the stream position ignoring CR characters
-            std::streambuf::pos_type pos;
-    #endif
-        };
-
-        BundleResourceBuffer::BundleResourceBuffer(std::unique_ptr<void, void (*)(void*)> data,
-                                                    std::size_t _size,
-                                                    std::ios_base::openmode mode)
-            : d(nullptr)
-        {
-            assert(_size < static_cast<std::size_t>(std::numeric_limits<uint32_t>::max()));
-
-            auto* begin = static_cast<char*>(data.get());
-            std::size_t size = begin ? _size : 0;
-
-    #ifdef DATA_NEEDS_NEWLINE_CONVERSION
-            if (begin != nullptr && !(mode & std::ios_base::binary) && begin[0] == '\r')
-            {
-                ++begin;
-                --size;
-            }
-    #endif
-
-    #ifdef REMOVE_LAST_NEWLINE_IN_TEXT_MODE
-            const char* end = std::next(begin, size);
-            if (begin != nullptr && !(mode & std::ios_base::binary) && *std::prev(end) == '\n')
-            {
-                --size;
-            }
-    #endif
-
-            d = std::make_unique<BundleResourceBufferPrivate>(std::move(data), size, begin, mode);
         }
 
-        BundleResourceBuffer::~BundleResourceBuffer() = default;
+        char const* const begin;
+        char const* const end;
+        char const* current;
 
-        BundleResourceBuffer::int_type
-        BundleResourceBuffer::underflow()
+        const std::ios_base::openmode mode;
+
+        std::unique_ptr<unsigned char, void (*)(void*)> uncompressedData;
+
+#ifdef DATA_NEEDS_NEWLINE_CONVERSION
+        // records the stream position ignoring CR characters
+        std::streambuf::pos_type pos;
+#endif
+    };
+
+    BundleResourceBuffer::BundleResourceBuffer(std::unique_ptr<void, void (*)(void*)> data,
+                                                std::size_t _size,
+                                                std::ios_base::openmode mode)
+        : d(nullptr)
+    {
+        assert(_size < static_cast<std::size_t>(std::numeric_limits<uint32_t>::max()));
+
+        auto* begin = static_cast<char*>(data.get());
+        std::size_t size = begin ? _size : 0;
+
+#ifdef DATA_NEEDS_NEWLINE_CONVERSION
+        if (begin != nullptr && !(mode & std::ios_base::binary) && begin[0] == '\r')
         {
-            if (d->current == d->end)
-                return traits_type::eof();
+            ++begin;
+            --size;
+        }
+#endif
 
-    #ifdef DATA_NEEDS_NEWLINE_CONVERSION
-            char c = *d->current;
-            if (!(d->mode & std::ios_base::binary))
+#ifdef REMOVE_LAST_NEWLINE_IN_TEXT_MODE
+        const char* end = std::next(begin, static_cast<std::ptrdiff_t>(size));
+        if (begin != nullptr && (mode & std::ios_base::binary) == 0 && *std::prev(end) == '\n')
+        {
+            --size;
+        }
+#endif
+
+        d = std::make_unique<BundleResourceBufferPrivate>(std::move(data), size, begin, mode);
+    }
+
+    BundleResourceBuffer::~BundleResourceBuffer() = default;
+
+    BundleResourceBuffer::int_type
+    BundleResourceBuffer::underflow()
+    {
+        if (d->current == d->end)
+            return traits_type::eof();
+
+#ifdef DATA_NEEDS_NEWLINE_CONVERSION
+        char c = *d->current;
+        if (!(d->mode & std::ios_base::binary))
+        {
+            if (c == '\r')
             {
-                if (c == '\r')
+                if (d->current + 1 == d->end)
                 {
-                    if (d->current + 1 == d->end)
-                    {
-                        return traits_type::eof();
-                    }
-                    c = d->current[1];
+                    return traits_type::eof();
                 }
+                c = d->current[1];
             }
-            return traits_type::to_int_type(c);
-    #else
-            return traits_type::to_int_type(*d->current);
-    #endif
         }
+        return traits_type::to_int_type(c);
+#else
+        return traits_type::to_int_type(*d->current);
+#endif
+    }
 
-        BundleResourceBuffer::int_type
-        BundleResourceBuffer::uflow()
+    BundleResourceBuffer::int_type
+    BundleResourceBuffer::uflow()
+    {
+        if (d->current == d->end)
+            return traits_type::eof();
+
+#ifdef DATA_NEEDS_NEWLINE_CONVERSION
+        char c = *d->current++;
+        if (!(d->mode & std::ios_base::binary))
         {
-            if (d->current == d->end)
-                return traits_type::eof();
-
-    #ifdef DATA_NEEDS_NEWLINE_CONVERSION
-            char c = *d->current++;
-            if (!(d->mode & std::ios_base::binary))
+            if (c == '\r')
             {
-                if (c == '\r')
+                if (d->current == d->end)
                 {
-                    if (d->current == d->end)
-                    {
-                        return traits_type::eof();
-                    }
-                    c = *d->current++;
+                    return traits_type::eof();
                 }
+                c = *d->current++;
             }
-            return traits_type::to_int_type(c);
-    #else
-            return traits_type::to_int_type(*std::exchange(d->current, std::next(d->current)));
-    #endif
+        }
+        return traits_type::to_int_type(c);
+#else
+        return traits_type::to_int_type(*std::exchange(d->current, std::next(d->current)));
+#endif
+    }
+
+    BundleResourceBuffer::int_type
+    BundleResourceBuffer::pbackfail(int_type ch)
+    {
+        int backOffset = -1;
+#ifdef DATA_NEEDS_NEWLINE_CONVERSION
+        if (!(d->mode & std::ios_base::binary))
+        {
+            while ((d->current - backOffset) >= d->begin && d->current[backOffset] == '\r')
+            {
+                --backOffset;
+            }
+            // d->begin always points to a character != '\r'
+        }
+#endif
+        if (d->current == d->begin || (ch != traits_type::eof() && ch != d->current[backOffset]))
+        {
+            return traits_type::eof();
         }
 
-        BundleResourceBuffer::int_type
-        BundleResourceBuffer::pbackfail(int_type ch)
-        {
-            int backOffset = -1;
-    #ifdef DATA_NEEDS_NEWLINE_CONVERSION
-            if (!(d->mode & std::ios_base::binary))
-            {
-                while ((d->current - backOffset) >= d->begin && d->current[backOffset] == '\r')
-                {
-                    --backOffset;
-                }
-                // d->begin always points to a character != '\r'
-            }
-    #endif
-            if (d->current == d->begin || (ch != traits_type::eof() && ch != d->current[backOffset]))
-            {
-                return traits_type::eof();
-            }
+        d->current += backOffset;
+        return traits_type::to_int_type(*d->current);
+    }
 
-            d->current += backOffset;
-            return traits_type::to_int_type(*d->current);
+    std::streamsize
+    BundleResourceBuffer::showmanyc()
+    {
+        assert(d->current <= d->end);
+
+#ifdef DATA_NEEDS_NEWLINE_CONVERSION
+        std::streamsize ssize = 0;
+        std::size_t chunkSize = d->end - d->current;
+        for (std::size_t i = 0; i < chunkSize; ++i)
+        {
+            if (d->current[i] != '\r')
+            {
+                ++ssize;
+            }
+        }
+        return ssize;
+#else
+        return d->end - d->current;
+#endif
+    }
+
+    std::streambuf::pos_type
+    BundleResourceBuffer::seekoff(std::streambuf::off_type off,
+                                    std::ios_base::seekdir way,
+                                    std::ios_base::openmode /*which*/)
+    {
+#ifdef DATA_NEEDS_NEWLINE_CONVERSION
+        std::streambuf::off_type step = 1;
+        if (way == std::ios_base::beg)
+        {
+            d->current = d->begin;
+        }
+        else if (way == std::ios_base::end)
+        {
+            d->current = d->end;
+            step = -1;
         }
 
-        std::streamsize
-        BundleResourceBuffer::showmanyc()
+        if (!(d->mode & std::ios_base::binary))
         {
-            assert(d->current <= d->end);
-
-    #ifdef DATA_NEEDS_NEWLINE_CONVERSION
-            std::streamsize ssize = 0;
-            std::size_t chunkSize = d->end - d->current;
-            for (std::size_t i = 0; i < chunkSize; ++i)
-            {
-                if (d->current[i] != '\r')
-                {
-                    ++ssize;
-                }
-            }
-            return ssize;
-    #else
-            return d->end - d->current;
-    #endif
-        }
-
-        std::streambuf::pos_type
-        BundleResourceBuffer::seekoff(std::streambuf::off_type off,
-                                        std::ios_base::seekdir way,
-                                        std::ios_base::openmode /*which*/)
-        {
-    #ifdef DATA_NEEDS_NEWLINE_CONVERSION
-            std::streambuf::off_type step = 1;
             if (way == std::ios_base::beg)
             {
-                d->current = d->begin;
+                d->pos = 0;
             }
             else if (way == std::ios_base::end)
             {
-                d->current = d->end;
-                step = -1;
+                d->current -= 1;
             }
 
-            if (!(d->mode & std::ios_base::binary))
+            std::streambuf::off_type i = 0;
+            // scan through off amount of characters excluding '\r'
+            while (i != off)
             {
-                if (way == std::ios_base::beg)
+                if (*d->current != '\r')
                 {
-                    d->pos = 0;
+                    i += step;
+                    d->pos += step;
                 }
-                else if (way == std::ios_base::end)
-                {
-                    d->current -= 1;
-                }
+                d->current += step;
+            }
 
-                std::streambuf::off_type i = 0;
-                // scan through off amount of characters excluding '\r'
-                while (i != off)
+            // adjust the position in case of a "backwards" seek
+            if (way == std::ios_base::end)
+            {
+                // fix pointer from previous while loop
+                d->current += 1;
+                d->pos = 0;
+                i = 0;
+                const std::streampos currInternalPos = d->current - d->begin;
+                while (i != currInternalPos)
                 {
-                    if (*d->current != '\r')
+                    if (d->begin[i] != '\r')
                     {
-                        i += step;
-                        d->pos += step;
+                        d->pos += 1;
                     }
-                    d->current += step;
-                }
-
-                // adjust the position in case of a "backwards" seek
-                if (way == std::ios_base::end)
-                {
-                    // fix pointer from previous while loop
-                    d->current += 1;
-                    d->pos = 0;
-                    i = 0;
-                    const std::streampos currInternalPos = d->current - d->begin;
-                    while (i != currInternalPos)
-                    {
-                        if (d->begin[i] != '\r')
-                        {
-                            d->pos += 1;
-                        }
-                        ++i;
-                    }
+                    ++i;
                 }
             }
-            else
-            {
-                d->current += off;
-                d->pos = d->current - d->begin;
-            }
-            return d->pos;
-    #else
-            if (way == std::ios_base::beg)
-            {
-                d->current = d->begin;
-                std::advance(d->current, off);
-                return off;
-            }
-            else if (way == std::ios_base::cur)
-            {
-                std::advance(d->current, off);
-                return std::distance(d->begin, d->current);
-            }
-            else
-            {
-                d->current = d->end;
-                std::advance(d->current, off);
-                return std::distance(d->begin, d->current);
-            }
-    #endif
         }
-
-        std::streambuf::pos_type
-        BundleResourceBuffer::seekpos(std::streambuf::pos_type sp, std::ios_base::openmode /*which*/)
+        else
         {
-            return this->seekoff(sp, std::ios_base::beg);
+            d->current += off;
+            d->pos = d->current - d->begin;
         }
+        return d->pos;
+#else
+        if (way == std::ios_base::beg)
+        {
+            d->current = d->begin;
+            std::advance(d->current, off);
+            return off;
+        }
+        else if (way == std::ios_base::cur)
+        {
+            std::advance(d->current, off);
+            return std::distance(d->begin, d->current);
+        }
+        else
+        {
+            d->current = d->end;
+            std::advance(d->current, off);
+            return std::distance(d->begin, d->current);
+        }
+#endif
+    }
+
+    std::streambuf::pos_type
+    BundleResourceBuffer::seekpos(std::streambuf::pos_type sp, std::ios_base::openmode /*which*/)
+    {
+        return this->seekoff(sp, std::ios_base::beg);
+    }
 
 } // namespace cppmicroservices::detail

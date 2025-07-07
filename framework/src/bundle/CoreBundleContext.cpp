@@ -249,7 +249,7 @@ namespace cppmicroservices
         {
             return dataStorage + util::DIR_SEP + util::ToString(id);
         }
-        return std::string();
+        return {};
     }
 
     WriteLock

@@ -26,37 +26,35 @@
 #include <cstdint>
 #include <cstdlib>
 #include <limits>
+#include <utility>
 #include <memory>
 
 #ifdef US_PLATFORM_WINDOWS
-#    define DATA_NEEDS_NEWLINE_CONVERSION 1
-#    undef REMOVE_LAST_NEWLINE_IN_TEXT_MODE
+    constexpr bool DATA_NEEDS_NEWLINE_CONVERSION = true;
+    constexpr bool REMOVE_LAST_NEWLINE_IN_TEXT_MODE = false;
 #else
-#    undef DATA_NEEDS_NEWLINE_CONVERSION
-#    define REMOVE_LAST_NEWLINE_IN_TEXT_MODE 1
+    constexpr bool DATA_NEEDS_NEWLINE_CONVERSION = false;
+    constexpr bool REMOVE_LAST_NEWLINE_IN_TEXT_MODE = true;
 #endif
 
-namespace cppmicroservices
+namespace cppmicroservices::detail
 {
-
-    namespace detail
-    {
 
         class BundleResourceBufferPrivate
         {
-          public:
+            public:
             BundleResourceBufferPrivate(std::unique_ptr<void, void (*)(void*)> data,
                                         std::size_t size,
                                         char const* begin,
                                         std::ios_base::openmode mode)
                 : begin(begin)
-                , end(begin + size)
+                , end(std::next(begin, static_cast<std::ptrdiff_t>(size)))
                 , current(begin)
                 , mode(mode)
                 , uncompressedData(reinterpret_cast<unsigned char*>(data.release()), data.get_deleter())
-#ifdef DATA_NEEDS_NEWLINE_CONVERSION
+    #ifdef DATA_NEEDS_NEWLINE_CONVERSION
                 , pos(0)
-#endif
+    #endif
             {
             }
 
@@ -68,36 +66,37 @@ namespace cppmicroservices
 
             std::unique_ptr<unsigned char, void (*)(void*)> uncompressedData;
 
-#ifdef DATA_NEEDS_NEWLINE_CONVERSION
+    #ifdef DATA_NEEDS_NEWLINE_CONVERSION
             // records the stream position ignoring CR characters
             std::streambuf::pos_type pos;
-#endif
+    #endif
         };
 
         BundleResourceBuffer::BundleResourceBuffer(std::unique_ptr<void, void (*)(void*)> data,
-                                                   std::size_t _size,
-                                                   std::ios_base::openmode mode)
+                                                    std::size_t _size,
+                                                    std::ios_base::openmode mode)
             : d(nullptr)
         {
             assert(_size < static_cast<std::size_t>(std::numeric_limits<uint32_t>::max()));
 
-            auto* begin = reinterpret_cast<char*>(data.get());
+            auto* begin = static_cast<char*>(data.get());
             std::size_t size = begin ? _size : 0;
 
-#ifdef DATA_NEEDS_NEWLINE_CONVERSION
+    #ifdef DATA_NEEDS_NEWLINE_CONVERSION
             if (begin != nullptr && !(mode & std::ios_base::binary) && begin[0] == '\r')
             {
                 ++begin;
                 --size;
             }
-#endif
+    #endif
 
-#ifdef REMOVE_LAST_NEWLINE_IN_TEXT_MODE
-            if (begin != nullptr && !(mode & std::ios_base::binary) && begin[size - 1] == '\n')
+    #ifdef REMOVE_LAST_NEWLINE_IN_TEXT_MODE
+            const char* end = std::next(begin, size);
+            if (begin != nullptr && !(mode & std::ios_base::binary) && *std::prev(end) == '\n')
             {
                 --size;
             }
-#endif
+    #endif
 
             d = std::make_unique<BundleResourceBufferPrivate>(std::move(data), size, begin, mode);
         }
@@ -110,7 +109,7 @@ namespace cppmicroservices
             if (d->current == d->end)
                 return traits_type::eof();
 
-#ifdef DATA_NEEDS_NEWLINE_CONVERSION
+    #ifdef DATA_NEEDS_NEWLINE_CONVERSION
             char c = *d->current;
             if (!(d->mode & std::ios_base::binary))
             {
@@ -124,9 +123,9 @@ namespace cppmicroservices
                 }
             }
             return traits_type::to_int_type(c);
-#else
+    #else
             return traits_type::to_int_type(*d->current);
-#endif
+    #endif
         }
 
         BundleResourceBuffer::int_type
@@ -135,7 +134,7 @@ namespace cppmicroservices
             if (d->current == d->end)
                 return traits_type::eof();
 
-#ifdef DATA_NEEDS_NEWLINE_CONVERSION
+    #ifdef DATA_NEEDS_NEWLINE_CONVERSION
             char c = *d->current++;
             if (!(d->mode & std::ios_base::binary))
             {
@@ -149,16 +148,16 @@ namespace cppmicroservices
                 }
             }
             return traits_type::to_int_type(c);
-#else
-            return traits_type::to_int_type(*d->current++);
-#endif
+    #else
+            return traits_type::to_int_type(*std::exchange(d->current, std::next(d->current)));
+    #endif
         }
 
         BundleResourceBuffer::int_type
         BundleResourceBuffer::pbackfail(int_type ch)
         {
             int backOffset = -1;
-#ifdef DATA_NEEDS_NEWLINE_CONVERSION
+    #ifdef DATA_NEEDS_NEWLINE_CONVERSION
             if (!(d->mode & std::ios_base::binary))
             {
                 while ((d->current - backOffset) >= d->begin && d->current[backOffset] == '\r')
@@ -167,7 +166,7 @@ namespace cppmicroservices
                 }
                 // d->begin always points to a character != '\r'
             }
-#endif
+    #endif
             if (d->current == d->begin || (ch != traits_type::eof() && ch != d->current[backOffset]))
             {
                 return traits_type::eof();
@@ -182,7 +181,7 @@ namespace cppmicroservices
         {
             assert(d->current <= d->end);
 
-#ifdef DATA_NEEDS_NEWLINE_CONVERSION
+    #ifdef DATA_NEEDS_NEWLINE_CONVERSION
             std::streamsize ssize = 0;
             std::size_t chunkSize = d->end - d->current;
             for (std::size_t i = 0; i < chunkSize; ++i)
@@ -193,17 +192,17 @@ namespace cppmicroservices
                 }
             }
             return ssize;
-#else
+    #else
             return d->end - d->current;
-#endif
+    #endif
         }
 
         std::streambuf::pos_type
         BundleResourceBuffer::seekoff(std::streambuf::off_type off,
-                                      std::ios_base::seekdir way,
-                                      std::ios_base::openmode /*which*/)
+                                        std::ios_base::seekdir way,
+                                        std::ios_base::openmode /*which*/)
         {
-#ifdef DATA_NEEDS_NEWLINE_CONVERSION
+    #ifdef DATA_NEEDS_NEWLINE_CONVERSION
             std::streambuf::off_type step = 1;
             if (way == std::ios_base::beg)
             {
@@ -262,23 +261,25 @@ namespace cppmicroservices
                 d->pos = d->current - d->begin;
             }
             return d->pos;
-#else
+    #else
             if (way == std::ios_base::beg)
             {
-                d->current = d->begin + off;
+                d->current = d->begin;
+                std::advance(d->current, off);
                 return off;
             }
             else if (way == std::ios_base::cur)
             {
-                d->current += off;
-                return d->current - d->begin;
+                std::advance(d->current, off);
+                return std::distance(d->begin, d->current);
             }
             else
             {
-                d->current = d->end + off;
-                return d->current - d->begin;
+                d->current = d->end;
+                std::advance(d->current, off);
+                return std::distance(d->begin, d->current);
             }
-#endif
+    #endif
         }
 
         std::streambuf::pos_type
@@ -287,6 +288,4 @@ namespace cppmicroservices
             return this->seekoff(sp, std::ios_base::beg);
         }
 
-    } // namespace detail
-
-} // namespace cppmicroservices
+} // namespace cppmicroservices::detail

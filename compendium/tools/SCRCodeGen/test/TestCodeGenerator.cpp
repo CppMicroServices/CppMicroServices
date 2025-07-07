@@ -701,7 +701,8 @@ namespace codegen
             auto scr = GetManifestSCRData(ics.manifest);
             auto version = util::JsonValueValidator(scr, "version", Json::ValueType::intValue)();
             auto manifestParser = ManifestParserFactory::Create(version.asInt());
-            manifestParser->ParseAndGetComponentInfos(scr);
+            auto componentInfos = manifestParser->ParseAndGetComponentInfos(scr);
+	    (void)componentInfos;
             FAIL() << "This failure suggests that parsing has succeeded. "
                       "Shouldn't happen for failure mode tests";
         }

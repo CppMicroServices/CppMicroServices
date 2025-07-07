@@ -48,25 +48,37 @@ namespace cppmicroservices
             struct ReferenceMetadata
             {
                 // defaults for the data model
-                ReferenceMetadata() : cardinality("1..1"), policy("static"), policyOption("reluctant"), scope("bundle"), requireBind(true)
+                ReferenceMetadata() : cardinality("1..1"), policy("static"), policyOption("reluctant"), scope("bundle"), injectOverride(true)
                 {
+                }
+                std::string getPolicy() const {
+                    return policy;
+                }
+
+                void setPolicy(std::string val) {
+                    if (val.empty()) {
+                        return;
+                    }
+                    policy = val;
                 }
 
                 std::string name;
                 std::string target;
                 std::string interfaceName;
                 std::string cardinality;
-                std::string policy;
                 std::string policyOption;
                 std::string scope;
-                bool requireBind;
+                bool injectOverride;
                 std::size_t minCardinality { 1 };
                 std::size_t maxCardinality { 1 };
-
                 static const std::vector<std::string> Cardinalities;
                 static const std::vector<std::string> Policies;
                 static const std::vector<std::string> PolicyOptions;
                 static const std::vector<std::string> Scopes;
+              private:
+                std::string policy;
+
+
             };
 
             /**

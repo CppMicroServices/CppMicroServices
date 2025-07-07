@@ -90,10 +90,10 @@ namespace cppmicroservices
                 std::tie(refMetadata.minCardinality, refMetadata.maxCardinality)
                     = GetReferenceCardinalityExtents(refMetadata.cardinality);
 
-                // reference.policy
+                std::string tmpPolicy = "";
                 object = ObjectValidator(metadata, "policy", /*isOptional=*/true);
-                object.AssignValueTo(refMetadata.policy,
-                                     /*choices=*/ReferenceMetadata::Policies);
+                object.AssignValueTo(tmpPolicy, /*choices=*/ReferenceMetadata::Policies);
+                refMetadata.setPolicy(tmpPolicy);
 
                 // reference.policy-option
                 object = ObjectValidator(metadata, "policy-option", /*isOptional=*/true);
@@ -103,8 +103,8 @@ namespace cppmicroservices
                 // reference.target
                 ObjectValidator(metadata, "target", /*isOptional=*/true).AssignValueTo(refMetadata.target);
 
-                // reference.require-bind
-                ObjectValidator(metadata, "require-bind", /*isOptional=*/true).AssignValueTo(refMetadata.requireBind);
+                // reference.inject-override
+                ObjectValidator(metadata, "inject-override", /*isOptional=*/true).AssignValueTo(refMetadata.injectOverride);
 
                 return refMetadata;
             }

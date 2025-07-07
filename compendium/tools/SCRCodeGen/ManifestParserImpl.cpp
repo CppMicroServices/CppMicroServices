@@ -170,9 +170,9 @@ ManifestParserImplV1::ParseAndGetComponentInfos(Json::Value const& scr) const
                         = JsonValueValidator(jsonRefInfo, "target", Json::ValueType::stringValue).GetString();
                 }
 
-                if (jsonRefInfo.isMember("require-bind")){
-                    auto const requireBind = JsonValueValidator(jsonRefInfo, "require-bind", Json::ValueType::booleanValue)();
-                    refInfo.require_bind = requireBind.asBool();
+                if (jsonRefInfo.isMember("inject-override")){
+                    auto const injectOverride = JsonValueValidator(jsonRefInfo, "require-bind", Json::ValueType::booleanValue)();
+                    refInfo.inject_override = injectOverride.asBool();
                 }
 
                 componentInfo.references.push_back(refInfo);

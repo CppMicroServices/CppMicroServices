@@ -60,7 +60,7 @@ namespace cppmicroservices
                        << "\t\t\ttarget: " << rMeta.target << std::endl
                        << "\t\t\tinterfaceName: " << rMeta.interfaceName << std::endl
                        << "\t\t\tcardinality: " << rMeta.cardinality << std::endl
-                       << "\t\t\tpolicy: " << rMeta.policy << std::endl
+                       << "\t\t\tpolicy: " << rMeta.getPolicy() << std::endl
                        << "\t\t\tpolicyOption: " << rMeta.policyOption << std::endl
                        << "\t\t\tscope: " << rMeta.scope << std::endl
                        << "\t\t\tminCardinality: " << rMeta.minCardinality << std::endl

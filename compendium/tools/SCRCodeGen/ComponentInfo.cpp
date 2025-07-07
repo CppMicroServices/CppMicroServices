@@ -64,7 +64,7 @@ namespace codegen
             auto sep = ", ";
             for (auto const& reference : compInfo.references)
             {
-                if (compInfo.injectReferences && reference.policy == "static")
+                if (compInfo.injectReferences && reference.policy == "static" && reference.inject_override)
                 {
                     if (reference.cardinality == "0..n" || reference.cardinality == "1..n")
                     {
@@ -88,7 +88,7 @@ namespace codegen
             resultStr << "{{";
             for (auto const& reference : compInfo.references)
             {
-                if (compInfo.injectReferences && reference.policy == "static")
+                if (compInfo.injectReferences && reference.policy == "static" && reference.inject_override)
                 {
                     resultStr << sep << "\"" << reference.name << "\"";
                     sep = ", ";

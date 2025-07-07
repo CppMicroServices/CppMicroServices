@@ -39,7 +39,7 @@ namespace codegen
             std::string policy_option;
             std::string target;
             std::string scope;
-            bool require_bind = true;
+            bool inject_override = true;
         };
 
         struct ServiceInfo

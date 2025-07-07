@@ -69,7 +69,7 @@ namespace cppmicroservices
                                        bc,
                                        logger,
                                        configName,
-                                       CreateBindingPolicy(*this, metadata.policy, metadata.policyOption))
+                                       CreateBindingPolicy(*this, metadata.getPolicy(), metadata.policyOption))
         {
         }
 

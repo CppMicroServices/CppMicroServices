@@ -211,7 +211,7 @@ namespace
         ASSERT_EQ(prop.cardinality, rmvs.cardinality);
         ASSERT_EQ(prop.minCardinality, rmvs.minCardinality);
         ASSERT_EQ(prop.maxCardinality, rmvs.maxCardinality);
-        ASSERT_EQ(prop.policy, rmvs.policy);
+        ASSERT_EQ(prop.getPolicy(), rmvs.policy);
         ASSERT_EQ(prop.policyOption, rmvs.policyOption);
         ASSERT_EQ(prop.scope, rmvs.scope);
         ASSERT_EQ(prop.target, rmvs.target);

@@ -667,13 +667,11 @@ namespace codegen
     // Instead, if we expect the errorOutput to be contained in the generated error message,
     // we set isPartial = true. (This is useful when we don't want to specify really long error messages)
 
-    struct ManifestPath { std::string value; };
-    struct ErrorOutput { std::string value; };
     struct CodegenInvalidManifestState
     {
-        CodegenInvalidManifestState(ManifestPath _manifest, ErrorOutput _errorOutput, bool _isPartial = false)
-            : manifest(std::move(_manifest.value))
-            , errorOutput(std::move(_errorOutput.value))
+        CodegenInvalidManifestState(std::string _manifest, std::string _errorOutput, bool _isPartial = false)
+            : manifest(std::move(_manifest))
+            , errorOutput(std::move(_errorOutput))
             , isPartial(_isPartial)
         {
         }

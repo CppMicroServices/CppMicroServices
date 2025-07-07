@@ -171,7 +171,7 @@ ManifestParserImplV1::ParseAndGetComponentInfos(Json::Value const& scr) const
                 }
 
                 if (jsonRefInfo.isMember("inject-override")){
-                    auto const injectOverride = JsonValueValidator(jsonRefInfo, "require-bind", Json::ValueType::booleanValue)();
+                    auto const injectOverride = JsonValueValidator(jsonRefInfo, "inject-override", Json::ValueType::booleanValue)();
                     refInfo.inject_override = injectOverride.asBool();
                 }
 

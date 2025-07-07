@@ -30,7 +30,7 @@ namespace cppmicroservices::service::cm
         cppmicroservices::BundleContext const& context,
         std::shared_ptr<cppmicroservices::logservice::LogService> logger,
         std::shared_ptr<cppmicroservices::scrimpl::ConfigurationNotifier> configNotifier)
-        : bundleContext(std::move(context))
+        : bundleContext(context)
         , logger(std::move(logger))
         , configNotifier(std::move(configNotifier))
     {

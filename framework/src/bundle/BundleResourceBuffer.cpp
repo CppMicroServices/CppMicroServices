@@ -30,11 +30,11 @@
 #include <memory>
 
 #ifdef US_PLATFORM_WINDOWS
-    constexpr bool DATA_NEEDS_NEWLINE_CONVERSION = true;
-    constexpr bool REMOVE_LAST_NEWLINE_IN_TEXT_MODE = false;
+#   define DATA_NEEDS_NEWLINE_CONVERSION 1
+#   undef REMOVE_LAST_NEWLINE_IN_TEXT_MODE
 #else
-    constexpr bool DATA_NEEDS_NEWLINE_CONVERSION = false;
-    constexpr bool REMOVE_LAST_NEWLINE_IN_TEXT_MODE = true;
+#   undef DATA_NEEDS_NEWLINE_CONVERSION
+#   define REMOVE_LAST_NEWLINE_IN_TEXT_MODE 1     
 #endif
 
 namespace cppmicroservices::detail

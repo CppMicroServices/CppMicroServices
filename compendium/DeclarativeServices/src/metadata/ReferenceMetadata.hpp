@@ -48,7 +48,7 @@ namespace cppmicroservices
             struct ReferenceMetadata
             {
                 // defaults for the data model
-                ReferenceMetadata() : cardinality("1..1"), policy("static"), policyOption("reluctant"), scope("bundle"), injectOverride(true)
+                ReferenceMetadata() : cardinality("1..1"), policyOption("reluctant"), scope("bundle"), injectOverride(true), policy("static")
                 {
                 }
                 std::string getPolicy() const {

@@ -81,6 +81,104 @@ namespace codegen
   }
   )manifest";
 
+      const std::string manifest_dyn_inj_some = R"manifest(
+  {
+    "scr" : { "version" : 1,
+              "components": [{
+                       "implementation-class": "DSSpellCheck::SpellCheckImpl",
+                       "activate" : "Activate",
+                       "deactivate" : "Deactivate",
+                       "inject-references" : ["dictionary1"],
+                       "service": {
+                       "scope": "SINGLETON", //case-insensitive
+                       "interfaces": ["SpellCheck::ISpellCheckService"]
+                       },
+                       "references": [{
+                         "name": "dictionary0",
+                         "interface": "DictionaryService::IDictionaryService",
+                         "target": "(somekey=someVal)",
+                         "policy": "dynamic"
+                       },
+                       {
+                         "name": "dictionary1",
+                         "interface": "DictionaryService::IDictionaryService",
+                         "target": "(somekey=someOtherVal)",
+                         "policy": "dynamic"
+                       }]
+                       }]
+            }
+  }
+  )manifest";
+
+      const std::string manifest_stat_inj_some = R"manifest(
+  {
+    "scr" : { "version" : 1,
+              "components": [{
+                       "implementation-class": "DSSpellCheck::SpellCheckImpl",
+                       "activate" : "Activate",
+                       "deactivate" : "Deactivate",
+                       "inject-references" : ["dictionary1"],
+                       "service": {
+                       "scope": "SINGLETON", //case-insensitive
+                       "interfaces": ["SpellCheck::ISpellCheckService"]
+                       },
+                       "references": [{
+                         "name": "dictionary0",
+                         "interface": "DictionaryService::IDictionaryService",
+                         "target": "(somekey=someVal)"
+                       },
+                       {
+                         "name": "dictionary1",
+                         "interface": "DictionaryService::IDictionaryService",
+                         "target": "(somekey=someOtherVal)"
+                       }]
+                       }]
+            }
+  }
+  )manifest";
+
+    const std::string manifest_stat_dyn_inj_some = R"manifest(
+  {
+    "scr" : { "version" : 1,
+              "components": [{
+                       "implementation-class": "DSSpellCheck::SpellCheckImpl",
+                       "activate" : "Activate",
+                       "deactivate" : "Deactivate",
+                       "inject-references" : ["dictionary1", "dictionary0"],
+                       "service": {
+                       "scope": "SINGLETON", //case-insensitive
+                       "interfaces": ["SpellCheck::ISpellCheckService"]
+                       },
+                      "references": [
+                          {
+                            "name": "dictionary0",
+                            "interface": "DictionaryService::IDictionaryService",
+                            "target": "(somekey=someVal)",
+                            "policy": "dynamic"
+                          },
+                          {
+                            "name": "dictionary1",
+                            "interface": "DictionaryService::IDictionaryService",
+                            "target": "(somekey=someOtherVal)"
+                          },
+                          {
+                            "name": "dictionary2",
+                            "interface": "DictionaryService::IDictionaryService",
+                            "target": "(somekey=someOtherVal)",
+                            "policy": "dynamic"
+                          },
+                          {
+                            "name": "dictionary3",
+                            "interface": "DictionaryService::IDictionaryService",
+                            "target": "(somekey=someOtherVal)"
+                          }
+                        ]
+                       }]
+            }
+  }
+  )manifest";
+
+
     const std::string manifest_mult_comp = R"manifest(
   {
     "scr" : { "version" : 1,
@@ -654,6 +752,12 @@ namespace codegen
             CodegenValidManifestState(manifest_json, { "SpellCheckerImpl.hpp" }, REF_SRC),
             // valid manifest with dynamic policy
             CodegenValidManifestState(manifest_dyn, { "SpellCheckerImpl.hpp" }, REF_SRC_DYN),
+            // valid manifest with dynamic refs, only one of which is injected
+            CodegenValidManifestState(manifest_dyn_inj_some, { "SpellCheckerImpl.hpp" }, REF_SRC_DYN_INJ_SOME),
+            // valid manifest with static refs, only one of which is injected
+            CodegenValidManifestState(manifest_stat_inj_some, { "SpellCheckerImpl.hpp" }, REF_SRC_STAT_INJ_SOME),
+            // valid manifest with static and dynamic refs, one of each is injected
+            CodegenValidManifestState(manifest_stat_dyn_inj_some, { "SpellCheckerImpl.hpp" }, REF_SRC_STAT_DYN_INJ_SOME),
             // valid manifest with multiple components
             CodegenValidManifestState(manifest_mult_comp, { "A.hpp", "B.hpp", "C.hpp" }, REF_MULT_COMPS),
             // valid manifest with multiple components of the same implementation class
@@ -781,9 +885,9 @@ namespace codegen
                                         "Invalid array value for the name "
                                         "'interfaces'. Expected non-empty string"),
             CodegenInvalidManifestState(manifest_illegal_inject_refs,
-                                        "Invalid value for the name 'inject-references'. Expected boolean"),
+                                        "Invalid value for the name 'inject-references'. Expected string or array of strings"),
             CodegenInvalidManifestState(manifest_illegal_inject_refs2,
-                                        "Invalid value for the name 'inject-references'. Expected boolean"),
+                                        "Invalid value for the name 'inject-references'. Expected string or array of strings"),
             CodegenInvalidManifestState(manifest_illegal_scope,
                                         "Invalid value 'global' for the name 'scope'. The valid choices are : "
                                         "[singleton, bundle, prototype]"),

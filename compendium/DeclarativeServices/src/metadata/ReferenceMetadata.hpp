@@ -48,7 +48,7 @@ namespace cppmicroservices
             struct ReferenceMetadata
             {
                 // defaults for the data model
-                ReferenceMetadata() : cardinality("1..1"), policy("static"), policyOption("reluctant"), scope("bundle"), injectOverride(true)
+                ReferenceMetadata() : cardinality("1..1"), policy("static"), policyOption("reluctant"), scope("bundle")
                 {
                 }
 
@@ -59,7 +59,6 @@ namespace cppmicroservices
                 std::string policy;
                 std::string policyOption;
                 std::string scope;
-                bool injectOverride;
                 std::size_t minCardinality { 1 };
                 std::size_t maxCardinality { 1 };
                 static const std::vector<std::string> Cardinalities;

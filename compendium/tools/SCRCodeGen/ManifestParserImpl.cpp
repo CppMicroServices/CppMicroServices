@@ -49,12 +49,31 @@ ManifestParserImplV1::ParseAndGetComponentInfos(Json::Value const& scr) const
         }
 
         // inject-references
-        componentInfo.injectReferences = true;
         if (jsonComponent.isMember("inject-references"))
         {
-            auto const injectReferences
-                = JsonValueValidator(jsonComponent, "inject-references", Json::ValueType::booleanValue)();
-            componentInfo.injectReferences = injectReferences.asBool();
+            bool isBool = false;
+            try {
+                auto const injectReferences = JsonValueValidator(jsonComponent, "inject-references", Json::ValueType::booleanValue)();
+                componentInfo.setInjectReferences(injectReferences.asBool());
+                isBool = true;
+            } catch(...){
+                // do nothing
+            }
+
+            // if the object was NOT a bool, try an array
+            if (!isBool){
+                try {
+                    // conversion of value to bool failed, must be array of strings
+                    auto const injectReferences = JsonValueValidator(jsonComponent, "inject-references", Json::ValueType::arrayValue)();
+                    std::vector<std::string> injectedRefNames;
+                    for (auto const& refName : injectReferences){
+                        injectedRefNames.push_back(refName.asString());
+                    }
+                    componentInfo.setInjectReferences(false, injectedRefNames);
+                } catch (...){
+                    throw std::runtime_error("Invalid value for the name 'inject-references'. Expected string or array of strings");
+                }
+            }
         }
 
         // configuration-policy and configuration-pid
@@ -170,11 +189,6 @@ ManifestParserImplV1::ParseAndGetComponentInfos(Json::Value const& scr) const
                         = JsonValueValidator(jsonRefInfo, "target", Json::ValueType::stringValue).GetString();
                 }
 
-                if (jsonRefInfo.isMember("inject-override")){
-                    auto const injectOverride = JsonValueValidator(jsonRefInfo, "inject-override", Json::ValueType::booleanValue)();
-                    refInfo.inject_override = injectOverride.asBool();
-                }
-
                 componentInfo.references.push_back(refInfo);
             }
 
@@ -194,6 +208,9 @@ ManifestParserImplV1::ParseAndGetComponentInfos(Json::Value const& scr) const
                 exceptionMessage += listOfDuplicateRefNames;
                 throw std::invalid_argument(exceptionMessage);
             }
+
+            // validate that all specified injected references correspond to named references
+            componentInfo.validateInjectedRefNames();
         }
         componentInfos.push_back(componentInfo);
     }

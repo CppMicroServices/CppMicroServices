@@ -101,9 +101,6 @@ namespace cppmicroservices
                 // reference.target
                 ObjectValidator(metadata, "target", /*isOptional=*/true).AssignValueTo(refMetadata.target);
 
-                // reference.inject-override
-                ObjectValidator(metadata, "inject-override", /*isOptional=*/true).AssignValueTo(refMetadata.injectOverride);
-
                 return refMetadata;
             }
 

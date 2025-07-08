@@ -8,13 +8,17 @@
              "service": {
                 "interfaces": ["test::CAInterface1"]
             },
+            "inject-references" : ["ref0"],
             "references" : [
+                {
+                    "name" : "ref0",
+                    "interface": "test::DSGraph01"
+                },
                 {
                     "name" : "ref1",
                     "interface": "test::CAInterface",
                     "target" : "(someKey=true)",
-                    "policy" : "dynamic",
-                    "inject-override" : false
+                    "policy" : "dynamic"
                 }
             ]
         }]

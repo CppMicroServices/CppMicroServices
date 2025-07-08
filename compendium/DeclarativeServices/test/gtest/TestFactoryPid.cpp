@@ -263,7 +263,18 @@ namespace test
         EXPECT_EQ(instances.size(), count);
     }
 
-    
+    class dsGraph1Impl : public test::DSGraph01 {
+      public:
+        dsGraph1Impl() : test::DSGraph01(){}
+        ~dsGraph1Impl() = default;
+
+        std::string
+        Description()
+        {
+            return "gsGraph1Impl";
+        }
+    };
+
     TEST_F(tServiceComponent, TestServicePropsChangeForBind)
     {
         auto ctx = framework.GetBundleContext();
@@ -273,6 +284,9 @@ namespace test
         auto bundle = StartTestBundle("TestBundleDSCA20");
 
         auto bundle1  = StartTestBundle("TestBundleDSCA20_5");
+        auto dsgraph1 = std::make_shared<dsGraph1Impl>();
+
+        ctx.RegisterService<test::DSGraph01>(dsgraph1);
 
         std::string configID = "sample::ServiceComponentCA20";
 

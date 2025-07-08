@@ -13,7 +13,7 @@ namespace sample
     class ServiceComponentCA20_5 : public test::CAInterface1
     {
       public:
-        ServiceComponentCA20_5() : active(false) {}
+        ServiceComponentCA20_5(std::shared_ptr<test::DSGraph01> ref0) : active(false) {}
 
         void
         Activate(std::shared_ptr<ComponentContext> const&)

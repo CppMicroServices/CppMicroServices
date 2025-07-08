@@ -242,7 +242,7 @@ namespace cppmicroservices
             metadata::ReferenceMetadata fakeMetadata {};
             fakeMetadata.name = "ref";
             fakeMetadata.interfaceName = us_service_interface_iid<dummy::Reference1>();
-            fakeMetadata.setPolicy(policy);
+            fakeMetadata.policy = policy;
             fakeMetadata.policyOption = policyOption;
             fakeMetadata.cardinality = !cardinality.empty() ? cardinality : "0..1";
 
@@ -275,7 +275,7 @@ namespace cppmicroservices
             auto mgr = std::make_shared<MockReferenceManagerBaseImpl>(fakeMetadata, bc, fakeLogger, "foo");
 
             auto bindingPolicy
-                = ReferenceManagerBaseImpl::CreateBindingPolicy(*mgr, fakeMetadata.getPolicy(), fakeMetadata.policyOption);
+                = ReferenceManagerBaseImpl::CreateBindingPolicy(*mgr, fakeMetadata.policy, fakeMetadata.policyOption);
             EXPECT_TRUE(bindingPolicy);
             auto* bindingPolicyData = bindingPolicy.get();
 
@@ -291,7 +291,7 @@ namespace cppmicroservices
             auto mgr = std::make_shared<MockReferenceManagerBaseImpl>(fakeMetadata, bc, mockLogger, "foo");
 
             auto bindingPolicy
-                = ReferenceManagerBaseImpl::CreateBindingPolicy(*mgr, fakeMetadata.getPolicy(), fakeMetadata.policyOption);
+                = ReferenceManagerBaseImpl::CreateBindingPolicy(*mgr, fakeMetadata.policy, fakeMetadata.policyOption);
 
             EXPECT_CALL(*mockLogger.get(), Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG, testing::_))
                 .Times(1);

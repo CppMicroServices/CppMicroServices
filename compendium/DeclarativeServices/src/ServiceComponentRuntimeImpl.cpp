@@ -94,7 +94,7 @@ namespace cppmicroservices
             refDTO.cardinality = refData.cardinality;
             refDTO.interfaceName = refData.interfaceName;
             refDTO.name = refData.name;
-            refDTO.policy = refData.getPolicy();
+            refDTO.policy = refData.policy;
             refDTO.policyOption = refData.policyOption;
             refDTO.scope = refData.scope;
             refDTO.target = refData.target;

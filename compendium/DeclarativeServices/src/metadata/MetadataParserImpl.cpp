@@ -90,10 +90,8 @@ namespace cppmicroservices
                 std::tie(refMetadata.minCardinality, refMetadata.maxCardinality)
                     = GetReferenceCardinalityExtents(refMetadata.cardinality);
 
-                std::string tmpPolicy = "";
                 object = ObjectValidator(metadata, "policy", /*isOptional=*/true);
-                object.AssignValueTo(tmpPolicy, /*choices=*/ReferenceMetadata::Policies);
-                refMetadata.setPolicy(tmpPolicy);
+                object.AssignValueTo(refMetadata.policy, /*choices=*/ReferenceMetadata::Policies);
 
                 // reference.policy-option
                 object = ObjectValidator(metadata, "policy-option", /*isOptional=*/true);

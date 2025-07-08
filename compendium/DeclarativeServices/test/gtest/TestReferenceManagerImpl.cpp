@@ -64,7 +64,7 @@ namespace cppmicroservices
                           << "target         = " << data.target << std::endl
                           << "interfaceName  = " << data.interfaceName << std::endl
                           << "cardinality    = " << data.cardinality << std::endl
-                          << "policy         = " << data.getPolicy() << std::endl
+                          << "policy         = " << data.policy << std::endl
                           << "policyOption   = " << data.policyOption << std::endl
                           << "scope          = " << data.scope << std::endl
                           << "minCardinality = " << data.minCardinality << std::endl
@@ -113,7 +113,7 @@ namespace cppmicroservices
             metadata::ReferenceMetadata fakeMetadata {};
             fakeMetadata.name = std::move(refName);
             fakeMetadata.interfaceName = us_service_interface_iid<dummy::Reference1>();
-            fakeMetadata.setPolicy(policy);
+            fakeMetadata.policy = policy;
             fakeMetadata.policyOption = policyOption;
             fakeMetadata.cardinality = cardinality;
 
@@ -301,18 +301,18 @@ namespace cppmicroservices
                 EXPECT_EQ(refManager.IsSatisfied(), true);
                 EXPECT_EQ(unsatisfiedNotificationCount,
                           refManager.IsOptional() && (ReferencePolicyOption_Greedy == fakeMetadata.policyOption)
-                                  && !(ReferencePolicy_Dynamic == fakeMetadata.getPolicy())
+                                  && !(ReferencePolicy_Dynamic == fakeMetadata.policy)
                               ? 1
                               : 0)
                     << "UNSATISFIED notification expected only for static-optional-greedy";
                 EXPECT_EQ(satisfiedNotificationCount,
                           (refManager.IsOptional() && ReferencePolicyOption_Reluctant == fakeMetadata.policyOption)
-                                  || (refManager.IsOptional() && (ReferencePolicy_Dynamic == fakeMetadata.getPolicy()))
+                                  || (refManager.IsOptional() && (ReferencePolicy_Dynamic == fakeMetadata.policy))
                               ? 0
                               : 1)
                     << "SATISFIED notification expected except for static-optional-reluctant";
 
-                if (ReferencePolicy_Dynamic == fakeMetadata.getPolicy())
+                if (ReferencePolicy_Dynamic == fakeMetadata.policy)
                 {
                     // the bind notification is sent only if the service component is already active
                     // e.g. when the service ref was already satisfied because it's optional
@@ -338,7 +338,7 @@ namespace cppmicroservices
                 EXPECT_EQ(unsatisfiedNotificationCount, 0)
                     << "no notification expected since the service registered has the same "
                        "rank";
-                if (ReferencePolicy_Dynamic == fakeMetadata.getPolicy())
+                if (ReferencePolicy_Dynamic == fakeMetadata.policy)
                 {
                     EXPECT_EQ(bindNotificationCount, 0);
                     EXPECT_EQ(unbindNotificationCount, 0);
@@ -361,18 +361,18 @@ namespace cppmicroservices
                 EXPECT_EQ(refManager.IsSatisfied(), true);
                 EXPECT_EQ(unsatisfiedNotificationCount,
                           ReferencePolicyOption_Greedy == fakeMetadata.policyOption
-                                  && !(ReferencePolicy_Dynamic == fakeMetadata.getPolicy())
+                                  && !(ReferencePolicy_Dynamic == fakeMetadata.policy)
                               ? 1
                               : 0)
                     << "UNSATISFIED notification must be sent only for static-greedy policy";
                 EXPECT_EQ(satisfiedNotificationCount,
                           ReferencePolicyOption_Greedy == fakeMetadata.policyOption
-                                  && !(ReferencePolicy_Dynamic == fakeMetadata.getPolicy())
+                                  && !(ReferencePolicy_Dynamic == fakeMetadata.policy)
                               ? 1
                               : 0)
                     << "SATISFIED notification must be sent only for static-greedy policy";
 
-                if (ReferencePolicy_Dynamic == fakeMetadata.getPolicy())
+                if (ReferencePolicy_Dynamic == fakeMetadata.policy)
                 {
                     EXPECT_EQ(bindNotificationCount, ReferencePolicyOption_Greedy == fakeMetadata.policyOption ? 1 : 0);
                     EXPECT_EQ(unbindNotificationCount,
@@ -393,7 +393,7 @@ namespace cppmicroservices
                 EXPECT_EQ(unsatisfiedNotificationCount,
                           ReferenceCardinality_MandatoryUnary == fakeMetadata.cardinality
                                   && ReferencePolicyOption_Reluctant == fakeMetadata.policyOption
-                                  && !(ReferencePolicy_Dynamic == fakeMetadata.getPolicy())
+                                  && !(ReferencePolicy_Dynamic == fakeMetadata.policy)
                               ? 1
                               : 0)
                     << "UNSATISFIED notification must be sent only for "
@@ -401,13 +401,13 @@ namespace cppmicroservices
                 EXPECT_EQ(satisfiedNotificationCount,
                           ReferenceCardinality_MandatoryUnary == fakeMetadata.cardinality
                                   && ReferencePolicyOption_Reluctant == fakeMetadata.policyOption
-                                  && !(ReferencePolicy_Dynamic == fakeMetadata.getPolicy())
+                                  && !(ReferencePolicy_Dynamic == fakeMetadata.policy)
                               ? 1
                               : 0)
                     << "SATISFIED notification must be sent only for "
                        "mandatory-unary-static-reluctant";
 
-                if (ReferencePolicy_Dynamic == fakeMetadata.getPolicy())
+                if (ReferencePolicy_Dynamic == fakeMetadata.policy)
                 {
                     EXPECT_EQ(bindNotificationCount,
                               ReferencePolicyOption_Reluctant == fakeMetadata.policyOption ? 1 : 0);
@@ -430,7 +430,7 @@ namespace cppmicroservices
                     << "No changes in bindings so no SATISFIED notification expected";
                 EXPECT_EQ(unsatisfiedNotificationCount, 0)
                     << "No changes in bindings so no UNSATISFIED notification expected";
-                if (ReferencePolicy_Dynamic == fakeMetadata.getPolicy())
+                if (ReferencePolicy_Dynamic == fakeMetadata.policy)
                 {
                     EXPECT_EQ(bindNotificationCount, 0);
                     EXPECT_EQ(unbindNotificationCount, 0);
@@ -449,19 +449,19 @@ namespace cppmicroservices
                 reg2.Unregister();
                 EXPECT_EQ(unsatisfiedNotificationCount,
                           (refManager.IsOptional() && ReferencePolicyOption_Reluctant == fakeMetadata.policyOption)
-                                  || (refManager.IsOptional() && ReferencePolicy_Dynamic == fakeMetadata.getPolicy())
+                                  || (refManager.IsOptional() && ReferencePolicy_Dynamic == fakeMetadata.policy)
                               ? 0
                               : 1)
                     << "UNSATISFIED notification must be sent except for "
                        "optional-static-reluctant";
                 EXPECT_EQ(satisfiedNotificationCount,
                           refManager.IsOptional() && ReferencePolicyOption_Greedy == fakeMetadata.policyOption
-                                  && !(ReferencePolicy_Dynamic == fakeMetadata.getPolicy())
+                                  && !(ReferencePolicy_Dynamic == fakeMetadata.policy)
                               ? 1
                               : 0)
                     << "SATISFIED notification must be sent only for optional-static-greedy";
 
-                if (ReferencePolicy_Dynamic == fakeMetadata.getPolicy())
+                if (ReferencePolicy_Dynamic == fakeMetadata.policy)
                 {
                     EXPECT_EQ(bindNotificationCount, 0)
                         << "No bind notifications are expected when there is nothing to bind "
@@ -498,7 +498,7 @@ namespace cppmicroservices
                    "registrations";
             EXPECT_EQ(refManager.GetBoundReferences().size(),
                       (refManager.IsOptional() && fakeMetadata.policyOption == ReferencePolicyOption_Reluctant
-                       && !(ReferencePolicy_Dynamic == fakeMetadata.getPolicy()))
+                       && !(ReferencePolicy_Dynamic == fakeMetadata.policy))
                           ? 0ul
                           : 1ul)
                 << "A reference must be bound unless the cardinality is optional and "
@@ -614,7 +614,7 @@ namespace cppmicroservices
             // static-reluctant, mandatory-unary - depends on which thread's service was bound
             // static-reluctant, optional-unary - none of the services are bound
             if (refManager.IsOptional() && fakeMetadata.policyOption == ReferencePolicyOption_Reluctant
-                && !(ReferencePolicy_Dynamic == fakeMetadata.getPolicy()))
+                && !(ReferencePolicy_Dynamic == fakeMetadata.policy))
             {
                 EXPECT_EQ(refManager.GetBoundReferences().size(), 0ul)
                     << "No references must be bound for OPTIONAL cardinality with RELUCTANT "

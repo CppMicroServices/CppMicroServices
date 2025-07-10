@@ -65,13 +65,13 @@ ManifestParserImplV1::ParseAndGetComponentInfos(Json::Value const& scr) const
                 try {
                     // conversion of value to bool failed, must be array of strings
                     auto const injectReferences = JsonValueValidator(jsonComponent, "inject-references", Json::ValueType::arrayValue)();
-                    std::vector<std::string> injectedRefNames;
+                    std::unordered_set<std::string> injectedRefNames;
                     for (auto const& refName : injectReferences){
-                        injectedRefNames.push_back(refName.asString());
+                        injectedRefNames.insert(refName.asString());
                     }
                     componentInfo.setInjectReferences(false, injectedRefNames);
                 } catch (...){
-                    throw std::runtime_error("Invalid value for the name 'inject-references'. Expected string or array of strings");
+                    throw std::runtime_error("Invalid JSON value for the name 'inject-references'. Expected string or array of strings");
                 }
             }
         }
@@ -188,7 +188,6 @@ ManifestParserImplV1::ParseAndGetComponentInfos(Json::Value const& scr) const
                     refInfo.target
                         = JsonValueValidator(jsonRefInfo, "target", Json::ValueType::stringValue).GetString();
                 }
-
                 componentInfo.references.push_back(refInfo);
             }
 

@@ -61,6 +61,7 @@ namespace cppmicroservices
                 std::string scope;
                 std::size_t minCardinality { 1 };
                 std::size_t maxCardinality { 1 };
+
                 static const std::vector<std::string> Cardinalities;
                 static const std::vector<std::string> Policies;
                 static const std::vector<std::string> PolicyOptions;

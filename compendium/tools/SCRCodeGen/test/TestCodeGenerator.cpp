@@ -885,9 +885,9 @@ namespace codegen
                                         "Invalid array value for the name "
                                         "'interfaces'. Expected non-empty string"),
             CodegenInvalidManifestState(manifest_illegal_inject_refs,
-                                        "Invalid value for the name 'inject-references'. Expected string or array of strings"),
+                                        "Invalid JSON value for the name 'inject-references'. Expected string or array of strings"),
             CodegenInvalidManifestState(manifest_illegal_inject_refs2,
-                                        "Invalid value for the name 'inject-references'. Expected string or array of strings"),
+                                        "Invalid JSON value for the name 'inject-references'. Expected string or array of strings"),
             CodegenInvalidManifestState(manifest_illegal_scope,
                                         "Invalid value 'global' for the name 'scope'. The valid choices are : "
                                         "[singleton, bundle, prototype]"),

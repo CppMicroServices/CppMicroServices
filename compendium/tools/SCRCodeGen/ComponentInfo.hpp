@@ -41,7 +41,6 @@ namespace codegen
             std::string policy_option;
             std::string target;
             std::string scope;
-            bool inject_override = true;
         };
 
         struct ServiceInfo
@@ -60,21 +59,30 @@ namespace codegen
             static const std::string CONFIG_POLICY_IGNORE;
             static const std::string CONFIG_POLICY_REQUIRE;
             static const std::string CONFIG_POLICY_OPTIONAL;
+
+            // check if the specific reference is injected
+            // true if either
+            //     injectAllRefs is true or
+            //     this one is injected
             bool injectRef(std::string refName) const {
                 return injectAllRefs || injectedRefs.find(refName) != injectedRefs.end();
             }
 
-            void setInjectReferences(bool allRefs, std::vector<std::string> refNames = {}){
+
+            // instantiate the set of injected refs or the 'all' bool
+            void setInjectReferences(bool allRefs, std::unordered_set<std::string> refNames = {}){
+                // if the set of refNames is empty, set the injectAll param
                 if (refNames.empty()){
                     injectAllRefs = allRefs;
                     return;
                 }
-                for (auto const& name : refNames){
-                    injectedRefs.insert(name);
-                    injectAllRefs = allRefs;
-                }
+
+                // set injectedRefs
+                injectedRefs = refNames;
+                injectAllRefs = allRefs;
             }
 
+            // ensure that all references in the set of injectedRefs are named references of the component
             void validateInjectedRefNames(){
                 std::unordered_set<std::string> allRefNames;
                 for (auto const& ref : references){
@@ -83,7 +91,9 @@ namespace codegen
 
                 for (auto const & injectedRef : injectedRefs){
                     if (allRefNames.find(injectedRef) == allRefNames.end()){
-                        throw std::runtime_error("The injected reference with name '" + injectedRef + "' does not match any of this service's references");
+                        throw std::runtime_error("The injected reference with name '"
+                                                 + injectedRef + 
+                                                 "' does not match any of this service's references");
                     }
                 }
             }

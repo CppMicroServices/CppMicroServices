@@ -17,7 +17,7 @@
           (block-length <block>)
           (block-ref <block> <index>) retrieves byte at location
           (block-set! <block> <index> <byte>) modifies byte at location
-
+     
      In the sequel, lines that begin with '>' denote lines to add to the
      code. Lines that begin with '|' are just citations of existing code.
      Lines that begin with X denote lines to be removed from the code.

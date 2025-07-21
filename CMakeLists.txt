@@ -364,6 +364,17 @@ if (APPLE AND US_COMPILER_APPLE_CLANG)
 endif()
 
 #-----------------------------------------------------------------------------
+# Set stack as non executable
+#-----------------------------------------------------------------------------
+
+# Add flag to force non executable stack on gcc builds
+# The -Wl,-z noexecstack link option on all gcc builds will
+# disallow executable stacks within CppMicroServices.
+if(UNIX AND NOT APPLE)
+  link_libraries("-Wl,-z,noexecstack")
+endif()
+
+#-----------------------------------------------------------------------------
 # 3rd Party Library configuration
 #-----------------------------------------------------------------------------
 

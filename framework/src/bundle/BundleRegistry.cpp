@@ -112,7 +112,8 @@ namespace cppmicroservices
         std::string const& location,
         cppmicroservices::AnyMap const& bundleManifest,
         std::vector<Bundle>& resultingBundles,
-        std::vector<std::string>& alreadyInstalled)
+        std::vector<std::string>& alreadyInstalled,
+        bool filter)
     {
         auto l = bundles.Lock();
         US_UNUSED(l);
@@ -126,9 +127,14 @@ namespace cppmicroservices
         {
             auto installedBundlePrivate = foundBundles.first->second;
             alreadyInstalled.emplace_back(installedBundlePrivate->symbolicName);
-            auto actualBundle
-                = coreCtx->bundleHooks.FilterBundle(MakeBundleContext(installedBundlePrivate->bundleContext.Load()),
+            Bundle actualBundle;
+            if (filter) {
+                actualBundle = coreCtx->bundleHooks.FilterBundle(MakeBundleContext(installedBundlePrivate->bundleContext.Load()),
                                                     MakeBundle(installedBundlePrivate));
+            } else {
+                actualBundle = MakeBundle(installedBundlePrivate);
+            }
+                
             if (actualBundle)
             {
                 resultingBundles.push_back(actualBundle);
@@ -139,7 +145,7 @@ namespace cppmicroservices
     }
 
     std::vector<Bundle>
-    BundleRegistry::Install(std::string const& location, BundlePrivate*, cppmicroservices::AnyMap const& bundleManifest)
+    BundleRegistry::Install(std::string const& location, BundlePrivate* installingBundle, cppmicroservices::AnyMap const& bundleManifest)
     {
         using namespace std::chrono_literals;
 
@@ -186,7 +192,8 @@ namespace cppmicroservices
                                                                 location,
                                                                 bundleManifest,
                                                                 resultingBundles,
-                                                                alreadyInstalled);
+                                                                alreadyInstalled,
+                                                                installingBundle->id != 0);
 
             // Perform the install
             auto newBundles = Install0(location, resCont, alreadyInstalled, bundleManifest);
@@ -274,7 +281,8 @@ namespace cppmicroservices
                                                                     location,
                                                                     bundleManifest,
                                                                     resultingBundles,
-                                                                    alreadyInstalled);
+                                                                    alreadyInstalled,
+                                                                    installingBundle->id != 0);
 
                 std::vector<Bundle> newBundles;
                 {

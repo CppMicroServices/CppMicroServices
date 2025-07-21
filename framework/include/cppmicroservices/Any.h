@@ -46,6 +46,7 @@ DEALINGS IN THE SOFTWARE.
 #include <typeinfo>
 #include <utility>
 #include <vector>
+#include <cstdint>
 
 namespace cppmicroservices
 {

@@ -35,7 +35,6 @@ US_MSVC_DISABLE_WARNING(4355)
 
 #include "BundleContextPrivate.h"
 #include "BundleStorageMemory.h"
-#include "BundleUtils.h"
 #include "FrameworkPrivate.h"
 
 #include <iomanip>
@@ -166,7 +165,7 @@ namespace cppmicroservices
         }
 
         systemBundle->InitSystemBundle();
-        _us_set_bundle_context_instance_system_bundle(systemBundle->bundleContext.Load().get());
+        US_SET_CTX_FUNC(system_bundle)(systemBundle->bundleContext.Load().get());
 
         bundleRegistry.Init();
 

@@ -23,6 +23,7 @@
 #include "cppmicroservices/SecurityException.h"
 
 #include "cppmicroservices/Bundle.h"
+#include "cppmicroservices/BundleInitialization.h"
 #include "cppmicroservices/Constants.h"
 #include "cppmicroservices/SharedLibrary.h"
 #include "cppmicroservices/SharedLibraryException.h"
@@ -132,10 +133,21 @@ namespace cppmicroservices
                     logger->Log(logservice::SeverityLevel::LOG_INFO,
                                 "Loading shared library for Bundle #" + ToString(fromBundle.GetBundleId())
                                     + " (location=" + bundleLoc + ")");
+
                     sh.Load(any_cast<int>(opts));
+
+                    // Message timestamps are used for approximately measuring the time it takes to load the library file
                     logger->Log(logservice::SeverityLevel::LOG_INFO,
                                 "Finished loading shared library for Bundle #" + ToString(fromBundle.GetBundleId())
                                     + " (location=" + bundleLoc + ")");
+
+                    const std::string fname_setcontext = US_STR(US_SET_CTX_PREFIX) + fromBundle.GetSymbolicName();
+                    void* setcontext_addr = fromBundle.GetSymbol(sh.GetHandle(), fname_setcontext);
+                    SetBundleContextFn setcontext = reinterpret_cast<void (*)(BundleContextPrivate*)>(setcontext_addr);
+                    if (setcontext)
+                    {
+                        setcontext(GetPrivate(fromBundle.GetBundleContext()).get());
+                    }
                 }
                 catch (std::system_error const& ex)
                 {

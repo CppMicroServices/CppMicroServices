@@ -1127,7 +1127,7 @@ namespace cppmicroservices
       private:
         friend US_Framework_EXPORT BundleContext MakeBundleContext(BundleContextPrivate*);
         friend BundleContext MakeBundleContext(std::shared_ptr<BundleContextPrivate> const&);
-        friend std::shared_ptr<BundleContextPrivate> GetPrivate(BundleContext const&);
+        friend US_Framework_EXPORT std::shared_ptr<BundleContextPrivate> GetPrivate(BundleContext const&);
 
         BundleContext(std::shared_ptr<BundleContextPrivate> ctx);
         // allow templated code to use the internal logger

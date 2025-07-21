@@ -263,6 +263,47 @@ namespace test
         EXPECT_FALSE(static_cast<bool>(sRef2)) << "Service must not be available after it's dependency is removed";
     }
 
+    class tInitialization
+        : public tServiceComponent
+        , public testing::WithParamInterface<std::string>
+    {
+    };
+
+    /**
+     * Verify that Declarative Services data stored in the bundle is initialized when a component is loaded
+     * Currently the only applicable data is the BundleContextPrivate used by GetBundleContext
+     */
+    TEST_P(tInitialization, testInitialization)
+    {
+        const std::string bundle = "TestBundleDSTOI" + GetParam();
+        const std::string component = "sample::ServiceComponent" + GetParam();
+        auto testBundle = this->StartTestBundle(bundle);
+        auto compDescDTO = this->dsRuntimeService->GetComponentDescriptionDTO(testBundle, component);
+        auto compConfigDTOs = this->dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
+        EXPECT_EQ(compConfigDTOs.size(), 1ul);
+
+        auto ctxt = testBundle.GetBundleContext();
+        ASSERT_TRUE(ctxt);
+        auto sRef = ctxt.GetServiceReference<test::TestInitialization>();
+        auto service = ctxt.GetService(sRef);
+        std::vector<cppmicroservices::BundleContext> ctxt2 = service->GetContexts();
+        int items = ctxt2.size();
+        ASSERT_TRUE(items == 2 || items == 3);
+        EXPECT_TRUE(ctxt == ctxt2[0]) << "Service's activator must be provided with its bundle context";
+        EXPECT_TRUE(ctxt == ctxt2[1]) << "Service's US_GET_CTX_FUNC must return the bundle context";
+        if (items == 3)
+        {
+            EXPECT_TRUE(ctxt == ctxt2[2]) << "Service's bundle activator must be provided with its bundle context";
+        }
+    }
+
+    /**
+     * Bundle 20 tests DS data initialization for an immediate component without a bundle activator
+     * Bundle 22 tests DS data initialization for an immediate component with a bundle activator
+     * Bundle 21 tests DS data initialization for a delayed component
+     */
+    INSTANTIATE_TEST_SUITE_P(testInitImmediateActivatorDelayed, tInitialization, testing::Values("20", "22", "21"));
+
     TEST_F(tServiceComponent, testDependencyInjection) // DS_TOI_18
     {
         auto testBundle = StartTestBundle("TestBundleDSTOI18");

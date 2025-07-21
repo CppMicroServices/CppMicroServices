@@ -19,35 +19,33 @@
   limitations under the License.
 
 =============================================================================*/
+#include "cppmicroservices/BundleActivator.h"
+#include "cppmicroservices/BundleContext.h"
+#include "cppmicroservices/ServiceProperties.h"
 
-#ifndef CPPMICROSERVICES_BUNDLEUTILS_H
-#define CPPMICROSERVICES_BUNDLEUTILS_H
+#include "ServiceImpl.hpp"
 
-#include <functional>
-#include <string>
-#include <utility>
-
-namespace cppmicroservices
+namespace sample
 {
 
-    namespace BundleUtils
+    cppmicroservices::BundleContext activatorProvidedCtx;
+
+    class Activator : public cppmicroservices::BundleActivator
     {
-        // returns the handle to the current executable
-        void* GetExecutableHandle();
+      public:
+        Activator() = default;
+        ~Activator() = default;
 
-        // returns the address of the symbol in library libHandle
-        void* GetSymbol(void* libHandle, char const* symbol, std::string& errmsg);
-
-        template <typename T>
         void
-        GetSymbol(std::function<T>& fptr, void* libHandle, std::string const& symbol, std::string& errmsg)
+        Start(cppmicroservices::BundleContext context)
         {
-            void* f = GetSymbol(libHandle, symbol.c_str(), errmsg);
-            fptr = reinterpret_cast<T*>(f);
+            activatorProvidedCtx = context;
         }
 
-    } // namespace BundleUtils
+        void
+        Stop(cppmicroservices::BundleContext /*context*/) {}
+    };
 
-} // namespace cppmicroservices
+} // namespace sample
 
-#endif // CPPMICROSERVICES_BUNDLEUTILS_H
+CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(sample::Activator)

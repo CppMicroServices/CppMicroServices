@@ -24,6 +24,7 @@
 #define CPPMICROSERVICES_BUNDLEPRIVATE_H
 
 #include "cppmicroservices/Bundle.h"
+#include "cppmicroservices/BundleInitialization.h"
 #include "cppmicroservices/BundleVersion.h"
 #include "cppmicroservices/SharedLibrary.h"
 #include "cppmicroservices/detail/Threads.h"
@@ -268,8 +269,7 @@ namespace cppmicroservices
          */
         SharedLibrary lib;
 
-        using SetBundleContextHook = std::function<void(BundleContextPrivate*)>;
-        SetBundleContextHook SetBundleContext;
+        SetBundleContextFn SetBundleContext;
     };
 
     Bundle MakeBundle(std::shared_ptr<BundlePrivate> const& d);

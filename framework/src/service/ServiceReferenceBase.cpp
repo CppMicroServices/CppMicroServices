@@ -226,7 +226,7 @@ namespace cppmicroservices
     std::size_t
     ServiceReferenceBase::Hash() const
     {
-        return std::hash<std::shared_ptr<ServiceRegistrationBasePrivate>>()(this->d.Load()->registration.lock());
+        return std::hash<std::shared_ptr<ServiceRegistrationCoreInfo>>()(this->d.Load()->coreInfo);
     }
 
     std::ostream&

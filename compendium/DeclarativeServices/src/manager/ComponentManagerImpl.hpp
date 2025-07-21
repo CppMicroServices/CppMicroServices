@@ -50,13 +50,13 @@ namespace cppmicroservices
         class ComponentManagerImpl : public ComponentManager
         {
           public:
-            ComponentManagerImpl(std::shared_ptr<const metadata::ComponentMetadata> metadata,
+            ComponentManagerImpl(std::shared_ptr<metadata::ComponentMetadata const> metadata,
                                  std::shared_ptr<ComponentRegistry> registry,
                                  cppmicroservices::BundleContext bundleContext,
                                  std::shared_ptr<cppmicroservices::logservice::LogService> logger,
                                  std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkService,
                                  std::shared_ptr<ConfigurationNotifier> configNotifier);
-             ComponentManagerImpl(ComponentManagerImpl const&) = delete;
+            ComponentManagerImpl(ComponentManagerImpl const&) = delete;
             ComponentManagerImpl(ComponentManagerImpl&&) = delete;
             ComponentManagerImpl& operator=(ComponentManagerImpl const&) = delete;
             ComponentManagerImpl& operator=(ComponentManagerImpl&&) = delete;
@@ -90,7 +90,7 @@ namespace cppmicroservices
             /** @copydoc ComponentManager::GetMetadata()
              * Returns the stored component description
              */
-            std::shared_ptr<const metadata::ComponentMetadata>
+            std::shared_ptr<metadata::ComponentMetadata const>
             GetMetadata() const override
             {
                 return compDesc;
@@ -206,11 +206,11 @@ namespace cppmicroservices
           private:
             FRIEND_TEST(ComponentManagerImplParameterizedTest, TestAccumulateFutures);
 
-            const std::shared_ptr<ComponentRegistry>
+            std::shared_ptr<ComponentRegistry> const
                 registry; ///< component registry associated with the current runtime
-            const std::shared_ptr<const metadata::ComponentMetadata> compDesc; ///< the component description
+            std::shared_ptr<metadata::ComponentMetadata const> const compDesc; ///< the component description
             cppmicroservices::BundleContext bundleContext; ///< context of the bundle which contains the component
-            const std::shared_ptr<cppmicroservices::logservice::LogService>
+            std::shared_ptr<cppmicroservices::logservice::LogService> const
                 logger;                                   ///< logger associated with the current runtime
             std::shared_ptr<ComponentManagerState> state; ///< This member is always accessed using atomic operations
             std::vector<std::shared_future<void>>
@@ -221,7 +221,7 @@ namespace cppmicroservices
             std::mutex
                 transitionMutex; ///< mutex to make the state transition and posting of the async operations atomic
             std::shared_ptr<ConfigurationNotifier> configNotifier;
-       };
+        };
     } // namespace scrimpl
 } // namespace cppmicroservices
 

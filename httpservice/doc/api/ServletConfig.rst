@@ -1,4 +1,0 @@
-ServletConfig
--------------
-
-.. doxygenclass:: cppmicroservices::ServletConfig

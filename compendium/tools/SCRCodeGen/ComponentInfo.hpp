@@ -99,7 +99,7 @@ namespace codegen
             }
           private: 
             bool injectAllRefs = true;
-             std::unordered_set<std::string> injectedRefs;
+            std::unordered_set<std::string> injectedRefs;
         };
 
         // These functions return the string representations for the data model

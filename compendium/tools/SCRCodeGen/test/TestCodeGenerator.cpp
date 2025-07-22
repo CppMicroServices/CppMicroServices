@@ -462,6 +462,18 @@ namespace codegen
   }
   )manifest";
 
+      const std::string manifest_illegal_inject_refs3 = R"manifest(
+  {
+    "scr" : { "version" : 1,
+              "components": [{
+                       "implementation-class": "Foo",
+                       "inject-references": []
+                       }]
+            }
+  }
+  )manifest";
+
+
     const std::string manifest_empty_ref_name = R"manifest(
   {
     "scr" : { "version" : 1,
@@ -885,9 +897,11 @@ namespace codegen
                                         "Invalid array value for the name "
                                         "'interfaces'. Expected non-empty string"),
             CodegenInvalidManifestState(manifest_illegal_inject_refs,
-                                        "Invalid JSON value for the name 'inject-references'. Expected string or array of strings"),
+                                        "Invalid JSON value for the name 'inject-references'. Expected boolean or non-empty array of strings"),
             CodegenInvalidManifestState(manifest_illegal_inject_refs2,
-                                        "Invalid JSON value for the name 'inject-references'. Expected string or array of strings"),
+                                        "Invalid JSON value for the name 'inject-references'. Expected boolean or non-empty array of strings"),
+            CodegenInvalidManifestState(manifest_illegal_inject_refs3,
+                                        "Invalid JSON value for the name 'inject-references'. Expected boolean or non-empty array of strings"),
             CodegenInvalidManifestState(manifest_illegal_scope,
                                         "Invalid value 'global' for the name 'scope'. The valid choices are : "
                                         "[singleton, bundle, prototype]"),

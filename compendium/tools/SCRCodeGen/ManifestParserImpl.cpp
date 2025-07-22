@@ -71,7 +71,7 @@ ManifestParserImplV1::ParseAndGetComponentInfos(Json::Value const& scr) const
                     }
                     componentInfo.setInjectReferences(false, injectedRefNames);
                 } catch (...){
-                    throw std::runtime_error("Invalid JSON value for the name 'inject-references'. Expected string or array of strings");
+                    throw std::runtime_error("Invalid JSON value for the name 'inject-references'. Expected boolean or non-empty array of strings");
                 }
             }
         }

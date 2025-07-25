@@ -105,7 +105,7 @@ target_include_directories(${us_logservice_test_exe_name} PRIVATE
   )
 
 # Needed for clock_gettime with glibc < 2.17
-if(UNIX AND NOT APPLE)
+if((UNIX AND NOT APPLE) AND NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Android")
   target_link_libraries(${us_logservice_test_exe_name} PRIVATE rt)
 endif()
 

@@ -58,7 +58,7 @@ namespace cppmicroservices
                                             std::current_exception());
                             }
                         });
-                    std::lock_guard<std::mutex> lock(oneAtATimeMutex);
+                    std::lock_guard<std::recursive_mutex> lock(oneAtATimeMutex);
 
                     // no state change, already in active state. create and return a ComponentInstance object
                     // This could throw; a scope guard is put in place to call latch.CountDown().
@@ -144,20 +144,18 @@ namespace cppmicroservices
                                         std::current_exception());
                         }
                     });
-                bool result;
+
+                std::lock_guard<std::recursive_mutex> lock(oneAtATimeMutex);
+                // Make sure the state didn't change while we were waiting
+                auto currentState = mgr.GetState();
+                if (currentState->GetValue() != service::component::runtime::dto::ComponentState::ACTIVE)
                 {
-                    std::lock_guard<std::mutex> lock(oneAtATimeMutex);
-                    // Make sure the state didn't change while we were waiting
-                    auto currentState = mgr.GetState();
-                    if (currentState->GetValue() != service::component::runtime::dto::ComponentState::ACTIVE)
-                    {
-                        auto logger = mgr.GetLogger();
-                        logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
-                                    "Modified failed. Component no longer in Active State.");
-                        return false;
-                    }
-                    result = mgr.ModifyComponentInstanceProperties();
+                    auto logger = mgr.GetLogger();
+                    logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
+                                "Modified failed. Component no longer in Active State.");
+                    return false;
                 }
+                bool result = mgr.ModifyComponentInstanceProperties();
                 if (result)
                 {
                     // Update service registration properties
@@ -197,7 +195,7 @@ namespace cppmicroservices
                                         std::current_exception());
                         }
                     });
-                std::lock_guard<std::mutex> lock(oneAtATimeMutex);
+                std::lock_guard<std::recursive_mutex> lock(oneAtATimeMutex);
                 // Make sure the state didn't change while we were waiting
                 auto currentState = mgr.GetState();
                 if (currentState->GetValue() != service::component::runtime::dto::ComponentState::ACTIVE)

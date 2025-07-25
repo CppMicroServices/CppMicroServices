@@ -104,7 +104,8 @@ namespace cppmicroservices
             return nullptr;
         }
 
-        auto h = std::make_shared<ServiceHolder<void>>(bundle_, d->m_reference, nullptr, interfaceMap);
+        auto serviceHolder = new ServiceHolder<void>(bundle_, d->m_reference, nullptr, interfaceMap);
+        std::shared_ptr<ServiceHolder<void>> h(serviceHolder, CustomServiceDeleter { serviceHolder });
         auto deleter = h->interfaceMap->find(d->m_reference.GetInterfaceId())->second.get();
         return std::shared_ptr<void>(h, deleter);
     }

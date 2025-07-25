@@ -168,6 +168,23 @@ namespace
         ASSERT_EQ(component->implClassName, "Foo::Impl2");
     }
 
+    TEST_F(MetadataParserImplV1Test, ParseValidManifestWithGlobalNamespacing)
+    {
+        auto metadataparser = MetadataParserFactory::Create(1, GetLogger());
+        auto components
+            = metadataparser->ParseAndGetComponentsMetadata(ManifestHelper::GetTestManifest("valid_manifest_with_global_namespacing"));
+        auto const component = components[0];
+        ASSERT_EQ(component->activateMethodName, std::string("Activate"));
+        ASSERT_EQ(component->deactivateMethodName, std::string("Deactivate"));
+        ASSERT_EQ(component->modifiedMethodName, std::string("Modified"));
+        ASSERT_EQ(component->immediate, false);
+        ASSERT_EQ(component->enabled, true);
+        ASSERT_EQ(component->name, "DSSpellCheck::SpellCheckImpl");
+        ASSERT_EQ(component->implClassName, "DSSpellCheck::SpellCheckImpl");
+        ASSERT_THAT(component->properties, ::testing::SizeIs(0));
+    }
+
+
     // For the SCR map specified in "scr", we expect the exception message
     // output by the Metadata Parser to be exactly errorOutput.
     // Instead, if we expect the errorOutput to be contained in the generated error message,

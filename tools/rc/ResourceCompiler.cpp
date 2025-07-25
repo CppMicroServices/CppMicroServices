@@ -37,9 +37,7 @@
 #include <utility>
 #include <vector>
 
-#ifndef __MINGW32__
-#include <filesystem>
-#else
+#ifdef __MINGW32__
 #include <Shlwapi.h>
 #endif
 
@@ -442,10 +440,10 @@ ZipArchive::AddResourceFile(std::string const& resFileName, bool isManifest)
     std::string archiveName = resFileName;
 
     bool pathToResIsAbsolute = false;
+
 #ifndef __MINGW32__
     // Issue 161.3: check to see if resFileName is relative or not, and exit early if it is not.
-    std::filesystem::path pathToResFile { resFileName };
-    pathToResIsAbsolute = pathToResFile.is_absolute();
+    pathToResIsAbsolute = resFileName[0] == '/';
 #else
     pathToResIsAbsolute = !PathIsRelativeA(resFileName.c_str());
 #endif

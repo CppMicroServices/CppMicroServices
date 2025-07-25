@@ -87,6 +87,11 @@ namespace
                           cppmicroservices::logservice::SeverityLevel,
                           std::string const&,
                           std::exception_ptr const));
+	MOCK_CONST_METHOD1(getLogger,
+                     std::shared_ptr<cppmicroservices::logservice::Logger>(const std::string&));
+	MOCK_CONST_METHOD2(getLogger,
+                     std::shared_ptr<cppmicroservices::logservice::Logger>(const cppmicroservices::Bundle&, const std::string&));
+
     };
 } // namespace
 

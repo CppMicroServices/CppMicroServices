@@ -29,7 +29,9 @@
 #include <string>
 #include <memory>
 
-namespace cppmicroservices::logservice
+namespace cppmicroservices
+{
+namespace logservice
 {
 	 /**
          \defgroup gr_logservice LoggerFactory
@@ -51,7 +53,7 @@ namespace cppmicroservices::logservice
 	{
 	    public:
 
-	        inline static const std::string ROOT_LOGGER_NAME = "ROOT";
+	        static const std::string ROOT_LOGGER_NAME;
 	
                 virtual ~LoggerFactory() = default;
 
@@ -72,6 +74,6 @@ namespace cppmicroservices::logservice
                  */
                 [[nodiscard]] virtual std::shared_ptr<Logger> getLogger(const cppmicroservices::Bundle& bundle, std::string const& name = ROOT_LOGGER_NAME) const = 0; 
         };
-}
+} }
 
 #endif

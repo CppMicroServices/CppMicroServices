@@ -1,8 +1,12 @@
 #include "LoggerFactoryImpl.hpp"
 #include "LoggerImpl.hpp"
 
-namespace cppmicroservices::logservice
+namespace cppmicroservices
 {
+namespace logservice
+{
+    const std::string LoggerFactory::ROOT_LOGGER_NAME {"ROOT"};
+
         std::shared_ptr<Logger> 
         LoggerFactoryImpl::getLogger(const std::string& name) const 
 	{
@@ -17,5 +21,5 @@ namespace cppmicroservices::logservice
 	    return std::make_shared<LoggerImpl>(bundle, name);
 	}
     
-}
+} }
 

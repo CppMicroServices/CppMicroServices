@@ -23,6 +23,7 @@
 #ifndef CONFIGURATIONADMINPRIVATE_HPP
 #define CONFIGURATIONADMINPRIVATE_HPP
 
+#include "ThreadpoolSafeFuturePrivate.hpp"
 #include "metadata/ConfigurationMetadata.hpp"
 #include <cstdint>
 #include <future>
@@ -32,7 +33,6 @@ namespace cppmicroservices
 {
     namespace cmimpl
     {
-
         /**
          * This class is a convenience container for tracking added Configurations.
          */
@@ -98,8 +98,9 @@ namespace cppmicroservices
              *
              * @param pid The PID of the {@code Configuration} which has been updated
              */
-            virtual std::shared_future<void> NotifyConfigurationUpdated(std::string const& pid,
-                                                                        unsigned long const changeCount)
+            virtual std::shared_ptr<ThreadpoolSafeFuturePrivate> NotifyConfigurationUpdated(
+                std::string const& pid,
+                unsigned long const changeCount)
                 = 0;
 
             /**
@@ -111,9 +112,10 @@ namespace cppmicroservices
              * @param configurationId The unique id of the configuration which has been removed. Used to avoid race
              * conditions.
              */
-            virtual std::shared_future<void> NotifyConfigurationRemoved(std::string const& pid,
-                                                                        std::uintptr_t configurationId,
-                                                                        unsigned long changeCount)
+            virtual std::shared_ptr<ThreadpoolSafeFuturePrivate> NotifyConfigurationRemoved(
+                std::string const& pid,
+                std::uintptr_t configurationId,
+                unsigned long changeCount)
                 = 0;
         };
     } // namespace cmimpl

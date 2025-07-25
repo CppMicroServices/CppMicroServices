@@ -61,8 +61,8 @@ as specified in the OSGi R4.2 specifications.
 
 namespace cppmicroservices
 {
-    using WriteLock = std::unique_lock<std::shared_mutex>;
-    using ReadLock = std::shared_lock<std::shared_mutex>;
+    using WriteLock = std::unique_lock<std::shared_timed_mutex>;
+    using ReadLock = std::shared_lock<std::shared_timed_mutex>;
 
     struct FrameworkShutdownBlocker
     {
@@ -227,7 +227,7 @@ namespace cppmicroservices
 
         // Mutex required to be held when changing stopped.
         // ReadLock or WriteLock construction is done using this mutex.
-        mutable std::shared_mutex stoppedLock;
+        mutable std::shared_timed_mutex stoppedLock;
 
         // Flag for whether the Framework has been stopped. See mutex stoppedLock
         bool stopped;

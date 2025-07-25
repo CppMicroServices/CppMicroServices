@@ -132,3 +132,29 @@ jobs:
     - name: Build And Test
       working-directory: Z:\
       run: ctest -VV -S cmake\usCTestScript_github.cmake
+      
+  build_win_deterministic_bundles:
+    name: Build and Test [windows-2022,Configuration=0,Deterministic]
+    runs-on: windows-2022
+    env:
+      BUILD_DIR: Z:\build\config_0
+      BUILD_CONFIGURATION: 0
+      BUILD_OS: windows-2022
+      BUILD_WITH_DETERMINISTIC: 1
+    strategy:
+      fail-fast: false
+
+    steps:
+    - name: Initialization
+      run: |
+        git config --global core.autocrlf true
+        subst Z: ${{github.workspace}}
+        echo "C:\msys64" >> $PATH
+
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+
+    - name: Build And Test
+      working-directory: Z:\
+      run: ctest -VV -S cmake\usCTestScript_github.cmake

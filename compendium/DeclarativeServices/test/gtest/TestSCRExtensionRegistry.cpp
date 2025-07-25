@@ -186,7 +186,9 @@ namespace cppmicroservices
             std::shared_ptr<ComponentConfigurationImpl> compConfigImpl
                 = std::make_shared<SingletonComponentConfigurationImpl>(mockMetadata, bundle, fakeRegistry, mockLogger, notifier);
             std::string pid { 123 };
-            EXPECT_NO_THROW({ notifier->CreateFactoryComponent(pid, compConfigImpl); });
+            cppmicroservices::AnyMap props;
+            auto componentFactory = notifier->GetComponentFactory();
+            EXPECT_NO_THROW({ componentFactory->CreateFactoryComponent(pid, compConfigImpl, props); });
 
             asyncWorkService->StopTracking();
             fakeRegistry->Clear();

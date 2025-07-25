@@ -24,7 +24,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-2019, windows-2022]
+        os: [windows-2019, windows-2022, windows-11-arm]
         # build configurations:
         # 0 = threading ON / shared lib ON
         # 1 = threading ON / shared lib OFF

@@ -582,7 +582,18 @@ namespace codegen
             }
   }
   )manifest";
-
+    const std::string manifest_too_many_configuration_pids = R"manifest(
+  {
+    "scr" : { "version" : 1,
+              "components": [{
+                       "implementation-class": "Foo",
+                       "factory" : "factory id",
+                       "configuration-policy": "require",
+                       "configuration-pid": ["Foo","Bar"]
+                       }]
+            }
+  }
+  )manifest";
     auto
     GetManifestSCRData(std::string const& content)
     {
@@ -795,6 +806,10 @@ namespace codegen
                                         "Error: Both configuration-policy and configuration-pid must be "
                                         "present in the manifest.json file to participate in Configuration "
                                         "Admin.",
-                                        true)));
-
+                                        true),
+            CodegenInvalidManifestState(manifest_too_many_configuration_pids,
+                                        "Error: For factory components, the configuration-pid array may "
+                                        "only contain one entry")));
+ 
+    
 } // namespace codegen

@@ -140,7 +140,7 @@ STRING(SUBSTRING "${CMAKE_SYSTEM_PROCESSOR}" 0 3 SYSTEM_PROCESSOR_SUBSTR)
 if("${SYSTEM_PROCESSOR_SUBSTR}" STREQUAL "arm")
   if(US_COMPILER_GNU)
     set(US_COMPILER_GNU_ARM 1)
-endif()
+  endif()
 endif()
 
 
@@ -177,6 +177,11 @@ if (US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG)
   check_cxx_compiler_flag(-Wno-missing-braces HAS_MISSING_BRACES_FLAG)
   if (HAS_MISSING_BRACES_FLAG)
     add_compile_options(-Wno-missing-braces)
+  endif()
+  
+  check_cxx_compiler_flag(-Wno-missing-template-arg-list-after-template-kw HAS_MISSING_TEMPLATE_KW_FLAG)
+  if (HAS_MISSING_TEMPLATE_KW_FLAG)
+    add_compile_options(-Wno-missing-template-arg-list-after-template-kw)
   endif()
 endif()
 

@@ -21,6 +21,7 @@
  =============================================================================*/
 
 #include <cassert>
+#include <memory>
 #include <stdexcept>
 #include <thread>
 
@@ -30,6 +31,7 @@
 
 #include "CMConstants.hpp"
 #include "ConfigurationAdminImpl.hpp"
+#include "SingleInvokeTask.hpp"
 
 using cppmicroservices::logservice::SeverityLevel;
 
@@ -192,8 +194,7 @@ namespace cppmicroservices
 {
     namespace cmimpl
     {
-
-        ConfigurationAdminImpl::ConfigurationAdminImpl(
+         ConfigurationAdminImpl::ConfigurationAdminImpl(
             cppmicroservices::BundleContext context,
             std::shared_ptr<cppmicroservices::logservice::LogService> const& lggr,
             std::shared_ptr<cppmicroservices::async::AsyncWorkService> const& asyncWS)
@@ -203,7 +204,6 @@ namespace cppmicroservices
             , futuresID { 0u }
             , managedServiceTracker(cmContext, this)
             , managedServiceFactoryTracker(cmContext, this)
-            , randomGenerator(std::random_device {}())
             , configListenerTracker(cmContext)
         {
             managedServiceTracker.Open();
@@ -598,7 +598,7 @@ namespace cppmicroservices
             }
         }
 
-        std::shared_future<void>
+        std::shared_ptr<ThreadpoolSafeFuturePrivate>
         ConfigurationAdminImpl::NotifyConfigurationUpdated(std::string const& pid, unsigned long const changeCount)
         {
             // NotifyConfigurationUpdated will only send a notification to the service if
@@ -740,13 +740,13 @@ namespace cppmicroservices
                 });
         }
 
-        std::shared_future<void>
+        std::shared_ptr<ThreadpoolSafeFuturePrivate>
         ConfigurationAdminImpl::NotifyConfigurationRemoved(std::string const& pid,
                                                            std::uintptr_t configurationId,
                                                            unsigned long changeCount)
         {
             std::promise<void> ready;
-            std::shared_future<void> alreadyRemoved = ready.get_future();
+            auto alreadyRemoved = std::make_shared<ThreadpoolSafeFuturePrivate>(ready.get_future().share());
             std::shared_ptr<ConfigurationImpl> configurationToInvalidate;
             bool hasBeenUpdated = false;
             {
@@ -1031,15 +1031,18 @@ namespace cppmicroservices
                         "ManagedServiceFactory with PID " + service->getPid() + " has been removed.");
         }
 
+        using PostTask = std::packaged_task<void()>;
+
         template <typename Functor>
-        std::shared_future<void>
+        std::shared_ptr<ThreadpoolSafeFuturePrivate>
         ConfigurationAdminImpl::PerformAsync(Functor&& f)
         {
+
             std::lock_guard<std::mutex> lk { futuresMutex };
             decltype(completeFutures) {}.swap(completeFutures);
             auto id = ++futuresID;
 
-            std::packaged_task<void()> task(
+            PostTask task(
                 [this, func = std::forward<Functor>(f), id]() mutable
                 {
                     // func() can throw, make sure that the futures
@@ -1059,18 +1062,23 @@ namespace cppmicroservices
                         });
                     func();
                 });
-
             std::shared_future<void> fut = task.get_future().share();
+
+            auto singleInvokeTask = std::make_shared<SingleInvokeTask>(std::make_shared<PostTask>(std::move(task)));
+
+            PostTask post_task([singleInvokeTask]() mutable { (*singleInvokeTask)(); });
+
             incompleteFutures.emplace(id, fut);
 
-            asyncWorkService->post(std::move(task));
+            asyncWorkService->post(std::move(post_task));
 
-            return fut;
+            return std::make_shared<ThreadpoolSafeFuturePrivate>(fut, singleInvokeTask);
         }
 
         std::string
         ConfigurationAdminImpl::RandomInstanceName()
         {
+            thread_local static std::mt19937 randomGenerator(std::random_device {}());
             static auto const characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
             std::uniform_int_distribution<> dist(0, 61);
             std::string randomString(6, '\0');

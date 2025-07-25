@@ -382,8 +382,8 @@ TEST_F(ResourceCompilerTest, testManifestAdd)
     std::ostringstream cmd;
     cmd << rcbinpath
         << " --bundle-name mybundle"
-        << " --out-file " << tempdir << "Example.zip"
-        << " --manifest-add " << tempdir << "manifest.json";
+        << " --out-file \"" << tempdir << "Example.zip\""
+        << " --manifest-add \"" << tempdir << "manifest.json\"";
     // Test that Cmdline invocation in testManifestAdd returns 0
     ASSERT_EQ(EXIT_SUCCESS, runExecutable(cmd.str()));
 
@@ -503,9 +503,9 @@ TEST_F(ResourceCompilerTest, testZipAddBundle)
     std::ostringstream cmd;
     cmd << rcbinpath;
     cmd << " --bundle-name mybundle ";
-    cmd << " --bundle-file " << tempdir << "sample.dll ";
-    cmd << " --manifest-add " << tempdir << "manifest.json ";
-    cmd << " --zip-add " << tempdir << "tomerge.zip";
+    cmd << " --bundle-file \"" << tempdir << "sample.dll\" ";
+    cmd << " --manifest-add \"" << tempdir << "manifest.json\" ";
+    cmd << " --zip-add \"" << tempdir << "tomerge.zip\"";
 
     // Test that Cmdline invocation in testResAdd returns 0
     ASSERT_EQ(EXIT_SUCCESS, runExecutable(cmd.str()));
@@ -528,9 +528,9 @@ TEST_F(ResourceCompilerTest, testZipAddTwice)
 {
     std::ostringstream cmd;
     cmd << rcbinpath;
-    cmd << " --bundle-file " << tempdir << "sample1.dll ";
-    cmd << " --zip-add " << tempdir << "tomerge.zip ";
-    cmd << " --zip-add " << tempdir << "Example2.zip";
+    cmd << " --bundle-file \"" << tempdir << "sample1.dll\" ";
+    cmd << " --zip-add \"" << tempdir << "tomerge.zip\" ";
+    cmd << " --zip-add \"" << tempdir << "Example2.zip\"";
 
     // Test that Cmdline invocation in testZipAddTwice returns 0
     ASSERT_EQ(EXIT_SUCCESS, runExecutable(cmd.str()));
@@ -563,10 +563,10 @@ TEST_F(ResourceCompilerTest, testBundleManifestZipAdd)
 
     std::ostringstream cmd;
     cmd << rcbinpath;
-    cmd << " --manifest-add " << tempdir << "manifest2.json ";
-    cmd << " --bundle-file " << tempdir << "sample1.dll ";
-    cmd << " --zip-add " << tempdir << "tomerge.zip ";
-    cmd << " --zip-add " << tempdir << "Example2.zip";
+    cmd << " --manifest-add \"" << tempdir << "manifest2.json\" ";
+    cmd << " --bundle-file \"" << tempdir << "sample1.dll\" ";
+    cmd << " --zip-add \"" << tempdir << "tomerge.zip\" ";
+    cmd << " --zip-add \"" << tempdir << "Example2.zip\"";
 
     // Test that Cmdline invocation in testBundleManifestZipAdd returns 0
     ASSERT_EQ(EXIT_SUCCESS, runExecutable(cmd.str()));
@@ -657,9 +657,9 @@ TEST_F(ResourceCompilerTest, testDuplicateManifestFileAdd)
     std::ostringstream cmd;
     cmd << rcbinpath;
     cmd << " --bundle-name mybundle ";
-    cmd << " --manifest-add " << tempdir << "manifest.json ";
-    cmd << " --manifest-add " << tempdir << "manifest.json ";
-    cmd << " --out-file " << tempdir << "testDuplicateManifestFileAdd.zip ";
+    cmd << " --manifest-add \"" << tempdir << "manifest.json\" ";
+    cmd << " --manifest-add \"" << tempdir << "manifest.json\" ";
+    cmd << " --out-file \"" << tempdir << "testDuplicateManifestFileAdd.zip\" ";
 
     // Test that Cmdline invocation in testDuplicateManifestFileAdd returns 0
     ASSERT_EQ(EXIT_SUCCESS, runExecutable(cmd.str()));
@@ -763,9 +763,9 @@ TEST_F(ResourceCompilerTest, testFailureModes)
     cmd.str(std::string());
     cmd << rcbinpath;
     cmd << " --bundle-name mybundle ";
-    cmd << " --bundle-file " << tempdir << DIR_SEP << "sample1.dll ";
-    cmd << " --zip-add " << tempdir << DIR_SEP << "tomerge.zip ";
-    cmd << " --zip-add " << tempdir << DIR_SEP << "Example2.zip";
+    cmd << " --bundle-file \"" << tempdir << "sample1.dll\" ";
+    cmd << " --zip-add \"" << tempdir << "tomerge.zip\" ";
+    cmd << " --zip-add \"" << tempdir << "Example2.zip\"";
     // test --bundle-name arg without either --manifest-add or --res-add is just a warning
     ASSERT_EQ(EXIT_SUCCESS, runExecutable(cmd.str()));
 
@@ -776,9 +776,9 @@ TEST_F(ResourceCompilerTest, testFailureModes)
     cmd << rcbinpath;
     cmd << " --bundle-name "
         << "mybundle";
-    cmd << " --out-file " << tempdir << DIR_SEP << "Example7.zip";
-    cmd << " --manifest-add " << tempdir << DIR_SEP << "manifest.json";
-    cmd << " --zip-add " << tempdir << DIR_SEP << "Example.zip";
+    cmd << " --out-file \"" << tempdir << "Example7.zip\"";
+    cmd << " --manifest-add \"" << tempdir << "manifest.json\"";
+    cmd << " --zip-add \"" << tempdir << "Example.zip\"";
     // Test Failure mode: duplicate manifest.json
     ASSERT_EQ(EXIT_FAILURE, runExecutable(cmd.str()));
 }
@@ -811,8 +811,8 @@ TEST_F(ResourceCompilerTest, testManifestAddWithInvalidJSON)
     cmd << rcbinpath;
     cmd << " --bundle-name "
         << "mybundle";
-    cmd << " --out-file " << tempdir << "invalid_syntax.zip";
-    cmd << " --manifest-add " << tempdir << "manifest.json";
+    cmd << " --out-file \"" << tempdir << "invalid_syntax.zip\"";
+    cmd << " --manifest-add \"" << tempdir << "manifest.json\"";
     // Fail to embed manifest containing JSON syntax errors.
     ASSERT_EQ(BUNDLE_MANIFEST_VALIDATION_ERROR_CODE, runExecutable(cmd.str()));
 
@@ -827,8 +827,8 @@ TEST_F(ResourceCompilerTest, testManifestAddWithInvalidJSON)
     cmd2 << rcbinpath;
     cmd2 << " --bundle-name "
          << "mybundle";
-    cmd2 << " --bundle-file " << tempdir << invalid_syntax_bundle_name;
-    cmd2 << " --manifest-add " << tempdir << "manifest.json";
+    cmd2 << " --bundle-file \"" << tempdir << invalid_syntax_bundle_name << "\"";
+    cmd2 << " --manifest-add \"" << tempdir << "manifest.json\"";
     // Fail to embed manifest containing JSON syntax errors
     ASSERT_EQ(BUNDLE_MANIFEST_VALIDATION_ERROR_CODE, runExecutable(cmd2.str()));
     // Test that the invalid manifest.json file was not added
@@ -871,7 +871,7 @@ TEST_F(ResourceCompilerTest, testUnicodeBundleFile)
 
     std::ostringstream cmd;
     cmd << rcbinpath;
-    cmd << " --bundle-file " << tempdir << u8"ｆｏｏｂａｒ/myArchive00.zip";
+    cmd << " --bundle-file \"" << tempdir << u8"ｆｏｏｂａｒ/myArchive00.zip\"";
 
     ASSERT_EQ(EXIT_SUCCESS, runExecutable(cmd.str()));
 }
@@ -880,7 +880,7 @@ TEST_F(ResourceCompilerTest, testUnicodeBundleName)
 {
     std::ostringstream cmd;
     cmd << rcbinpath;
-    cmd << " --bundle-file " << tempdir << u8"ｆｏｏｂａｒ/myArchive01.zip";
+    cmd << " --bundle-file \"" << tempdir << u8"ｆｏｏｂａｒ/myArchive01.zip\"";
     cmd << " --bundle-name ｆｏｏｂａｒ";
 
     ASSERT_EQ(EXIT_SUCCESS, runExecutable(cmd.str()));
@@ -890,8 +890,8 @@ TEST_F(ResourceCompilerTest, testUnicodeOutFile)
 {
     std::ostringstream cmd;
     cmd << rcbinpath;
-    cmd << " --bundle-file " << tempdir << u8"ｆｏｏｂａｒ/myArchive02.zip";
-    cmd << " --out-file " << tempdir << u8"ｆｏｏｂａｒ123";
+    cmd << " --bundle-file \"" << tempdir << u8"ｆｏｏｂａｒ/myArchive02.zip\"";
+    cmd << " --out-file \"" << tempdir << u8"ｆｏｏｂａｒ123\"";
 
     ASSERT_EQ(EXIT_SUCCESS, runExecutable(cmd.str()));
 }
@@ -917,9 +917,9 @@ TEST_F(ResourceCompilerTest, testUnicodeZipAdd)
 {
     std::ostringstream cmd;
     cmd << rcbinpath;
-    cmd << " --bundle-file " << tempdir << u8"ｆｏｏｂａｒ/myArchive04.zip";
-    cmd << " --out-file " << tempdir << "unicodeResAdd01.zip";
-    cmd << " --zip-add " << tempdir << "tomerge.zip";
+    cmd << " --bundle-file \"" << tempdir << u8"ｆｏｏｂａｒ/myArchive04.zip\"";
+    cmd << " --out-file \"" << tempdir << "unicodeResAdd01.zip\"";
+    cmd << " --zip-add \"" << tempdir << "tomerge.zip\"";
     cmd << " --bundle-name myunicodebundle01";
 
     ASSERT_EQ(EXIT_SUCCESS, runExecutable(cmd.str()));
@@ -973,8 +973,8 @@ TEST_F(ResourceCompilerTest, testManifestAddWithJSONComments)
     std::ostringstream cmd;
     cmd << rcbinpath;
     cmd << " --bundle-name mybundle";
-    cmd << " --out-file " << tempdir << "json_comment_syntax.zip";
-    cmd << " --manifest-add " << tempdir << "manifest4.json";
+    cmd << " --out-file \"" << tempdir << "json_comment_syntax.zip\"";
+    cmd << " --manifest-add \"" << tempdir << "manifest4.json\"";
     // Test embedding a manifest containing JSON comments.
     ASSERT_EQ(EXIT_SUCCESS, runExecutable(cmd.str()));
 }
@@ -998,8 +998,8 @@ TEST_F(ResourceCompilerTest, testManifestAddWithDuplicateKeys)
     cmd << rcbinpath;
     cmd << " --bundle-name "
         << "mybundle";
-    cmd << " --out-file " << tempdir << "duplicate_keys.zip";
-    cmd << " --manifest-add " << tempdir << "manifest.json";
+    cmd << " --out-file \"" << tempdir << "duplicate_keys.zip\"";
+    cmd << " --manifest-add \"" << tempdir << "manifest.json\"";
     // Fail to embed manifest containing duplicate JSON key names.
     ASSERT_EQ(BUNDLE_MANIFEST_VALIDATION_ERROR_CODE, runExecutable(cmd.str()));
 
@@ -1012,8 +1012,8 @@ TEST_F(ResourceCompilerTest, testManifestAddWithDuplicateKeys)
     cmd2 << rcbinpath;
     cmd2 << " --bundle-name "
          << "mybundle";
-    cmd2 << " --bundle-file " << tempdir << duplicate_keys_bundle_file;
-    cmd2 << " --manifest-add " << tempdir << "manifest.json";
+    cmd2 << " --bundle-file \"" << tempdir << duplicate_keys_bundle_file << "\"";
+    cmd2 << " --manifest-add \"" << tempdir << "manifest.json\"";
     // Fail to embed manifest containing duplicate JSON key names.
     ASSERT_EQ(BUNDLE_MANIFEST_VALIDATION_ERROR_CODE, runExecutable(cmd2.str()));
 
@@ -1066,8 +1066,8 @@ TEST_F(ResourceCompilerTest, testAppendZipWithInvalidManifest)
     std::ostringstream cmdCreateBundle;
     cmdCreateBundle << rcbinpath;
     cmdCreateBundle << " --bundle-name main ";
-    cmdCreateBundle << " --bundle-file " << tempdir << "sample.dll ";
-    cmdCreateBundle << " --manifest-add " << tempdir << "manifest.json ";
+    cmdCreateBundle << " --bundle-file \"" << tempdir << "sample.dll\" ";
+    cmdCreateBundle << " --manifest-add \"" << tempdir << "manifest.json\" ";
     // Test that the manifest.json file was embedded correctly.
     ASSERT_EQ(EXIT_SUCCESS, runExecutable(cmdCreateBundle.str()));
 
@@ -1086,8 +1086,8 @@ TEST_F(ResourceCompilerTest, testAppendZipWithInvalidManifest)
     cmd << rcbinpath;
     cmd << " --bundle-name "
         << "invalid";
-    cmd << " --bundle-file " << tempdir << "sample.dll";
-    cmd << " --zip-add " << tempdir << "append_invalid_manifest_zip.zip";
+    cmd << " --bundle-file \"" << tempdir << "sample.dll\"";
+    cmd << " --zip-add \"" << tempdir << "append_invalid_manifest_zip.zip\"";
     // Fail to append a zip file containing an invalid manifest.json
     ASSERT_EQ(BUNDLE_MANIFEST_VALIDATION_ERROR_CODE, runExecutable(cmd.str()));
 
@@ -1127,9 +1127,9 @@ TEST_F(ResourceCompilerTest, testZipMergeWithInvalidManifest)
     cmd << rcbinpath;
     cmd << " --bundle-name "
         << "main";
-    cmd << " --out-file " << tempdir << "new_merged_zip.zip";
-    cmd << " --zip-add " << tempdir << "merged_zip.zip";
-    cmd << " --zip-add " << tempdir << "x_invalid_manifest.zip";
+    cmd << " --out-file \"" << tempdir << "new_merged_zip.zip\"";
+    cmd << " --zip-add \"" << tempdir << "merged_zip.zip\"";
+    cmd << " --zip-add \"" << tempdir << "x_invalid_manifest.zip\"";
     // Fail to merge a zip file containing an invalid manifest.json
     ASSERT_EQ(BUNDLE_MANIFEST_VALIDATION_ERROR_CODE, runExecutable(cmd.str()));
 
@@ -1171,10 +1171,10 @@ TEST_F(ResourceCompilerTest, testMultipleManifestAdd)
     cmd << rcbinpath;
     cmd << " --bundle-name "
         << "main";
-    cmd << " --out-file " << tempdir << "merged_zip.zip";
-    cmd << " --manifest-add " << tempdir << "manifest_part1.json";
-    cmd << " --manifest-add " << tempdir << "manifest_part2.json";
-    cmd << " --manifest-add " << tempdir << "manifest_part3.json";
+    cmd << " --out-file \"" << tempdir << "merged_zip.zip\"";
+    cmd << " --manifest-add \"" << tempdir << "manifest_part1.json\"";
+    cmd << " --manifest-add \"" << tempdir << "manifest_part2.json\"";
+    cmd << " --manifest-add \"" << tempdir << "manifest_part3.json\"";
     // Test successful concatenation of multiple manifest.json files into one.
     ASSERT_EQ(EXIT_SUCCESS, runExecutable(cmd.str()));
 
@@ -1197,11 +1197,11 @@ TEST_F(ResourceCompilerTest, testMultipleManifestAdd)
     cmd << rcbinpath;
     cmd << " --bundle-name "
         << "main";
-    cmd << " --out-file " << tempdir << "invalid_merged_zip.zip";
-    cmd << " --manifest-add " << tempdir << "manifest_part1.json";
-    cmd << " --manifest-add " << tempdir << "manifest_part2.json";
-    cmd << " --manifest-add " << tempdir << "invalid_manifest.json";
-    cmd << " --manifest-add " << tempdir << "manifest_part3.json";
+    cmd << " --out-file \"" << tempdir << "invalid_merged_zip.zip\"";
+    cmd << " --manifest-add \"" << tempdir << "manifest_part1.json\"";
+    cmd << " --manifest-add \"" << tempdir << "manifest_part2.json\"";
+    cmd << " --manifest-add \"" << tempdir << "invalid_manifest.json\"";
+    cmd << " --manifest-add \"" << tempdir << "manifest_part3.json\"";
     // Test that an invalid manifest json part fails to embed the manifest.
     ASSERT_EQ(BUNDLE_MANIFEST_VALIDATION_ERROR_CODE, runExecutable(cmd.str()));
 
@@ -1233,11 +1233,11 @@ TEST_F(ResourceCompilerTest, testMultipleManifestAdd)
     cmd << rcbinpath;
     cmd << " --bundle-name "
         << "main";
-    cmd << " --out-file " << tempdir << "duplicate_merged_zip.zip";
-    cmd << " --manifest-add " << tempdir << "manifest_part1.json";
-    cmd << " --manifest-add " << tempdir << "manifest_part2.json";
-    cmd << " --manifest-add " << tempdir << "duplicate_manifest.json";
-    cmd << " --manifest-add " << tempdir << "manifest_part3.json";
+    cmd << " --out-file \"" << tempdir << "duplicate_merged_zip.zip\"";
+    cmd << " --manifest-add \"" << tempdir << "manifest_part1.json\"";
+    cmd << " --manifest-add \"" << tempdir << "manifest_part2.json\"";
+    cmd << " --manifest-add \"" << tempdir << "duplicate_manifest.json\"";
+    cmd << " --manifest-add \"" << tempdir << "manifest_part3.json\"";
     // Test that a duplicate manifest json part fails to embed the manifest.
     ASSERT_EQ(BUNDLE_MANIFEST_VALIDATION_ERROR_CODE, runExecutable(cmd.str()));
 
@@ -1305,10 +1305,10 @@ TEST_F(ResourceCompilerTest, testMultipleManifestConcatenation)
     cmd << rcbinpath;
     cmd << " --bundle-name "
         << "main";
-    cmd << " --out-file " << tempdir << "merged_zip.zip";
-    cmd << " --manifest-add " << tempdir << "manifest_part1.json";
-    cmd << " --manifest-add " << tempdir << "manifest_part2.json";
-    cmd << " --manifest-add " << tempdir << "manifest_part3.json";
+    cmd << " --out-file \"" << tempdir << "merged_zip.zip\"";
+    cmd << " --manifest-add \"" << tempdir << "manifest_part1.json\"";
+    cmd << " --manifest-add \"" << tempdir << "manifest_part2.json\"";
+    cmd << " --manifest-add \"" << tempdir << "manifest_part3.json\"";
     // Test the successful concatenation of multiple manifest.json files into one.
     ASSERT_EQ(EXIT_SUCCESS, runExecutable(cmd.str()));
 
@@ -1354,8 +1354,8 @@ TEST_F(ResourceCompilerTest, testManifestWithNullTerminator)
     cmd << rcbinpath;
     cmd << " --bundle-name "
         << "main";
-    cmd << " --out-file " << tempdir << zipFile;
-    cmd << " --manifest-add " << tempdir << jsonFileName;
+    cmd << " --out-file \"" << tempdir << zipFile << "\"";
+    cmd << " --manifest-add \"" << tempdir << jsonFileName << "\"";
     // Test the successful embedding of a manifest containing an embedded null terminator.
     ASSERT_EQ(EXIT_SUCCESS, runExecutable(cmd.str()));
 
@@ -1380,8 +1380,8 @@ TEST_F(ResourceCompilerTest, testManifestWithNullTerminator)
 
     cmd.str(std::string());
     cmd << rcbinpath;
-    cmd << " --out-file " << tempdir << mergedZipFile;
-    cmd << " --zip-add " << tempdir << zipFile;
+    cmd << " --out-file \"" << tempdir << mergedZipFile << "\"";
+    cmd << " --zip-add \"" << tempdir << zipFile << "\"";
     // Test the successful merging of zip file containing a manifest with an embedded null terminator.
     ASSERT_EQ(EXIT_SUCCESS, runExecutable(cmd.str()));
 

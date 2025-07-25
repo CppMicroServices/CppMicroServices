@@ -20,7 +20,7 @@ jobs:
           toolchain: stable
           override: true
 
-      - uses: Swatinem/rust-cache@v1
+      - uses: Swatinem/rust-cache@v2
 
       - run: cargo install clang-tidy-sarif sarif-fmt
 

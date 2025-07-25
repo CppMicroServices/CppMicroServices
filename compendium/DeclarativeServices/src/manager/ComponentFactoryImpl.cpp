@@ -111,7 +111,8 @@ namespace cppmicroservices::scrimpl
                                                                           configNotifier);
                 if (registry->AddComponentManager(compManager))
                 {
-                    if (auto const& extension = extensionRegistry->Find(bundle.GetBundleId()); extension)
+                    auto const& extension = extensionRegistry->Find(bundle.GetBundleId());
+                    if (extension)
                     {
                         extension->AddComponentManager(compManager);
                         compManager->Initialize();

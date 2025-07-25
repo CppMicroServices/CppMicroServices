@@ -77,7 +77,7 @@ namespace
       public:
         MOCK_METHOD2(Log, void(cppmicroservices::logservice::SeverityLevel, std::string const&));
         MOCK_METHOD3(Log,
-                     void(cppmicroservices::logservice::SeverityLevel, std::string const&, const std::exception_ptr));
+                     void(cppmicroservices::logservice::SeverityLevel, std::string const&, std::exception_ptr const));
         MOCK_METHOD3(Log,
                      void(cppmicroservices::ServiceReferenceBase const&,
                           cppmicroservices::logservice::SeverityLevel,
@@ -86,7 +86,7 @@ namespace
                      void(cppmicroservices::ServiceReferenceBase const&,
                           cppmicroservices::logservice::SeverityLevel,
                           std::string const&,
-                          const std::exception_ptr));
+                          std::exception_ptr const));
     };
 } // namespace
 
@@ -290,7 +290,7 @@ TEST(FrameworkTest, FrameworkStartsWhenFileNamedDataExistsInTempDir)
             file << "test";
             file.close();
         }
-        const std::string filePath;
+        std::string const filePath;
     };
 
     auto frameworkStorage = MakeUniqueTempDirectory();
@@ -460,7 +460,9 @@ TEST(Framework, LifeCycle)
             auto ev = f.WaitForStop(std::chrono::seconds(10));
             ASSERT_TRUE(ev); // "Test for valid framework event returned by Framework::WaitForStop()"
             if (!ev && ev.GetType() == FrameworkEvent::Type::FRAMEWORK_ERROR)
+            {
                 std::rethrow_exception(ev.GetThrowable());
+            }
             ASSERT_EQ(ev.GetType(),
                       FrameworkEvent::Type::FRAMEWORK_STOPPED); // "Check that framework event is stopped"
         });
@@ -477,6 +479,23 @@ TEST(Framework, LifeCycle)
               Bundle::STATE_ACTIVE); // "Check framework is not active"
 }
 
+TEST(Framework, BundleStartAfterFrameworkStop)
+{
+    auto f = FrameworkFactory().NewFramework();
+    f.Start();
+
+#if defined(US_BUILD_SHARED_LIBS)
+    auto bundle = cppmicroservices::testing::InstallLib(f.GetBundleContext(), "TestBundleA");
+#else
+    auto bundle = cppmicroservices::testing::GetBundle("TestBundleA", f.GetBundleContext());
+#endif
+    ASSERT_TRUE(bundle); // "Non-null bundle"
+
+    f.Stop();
+    f.WaitForStop(std::chrono::milliseconds::zero());
+    ASSERT_THROW(bundle.Start(), std::runtime_error);
+}
+
 #ifdef US_ENABLE_THREADING_SUPPORT
 
 TEST(FrameworkTest, ConcurrentFrameworkStart)
@@ -489,7 +508,9 @@ TEST(FrameworkTest, ConcurrentFrameworkStart)
         [&start_count](FrameworkEvent const& ev)
         {
             if (FrameworkEvent::Type::FRAMEWORK_STARTED == ev.GetType())
+            {
                 ++start_count;
+            }
         });
     size_t num_threads { 100 };
     std::vector<std::thread> threads;
@@ -499,7 +520,9 @@ TEST(FrameworkTest, ConcurrentFrameworkStart)
     }
 
     for (auto& t : threads)
+    {
         t.join();
+    }
 
     // To test that the correct FrameworkEvent is returned, we must guarantee that the Framework
     // is in a STARTING, ACTIVE, or STOPPING state.
@@ -553,7 +576,9 @@ TEST(FrameworkTest, ConcurrentFrameworkStop)
     }
 
     for (auto& t : threads)
+    {
         t.join();
+    }
     waitForStopThread.join();
 }
 
@@ -758,7 +783,6 @@ TEST(FrameworkTest, ShutdownAndStart)
 
 TEST(FrameworkTest, ConfigurationWithBundleValidation)
 {
-
     using validationFuncType = std::function<bool(cppmicroservices::Bundle const&)>;
 
     validationFuncType validationFunc = [](cppmicroservices::Bundle const&) -> bool { return false; };
@@ -785,8 +809,8 @@ TEST(FrameworkTest, ConfigurationWithBundleValidation)
     ASSERT_TRUE(!isBundleValid);
 
     // exercise cppmicroservices::Any partial template specializations for std::function<bool(const
-    // cppmicroservices::Bundle&)> There is no string/json representation of a std::function, so these should be empty
-    // strings.
+    // cppmicroservices::Bundle&)> There is no string/json representation of a std::function, so these should be
+    // empty strings.
     ASSERT_TRUE(func.ToStringNoExcept().empty());
     ASSERT_TRUE(func.ToJSON().empty());
 

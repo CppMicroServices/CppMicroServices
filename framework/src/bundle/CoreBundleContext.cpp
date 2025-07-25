@@ -94,6 +94,7 @@ namespace cppmicroservices
         , firstInit(true)
         , initCount(0)
         , libraryLoadOptions(0)
+        , stopped(false)
     {
         auto enableDiagLog = any_cast<bool>(frameworkProperties.at(Constants::FRAMEWORK_LOG));
         std::ostream* diagnosticLogger = (diagLogger) ? diagLogger : &std::clog;
@@ -131,7 +132,7 @@ namespace cppmicroservices
         }
 
         // We use a "pseudo" random UUID.
-        const std::string sid_base = "04f4f884-31bb-45c0-b176-";
+        std::string const sid_base = "04f4f884-31bb-45c0-b176-";
         std::stringstream ss;
         ss << sid_base << std::setfill('0') << std::setw(8) << std::hex << static_cast<int32_t>(id * 65536 + initCount);
 
@@ -249,5 +250,20 @@ namespace cppmicroservices
             return dataStorage + util::DIR_SEP + util::ToString(id);
         }
         return std::string();
+    }
+
+    WriteLock
+    CoreBundleContext::SetFrameworkStateAndBlockUntilComplete(bool desiredState)
+    {
+        WriteLock lock(stoppedLock);
+        stopped = desiredState;
+        return lock;
+    }
+
+    std::unique_ptr<FrameworkShutdownBlocker>
+    CoreBundleContext::GetFrameworkStateAndBlock() const
+    {
+        ReadLock lock(stoppedLock);
+        return std::make_unique<FrameworkShutdownBlocker>(stopped, std::move(lock));
     }
 } // namespace cppmicroservices

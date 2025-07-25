@@ -69,7 +69,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, macos-13, macos-14]
+        os: [ubuntu-22.04, ubuntu-22.04-arm, macos-13, macos-14]
         # build configurations:
         # 0 = threading ON / shared lib ON
         # 1 = threading ON / shared lib OFF

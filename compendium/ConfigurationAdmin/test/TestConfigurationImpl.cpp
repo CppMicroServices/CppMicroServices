@@ -67,9 +67,13 @@ namespace cppmicroservices
             std::string pid { "test~instance" };
             std::string factoryPid { "test" };
             ConfigurationImpl conf { mockConfigAdmin.get(), pid, factoryPid, props };
+            auto validFuture = std::make_shared<ThreadpoolSafeFuturePrivate>();
+
             EXPECT_CALL(*mockConfigAdmin,
                         NotifyConfigurationRemoved(pid, reinterpret_cast<std::uintptr_t>(&conf), testing::_))
-                .Times(1);
+                .Times(1)
+                .WillOnce(testing::Return(validFuture));
+            ;
             EXPECT_NO_THROW(conf.Remove());
             EXPECT_THROW(conf.GetPid(), std::runtime_error);
             EXPECT_THROW(conf.GetFactoryPid(), std::runtime_error);
@@ -108,7 +112,12 @@ namespace cppmicroservices
             std::string pid { "test~instance" };
             std::string factoryPid { "test" };
             ConfigurationImpl conf { mockConfigAdmin.get(), pid, factoryPid, props };
-            EXPECT_CALL(*mockConfigAdmin, NotifyConfigurationUpdated(pid, testing::_)).Times(1);
+            auto validFuture = std::make_shared<ThreadpoolSafeFuturePrivate>();
+
+            EXPECT_CALL(*mockConfigAdmin, NotifyConfigurationUpdated(pid, testing::_))
+                .Times(1)
+                .WillOnce(testing::Return(validFuture));
+            ;
             EXPECT_NO_THROW(conf.Update(props));
         }
 
@@ -120,7 +129,11 @@ namespace cppmicroservices
             std::string pid { "test~instance" };
             std::string factoryPid { "test" };
             ConfigurationImpl conf { mockConfigAdmin.get(), pid, factoryPid, props };
-            EXPECT_CALL(*mockConfigAdmin, NotifyConfigurationUpdated(pid, testing::_)).Times(1);
+            auto validFuture = std::make_shared<ThreadpoolSafeFuturePrivate>();
+
+            EXPECT_CALL(*mockConfigAdmin, NotifyConfigurationUpdated(pid, testing::_))
+                .Times(1)
+                .WillOnce(testing::Return(validFuture));
             auto result = conf.UpdateIfDifferent(props);
             EXPECT_FALSE(result.first);
             props["bar"] = std::string("baz");

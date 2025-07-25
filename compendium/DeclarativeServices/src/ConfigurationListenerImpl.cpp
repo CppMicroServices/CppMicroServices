@@ -56,17 +56,12 @@ namespace cppmicroservices
                     {
                         return;
                     }
-                    if (!configNotifier->AnyListenersForPid(pid))
-                    {
-                        return;
-                    }
-
                     auto configAdminRef = event.getReference();
                     if (!configAdminRef)
                     {
                         logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-                                    "configurationEvent error. ConfigurationAdmin service "
-                                    "reference is no longer valid");
+                            "configurationEvent error. ConfigurationAdmin service "
+                            "reference is no longer valid");
                         return;
                     }
                     auto configAdmin
@@ -74,11 +69,11 @@ namespace cppmicroservices
                     if (!configAdmin)
                     {
                         logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-                                    "configurationEvent error. ConfigurationAdmin service "
-                                    "reference is no longer valid");
+                            "configurationEvent error. ConfigurationAdmin service "
+                            "reference is no longer valid");
                         return;
                     }
-                    auto properties = cppmicroservices::AnyMap(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+                    cppmicroservices::AnyMap properties;
                     auto type = event.getType();
 
                     if (type == ConfigurationEventType::CM_UPDATED)
@@ -88,6 +83,10 @@ namespace cppmicroservices
                         {
                             properties = configObject->GetProperties();
                         }
+                    }
+                    if (!configNotifier->AnyListenersForPid(pid, properties))
+                    {
+                        return;
                     }
                     auto ptr = std::make_shared<cppmicroservices::AnyMap>(properties);
                     configNotifier->NotifyAllListeners(pid, type, ptr);

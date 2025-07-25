@@ -48,7 +48,7 @@ namespace cppmicroservices
             MOCK_METHOD3(Log,
                          void(cppmicroservices::logservice::SeverityLevel,
                               std::string const&,
-                              const std::exception_ptr));
+                              std::exception_ptr const));
             MOCK_METHOD3(Log,
                          void(cppmicroservices::ServiceReferenceBase const&,
                               cppmicroservices::logservice::SeverityLevel,
@@ -57,7 +57,7 @@ namespace cppmicroservices
                          void(cppmicroservices::ServiceReferenceBase const&,
                               cppmicroservices::logservice::SeverityLevel,
                               std::string const&,
-                              const std::exception_ptr));
+                              std::exception_ptr const));
 	          MOCK_CONST_METHOD1(getLogger,
                                std::shared_ptr<cppmicroservices::logservice::Logger>(const std::string&));
 	          MOCK_CONST_METHOD2(getLogger,
@@ -76,7 +76,7 @@ namespace cppmicroservices
             {
             }
             void
-            Log(cppmicroservices::logservice::SeverityLevel, std::string const&, const std::exception_ptr) override
+            Log(cppmicroservices::logservice::SeverityLevel, std::string const&, std::exception_ptr const) override
             {
             }
             void
@@ -87,7 +87,7 @@ namespace cppmicroservices
             Log(ServiceReferenceBase const&,
                 cppmicroservices::logservice::SeverityLevel,
                 std::string const&,
-                const std::exception_ptr) override
+                std::exception_ptr const) override
             {
             }
 	    [[nodiscard]] std::shared_ptr<cppmicroservices::logservice::Logger>
@@ -136,9 +136,12 @@ namespace cppmicroservices
             MOCK_METHOD1(AddConfigurations,
                          std::vector<ConfigurationAddedInfo>(std::vector<metadata::ConfigurationMetadata>));
             MOCK_METHOD1(RemoveConfigurations, void(std::vector<ConfigurationAddedInfo>));
-            MOCK_METHOD2(NotifyConfigurationUpdated, std::shared_future<void>(std::string const&, unsigned long const));
+            MOCK_METHOD2(NotifyConfigurationUpdated,
+                         std::shared_ptr<ThreadpoolSafeFuturePrivate>(std::string const&, unsigned long const));
             MOCK_METHOD3(NotifyConfigurationRemoved,
-                         std::shared_future<void>(std::string const&, std::uintptr_t, unsigned long));
+                         std::shared_ptr<ThreadpoolSafeFuturePrivate>(std::string const&,
+                                                                      std::uintptr_t,
+                                                                      unsigned long));
         };
 
         namespace async

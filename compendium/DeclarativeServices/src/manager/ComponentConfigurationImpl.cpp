@@ -234,7 +234,10 @@ namespace cppmicroservices
                         {
                             for (auto const& config : configs)
                             {
-                                configNotifier->CreateFactoryComponent(config->GetPid(), mgr);
+                                auto componentFactory = configNotifier->GetComponentFactory();
+                                componentFactory->CreateFactoryComponent(config->GetPid(),
+                                                                         mgr,
+                                                                         config->GetProperties());
                             }
                         }
                     }

@@ -47,7 +47,7 @@ namespace cppmicroservices
     } // namespace detail
 
     std::ostream&
-    newline_and_indent(std::ostream& os, const uint8_t increment, const int32_t indent)
+    newline_and_indent(std::ostream& os, uint8_t const increment, int32_t const indent)
     {
         if (increment > 0)
         {
@@ -73,14 +73,14 @@ namespace cppmicroservices
     }
 
     std::ostream&
-    any_value_to_json(std::ostream& os, Any const& val, const uint8_t increment, const int32_t indent)
+    any_value_to_json(std::ostream& os, Any const& val, uint8_t const increment, int32_t const indent)
     {
         os << val.ToJSON(increment, indent);
         return os;
     }
 
     std::ostream&
-    any_value_to_json(std::ostream& o, std::string const& s, const uint8_t, const int32_t)
+    any_value_to_json(std::ostream& o, std::string const& s, uint8_t const, int32_t const)
     {
         o << '"';
         for (auto c = s.cbegin(); c != s.cend(); c++)
@@ -131,7 +131,7 @@ namespace cppmicroservices
     }
 
     std::ostream&
-    any_value_to_json(std::ostream& os, bool val, const uint8_t, const int32_t)
+    any_value_to_json(std::ostream& os, bool val, uint8_t const, int32_t const)
     {
         return os << std::boolalpha << val;
     }
@@ -156,5 +156,69 @@ namespace cppmicroservices
     Any::ToStringNoExcept() const
     {
         return Empty() ? std::string() : _content->ToString();
+    }
+
+    std::ostream&
+    any_value_to_cpp(std::ostream& os, Any const& val, uint8_t const increment, int32_t const indent)
+    {
+        os << val.ToCPP(increment, indent);
+        return os;
+    }
+
+    std::ostream&
+    any_value_to_cpp(std::ostream& o, std::string const& s, uint8_t const, int32_t const)
+    {
+        o << "std::string(\"";
+        for (auto c = s.cbegin(); c != s.cend(); c++)
+        {
+            switch (*c)
+            {
+                case '"':
+                    o << "\\\"";
+                    break;
+                case '\\':
+                    o << "\\\\";
+                    break;
+                case '\b':
+                    o << "\\b";
+                    break;
+                case '\f':
+                    o << "\\f";
+                    break;
+                case '\n':
+                    o << "\\n";
+                    break;
+                case '\r':
+                    o << "\\r";
+                    break;
+                case '\t':
+                    o << "\\t";
+                    break;
+                default:
+// suppress type-limits warning on linux arm 64 build
+#if defined(__GNUC__)
+#    pragma GCC diagnostic push
+#    pragma GCC diagnostic ignored "-Wtype-limits"
+#endif
+                    if ('\x00' <= *c && *c <= '\x1f')
+                    {
+                        o << "\\u" << std::hex << std::setw(4) << std::setfill('0') << static_cast<int>(*c);
+                    }
+                    else
+                    {
+                        o << *c;
+                    }
+#if defined(__GNUC__)
+#    pragma GCC diagnostic pop
+#endif
+            }
+        }
+        return o << "\")";
+    }
+
+    std::ostream&
+    any_value_to_cpp(std::ostream& os, bool val, uint8_t const, int32_t const)
+    {
+        return os << std::boolalpha << val;
     }
 } // namespace cppmicroservices

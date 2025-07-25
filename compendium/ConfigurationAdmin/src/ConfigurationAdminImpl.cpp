@@ -192,8 +192,7 @@ namespace cppmicroservices
 {
     namespace cmimpl
     {
-
-        ConfigurationAdminImpl::ConfigurationAdminImpl(
+         ConfigurationAdminImpl::ConfigurationAdminImpl(
             cppmicroservices::BundleContext context,
             std::shared_ptr<cppmicroservices::logservice::LogService> const& lggr,
             std::shared_ptr<cppmicroservices::async::AsyncWorkService> const& asyncWS)
@@ -203,7 +202,6 @@ namespace cppmicroservices
             , futuresID { 0u }
             , managedServiceTracker(cmContext, this)
             , managedServiceFactoryTracker(cmContext, this)
-            , randomGenerator(std::random_device {}())
             , configListenerTracker(cmContext)
         {
             managedServiceTracker.Open();
@@ -1071,6 +1069,7 @@ namespace cppmicroservices
         std::string
         ConfigurationAdminImpl::RandomInstanceName()
         {
+            thread_local static std::mt19937 randomGenerator(std::random_device {}());
             static auto const characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
             std::uniform_int_distribution<> dist(0, 61);
             std::string randomString(6, '\0');

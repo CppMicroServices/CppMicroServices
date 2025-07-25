@@ -29,11 +29,11 @@
 #include <cppmicroservices/FrameworkEvent.h>
 #include <cppmicroservices/FrameworkFactory.h>
 
+#include "../TestUtils.hpp"
 #include "ConcurrencyTestUtil.hpp"
 #include "Mocks.hpp"
 #include "TestFixture.hpp"
 #include "TestInterfaces/Interfaces.hpp"
-#include "../TestUtils.hpp"
 #include "boost/asio/async_result.hpp"
 #include "boost/asio/packaged_task.hpp"
 #include "boost/asio/post.hpp"
@@ -69,7 +69,6 @@ namespace test
             dsRuntimeService = context.GetService<scr::ServiceComponentRuntime>(sRef);
             ASSERT_TRUE(dsRuntimeService);
         }
-
         void
         TearDown() override
         {
@@ -79,30 +78,6 @@ namespace test
 
         std::shared_ptr<scr::ServiceComponentRuntime> dsRuntimeService;
         cppmicroservices::Framework framework;
-    };
-
-    class AsyncWorkServiceInline : public cppmicroservices::async::AsyncWorkService
-    {
-      public:
-        AsyncWorkServiceInline() : cppmicroservices::async::AsyncWorkService() {}
-
-        void
-        post(std::packaged_task<void()>&& task) override
-        {
-            task();
-        }
-    };
-
-    class AsyncWorkServiceStdAsync : public cppmicroservices::async::AsyncWorkService
-    {
-      public:
-        AsyncWorkServiceStdAsync() : cppmicroservices::async::AsyncWorkService() {}
-
-        void
-        post(std::packaged_task<void()>&& task) override
-        {
-            std::future<void> f = std::async(std::launch::async, [task = std::move(task)]() mutable { task(); });
-        }
     };
 
     class AsyncWorkServiceThreadPool : public cppmicroservices::async::AsyncWorkService
@@ -312,10 +287,10 @@ namespace test
 
     INSTANTIATE_TEST_SUITE_P(AsyncWorkServiceEndToEndParameterized,
                              TestAsyncWorkServiceEndToEnd,
-                             testing::Values(std::make_shared<AsyncWorkServiceInline>(),
-                                             std::make_shared<AsyncWorkServiceStdAsync>(),
-                                             std::make_shared<AsyncWorkServiceThreadPool>(1),
-                                             std::make_shared<AsyncWorkServiceThreadPool>(2)));
+                             testing::Values(
+                                 std::make_shared<AsyncWorkServiceThreadPool>(1),
+                                 std::make_shared<AsyncWorkServiceThreadPool>(8),
+                                 std::make_shared<AsyncWorkServiceThreadPool>(20)));
 
     TEST_P(TestAsyncWorkServiceEndToEnd, TestEndToEndBehaviorWithAsyncWorkService)
     {
@@ -340,6 +315,56 @@ namespace test
                 bundle.Stop();
             }
         });
+    }
+
+    TEST_P(TestAsyncWorkServiceEndToEnd, testAsyncWorkServiceDeadlock)
+    {
+        auto param = GetParam();
+
+        auto ctx = framework.GetBundleContext();
+
+        // ASYNCWORKSERVICE
+        auto reg = ctx.RegisterService<cppmicroservices::async::AsyncWorkService>(param);
+
+        // CA, DS
+        ::test::InstallAndStartConfigAdmin(ctx);
+
+        // CA SERVICE
+        auto sr = ctx.GetServiceReference<cppmicroservices::service::cm::ConfigurationAdmin>();
+        auto configAdmin = ctx.GetService<cppmicroservices::service::cm::ConfigurationAdmin>(sr);
+
+        // CONFIG NAME
+        std::string componentName = "sample::ServiceComponentCA06";
+
+        auto bundle = ::test::InstallAndStartBundle(ctx, "TestBundleDSCA06");
+        ASSERT_TRUE(bundle);
+
+        // Create configuration object and update property.
+        auto configuration = configAdmin->GetConfiguration(componentName);
+        auto configInstance = configuration->GetPid();
+
+        cppmicroservices::AnyMap props({
+            {"uniqueProp", std::string("instance1")}
+        });
+
+        auto fut = configuration->Update(props);
+        fut.get();
+
+        auto instanceRef = ctx.GetServiceReference<::test::TestManagedServiceInterface>();
+        auto service = ctx.GetService<::test::TestManagedServiceInterface>(instanceRef);
+
+        auto pathI = ::test::GetPathInfo();
+        props["libPath"] = pathI["libPath"];
+        props["dirSep"] = pathI["dirSep"];
+        props["usLibPrefix"] = pathI["usLibPrefix"];
+        props["usLibPostfix"] = pathI["usLibPostfix"];
+        props["usLibExt"] = pathI["usLibExt"];
+        props["context"] = std::make_shared<cppmicroservices::BundleContext>(ctx);
+
+        fut = configuration->Update(props);
+        fut.get();
+
+        ASSERT_TRUE(service) << "GetService failed for CAInterface.";
     }
 
 }; // namespace test

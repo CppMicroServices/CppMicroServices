@@ -1,0 +1,24 @@
+{
+    "bundle.symbolic_name": "TestBundleDSCA06",
+    "bundle.activator": false,
+    "scr": {
+        "version": 1,
+        "components": [
+            {
+                "enabled": true,
+                "immediate": true,
+                "implementation-class": "sample::ServiceComponentCA06",
+                "configuration-policy": "require",
+                "configuration-pid": [
+                    "sample::ServiceComponentCA06"
+                ],
+                "service": {
+                    "interfaces": [
+                        "test::TestManagedServiceInterface",
+                        "cppmicroservices::service::cm::ManagedService"
+                    ]
+                }
+            }
+        ]
+    }
+}

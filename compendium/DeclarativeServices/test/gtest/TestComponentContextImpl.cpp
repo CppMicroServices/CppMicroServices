@@ -566,7 +566,7 @@ namespace cppmicroservices
             EXPECT_CALL(*mockRegistry, GetComponentManager(GetFramework().GetBundleId(), "comp::name"))
                 .Times(1)
                 .WillRepeatedly(testing::Return(mockCompMgr));
-            EXPECT_CALL(*mockCompMgr, Enable()).Times(1);
+            EXPECT_CALL(*mockCompMgr, Enable(testing::_)).Times(1);
             ctxt->EnableComponent("comp::name");
         }
 
@@ -584,9 +584,9 @@ namespace cppmicroservices
             EXPECT_CALL(*mockRegistry, GetComponentManagers(GetFramework().GetBundleId()))
                 .Times(1)
                 .WillRepeatedly(testing::Return(compmgrs));
-            EXPECT_CALL(*mockCompMgr, Enable()).Times(1);
-            EXPECT_CALL(*mockCompMgr1, Enable()).Times(1);
-            EXPECT_CALL(*mockCompMgr2, Enable()).Times(1);
+            EXPECT_CALL(*mockCompMgr, Enable(testing::_)).Times(1);
+            EXPECT_CALL(*mockCompMgr1, Enable(testing::_)).Times(1);
+            EXPECT_CALL(*mockCompMgr2, Enable(testing::_)).Times(1);
             ctxt->EnableComponent("");
         }
 
@@ -601,7 +601,7 @@ namespace cppmicroservices
             EXPECT_CALL(*mockRegistry, GetComponentManager(GetFramework().GetBundleId(), "comp::name"))
                 .Times(1)
                 .WillRepeatedly(testing::Return(mockCompMgr));
-            EXPECT_CALL(*mockCompMgr, Disable()).Times(1);
+            EXPECT_CALL(*mockCompMgr, Disable(testing::_)).Times(1);
             ctxt->DisableComponent("comp::name");
         }
 

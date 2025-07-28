@@ -12,7 +12,9 @@ namespace spdlog
     using sink_ptr = std::shared_ptr<sinks::sink>;
 } // namespace spdlog
 
-namespace cppmicroservices::logservice
+namespace cppmicroservices
+{
+namespace logservice
 {
 
         class LoggerImpl final : public Logger
@@ -98,4 +100,5 @@ namespace cppmicroservices::logservice
             private:
                 std::shared_ptr<::spdlog::logger> m_Logger;
         };
-} // namespace cppmicroservices::logservice
+} // namespace logservice
+} // namespace cppmicroservices

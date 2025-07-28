@@ -1,7 +1,9 @@
 #include "cppmicroservices/logservice/LoggerFactory.hpp"
 #include <mutex>
 
-namespace cppmicroservices::logservice
+namespace cppmicroservices
+{
+namespace logservice
 {
         class LoggerFactoryImpl final : public LoggerFactory
         {
@@ -28,4 +30,5 @@ namespace cppmicroservices::logservice
 	  private:
 	      mutable std::mutex mutex; // Mutex for synchronization
         };
-} // namespace cppmicroservices::logservice
+} // namespace logservice
+} // namespace cppmicroservices

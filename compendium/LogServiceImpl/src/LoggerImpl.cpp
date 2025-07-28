@@ -7,7 +7,9 @@
 
 #include "LoggerImpl.hpp"
 
-namespace cppmicroservices::logservice
+namespace cppmicroservices
+{
+namespace logservice
 {
         inline std::string
         GetExceptionMessage(std::exception_ptr const& ex)
@@ -308,4 +310,5 @@ namespace cppmicroservices::logservice
             m_Logger->sinks().push_back(sink);
         }
 
-} // namespace cppmicroservices::logservice
+} // namespace logservice
+} // namespace cppmicroservices

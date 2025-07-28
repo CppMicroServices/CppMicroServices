@@ -8,7 +8,9 @@
 #include <functional>
 #include <string>
 
-namespace cppmicroservices::logservice
+namespace cppmicroservices
+{
+namespace logservice
 {
     /**
      \defgroup gr_logservice Logger
@@ -315,6 +317,7 @@ namespace cppmicroservices::logservice
          */
         virtual void warn(std::string const& message, ServiceReferenceBase const& sr, const std::exception_ptr ex) = 0;
     };
-} // namespace cppmicroservices::logservice
+} // namespace logservice
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_LOG_SERVICE_H__

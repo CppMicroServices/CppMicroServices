@@ -38,7 +38,9 @@ DEALINGS IN THE SOFTWARE.
 
 #include <future>
 
-namespace cppmicroservices::cmimpl
+namespace cppmicroservices
+{
+namespace cmimpl
 {
     class ThreadpoolSafeFuturePrivate : public cppmicroservices::ThreadpoolSafeFuture
     {
@@ -69,6 +71,7 @@ namespace cppmicroservices::cmimpl
         std::shared_future<void> future;
         std::shared_ptr<SingleInvokeTask> task;
     };
-} // namespace cppmicroservices::cmimpl
+} // namespace cmimpl
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_THREADPOOLSAFEFUTUREPRIVATE_H

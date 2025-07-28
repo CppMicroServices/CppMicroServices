@@ -45,7 +45,9 @@
 using cppmicroservices::scrimpl::ReferenceManager;
 using cppmicroservices::service::component::detail::ComponentInstance;
 
-namespace cppmicroservices::scrimpl
+namespace cppmicroservices
+{
+    namespace scrimpl
     {
        class SCRExtensionRegistry;
 
@@ -435,5 +437,6 @@ namespace cppmicroservices::scrimpl
                 deleteCompInstanceFunc; ///< extern C function to delete an instance of the {@link ComponentInstance}
                                         ///< class from the component's bundle
         };
-    } // namespace cppmicroservices::scrimpl
+    } // namespace scrimpl
+} // namespace cppmicroservices
 #endif /* COMPONENTCONFIGURATIONIMPL_HPP__ */

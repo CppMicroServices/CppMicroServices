@@ -161,8 +161,14 @@ namespace cppmicroservices
         void
         ComponentConfigurationImpl::SetRegistrationProperties()
         {
-            if (regManager)
+            if (regManager && !currentlySettingProperties)
             {
+                currentlySettingProperties = true;
+                detail::ScopeGuard sg(
+                    [this]()
+                    {
+                        currentlySettingProperties = false;
+                    });
                 regManager->SetProperties(GetProperties());
             }
         }

@@ -24,7 +24,9 @@
 #include <chrono>
 #include <future>
 
-namespace cppmicroservices::cmimpl
+namespace cppmicroservices
+{
+namespace cmimpl
 {
     ThreadpoolSafeFuturePrivate::ThreadpoolSafeFuturePrivate(std::shared_future<void> future,
                                                              std::shared_ptr<SingleInvokeTask> task)
@@ -59,4 +61,5 @@ namespace cppmicroservices::cmimpl
         return future.wait_for(std::chrono::milliseconds(timeout_duration_ms));
     }
 
-} // namespace cppmicroservices::cmimpl
+} // namespace cmimpl
+} // namespace cppmicroservices

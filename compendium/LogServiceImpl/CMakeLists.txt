@@ -37,6 +37,8 @@ endif()
 if(MINGW)
   # silence ignored attributes warnings
   add_compile_options(-Wno-attributes)
+  # silence dangling references warning due to false positives
+  add_compile_options(-Wno-dangling-reference)
 endif()
 
 usMacroCreateBundle(LogServiceImpl

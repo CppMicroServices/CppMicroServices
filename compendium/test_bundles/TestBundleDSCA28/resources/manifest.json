@@ -1,0 +1,44 @@
+{
+    "bundle.symbolic_name": "TestBundleDSCA28",
+    "bundle.activator": false,
+    "scr": {
+        "version": 1,
+        "components": [
+            {
+                "configuration-pid": [
+                    "my.dependency.pid"
+                ],
+                "factory": "myFactoryComponent",
+                "factory-properties": {
+                    "prop3": 3
+                },
+                "service": {
+                    "scope": "singleton",
+                    "interfaces": [
+                        "test::CAInterface"
+                    ]
+                },
+                "inject-references": false,
+                "enabled": true,
+                "immediate": false,
+                "implementation-class": "sample::ServiceComponentCA28",
+                "configuration-policy": "optional",
+                "properties": {
+                    "service.ranking": -10,
+                    "prop1": 1
+                }
+            }
+        ]
+    },
+    "cm": {
+        "version": 1,
+        "configurations": [
+            {
+                "pid": "my.dependency.pid",
+                "properties": {
+                    "prop2": "2"
+                }
+            }
+        ]
+    }
+}

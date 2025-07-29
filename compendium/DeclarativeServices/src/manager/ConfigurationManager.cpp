@@ -154,7 +154,11 @@ namespace cppmicroservices
         {
             bool allConfigsAvailable = configProperties.size() >= metadata->configurationPids.size();
 
-            if ((metadata->configurationPolicy != CONFIG_POLICY_REQUIRE) || (allConfigsAvailable))
+            // If all configs are available or we do not require configs AND this component is not a factory component.
+            // No factory component should ever have satisfied configurations even if an erroneous pid is added which
+            // exactly matches the factory PID
+            if (((metadata->configurationPolicy != CONFIG_POLICY_REQUIRE) || (allConfigsAvailable))
+                && metadata->factoryComponentID.empty())
             {
                 return true;
             }

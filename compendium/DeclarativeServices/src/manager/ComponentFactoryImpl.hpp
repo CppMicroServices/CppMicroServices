@@ -27,7 +27,9 @@
 #include "cppmicroservices/asyncworkservice/AsyncWorkService.hpp"
 #include "cppmicroservices/cm/ConfigurationListener.hpp"
 
-namespace cppmicroservices::scrimpl {
+namespace cppmicroservices
+{
+namespace scrimpl {
     class SCRExtensionRegistry;
     class ComponentConfigurationImpl;
     class ComponentFactoryImpl final
@@ -67,5 +69,6 @@ namespace cppmicroservices::scrimpl {
          std::shared_ptr<SCRExtensionRegistry> extensionRegistry;
     };
 
-} // cppmicroservices::scrimpl namespace 
+} // scrimpl namespace
+} // cppmicroservices namespace
 #endif //__CPPMICROSERVICES_SCRIMPL_COMPONENTFACTORYIMPL_HPP__

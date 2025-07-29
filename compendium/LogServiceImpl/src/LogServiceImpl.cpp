@@ -9,7 +9,9 @@
 #include "LoggerFactoryImpl.hpp"
 #include "LoggerImpl.hpp"
 
-namespace cppmicroservices::logservice
+namespace cppmicroservices
+{
+namespace logservice
 {     
         LogServiceImpl::LogServiceImpl(std::string const& loggerName)
         {
@@ -94,4 +96,5 @@ namespace cppmicroservices::logservice
 	    std::shared_ptr<LoggerImpl> logimpl = std::dynamic_pointer_cast<LoggerImpl>(currLogger);
             logimpl->AddSink(sink);
         }
-} // namespace cppmicroservices::logservice
+} // namespace logservice
+} // namespace cppmicroservices

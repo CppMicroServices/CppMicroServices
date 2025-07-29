@@ -191,10 +191,11 @@ namespace cppmicroservices
             {
                 auto listenersMapHandle = listenersMap.lock();
                 auto iter = listenersMapHandle->find(pid);
-                callbacks.reserve((iter->second)->size());
 
                 if (iter != listenersMapHandle->end())
                 {
+                    // reserve space after verifying the iterator is valid
+                    callbacks.reserve((iter->second)->size());
 
                     for (auto const& configListenerPtr : *(iter->second))
                     {

@@ -544,8 +544,8 @@ if(MSVC)
   # Differences in character sets will cause these sort orders to differ. For this
   # reason, we set the LC_ALL environment variable to 'C' with the utf-8 character set to ensure
   # sort ordering is correct.
-  set(US_CXX_FLAGS "/source-charset:utf-8 /execution-charset:utf-8 ${US_CXX_FLAGS}")
-  set(US_C_FLAGS "/source-charset:utf-8 /execution-charset:utf-8 ${US_C_FLAGS}")
+  set(US_CXX_FLAGS "/utf-8 ${US_CXX_FLAGS}")
+  set(US_C_FLAGS "/utf-8 ${US_C_FLAGS}")
 else()
 
   # If not cross-compiling, turn on Stack Smashing Protection.
@@ -665,6 +665,9 @@ if(MINGW)
   set(US_CXX_FLAGS "-D_WIN32_WINNT=0x0600 -DNTDDI_VERSION=0x06000000 ${US_CXX_FLAGS}")
   # silence ignored attributes warnings
   add_compile_options(-Wno-attributes)
+  # silence maybe-uninitialized warnings for mingw.
+  # @todo: limit this compile option only to the offending file, jasoncpp.cpp, or fix the warning in code
+  add_compile_options(-Wno-error=maybe-uninitialized)
 endif()
 
 # Include the selected sanitizer's flags in US_CXX_FLAGS if the compiler supports the required flags

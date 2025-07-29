@@ -36,7 +36,9 @@ DEALINGS IN THE SOFTWARE.
 #include <future>
 #include <mutex>
 
-namespace cppmicroservices::cmimpl
+namespace cppmicroservices
+{
+namespace cmimpl
 {
     using PostTask = std::packaged_task<void()>;
     class SingleInvokeTask
@@ -75,6 +77,7 @@ namespace cppmicroservices::cmimpl
         bool executed = false;
         std::shared_ptr<PostTask> task;
     };
-} // namespace cppmicroservices::cmimpl
+} // namespace cmimpl
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_SINGLEINVOKETASK_H

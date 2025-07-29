@@ -102,11 +102,9 @@ namespace cppmicroservices
             void NotifyAllListeners(std::string const& pid,
                                     cppmicroservices::service::cm::ConfigurationEventType type,
                                     std::shared_ptr<cppmicroservices::AnyMap> properties);
-
             std::shared_ptr<ComponentFactoryImpl> GetComponentFactory();
             void LogInvalidDynamicTargetInProperties(cppmicroservices::AnyMap const& properties,
-                                  std::shared_ptr<ComponentConfigurationImpl> mgr) const noexcept;
-
+                                                     std::shared_ptr<ComponentConfigurationImpl> mgr) const noexcept;
           private:
             using TokenMap = std::unordered_map<ListenerTokenId, Listener>;
 
@@ -119,9 +117,8 @@ namespace cppmicroservices
 
             std::shared_ptr<cppmicroservices::logservice::LogService> logger;
             std::shared_ptr<ComponentFactoryImpl> componentFactory;
-            std::mutex notificationOrderingLock;
-         };
+        };
 
     } // namespace scrimpl
 } // namespace cppmicroservices
-#endif //__CPPMICROSERVICES_SCRIMPL_CONFIGURATIONNOTIFIER_HPP__
+#endif // __CPPMICROSERVICES_SCRIMPL_CONFIGURATIONNOTIFIER_HPP__

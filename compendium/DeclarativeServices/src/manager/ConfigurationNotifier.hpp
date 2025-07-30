@@ -43,16 +43,19 @@ namespace cppmicroservices
         {
             ConfigChangeNotification(std::string pid,
                                      std::shared_ptr<cppmicroservices::AnyMap> properties,
-                                     cppmicroservices::service::cm::ConfigurationEventType evt)
+                                     cppmicroservices::service::cm::ConfigurationEventType evt,
+                                     unsigned long changeCount)
                 : pid(std::move(pid))
                 , event(std::move(evt))
                 , newProperties(properties)
+                , newChangeCount(changeCount)
             {
             }
 
             std::string pid;
             cppmicroservices::service::cm::ConfigurationEventType event;
             std::shared_ptr<cppmicroservices::AnyMap> newProperties;
+            unsigned long newChangeCount;
         };
 
         struct Listener final
@@ -95,13 +98,15 @@ namespace cppmicroservices
                 std::function<void(ConfigChangeNotification const&)> notify,
                 std::shared_ptr<ComponentConfigurationImpl> mgr);
 
-            void UnregisterListener(std::string const& pid, const cppmicroservices::ListenerTokenId token) noexcept;
+            void UnregisterListener(std::string const& pid, cppmicroservices::ListenerTokenId const token) noexcept;
 
             bool AnyListenersForPid(std::string const& pid, cppmicroservices::AnyMap const& properties) noexcept;
 
             void NotifyAllListeners(std::string const& pid,
                                     cppmicroservices::service::cm::ConfigurationEventType type,
-                                    std::shared_ptr<cppmicroservices::AnyMap> properties);
+                                    std::shared_ptr<cppmicroservices::AnyMap> properties,
+                                    unsigned long const& changeCount);
+
             std::shared_ptr<ComponentFactoryImpl> GetComponentFactory();
             void LogInvalidDynamicTargetInProperties(cppmicroservices::AnyMap const& properties,
                                                      std::shared_ptr<ComponentConfigurationImpl> mgr) const noexcept;

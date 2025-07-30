@@ -51,21 +51,21 @@ namespace cppmicroservices
                  *
                  * @see Bundle#GetBundleId()
                  */
-                unsigned long id;
+                unsigned long id = 0;
 
                 /**
                  * The time when the bundle was last modified.
                  *
                  * @see Bundle#GetLastModified()
                  */
-                unsigned long lastModified;
+                unsigned long lastModified = 0;
 
                 /**
                  * The bundle's state.
                  *
                  * @see Bundle#GetState()
                  */
-                uint32_t state;
+                uint32_t state = 0;
 
                 /**
                  * The bundle's symbolic name.

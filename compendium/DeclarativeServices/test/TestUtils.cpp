@@ -59,11 +59,11 @@ namespace test
     GetPathInfo()
     {
         std::unordered_map<std::string, std::string> pathInfo = {
-            {     "libPath",             cppmicroservices::testing::LIB_PATH},
-            {      "dirSep", std::to_string(cppmicroservices::util::DIR_SEP)},
-            { "usLibPrefix",                                   US_LIB_PREFIX},
-            {"usLibPostfix",                                  US_LIB_POSTFIX},
-            {    "usLibExt",                                      US_LIB_EXT}
+            { "libPath", cppmicroservices::testing::LIB_PATH },
+            { "dirSep", std::string(1, cppmicroservices::util::DIR_SEP) },
+            { "usLibPrefix", US_LIB_PREFIX },
+            { "usLibPostfix", US_LIB_POSTFIX },
+            { "usLibExt", US_LIB_EXT }
         };
         return pathInfo;
     }
@@ -281,23 +281,11 @@ namespace test
 
     AsyncWorkServiceThreadPool::~AsyncWorkServiceThreadPool()
     {
-        try
+        if (threadpool)
         {
-            if (threadpool)
-            {
-                try
-                {
-                    threadpool->join();
-                }
-                catch (...)
-                {
-                    //
-                }
-            }
-        }
-        catch (...)
-        {
-            //
+            threadpool->join();
+            threadpool->stop();
+            threadpool.reset();
         }
     }
 

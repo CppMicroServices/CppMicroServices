@@ -81,8 +81,7 @@ namespace test
             {
                 bundle.Start();
             }
-            test::InstallLib(context, "DSFrenchDictionary");
-            test::InstallLib(context, "EnglishDictionary");
+
             test::InstallLib(context, "TestBundleDSTOI1");
             test::InstallLib(context, "TestBundleDSTOI2");
             test::InstallLib(context, "TestBundleDSTOI3");
@@ -220,7 +219,6 @@ namespace test
         }
 
         std::shared_ptr<scr::ServiceComponentRuntime> dsRuntimeService;
-        // std::shared_ptr<cppmicroservices::service::cm::ConfigurationAdmin>  configAdminService;
         cppmicroservices::Framework framework;
         cppmicroservices::BundleContext context;
     };

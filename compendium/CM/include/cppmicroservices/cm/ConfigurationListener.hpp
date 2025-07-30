@@ -121,11 +121,17 @@ namespace cppmicroservices
             /**
              * \ingroup gr_configurationlistener
              *
-             * The ConfigurationListener interface is the interface that Declarative Services implements
-             * to receive updates from the ConfigurationAdmin implementation for all configuration object
-             * updates. ConfigurationAdmin sends updates for all configuration object updates. It is up to
-             * DS to determine if this is a configuration object associated with a service being managed
-             * by DS.
+             * Listener for Configuration Events. When a ConfigurationEvent is fired, it is asynchronously
+             * delivered to all ConfigurationListeners.
+             * 
+             * ConfigurationListener objects are registered with the Framework service registry and are
+             * notified with a ConfigurationEvent object when an event is fired.
+             * 
+             * ConfigurationListener objects can inspect the received ConfigurationEvent object to determine
+             * its type, the pid of the Configuration object with which it is associated, and the
+             * Configuration Admin service that fired the event.
+             * 
+             * ConfigurationAdmin sends updates for all configuration object updates.
              */
             class ConfigurationListener
             {

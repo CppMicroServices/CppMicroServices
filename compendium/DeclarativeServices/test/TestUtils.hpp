@@ -107,6 +107,10 @@ namespace test
      */
     bool isBundleLoadedInThisProcess(std::string bundleName);
 
+    /**
+     * Implementation of AsyncWorkService that uses a boost::asio::thread_pool
+     * to execute asynchronous tasks.
+     */
     class AsyncWorkServiceThreadPool : public cppmicroservices::async::AsyncWorkService
     {
       public:

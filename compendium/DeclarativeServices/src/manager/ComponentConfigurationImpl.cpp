@@ -275,14 +275,17 @@ namespace cppmicroservices
             }
             bool configWasSatisfied = false;
             bool configNowSatisfied = false;
+            bool changeCountDifferent = false;
 
             configManager->UpdateMergedProperties(notification.pid,
                                                   notification.newProperties,
                                                   notification.event,
+                                                  notification.newChangeCount,
                                                   configWasSatisfied,
-                                                  configNowSatisfied);
+                                                  configNowSatisfied,
+                                                  changeCountDifferent);
 
-            if (configWasSatisfied && configNowSatisfied && (metadata->configurationPolicy != CONFIG_POLICY_IGNORE))
+            if (configWasSatisfied && configNowSatisfied && changeCountDifferent && (metadata->configurationPolicy != CONFIG_POLICY_IGNORE))
             {
                 if (!Modified())
                 {

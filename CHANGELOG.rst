@@ -8,16 +8,22 @@ and this project adheres to `Semantic Versioning <http://semver.org/>`_.
 
 `v3.8.7 <https://github.com/cppmicroservices/cppmicroservices/tree/3.8.7>`_ (2025-5-1)
 ---------------------------------------------------------------------------------------------------------
+
 `Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.8.6...3.8.7>`_
+
 Added
 -----
 - `[Declarative Services] New Dynamic Targeting mechanism <https://github.com/CppMicroServices/CppMicroServices/pull/1064>`_
+
 Changed
 -------
+
 Removed
 -------
+
 Deprecated
 ----------
+
 Fixed
 -----
 - `[Core Framework] Make ServiceProperties an AnyMap <https://github.com/CppMicroServices/CppMicroServices/pull/1056>`_

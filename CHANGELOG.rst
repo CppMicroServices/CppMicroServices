@@ -6,14 +6,13 @@ All notable changes to this project branch will be documented in this file.
 The format is based on `Keep a Changelog <http://keepachangelog.com/>`_
 and this project adheres to `Semantic Versioning <http://semver.org/>`_.
 
-`Unreleased C++14-branch based on 3.6.3 <https://github.com/cppmicroservices/cppmicroservices/tree/c++14-compliant>`_
+`Unreleased C++14-branch based on 3.6.4 <https://github.com/cppmicroservices/cppmicroservices/tree/c++14-compliant>`_
 ---------------------------------------------------------------------------------------------------------
 
-`Full Changelog <https://github.com/CppMicroServices/CppMicroServices/compare/c++14-compliant...v3.6.3>`_
+`Full Changelog <https://github.com/CppMicroServices/CppMicroServices/compare/c++14-compliant...v3.6.4>`_
 
 General Note
 ------------
-
 This branch is intended to continue to provide bugfixes and improvements while staying compliant to C++14.
 
 Added
@@ -30,6 +29,81 @@ Deprecated
 
 Fixed
 -----
+
+`v3.6.4 <https://github.com/cppmicroservices/cppmicroservices/tree/v3.6.4>`_ (2025-08-01)
+---------------------------------------------------------------------------------------------------------
+
+`Full Changelog <https://github.com/CppMicroServices/CppMicroServices/compare/v3.6.4...v3.6.3>`_
+
+General Note
+------------
+
+This entry in the change log captures the relevant changes that were made between v3.6.3 and v3.6.4.
+This version contains all changes between v3.7.6 and v3.8.7 plus additional changes from `development` after the v3.8.7 release.
+
+The trigger for this release were vulnerabilities in third party software. The main focus of this release was on framework, so quite some changes especially of compendium/DeclarativeServices have not been included.
+
+Some cherry picked changes needed to be adapted for C++14 compliance since they were using nested namespaces, inline variable definition, `std::shared_mutex` and `std::filesystem` from C++17 standard.
+
+Added
+-----
+- `[Core Framework] Added Testing section to documentation <https://github.com/CppMicroServices/CppMicroServices/pull/1142>`_
+- `[GithubActions] Updated Github actions to use clang-tidy <https://github.com/CppMicroServices/CppMicroServices/pull/1145>`_
+- `[GithubActions] Updated Github actions to lint with clang-tidy <https://github.com/CppMicroServices/CppMicroServices/pull/1146>`_
+- `[GithubActions] Remove Clang-tidy 'modernize-use-trailing-type' <https://github.com/CppMicroServices/CppMicroServices/pull/1159>`_
+- `[Configuration Admin] Safe Futures Addition <https://github.com/CppMicroServices/CppMicroServices/pull/1162>`_
+- `[Core Framework] Functionality to retrieve Service Reference from Service <https://github.com/CppMicroServices/CppMicroServices/pull/1157>`_
+- `[Declarative Services] Allow for global namespacing in interface definitions and manifests <https://github.com/CppMicroServices/CppMicroServices/pull/1158>`_
+- `[GithubActions] enable Windows and Linux ARM builds <https://github.com/CppMicroServices/CppMicroServices/pull/1171>`_
+
+Changed
+-------
+- `[Core Framework] Guarentee hash of serviceReference is conserved after destruction of serviceRegistrationBase object <https://github.com/CppMicroServices/CppMicroServices/pull/1128>`_
+- `[GithubActions] Use ubuntu-22.04 <https://github.com/CppMicroServices/CppMicroServices/pull/1181>`_
+- `[Core Framework] Improve ResourceCompiler code <https://github.com/CppMicroServices/CppMicroServices/pull/1169>`_
+- `[Core Framework] Moved google benchmark to v1.9.0 <https://github.com/CppMicroServices/CppMicroServices/pull/1123>`_
+- `[Core Framework] Update spdlog to version 1.15.2 <https://github.com/CppMicroServices/CppMicroServices/pull/1122>`_
+- `[Core Framework] Update Tiny Scheme to 1.42 <https://github.com/CppMicroServices/CppMicroServices/pull/1124>`_
+
+Removed
+-------
+- `[Core Framework] Remove export of miniz symbols <https://github.com/CppMicroServices/CppMicroServices/pull/1129>`_
+- `[Core Framework] Remove bundled libtelnet code <https://github.com/CppMicroServices/CppMicroServices/pull/1125>`_
+- `[Core Framework] TSAN suppression of CCActiveState deadlock <https://github.com/CppMicroServices/CppMicroServices/pull/1143>`_
+- `[Core Framework] Remove export of miniz symbols <https://github.com/CppMicroServices/CppMicroServices/pull/966>`_
+- `[Core Framework] Removed unnecessary android only workaround <https://github.com/CppMicroServices/CppMicroServices/pull/1168>`_
+- `[Core Framework] Remove httpservice, webconsole, third_party/civetweb, shellservices, shell, third_party/linenoise <https://github.com/CppMicroServices/CppMicroServices/pull/1127>`_
+- `[GithubActions] Remove use of windows-2019 runner <https://github.com/CppMicroServices/CppMicroServices/pull/1175>`_
+
+Deprecated
+----------
+
+Fixed
+-----
+- `[Declarative Services] Fix GetBundleContext when using DS <https://github.com/CppMicroServices/CppMicroServices/pull/1130>`_
+- `[Core Framework] Fix code scan warnings <https://github.com/CppMicroServices/CppMicroServices/pull/1139>`_
+- `[Core Framework] Fix more code scan warnings <https://github.com/CppMicroServices/CppMicroServices/pull/1140>`_
+- `[Core Framework] Ensure that Bundle.start() throws after framework has stopped <https://github.com/CppMicroServices/CppMicroServices/pull/1144>`_
+- `[Core Framework] Ensure safe concurrent destruction of bundles and framework stopping <https://github.com/CppMicroServices/CppMicroServices/pull/1131>`_
+- `[Declarative Services and Configuration Admin] Fix deadlock in thread starved environment <https://github.com/CppMicroServices/CppMicroServices/pull/1152>`_
+- `[Core Framework] FixUpdate spdlog to version 1.15.2 for concurrent Bundle.start() and framework stop <https://github.com/CppMicroServices/CppMicroServices/pull/1189>`_
+- `[Core Framework] Compile CppMicroServices with -noexecstack <https://github.com/CppMicroServices/CppMicroServices/pull/1133>`_
+- `[GithubActions] Update Codeql version <https://github.com/CppMicroServices/CppMicroServices/pull/1160>`_
+- `[GithubActions] Update MSVC to silence erroneous warning <https://github.com/CppMicroServices/CppMicroServices/pull/1147>`_
+- `[Declarative Services] Fix string casting in testUtils <https://github.com/CppMicroServices/CppMicroServices/pull/1182>`_
+- `[Core Framework] Deterministic Builds on all platforms <https://github.com/CppMicroServices/CppMicroServices/pull/1148>`_
+- `[Core Framework] Add Tests to verify support of nested AnyMaps in initializer lists <https://github.com/CppMicroServices/CppMicroServices/pull/1149>`_
+- `[Core Framework] Remove linking to library rt from Android build as it is apart of stdc++ <https://github.com/CppMicroServices/CppMicroServices/pull/1154>`_
+- `[Core Framework] Create cmake-variants.json <https://github.com/CppMicroServices/CppMicroServices/pull/1155>`_
+- `[Log Service] Update LogService class in CppMicroServices <https://github.com/CppMicroServices/CppMicroServices/pull/1163>`_
+- `[Core Framework] Update clang_tidy_complete_code_review.yml <https://github.com/CppMicroServices/CppMicroServices/pull/1164>`_
+- `[Core Framework] Add missing cstdint includes <https://github.com/CppMicroServices/CppMicroServices/pull/1134>`_
+- `[Core Framework] getServiceObjects fix to use customDeleter <https://github.com/CppMicroServices/CppMicroServices/pull/1166>`_
+- `[Core Framework] Space in tempdir for Windows <https://github.com/CppMicroServices/CppMicroServices/pull/1167>`_
+- `[Core Framework] Fix ResourceCompiler <https://github.com/CppMicroServices/CppMicroServices/pull/1170>`_
+- `[Core Framework] Resolve valgrind 'possibly lost' leaks <https://github.com/CppMicroServices/CppMicroServices/pull/1179>`_
+- `[Core Framework] Updated schema to correctly check that the symbolic_name follows c identifier rules <https://github.com/CppMicroServices/CppMicroServices/pull/1135>`_
+- `[Core Framework] Fix Bundle Find Hooks to take into consideration systemBundle <https://github.com/CppMicroServices/CppMicroServices/pull/1136>`_
 
 `v3.6.3 <https://github.com/cppmicroservices/cppmicroservices/tree/v3.6.3>`_ (2023-10-30)
 ---------------------------------------------------------------------------------------------------------

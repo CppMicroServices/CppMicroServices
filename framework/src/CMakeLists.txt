@@ -46,6 +46,7 @@ set(_srcs
   bundle/BundleEvent.cpp
   bundle/BundleEventHook.cpp
   bundle/BundleFindHook.cpp
+  bundle/BundleInstallHook.cpp
   bundle/BundleHooks.cpp
   bundle/BundleManifest.cpp
   bundle/BundlePrivate.cpp

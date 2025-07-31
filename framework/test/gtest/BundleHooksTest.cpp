@@ -25,6 +25,7 @@
 #include "cppmicroservices/BundleEvent.h"
 #include "cppmicroservices/BundleEventHook.h"
 #include "cppmicroservices/BundleFindHook.h"
+#include "cppmicroservices/BundleInstallHook.h"
 #include "cppmicroservices/Framework.h"
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/FrameworkFactory.h"
@@ -94,6 +95,37 @@ class TestBundleFindHookFailure : public BundleFindHook
         throw std::runtime_error("TestBundleFindHookFailure Event exception");
     }
 };
+
+class TestBundleInstallHook : public BundleInstallHook
+{
+  public:
+    void
+    Install(BundleContext const& /*context*/, ShrinkableVector<Bundle>& bundles)
+    {
+        for (auto i = bundles.begin(); i != bundles.end();)
+        {
+            if (i->GetSymbolicName() == "TestBundleB" || i->GetSymbolicName() == "TestBundleBA_00")
+            {
+                i = bundles.erase(i);
+            }
+            else
+            {
+                ++i;
+            }
+        }
+    }
+};
+
+class TestBundleInstallHookFailure : public TestBundleInstallHook
+{
+  public:
+    void
+    Find(BundleContext const&, ShrinkableVector<Bundle>&)
+    {
+        throw std::runtime_error("TestBundleInstallHook install exception");
+    }
+};
+
 
 class TestBundleEventHook : public BundleEventHook
 {
@@ -232,6 +264,47 @@ TEST_F(BundleHooksTest, TestFindHookBundleInstall)
     bundleB.Stop();
 }
 
+#if defined(US_BUILD_SHARED_LIBS)
+TEST_F(BundleHooksTest, TestInstallHook)
+{
+    auto bundleA = cppmicroservices::testing::InstallLib(framework.GetBundleContext(), "TestBundleA");
+    ASSERT_TRUE(bundleA);
+
+    bundleA.Start();
+
+    auto installHookReg
+        = framework.GetBundleContext().RegisterService<BundleInstallHook>(std::make_shared<TestBundleInstallHook>());
+
+    // for any bundle context (including system), install should NOT work on bundleB or bundleBA_00
+    auto bundleB = cppmicroservices::testing::InstallLib(bundleA.GetBundleContext(), "TestBundleB");
+    ASSERT_FALSE(bundleB);
+    bundleB = cppmicroservices::testing::InstallLib(framework.GetBundleContext(), "TestBundleB");
+    ASSERT_FALSE(bundleB);
+    bundleB = cppmicroservices::testing::InstallLib(bundleA.GetBundleContext(), "TestBundleBA_00");
+    ASSERT_FALSE(bundleB);
+    bundleB = cppmicroservices::testing::InstallLib(framework.GetBundleContext(), "TestBundleBA_00");
+    ASSERT_FALSE(bundleB);
+
+    bundleA = cppmicroservices::testing::InstallLib(framework.GetBundleContext(), "TestBundleA");
+    ASSERT_TRUE(bundleA);
+
+    // assert that the bundle WAS installed
+    auto bundles = framework.GetBundleContext().GetBundles();
+    int foundBundle = 0;
+    for (auto const& i : bundles)
+    {
+        if(i.GetSymbolicName() == "TestBundleB" || i.GetSymbolicName() == "TestBundleBA_00"){
+            foundBundle++;;
+        }
+    }
+    ASSERT_EQ(foundBundle, 2);
+
+
+    installHookReg.Unregister();
+
+    bundleA.Stop();
+}
+#endif
 
 TEST_F(BundleHooksTest, TestEventHook)
 {

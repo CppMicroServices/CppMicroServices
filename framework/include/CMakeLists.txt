@@ -53,6 +53,7 @@ set(_public_headers
   cppmicroservices/BundleEvent.h
   cppmicroservices/BundleEventHook.h
   cppmicroservices/BundleFindHook.h
+  cppmicroservices/BundleInstallHook.h
   cppmicroservices/BundleImport.h
   cppmicroservices/BundleInitialization.h
   cppmicroservices/BundleResource.h

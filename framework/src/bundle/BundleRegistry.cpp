@@ -42,6 +42,7 @@
 #include <deque>
 #include <functional>
 #include <map>
+#include <unordered_map>
 
 namespace
 {
@@ -159,6 +160,9 @@ namespace cppmicroservices
         // Search the multimap for the current bundle location
         auto bundlesAtLocationRange = (bundles.Lock(), bundles.v.equal_range(location));
 
+        // bundles returned from the installation
+        std::vector<Bundle> resultingBundles;
+
         /*
           If the bundle is already installed, then execute the regular
           install process. In this case, there are no data races to worry about.
@@ -184,7 +188,6 @@ namespace cppmicroservices
         if (bundlesAtLocationRange.first != bundlesAtLocationRange.second)
         {
             l.UnLock();
-            std::vector<Bundle> resultingBundles;
             std::vector<std::string> alreadyInstalled;
             // Populate the resultingBundles and alreadyInstalled vectors with the appropriate data
             // based on what bundles are already installed
@@ -202,7 +205,6 @@ namespace cppmicroservices
             {
                 throw std::runtime_error("All bundles rejected by a bundle hook");
             }
-            return resultingBundles;
         }
         else
         {
@@ -226,7 +228,6 @@ namespace cppmicroservices
                 initialBundleInstallMap.insert(std::make_pair(location, std::move(pairToInsert)));
                 l.UnLock();
 
-                std::vector<Bundle> installedBundles;
                 {
                     // create instance of clean-up object to ensure RAII
                     InitialBundleMapCleanup cleanup(
@@ -246,9 +247,8 @@ namespace cppmicroservices
 
                     // Perform the install
                     auto resCont = std::make_shared<BundleResourceContainer>(location, bundleManifest);
-                    installedBundles = Install0(location, resCont, {}, bundleManifest);
+                    resultingBundles = Install0(location, resCont, {}, bundleManifest);
                 }
-                return installedBundles;
             }
             else
             {
@@ -275,7 +275,6 @@ namespace cppmicroservices
                 bundlesAtLocationRange = (bundles.Lock(), bundles.v.equal_range(location));
                 l.UnLock();
 
-                std::vector<Bundle> resultingBundles;
                 std::vector<std::string> alreadyInstalled;
                 auto resCont = GetAlreadyInstalledBundlesAtLocation(bundlesAtLocationRange,
                                                                     location,
@@ -299,9 +298,12 @@ namespace cppmicroservices
                 {
                     throw std::runtime_error("All bundles rejected by a bundle hook");
                 }
-                return resultingBundles;
             }
         }
+        
+        coreCtx->bundleHooks.InstallBundles(MakeBundleContext(installingBundle->bundleContext.Load()),
+                                                              resultingBundles);
+        return resultingBundles;
     }
 
     std::vector<Bundle>

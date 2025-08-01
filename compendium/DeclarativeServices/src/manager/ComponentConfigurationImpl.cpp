@@ -161,14 +161,14 @@ namespace cppmicroservices
         void
         ComponentConfigurationImpl::SetRegistrationProperties()
         {
+            // this ensures that we do not recursively set the properties within the service registration. This
+            // situation can occur if the modified method is invoked on the active state which then activates other
+            // dependING services which then calls getService on the original compConfig which then calls activate on
+            // the original activeState and tries to set the properties recursively. See PR #1141
             if (regManager && !currentlySettingProperties)
             {
                 currentlySettingProperties = true;
-                detail::ScopeGuard sg(
-                    [this]()
-                    {
-                        currentlySettingProperties = false;
-                    });
+                detail::ScopeGuard sg([this]() { currentlySettingProperties = false; });
                 regManager->SetProperties(GetProperties());
             }
         }

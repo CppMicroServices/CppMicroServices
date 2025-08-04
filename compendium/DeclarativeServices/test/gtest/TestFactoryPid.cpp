@@ -303,6 +303,7 @@ namespace test
         properties["someKey"] = false;
         config->Update(properties).get();
         ASSERT_FALSE(mainSvc->isDependencyInjected());
+    }
 
     /* test testDependencyOnFactoryServiceWithModifiedMethod.
      * This test creates a factory service instance

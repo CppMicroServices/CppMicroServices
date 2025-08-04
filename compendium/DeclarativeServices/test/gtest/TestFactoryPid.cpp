@@ -303,5 +303,45 @@ namespace test
         properties["someKey"] = false;
         config->Update(properties).get();
         ASSERT_FALSE(mainSvc->isDependencyInjected());
+
+    /* test testDependencyOnFactoryServiceWithModifiedMethod.
+     * This test creates a factory service instance
+     * this is depended on by antoher service
+     * Then we update the config such that it no longer mathces the desired service
+     */
+    TEST_F(tServiceComponent, testDependencyOnFactoryServiceWithModifiedMethod)
+    {
+        auto const& param = std::make_shared<AsyncWorkServiceThreadPool>(10);
+        auto reg = context.RegisterService<cppmicroservices::async::AsyncWorkService>(param);
+
+        std::string configurationPid = "sharedConfiguration1";
+
+        // Start the test bundle containing the factory component.
+        cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSFAC1");
+
+        // Get a service reference to ConfigAdmin to create the factory component instances.
+        auto configAdminService = GetInstance<cppmicroservices::service::cm::ConfigurationAdmin>();
+        ASSERT_TRUE(configAdminService) << "GetService failed for ConfigurationAdmin";
+
+        // Create the factory configuration object
+        auto factoryConfig = configAdminService->CreateFactoryConfiguration(configurationPid);
+
+        cppmicroservices::AnyMap props;
+        props["key1"] = false;
+
+        factoryConfig->Update(props).get();
+
+        // assert DEPENDING service does not exist
+        ASSERT_FALSE(GetInstance<test::ServiceAInt>()) << "GetService SUCCEEDED for test::ServiceAInt";
+
+        // assert DEPENDED service exists (but with wrong props for DEPENDING)
+        ASSERT_TRUE(GetInstance<test::ServiceBInt>()) << "GetService FAILED for test::ServiceBInt";
+
+        cppmicroservices::AnyMap props1;
+        props1["key1"] = true;
+        factoryConfig->Update(props1).get();
+
+        // assert DEPENDING service does not exist
+        ASSERT_TRUE(GetInstance<test::ServiceAInt>()) << "GetService FAILED for test::ServiceAInt";
     }
 } // namespace test

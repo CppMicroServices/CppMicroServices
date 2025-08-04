@@ -2,13 +2,13 @@
 .. rubric:: Continuous Integration Status
 
 +-------------+---------------------------+--------------------------------------+----------------------------------------+
-| Branch      | GCC 7.5.0 and 9.4.0       | Visual Studio 2019                   |                                        |
+| Branch      | GCC 7.5.0 and 9.4.0       | Visual Studio 2022                   |                                        |
 |             +---------------------------+--------------------------------------+----------------------------------------+
-|             | Clang 9.0                 | Visual Studio 2022                   |                                        |
+|             | Clang 9.0                 | MinGW-w64                            |                                        |
 |             +---------------------------+--------------------------------------+----------------------------------------+
-|             | Xcode 13.2                | MinGW-w64                            |                                        |
+|             | Xcode 15.2                |                                      |                                        |
 |             +---------------------------+--------------------------------------+----------------------------------------+
-|             | Xcode 13.4                |                                      |                                        |
+|             | Xcode 15.4                |                                      |                                        |
 +=============+===========================+======================================+========================================+
 | master      | |BuildAndTestNix(master)| | |BuildAndTestWindows(master)|        | |Code Coverage Status|                 |
 +-------------+---------------------------+--------------------------------------+----------------------------------------+
@@ -68,8 +68,8 @@ the following compilers:
 
 - GCC 11.3.0
 - Clang 11.0
-- Clang from Xcode 13.2 and 13.4
-- Visual Studio 2019 and 2022
+- Clang from Xcode 15.2 and 15.4
+- Visual Studio 2022
 
 Recommended minimum required CMake version:
 
@@ -82,21 +82,18 @@ software provided on the GitHub-hosted runners.
 For information about the specific versions of software the runners
 use, please see the following resources:
 
-- `ubuntu-20.04 Runner Information <https://github.com/actions/virtual-environments/blob/main/images/linux/Ubuntu2004-Readme.md>`
-- `ubuntu-22.04 Runner Information <https://github.com/actions/runner-images/blob/main/images/linux/Ubuntu2204-Readme.md>`
-- `macos-11 Runner Information <https://github.com/actions/virtual-environments/blob/main/images/macos/macos-11-Readme.md>`
-- `macos-12 Runner Information <https://github.com/actions/virtual-environments/blob/main/images/macos/macos-12-Readme.md>`
-- `windows-2019 Runner Information <https://github.com/actions/virtual-environments/blob/main/images/win/Windows2019-Readme.md>`
-- `windows-2022 Runner Information <https://github.com/actions/virtual-environments/blob/main/images/win/Windows2022-Readme.md>`
+- `ubuntu-22.04 Runner Information <https://github.com/actions/runner-images/blob/main/images/ubuntu/Ubuntu2204-Readme.md>`_
+- `macos-13 Runner Information <https://github.com/actions/runner-images/blob/main/images/macos/macos-13-Readme.md>`_
+- `macos-14 Runner Information <https://github.com/actions/runner-images/blob/main/images/macos/macos-14-Readme.md>`_
+- `windows-2022 Runner Information <https://github.com/actions/runner-images/blob/main/images/windows/Windows2022-Readme.md>`_
+- `windows-2025 Runner Information <https://github.com/actions/runner-images/blob/main/images/windows/Windows2025-Readme.md>`_
 
 Below is a list of tested compiler/OS combinations:
 
-- GCC 7.5.0 (Ubuntu 20.04)
-- GCC 11.3.0 (Ubuntu 22.04)
-- Clang 11.0.0 (Ubuntu 20.04)
-- Apple Clang 13.0.0.13000029, Xcode 13.2.0 (OS X 11.7.6)
-- Apple Clang 14.0.0.14000029, Xcode 13.4.0 (OS X 12.6.5)
-- Visual Studio 2019
+- GCC 11.4.0 (Ubuntu 22.04)
+- Clang 14.0.0 (Ubuntu 22.04)
+- Apple Clang from Xcode 15.2.0 (OS X 13.3.0)
+- Apple Clang from Xcode 15.4.0 (OS X 14.5.0)
 - Visual Studio 2022
 - MinGW-w64
 

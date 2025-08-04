@@ -24,8 +24,8 @@
 #define __CPPMICROSERVICES_SCRIMPL_CONFIGURATIONNOTIFIER_HPP__
 
 #include "../SCRLogger.hpp"
+#include "ComponentFactoryImpl.hpp"
 #include "ConcurrencyUtil.hpp"
-#include "cppmicroservices/asyncworkservice/AsyncWorkService.hpp"
 #include "cppmicroservices/cm/ConfigurationListener.hpp"
 
 namespace cppmicroservices
@@ -43,16 +43,19 @@ namespace cppmicroservices
         {
             ConfigChangeNotification(std::string pid,
                                      std::shared_ptr<cppmicroservices::AnyMap> properties,
-                                     cppmicroservices::service::cm::ConfigurationEventType evt)
+                                     cppmicroservices::service::cm::ConfigurationEventType evt,
+                                     unsigned long changeCount)
                 : pid(std::move(pid))
                 , event(std::move(evt))
                 , newProperties(properties)
+                , newChangeCount(changeCount)
             {
             }
 
             std::string pid;
             cppmicroservices::service::cm::ConfigurationEventType event;
             std::shared_ptr<cppmicroservices::AnyMap> newProperties;
+            unsigned long newChangeCount;
         };
 
         struct Listener final
@@ -73,7 +76,8 @@ namespace cppmicroservices
 
           public:
             /**
-             * @throws std::invalid_argument exception if any of the params is a nullptr
+             * @throws std::invalid_argument exception if any of the params is a nullptr or
+             * if componentFactory object cannot be constructed.
              */
             ConfigurationNotifier(cppmicroservices::BundleContext const& context,
                                   std::shared_ptr<cppmicroservices::logservice::LogService> logger,
@@ -94,16 +98,18 @@ namespace cppmicroservices
                 std::function<void(ConfigChangeNotification const&)> notify,
                 std::shared_ptr<ComponentConfigurationImpl> mgr);
 
-            void UnregisterListener(std::string const& pid, const cppmicroservices::ListenerTokenId token) noexcept;
+            void UnregisterListener(std::string const& pid, cppmicroservices::ListenerTokenId const token) noexcept;
 
-            bool AnyListenersForPid(std::string const& pid) noexcept;
+            bool AnyListenersForPid(std::string const& pid, cppmicroservices::AnyMap const& properties) noexcept;
 
             void NotifyAllListeners(std::string const& pid,
                                     cppmicroservices::service::cm::ConfigurationEventType type,
-                                    std::shared_ptr<cppmicroservices::AnyMap> properties);
+                                    std::shared_ptr<cppmicroservices::AnyMap> properties,
+                                    unsigned long const& changeCount);
 
-            void CreateFactoryComponent(std::string const& pid, std::shared_ptr<ComponentConfigurationImpl>& mgr);
-
+            std::shared_ptr<ComponentFactoryImpl> GetComponentFactory();
+            void LogInvalidDynamicTargetInProperties(cppmicroservices::AnyMap const& properties,
+                                                     std::shared_ptr<ComponentConfigurationImpl> mgr) const noexcept;
           private:
             using TokenMap = std::unordered_map<ListenerTokenId, Listener>;
 
@@ -114,12 +120,10 @@ namespace cppmicroservices
                                                                          /// tokens for
                                                                          /// listeners
 
-            cppmicroservices::BundleContext bundleContext;
             std::shared_ptr<cppmicroservices::logservice::LogService> logger;
-            std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkService;
-            std::shared_ptr<SCRExtensionRegistry> extensionRegistry;
+            std::shared_ptr<ComponentFactoryImpl> componentFactory;
         };
 
     } // namespace scrimpl
 } // namespace cppmicroservices
-#endif //__CPPMICROSERVICES_SCRIMPL_CONFIGURATIONNOTIFIER_HPP__
+#endif // __CPPMICROSERVICES_SCRIMPL_CONFIGURATIONNOTIFIER_HPP__

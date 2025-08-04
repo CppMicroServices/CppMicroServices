@@ -29,7 +29,7 @@ namespace cppmicroservices
 {
     namespace scrimpl
     {
-        ConfigurationManager::ConfigurationManager(std::shared_ptr<const metadata::ComponentMetadata> const& metadata,
+        ConfigurationManager::ConfigurationManager(std::shared_ptr<metadata::ComponentMetadata const> const& metadata,
                                                    cppmicroservices::BundleContext const& bc,
                                                    std::shared_ptr<cppmicroservices::logservice::LogService> logger)
             : logger(std::move(logger))
@@ -73,6 +73,7 @@ namespace cppmicroservices
                         auto config = configAdmin->ListConfigurations("(pid=" + pid + ")");
                         if (config.size() > 0)
                         {
+                            changeCount[pid] = config.front()->GetChangeCount();
                             auto properties = config.front()->GetProperties();
                             configProperties.emplace(pid, properties);
                             for (auto const& item : properties)
@@ -98,8 +99,10 @@ namespace cppmicroservices
         ConfigurationManager::UpdateMergedProperties(std::string const& pid,
                                                      std::shared_ptr<cppmicroservices::AnyMap> props,
                                                      cppmicroservices::service::cm::ConfigurationEventType const& type,
+                                                     unsigned long const& newChangeCount,
                                                      bool& configWasSatisfied,
-                                                     bool& configNowSatisfied)
+                                                     bool& configNowSatisfied,
+                                                     bool& changeCountDifferent)
         {
             std::lock_guard<std::mutex> lock(propertiesMutex);
             configWasSatisfied = isConfigSatisfied();
@@ -120,6 +123,12 @@ namespace cppmicroservices
             //  lowest precedence properties from the metadata
             //  next precedence each pid in meta-data configuration-pids with first one
             //  in the list having lower precedence than the last one in the list.
+
+            if (newChangeCount != changeCount[pid])
+            {
+                changeCountDifferent = true;
+                changeCount[pid] = newChangeCount;
+            }
 
             mergedProperties = metadata->properties;
 
@@ -154,7 +163,11 @@ namespace cppmicroservices
         {
             bool allConfigsAvailable = configProperties.size() >= metadata->configurationPids.size();
 
-            if ((metadata->configurationPolicy != CONFIG_POLICY_REQUIRE) || (allConfigsAvailable))
+            // If all configs are available or we do not require configs AND this component is not a factory component.
+            // No factory component should ever have satisfied configurations even if an erroneous pid is added which
+            // exactly matches the factory PID
+            if (((metadata->configurationPolicy != CONFIG_POLICY_REQUIRE) || (allConfigsAvailable))
+                && metadata->factoryComponentID.empty())
             {
                 return true;
             }

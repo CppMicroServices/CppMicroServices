@@ -36,6 +36,7 @@ set(_gtest_tests
   BundleManifestTest.cpp
   BundleValidationTest.cpp
   BundleVersionTest.cpp
+  CFRLoggerTest.cpp
   InvalidBundleTest.cpp
   GlobalServiceTrackerTest.cpp
   LDAPExprTest.cpp
@@ -90,6 +91,7 @@ set(_additional_srcs
   ../util/TestUtilFrameworkListener.cpp
   ../util/TestUtils.cpp
   ../util/ImportTestBundles.cpp
+  ../../src/util/CFRLogger.cpp
   $<TARGET_OBJECTS:util>
   )
 
@@ -138,8 +140,6 @@ target_link_libraries(${us_gtest_test_exe_name} ${Framework_TARGET} usLogService
 if(UNIX AND NOT APPLE)
   target_link_libraries(${us_gtest_test_exe_name} rt)
 endif()
-
-
 
 # tests can be configured to run using add_test or GTEST_ADD_TEST (https://cmake.org/cmake/help/v3.0/module/FindGTest.html)
 # GTEST_ADD_TEST will run a seprate EXE for each test and test fixture in the EXE.

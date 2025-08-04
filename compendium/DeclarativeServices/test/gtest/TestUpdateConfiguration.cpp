@@ -22,7 +22,6 @@
 
 #include "TestFixture.hpp"
 #include "gtest/gtest.h"
-
 #include "cppmicroservices/Constants.h"
 #include "cppmicroservices/ServiceObjects.h"
 
@@ -50,13 +49,13 @@ namespace test
         // starting the bundle which defines the service.
         auto configuration = configAdminService->GetConfiguration("sample::ServiceComponentCA02");
         configuration->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
-            {"foo", true}
+            { "foo", true }
         });
 
         // Install and start the bundle which has the service
         auto testBundle = ::test::InstallAndStartBundle(ctx, "TestBundleDSCA02");
         ASSERT_TRUE(testBundle);
-        const std::string componentName { "sample::ServiceComponentCA02" };
+        std::string const componentName { "sample::ServiceComponentCA02" };
 
         // Confirm configuration object is available and service is resolved.
         scr::dto::ComponentDescriptionDTO compDescDTO;
@@ -95,7 +94,7 @@ namespace test
                              ready.wait();
                              auto configuration = configAdminService->GetConfiguration("sample::ServiceComponentCA02");
                              configuration->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
-                                 {"foo", true}
+                                 { "foo", true }
                              });
                          });
 
@@ -125,7 +124,7 @@ namespace test
     {
         cppmicroservices::BundleContext ctx = framework.GetBundleContext();
 
-        const std::string svcComponentName { "sample::ServiceComponentCA02" };
+        std::string const svcComponentName { "sample::ServiceComponentCA02" };
 
         // Get a service reference to ConfigAdmin to create the configuration object.
         auto configAdminService = GetInstance<cppmicroservices::service::cm::ConfigurationAdmin>();
@@ -149,7 +148,7 @@ namespace test
 
         configuration
             ->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
-                {"foo", true}
+                { "foo", true }
         })
             .second.get();
 
@@ -174,7 +173,7 @@ namespace test
      */
     TEST_F(tServiceComponent, testConfigObjectInManifestResolvesService)
     {
-        const std::string configObject = "mw.dependency";
+        std::string const configObject = "mw.dependency";
 
         // Install and start the bundle containing the configuration object and the
         // service which is dependent on the configuration object.
@@ -237,11 +236,56 @@ namespace test
 
         // Confirm that the properties match the properties provided in the
         // manifest.json file.
-        const std::string bar { "bar" };
+        std::string const bar { "bar" };
         auto serviceProps = service->GetProperties();
         auto foo = serviceProps.find("foo");
         ASSERT_TRUE(foo != serviceProps.end()) << "foo not found in constructed instance";
         EXPECT_EQ(foo->second, bar);
+
+        testBundle.Stop();
+    }
+
+    /*
+     * Verify that Factory Components will not be registered even if an incorrect Configuration matching exactly Factory
+     * Configuration PID is initialized.
+     */
+    TEST_F(tServiceComponent, testErroneousConfigurationInjection)
+    {
+        std::string const configName = "my.dependency.pid";
+
+        // Install and start the bundle containing the configuration object and the
+        // service which is dependent on the configuration object.
+        std::string componentName = "sample::ServiceComponentCA28";
+        cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA28");
+        ASSERT_TRUE(testBundle);
+
+        auto configAdminService = GetInstance<cppmicroservices::service::cm::ConfigurationAdmin>();
+        ASSERT_TRUE(configAdminService) << "GetService failed for ConfigurationAdmin.";
+
+        // GetService to make component active
+        auto invalidService = GetInstance<test::CAInterface>();
+        ASSERT_FALSE(invalidService) << "Factory component itself should not be registered";
+
+        auto uniqueVal0 = 1;
+        auto configuration0 = configAdminService->GetConfiguration(configName);
+        cppmicroservices::AnyMap props0 { cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS,
+                                          { { "uniqueKey", uniqueVal0 } } };
+
+        auto fut0 = configuration0->Update(props0);
+        ASSERT_FALSE(GetInstance<test::CAInterface>())
+            << "Factory component should not be registered even with config matching exactly (with no ~)";
+
+        auto uniqueVal1 = 6;
+        auto configuration1 = configAdminService->GetConfiguration(configName + "~1");
+        cppmicroservices::AnyMap props1 { cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS,
+                                          { { "uniqueKey", uniqueVal1 } } };
+
+        auto fut1 = configuration1->Update(props1);
+        fut1.wait();
+        auto service0 = GetInstance<test::CAInterface>();
+        ASSERT_TRUE(service0)
+            << "Factory instance should be created when a '~' configuration is added";
+        ASSERT_TRUE(service0->GetProperties().find("uniqueKey")->second == 6);
 
         testBundle.Stop();
     }
@@ -264,7 +308,7 @@ namespace test
         // starting the bundle which defines the service.
         auto configuration = configAdminService->GetConfiguration(configObjectName);
         cppmicroservices::AnyMap props(cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
-        const std::string fooProp { "notbar" };
+        std::string const fooProp { "notbar" };
         props["foo"] = fooProp;
         configuration->UpdateIfDifferent(props);
 
@@ -340,7 +384,7 @@ namespace test
 
         // Update property
         cppmicroservices::AnyMap props(cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
-        const std::string instanceId { "instance1" };
+        std::string const instanceId { "instance1" };
         props["uniqueProp"] = instanceId;
         auto fut = configObject->Update(props);
         fut.get();
@@ -394,7 +438,7 @@ namespace test
         EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::ACTIVE) << "Component state should be ACTIVE";
 
         // Update property
-        const std::string instanceId { "instance1" };
+        std::string const instanceId { "instance1" };
         props["uniqueProp"] = instanceId;
         fut = configObject->Update(props);
         fut.get();
@@ -441,9 +485,9 @@ namespace test
         // Verify that all changes to the configuration objects on which the component is dependent
         // result in a deactivation and reactivation of the component
         std::shared_ptr<cppmicroservices::service::cm::Configuration> configuration;
-        const std::string uniqueProp[3] = { "uniqueProp1", "uniqueProp2", "uniqueProp3" };
+        std::string const uniqueProp[3] = { "uniqueProp1", "uniqueProp2", "uniqueProp3" };
         cppmicroservices::AnyMap props(cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
-        const std::string instance[3] = { "instance1", "instance2", "instance3" };
+        std::string const instance[3] = { "instance1", "instance2", "instance3" };
 
         int i = 0;
         while (i < 3)
@@ -508,7 +552,7 @@ namespace test
         auto configInstance = configuration->GetPid();
 
         cppmicroservices::AnyMap props(cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
-        const std::string instanceId { "instance1" };
+        std::string const instanceId { "instance1" };
         props["uniqueProp"] = instanceId;
         auto fut = configuration->Update(props);
         fut.get();
@@ -530,7 +574,7 @@ namespace test
         EXPECT_EQ(uniqueProp->second, instanceId);
 
         // Update property
-        const std::string instanceId2 { "instance2" };
+        std::string const instanceId2 { "instance2" };
         props["uniqueProp"] = instanceId2;
         fut = configuration->Update(props);
         fut.get();
@@ -607,7 +651,7 @@ namespace test
         auto configInstance = configuration->GetPid();
 
         cppmicroservices::AnyMap props(cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
-        const std::string newProp { "newProperty" };
+        std::string const newProp { "newProperty" };
         props["uniqueProp"] = newProp;
         auto fut = configuration->Update(props);
         fut.get();
@@ -661,7 +705,7 @@ namespace test
         auto configInstance = configuration->GetPid();
 
         cppmicroservices::AnyMap props(cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
-        const std::string initialProp { "initialProp" };
+        std::string const initialProp { "initialProp" };
         props["uniqueProp"] = initialProp;
         auto fut = configuration->Update(props);
         fut.get();
@@ -703,7 +747,7 @@ namespace test
         // this is a delayed component(immediate = false). The update call
         // should result in the component begin deactivated. Verify that the
         // state is SATISFIED.
-        const std::string updatedProp { "updatedProp" };
+        std::string const updatedProp { "updatedProp" };
         props["uniqueProp"] = updatedProp;
         fut = configuration->Update(props);
         fut.get();

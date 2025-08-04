@@ -1,24 +1,24 @@
  /*=============================================================================
 
-  Library: CppMicroServices
+ Library: CppMicroServices
 
-  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
-  file at the top-level directory of this distribution and at
-  https://github.com/CppMicroServices/CppMicroServices/COPYRIGHT .
+ Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+ file at the top-level directory of this distribution and at
+ https://github.com/CppMicroServices/CppMicroServices/COPYRIGHT .
 
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-  http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
 
-  =============================================================================*/
+ =============================================================================*/
 
 #include "cppmicroservices/FrameworkFactory.h"
 
@@ -53,7 +53,7 @@ namespace cppmicroservices
         std::atomic<unsigned long> ComponentConfigurationImpl::idCounter(0);
 
         ComponentConfigurationImpl::ComponentConfigurationImpl(
-            std::shared_ptr<const metadata::ComponentMetadata> metadata,
+            std::shared_ptr<metadata::ComponentMetadata const> metadata,
             Bundle const& bundle,
             std::shared_ptr<ComponentRegistry> registry,
             std::shared_ptr<cppmicroservices::logservice::LogService> logger,
@@ -70,7 +70,7 @@ namespace cppmicroservices
             , deleteCompInstanceFunc(nullptr)
         {
             if (!this->metadata || !this->bundle || !this->registry || !this->logger || !this->configNotifier)
-           {
+            {
                 throw std::invalid_argument("ComponentConfigurationImpl - Invalid arguments passed to constructor");
             }
 
@@ -107,7 +107,7 @@ namespace cppmicroservices
             std::for_each(
                 referenceManagerTokens.begin(),
                 referenceManagerTokens.end(),
-                [](const std::unordered_map<std::shared_ptr<ReferenceManager>, ListenerTokenId>::value_type& kvpair)
+                [](std::unordered_map<std::shared_ptr<ReferenceManager>, ListenerTokenId>::value_type const& kvpair)
                 { (kvpair.first)->UnregisterListener(kvpair.second); });
 
             referenceManagerTokens.clear();
@@ -140,7 +140,7 @@ namespace cppmicroservices
                         props.emplace(item.first, item.second);
                     }
                 }
-                else 
+                else
                 {
                     props = metadata->properties;
                 }
@@ -234,7 +234,10 @@ namespace cppmicroservices
                         {
                             for (auto const& config : configs)
                             {
-                                configNotifier->CreateFactoryComponent(config->GetPid(), mgr);
+                                auto componentFactory = configNotifier->GetComponentFactory();
+                                componentFactory->CreateFactoryComponent(config->GetPid(),
+                                                                         mgr,
+                                                                         config->GetProperties());
                             }
                         }
                     }
@@ -272,14 +275,17 @@ namespace cppmicroservices
             }
             bool configWasSatisfied = false;
             bool configNowSatisfied = false;
+            bool changeCountDifferent = false;
 
             configManager->UpdateMergedProperties(notification.pid,
                                                   notification.newProperties,
                                                   notification.event,
+                                                  notification.newChangeCount,
                                                   configWasSatisfied,
-                                                  configNowSatisfied);
+                                                  configNowSatisfied,
+                                                  changeCountDifferent);
 
-            if (configWasSatisfied && configNowSatisfied && (metadata->configurationPolicy != CONFIG_POLICY_IGNORE))
+            if (configWasSatisfied && configNowSatisfied && changeCountDifferent && (metadata->configurationPolicy != CONFIG_POLICY_IGNORE))
             {
                 if (!Modified())
                 {
@@ -364,7 +370,7 @@ namespace cppmicroservices
                 return (state);
             }
             void
-            operator()(const std::unordered_map<std::string, std::shared_ptr<ReferenceManager>>::value_type& item)
+            operator()(std::unordered_map<std::string, std::shared_ptr<ReferenceManager>>::value_type const& item)
             {
                 if (skipKey.empty() || item.first != skipKey)
                 {

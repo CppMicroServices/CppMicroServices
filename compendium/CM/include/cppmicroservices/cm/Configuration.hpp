@@ -24,6 +24,7 @@
 #define CppMicroServices_CM_Configuration_hpp
 
 #include "cppmicroservices/AnyMap.h"
+#include "cppmicroservices/ThreadpoolSafeFuture.h"
 #include <future>
 #include <string>
 
@@ -103,15 +104,25 @@ namespace cppmicroservices
                  *
                  * @param properties The properties to update this Configuration with.
                  *
-                 * @remarks The shared_future<void> returned can contain a cppmicroservices::SecurityException
-                 *  if the Configuration caused a bundle's shared library to be loaded and the bundle failed
-                 *  a security check.
+                 * @remarks The shared_ptr<ThreadpoolSafeFuture> returned can contain a
+                 * cppmicroservices::SecurityException if the Configuration caused a bundle's shared library to be
+                 * loaded and the bundle failed a security check.
                  *
-                 * @return a shared_future<void> which can be used to wait for the asynchronous
+                 * @return a shared_ptr<ThreadpoolSafeFuture> which can be used to wait for the asynchronous
                  * operation that pushed the update to a ManagedService, ManagedServiceFactory or
-                 * ConfigurationListener to complete. If an exception occurs during the execution
-                 * of the service component's Modified method, this exception is intercepted and
-                 * logged by Declarative Services. This exception is not returned in the shared_future.
+                 * ConfigurationListener to complete. This can be safely done from the same asyncWorkService on which
+                 * the update is done. If an exception occurs during the execution of the service component's Modified
+                 * method, this exception is intercepted and logged by Declarative Services. This exception is not
+                 * returned in the shared_ptr<ThreadpoolSafeFuture>.
+                 */
+                virtual std::shared_ptr<ThreadpoolSafeFuture> SafeUpdate(
+                    AnyMap properties = AnyMap { AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS })
+                    = 0;
+
+                /**
+                 * Same as SafeUpdate() except:
+                 * @return a std::shared_future<void> that is unsafe to wait on from within a thread allocated to the
+                 * AsyncWorkService
                  */
                 virtual std::shared_future<void> Update(AnyMap properties
                                                         = AnyMap { AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS })
@@ -131,16 +142,26 @@ namespace cppmicroservices
                  *
                  * @param properties The properties to update this Configuration with (if they differ)
                  *
-                 * @remarks The shared_future<void> returned can contain a cppmicroservices::SecurityException
-                 *  if the Configuration caused a bundle's shared library to be loaded and the bundle failed
-                 *  a security check.
+                 * @remarks The shared_ptr<ThreadpoolSafeFuture> returned can contain a
+                 * cppmicroservices::SecurityException if the Configuration caused a bundle's shared library to be
+                 * loaded and the bundle failed a security check.
                  *
-                 * @return std::pair<boolean, std::shared_future<void>> The boolean indicates whether
-                 * the properties were updated or not. The shared_future<void> allows access to the result of the
-                 * asynchronous operation that pushed the update operation to a ManagedService, ManagedServiceFactory or
-                 * ConfigurationListener. If an exception occurs during the execution
-                 * of the service component's Modified method, this exception is intercepted and
-                 * logged by Declarative Services. This exception is not returned in the shared_future.
+                 * @return std::pair<boolean, std::shared_ptr<ThreadpoolSafeFuture>> The boolean indicates whether
+                 * the properties were updated or not. The shared_ptr<ThreadpoolSafeFuture> allows access to the result
+                 * of the asynchronous operation that pushed the update operation to a ManagedService,
+                 * ManagedServiceFactory or ConfigurationListener. This can be safely done from the same
+                 * asyncWorkService on which the update is done. If an exception occurs during the execution of the
+                 * service component's Modified method, this exception is intercepted and logged by Declarative
+                 * Services. This exception is not returned in the shared_ptr<ThreadpoolSafeFuture>.
+                 */
+                virtual std::pair<bool, std::shared_ptr<ThreadpoolSafeFuture>> SafeUpdateIfDifferent(
+                    AnyMap properties = AnyMap { AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS })
+                    = 0;
+
+                /**
+                 * Same as SafeUpdateIfDifferent() except:
+                 * @return a std::shared_future<void> that is unsafe to wait on from within a thread allocated to the
+                 * AsyncWorkService
                  */
                 virtual std::pair<bool, std::shared_future<void>> UpdateIfDifferent(
                     AnyMap properties = AnyMap { AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS })
@@ -155,11 +176,20 @@ namespace cppmicroservices
                  *
                  * @throws std::runtime_error if this Configuration object has been Removed already
                  *
-                 * @return a shared_future<void> to access the result of the asynchronous operation
+                 * @return a shared_ptr<ThreadpoolSafeFuture> to access the result of the asynchronous operation
                  * that pushed the remove operation to a ManagedService, ManagedServiceFactory or
-                 * ConfigurationListener. If an exception occurs during the execution
+                 * ConfigurationListener. This can be safely done from the same
+                 * asyncWorkService on which the update is done. If an exception occurs during the execution
                  * of the service component's Modified method, this exception is intercepted and
-                 * logged by Declarative Services. This exception is not returned in the shared_future.
+                 * logged by Declarative Services. This exception is not returned in the
+                 * shared_ptr<ThreadpoolSafeFuture>.
+                 */
+                virtual std::shared_ptr<ThreadpoolSafeFuture> SafeRemove() = 0;
+
+                /**
+                 * Same as SafeRemove() except:
+                 * @return a std::shared_future<void> that is unsafe to wait on from within a thread allocated to the
+                 * AsyncWorkService
                  */
                 virtual std::shared_future<void> Remove() = 0;
             };

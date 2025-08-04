@@ -29,13 +29,13 @@ US_MSVC_DISABLE_WARNING(4355)
 #include "cppmicroservices/BundleInitialization.h"
 #include "cppmicroservices/Constants.h"
 #include "cppmicroservices/FrameworkFactory.h"
+#include "cppmicroservices/GetBundleContext.h"
 
 #include "cppmicroservices/util/FileSystem.h"
 #include "cppmicroservices/util/String.h"
 
 #include "BundleContextPrivate.h"
 #include "BundleStorageMemory.h"
-#include "BundleUtils.h"
 #include "FrameworkPrivate.h"
 
 #include <iomanip>
@@ -88,13 +88,13 @@ namespace cppmicroservices
         , workingDir(ref_any_cast<std::string>(frameworkProperties.at(Constants::FRAMEWORK_WORKING_DIR)))
         , listeners(this)
         , services(this)
-        , logger(std::make_shared<cppmicroservices::cfrimpl::CFRLogger>())
         , serviceHooks(this)
         , bundleHooks(this)
         , bundleRegistry(this)
         , firstInit(true)
         , initCount(0)
         , libraryLoadOptions(0)
+        , stopped(false)
     {
         auto enableDiagLog = any_cast<bool>(frameworkProperties.at(Constants::FRAMEWORK_LOG));
         std::ostream* diagnosticLogger = (diagLogger) ? diagLogger : &std::clog;
@@ -132,7 +132,7 @@ namespace cppmicroservices
         }
 
         // We use a "pseudo" random UUID.
-        const std::string sid_base = "04f4f884-31bb-45c0-b176-";
+        std::string const sid_base = "04f4f884-31bb-45c0-b176-";
         std::stringstream ss;
         ss << sid_base << std::setfill('0') << std::setw(8) << std::hex << static_cast<int32_t>(id * 65536 + initCount);
 
@@ -166,7 +166,7 @@ namespace cppmicroservices
         }
 
         systemBundle->InitSystemBundle();
-        _us_set_bundle_context_instance_system_bundle(systemBundle->bundleContext.Load().get());
+        US_SET_CTX_FUNC(system_bundle)(systemBundle->bundleContext.Load().get());
 
         bundleRegistry.Init();
 
@@ -174,7 +174,7 @@ namespace cppmicroservices
 
         bundleRegistry.Load();
 
-        logger->Open();
+        logger = std::make_shared<cppmicroservices::cfrimpl::CFRLogger>(GetBundleContext());        
 
         std::string execPath;
         try
@@ -250,5 +250,20 @@ namespace cppmicroservices
             return dataStorage + util::DIR_SEP + util::ToString(id);
         }
         return std::string();
+    }
+
+    WriteLock
+    CoreBundleContext::SetFrameworkStateAndBlockUntilComplete(bool desiredState)
+    {
+        WriteLock lock(stoppedLock);
+        stopped = desiredState;
+        return lock;
+    }
+
+    std::unique_ptr<FrameworkShutdownBlocker>
+    CoreBundleContext::GetFrameworkStateAndBlock() const
+    {
+        ReadLock lock(stoppedLock);
+        return std::make_unique<FrameworkShutdownBlocker>(stopped, std::move(lock));
     }
 } // namespace cppmicroservices

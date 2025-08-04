@@ -51,17 +51,19 @@ namespace cppmicroservices
             , logger(logger)
             , configNotifier(configNotifier)
         {
-            if (!bundle || !registry || !logger  || !configNotifier)
+            if (!bundle || !registry || !logger || !configNotifier)
             {
                 throw std::invalid_argument("Invalid parameters passed to SCRBundleExtension constructor");
             }
             managers = std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
         }
 
-       void SCRBundleExtension::Initialize(cppmicroservices::AnyMap const& scrMetadata,
+        void
+        SCRBundleExtension::Initialize(
+            cppmicroservices::AnyMap const& scrMetadata,
             std::shared_ptr<cppmicroservices::async::AsyncWorkService> const& asyncWorkService)
-         {
-            if ( scrMetadata.empty() || !asyncWorkService )
+        {
+            if (scrMetadata.empty() || !asyncWorkService)
             {
                 throw std::invalid_argument("Invalid parameters passed to SCRBundleExtension::Initialize");
             }
@@ -131,12 +133,14 @@ namespace cppmicroservices
                         "Deleting instance of SCRBundleExtension for " + bundle_.GetSymbolicName());
             for (auto& compManager : *managers)
             {
-                auto fut = compManager->Disable();
+                std::shared_ptr<std::atomic<bool>> asyncStarted = std::make_shared<std::atomic<bool>>(false);
+                auto fut = compManager->Disable(asyncStarted);
                 registry->RemoveComponentManager(compManager);
                 try
                 {
-                    fut.get(); // since this happens when the bundle is stopped. Wait until the disable is finished on
-                               // the other thread.
+                    // since this happens when the bundle is stopped,
+                    // wait until the disable is finished on the other thread.
+                    compManager->WaitForFuture(fut, asyncStarted);
                 }
                 catch (...)
                 {

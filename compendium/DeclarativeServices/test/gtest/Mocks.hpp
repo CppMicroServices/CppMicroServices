@@ -133,7 +133,7 @@ namespace cppmicroservices
             MOCK_METHOD3(Log,
                          void(cppmicroservices::logservice::SeverityLevel,
                               std::string const&,
-                              const std::exception_ptr));
+                              std::exception_ptr const));
             MOCK_METHOD3(Log,
                          void(cppmicroservices::ServiceReferenceBase const&,
                               cppmicroservices::logservice::SeverityLevel,
@@ -142,7 +142,11 @@ namespace cppmicroservices
                          void(cppmicroservices::ServiceReferenceBase const&,
                               cppmicroservices::logservice::SeverityLevel,
                               std::string const&,
-                              const std::exception_ptr));
+                              std::exception_ptr const));
+	    MOCK_CONST_METHOD1(getLogger,
+                     std::shared_ptr<cppmicroservices::logservice::Logger>(const std::string&));
+	    MOCK_CONST_METHOD2(getLogger,
+                     std::shared_ptr<cppmicroservices::logservice::Logger>(const cppmicroservices::Bundle&, const std::string&));
         };
 
 #ifdef _MSC_VER
@@ -161,7 +165,7 @@ namespace cppmicroservices
             {
             }
             void
-            Log(cppmicroservices::logservice::SeverityLevel, std::string const&, const std::exception_ptr) override
+            Log(cppmicroservices::logservice::SeverityLevel, std::string const&, std::exception_ptr const) override
             {
             }
             void
@@ -172,8 +176,18 @@ namespace cppmicroservices
             Log(ServiceReferenceBase const&,
                 cppmicroservices::logservice::SeverityLevel,
                 std::string const&,
-                const std::exception_ptr) override
+                std::exception_ptr const) override
             {
+            }
+	    [[nodiscard]] std::shared_ptr<cppmicroservices::logservice::Logger>
+	    getLogger(const std::string&) const override
+	    {
+		return nullptr;
+	    }
+	    [[nodiscard]] std::shared_ptr<cppmicroservices::logservice::Logger>
+            getLogger(const cppmicroservices::Bundle&, const std::string&) const override
+            {
+                return nullptr;
             }
         };
 
@@ -183,12 +197,13 @@ namespace cppmicroservices
             MOCK_CONST_METHOD0(GetName, std::string(void));
             MOCK_CONST_METHOD0(GetBundle, cppmicroservices::Bundle(void));
             MOCK_CONST_METHOD0(GetBundleId, unsigned long(void));
+            MOCK_METHOD2(WaitForFuture, void(std::shared_future<void>&, std::shared_ptr<std::atomic<bool>>));
             MOCK_METHOD0(Initialize, void(void));
             MOCK_CONST_METHOD0(IsEnabled, bool(void));
-            MOCK_METHOD0(Enable, std::shared_future<void>(void));
-            MOCK_METHOD0(Disable, std::shared_future<void>(void));
+            MOCK_METHOD1(Enable, std::shared_future<void>(std::shared_ptr<std::atomic<bool>>));
+            MOCK_METHOD1(Disable, std::shared_future<void>(std::shared_ptr<std::atomic<bool>>));
             MOCK_CONST_METHOD0(GetComponentConfigurations, std::vector<std::shared_ptr<ComponentConfiguration>>());
-            MOCK_CONST_METHOD0(GetMetadata, std::shared_ptr<const metadata::ComponentMetadata>());
+            MOCK_CONST_METHOD0(GetMetadata, std::shared_ptr<metadata::ComponentMetadata const>());
         };
 
         class MockComponentRegistry : public ComponentRegistry
@@ -205,8 +220,8 @@ namespace cppmicroservices
         class MockComponentManagerState : public ComponentManagerState
         {
           public:
-            MOCK_METHOD1(Enable, std::shared_future<void>(ComponentManagerImpl&));
-            MOCK_METHOD1(Disable, std::shared_future<void>(ComponentManagerImpl&));
+            MOCK_METHOD2(Enable, std::shared_future<void>(ComponentManagerImpl&, std::shared_ptr<std::atomic<bool>>));
+            MOCK_METHOD2(Disable, std::shared_future<void>(ComponentManagerImpl&, std::shared_ptr<std::atomic<bool>>));
             MOCK_CONST_METHOD1(IsEnabled, bool(ComponentManagerImpl const&));
             MOCK_CONST_METHOD1(GetConfigurations,
                                std::vector<std::shared_ptr<ComponentConfiguration>>(ComponentManagerImpl const&));
@@ -266,7 +281,7 @@ namespace cppmicroservices
             MOCK_CONST_METHOD0(GetBundle, cppmicroservices::Bundle(void));
             MOCK_CONST_METHOD0(GetId, unsigned long(void));
             MOCK_CONST_METHOD0(GetConfigState, ComponentState(void));
-            MOCK_CONST_METHOD0(GetMetadata, std::shared_ptr<const metadata::ComponentMetadata>(void));
+            MOCK_CONST_METHOD0(GetMetadata, std::shared_ptr<metadata::ComponentMetadata const>(void));
         };
 
         class MockFactory : public cppmicroservices::ServiceFactory
@@ -332,13 +347,13 @@ namespace cppmicroservices
         class MockComponentManagerImpl : public ComponentManagerImpl
         {
           public:
-            MockComponentManagerImpl(std::shared_ptr<const metadata::ComponentMetadata> metadata,
+            MockComponentManagerImpl(std::shared_ptr<metadata::ComponentMetadata const> metadata,
                                      std::shared_ptr<ComponentRegistry> registry,
                                      BundleContext bundleContext,
                                      std::shared_ptr<cppmicroservices::logservice::LogService> logger,
                                      std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkService,
                                      std::shared_ptr<ConfigurationNotifier> notifier)
-               : ComponentManagerImpl(metadata, registry, bundleContext, logger, asyncWorkService, notifier)
+                : ComponentManagerImpl(metadata, registry, bundleContext, logger, asyncWorkService, notifier)
                 , statechangecount(0)
             {
             }
@@ -373,7 +388,7 @@ namespace cppmicroservices
         class MockComponentConfigurationImpl : public ComponentConfigurationImpl
         {
           public:
-            MockComponentConfigurationImpl(std::shared_ptr<const metadata::ComponentMetadata> metadata,
+            MockComponentConfigurationImpl(std::shared_ptr<metadata::ComponentMetadata const> metadata,
                                            Bundle const& bundle,
                                            std::shared_ptr<ComponentRegistry> registry,
                                            std::shared_ptr<cppmicroservices::logservice::LogService> logger,

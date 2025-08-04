@@ -24,7 +24,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-2019, windows-2022]
+        os: [windows-2022, windows-2025, windows-11-arm]
         # build configurations:
         # 0 = threading ON / shared lib ON
         # 1 = threading ON / shared lib OFF
@@ -58,7 +58,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-2019, windows-2022]
+        os: [windows-2022, windows-2025]
         # build configurations:
         # 0 = threading ON / shared lib ON
         # 1 = threading ON / shared lib OFF
@@ -92,15 +92,17 @@ jobs:
         working-directory: ${{github.workspace}}
         run: python ${{github.workspace}}\fixcoveragefilepaths.py -i build\config_${{matrix.buildconfiguration}}\coverage.xml -s Z:\ -o ${{github.workspace}}\coverage_pathsfixed.xml
 
-      - uses: codecov/codecov-action@v2
+      - uses: codecov/codecov-action@v4
         with:
           files: ./coverage_pathsfixed.xml
           fail_ci_if_error: true
           verbose: true
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   build_win_mingw:
     name: Build and Test [mingw-w64,Configuration=${{matrix.buildconfiguration}}]
-    runs-on: windows-2019
+    runs-on: windows-2025
     env:
       BUILD_DIR: Z:\build\config_${{matrix.buildconfiguration}}
       BUILD_CONFIGURATION: ${{matrix.buildconfiguration}}
@@ -122,6 +124,32 @@ jobs:
       run: |
         git config --global core.autocrlf true
         subst Z: ${{github.workspace}}
+
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+
+    - name: Build And Test
+      working-directory: Z:\
+      run: ctest -VV -S cmake\usCTestScript_github.cmake
+      
+  build_win_deterministic_bundles:
+    name: Build and Test [windows-2022,Configuration=0,Deterministic]
+    runs-on: windows-2022
+    env:
+      BUILD_DIR: Z:\build\config_0
+      BUILD_CONFIGURATION: 0
+      BUILD_OS: windows-2022
+      BUILD_WITH_DETERMINISTIC: 1
+    strategy:
+      fail-fast: false
+
+    steps:
+    - name: Initialization
+      run: |
+        git config --global core.autocrlf true
+        subst Z: ${{github.workspace}}
+        echo "C:\msys64" >> $PATH
 
     - uses: actions/checkout@v2
       with:

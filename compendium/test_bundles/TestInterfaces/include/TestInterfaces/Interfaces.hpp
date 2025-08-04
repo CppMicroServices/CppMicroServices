@@ -24,6 +24,7 @@
 
 #include "TestInterfaces/TestInterfacesExport.h"
 #include "cppmicroservices/AnyMap.h"
+#include "cppmicroservices/BundleContext.h"
 #include <memory>
 #include <string>
 
@@ -95,6 +96,15 @@ namespace test
     {
       public:
         virtual ~TestBundleDSUpstreamDependency();
+    };
+
+    // Use this bundle in test bundles & test points to validate if bundle
+    // static data is initialized correctly
+    class US_TestInterfaces_EXPORT TestInitialization
+    {
+    public:
+        virtual std::vector<cppmicroservices::BundleContext> GetContexts(void) = 0;
+        virtual ~TestInitialization() = default;
     };
 
     // Interfaces for declarative services dependency graph resolution benchmarks. The
@@ -179,6 +189,26 @@ namespace test
         virtual cppmicroservices::AnyMap GetProperties() = 0;
         virtual bool isDependencyInjected() = 0;
         virtual ~CAInterface1();
+    };
+    // Use these interfaces in test bundles testing Factory target 
+    // functionality in DS.
+    class US_TestInterfaces_EXPORT ServiceAInt
+    {
+      public:
+        virtual cppmicroservices::AnyMap GetProperties() = 0;
+        virtual ~ServiceAInt();
+    };
+    class US_TestInterfaces_EXPORT ServiceBInt
+    {
+      public:
+        virtual cppmicroservices::AnyMap GetProperties() = 0;
+        virtual ~ServiceBInt();
+    };
+    class US_TestInterfaces_EXPORT ServiceCInt
+    {
+      public:
+        virtual cppmicroservices::AnyMap GetProperties() = 0;
+        virtual ~ServiceCInt();
     };
 } // namespace test
 

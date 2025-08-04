@@ -22,18 +22,23 @@
 
 #include "miniz.h"
 
+#include <algorithm>
 #include <cassert>
 #include <cstdio>
 #include <cstring>
 #include <fstream>
 #include <iostream>
-#include <memory>
+#include <list>
 #include <set>
 #include <stdexcept>
 #include <string>
 #include <unordered_map>
 #include <utility>
 #include <vector>
+
+#ifdef __MINGW32__
+#include <Shlwapi.h>
+#endif
 
 #include <nowide/args.hpp>
 #include <nowide/fstream.hpp>
@@ -46,8 +51,9 @@
 // ---------------------------------------------------------------------------------
 
 #if defined(_WIN32) || defined(_WIN64)
-
+#ifndef WIN32_LEAN_AND_MEAN
 #    define WIN32_LEAN_AND_MEAN
+#endif
 #    define VC_EXTRALEAN
 #    include <windows.h>
 #    define PATH_SEPARATOR "\\"
@@ -410,9 +416,32 @@ ZipArchive::CheckAndAddToArchivedNames(std::string const& archiveEntry)
 void
 ZipArchive::AddManifestFile(Json::Value const& manifest)
 {
+    // Check to make sure that the bundleName passed on the command line and the
+    // bundle.symbolic_name in the manifest file match. If the bundleName is not passed in on the
+    // command line, use the name specified in the manifest. If there's a mismatch or if no
+    // bundleName is supplied in either location, it's an error.
+    auto bname = manifest.get("bundle.symbolic_name", "");
+    if (bname.isString()) {
+        auto bnameStr = bname.asString();
+        if (!bundleName.empty()) {
+            if (bnameStr != bundleName) {
+                throw std::runtime_error("Bundle name in manifest "
+                                         + bnameStr
+                                         + " does not match value supplied on command line "
+                                         + bundleName);
+            }
+        }
+        else {
+            bundleName = bnameStr;
+        }
+    }
+    if (bundleName.empty()) {
+      throw std::runtime_error("Bundle name is required. Make sure that \"bundle.symbolic_name\" is set in the manifest.json file.");
+    }
     std::string styledManifestJson(manifest.toStyledString());
     std::string archiveEntry(bundleName + "/manifest.json");
 
+    // Issue 161.1: Check for file exists first and throw a more desriptive runtime error
     CheckAndAddToArchivedNames(archiveEntry);
 
     if (MZ_FALSE
@@ -431,6 +460,19 @@ void
 ZipArchive::AddResourceFile(std::string const& resFileName, bool isManifest)
 {
     std::string archiveName = resFileName;
+
+    bool pathToResIsAbsolute = false;
+
+#ifndef __MINGW32__
+    // Issue 161.3: check to see if resFileName is relative or not, and exit early if it is not.
+    pathToResIsAbsolute = resFileName[0] == '/';
+#else
+    pathToResIsAbsolute = !PathIsRelativeA(resFileName.c_str());
+#endif
+    
+    if (pathToResIsAbsolute) {
+        throw std::runtime_error("Relatvie path to resource file required. " + resFileName + " is absolute");
+    }
 
     // This check exists solely to maintain a deprecated way of adding manifest.json
     // through the --res-add option.
@@ -532,7 +574,9 @@ ZipArchive::AddResourcesFromArchive(std::string const& archiveFileName)
         {
             if (numBytes > 1)
             {
-                if (archiveName[numBytes - 2] != '/') // The last character is '\0' in the array
+                // Issue 161.2: change to use mz_zip_read_is_file_a_directory() instead of checking
+                // for the format of the string.
+                if (MZ_FALSE == mz_zip_reader_is_file_a_directory(&currZipArchive, currZipIndex))
                 {
                     if (!archivedNames.insert(archiveName).second)
                     {
@@ -723,7 +767,7 @@ const option::Descriptor usage[] = {
 
 // Check invalid invocations and errors
 static int
-checkSanity(option::Parser& parse, option::Option* options)
+checkSanity(option::Parser& parse, std::vector<option::Option>& options)
 {
     int return_code = EXIT_SUCCESS;
 
@@ -770,17 +814,16 @@ checkSanity(option::Parser& parse, option::Option* options)
         return_code = EXIT_FAILURE;
     }
 
-    // If either --manifest-add or --res-add is given, --bundle-name must also be given.
-    if ((options[MANIFESTADD] || options[RESADD]) && !options[BUNDLENAME])
+    // If --res-add is given, --bundle-name must also be given.
+    if (options[RESADD] && !options[BUNDLENAME])
     {
-        std::cerr << "If either --manifest-add or --res-add is provided, "
-                     "--bundle-name must be provided."
+        std::cerr << "If --res-add is provided, --bundle-name must be provided."
                   << std::endl;
         return_code = EXIT_FAILURE;
     }
 
     // Generate a warning that --bundle-name is not necessary in following invocation.
-    if (options[BUNDLENAME] && !options[MANIFESTADD] && !options[RESADD] && return_code != EXIT_FAILURE)
+    if (options[BUNDLENAME] && !options[RESADD] && return_code != EXIT_FAILURE)
     {
         std::clog << "Warning: --bundle-name option is unnecessary here." << std::endl;
     }
@@ -795,7 +838,14 @@ checkSanity(option::Parser& parse, option::Option* options)
 int
 main(int argc, char** argv)
 {
-    nowide::args _(argc, argv);
+    // Deterministic build things to set
+#if (defined(_WIN32) || defined(_WIN64)) && defined(US_USE_DETERMINISTIC_BUNDLE_BUILDS)
+    // Differences in character sets will cause these sort orders to differ. For this reason, we set
+    // the LC_ALL environment variable to 'C' so that sort ordering is consistent.
+    setlocale(LC_ALL, "C.UTF-8")
+#endif
+
+        nowide::args _(argc, argv);
 
     int const BUNDLE_MANIFEST_VALIDATION_ERROR_CODE(2);
 
@@ -806,9 +856,9 @@ main(int argc, char** argv)
     argc -= (argc > 0);
     argv += (argc > 0); // skip program name argv[0]
     option::Stats stats(usage, argc, argv);
-    std::unique_ptr<option::Option[]> options(new option::Option[stats.options_max]);
-    std::unique_ptr<option::Option[]> buffer(new option::Option[stats.buffer_max]);
-    option::Parser parse(true, usage, argc, argv, options.get(), buffer.get());
+    std::vector<option::Option> options { stats.options_max };
+    std::vector<option::Option> buffer { stats.buffer_max };
+    option::Parser parse(true, usage, argc, argv, options.data(), buffer.data());
 
     if (argc == 0 || options[HELP])
     {
@@ -816,7 +866,7 @@ main(int argc, char** argv)
         return return_code;
     }
 
-    return_code = checkSanity(parse, options.get());
+    return_code = checkSanity(parse, options);
     if (return_code == EXIT_FAILURE)
     {
         return return_code;
@@ -889,16 +939,30 @@ main(int argc, char** argv)
                 // concatenate all manifest files into one, validate it and add it to the zip archive.
                 zipArchive->AddManifestFile(AggregateManifestsAndValidate(manifests));
             }
-            // Add resource files to the zip archive
+            // Add resource files to the zip archive. In order to produce deterministic zip archives,
+            // the files must always be added to it in the same order. Store up the list of files in
+            // a std::set, which is sorted, so that we always process them in the same order.
+            std::set<std::string> resAddArgs;
             for (option::Option* resopt = options[RESADD]; resopt; resopt = resopt->next())
             {
-                zipArchive->AddResourceFile(resopt->arg);
+                resAddArgs.insert(resopt->arg);
             }
-            // Merge resources from supplied zip archives
+            std::for_each(std::begin(resAddArgs),
+                          std::end(resAddArgs),
+                          [&zipArchive](std::string const& res) { zipArchive->AddResourceFile(res); });
+
+            // Merge resources from supplied zip archives. Similar to resource files, In order to
+            // produce deterministic zip archives, the files must always be added to it in the same
+            // order. Store up the list of files in a std::set, which is sorted, so that we always
+            // process them in the same order.
+            std::set<std::string> resAddArchiveArgs;
             for (option::Option* opt = options[ZIPADD]; opt; opt = opt->next())
             {
-                zipArchive->AddResourcesFromArchive(opt->arg);
+                resAddArchiveArgs.insert(opt->arg);
             }
+            std::for_each(std::begin(resAddArchiveArgs),
+                          std::end(resAddArchiveArgs),
+                          [&zipArchive](std::string const& res) { zipArchive->AddResourcesFromArchive(res); });
         }
         // ---------------------------------------------------------------------------------
         //      APPEND ZIP to BINARY if bundle-file is specified

@@ -1,5 +1,0 @@
-{
-  "bundle.symbolic_name" : "org.cppmicroservices.httpservice",
-  "bundle.name" : "C++ Micro Services Http Service",
-  "bundle.version" : "0.1.0"
-}

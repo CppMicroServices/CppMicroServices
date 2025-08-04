@@ -5,6 +5,7 @@ set(_srcs
   CMLogger.cpp
   ConfigurationAdminImpl.cpp
   ConfigurationImpl.cpp
+  ThreadpoolSafeFuturePrivate.cpp
   metadata/MetadataParserImpl.cpp
   )
 
@@ -18,6 +19,8 @@ set(_private_headers
   ConfigurationAdminPrivate.hpp
   ConfigurationImpl.hpp
   ConfigurationPrivate.hpp
+  ThreadpoolSafeFuturePrivate.hpp
+  SingleInvokeTask.hpp
   metadata/ConfigurationMetadata.hpp
   metadata/MetadataParser.hpp
   metadata/MetadataParserFactory.hpp
@@ -26,10 +29,9 @@ set(_private_headers
 
 add_library(ConfigurationAdminObjs OBJECT ${_srcs} ${_private_headers})
 
-if(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
-  get_property(_compile_flags TARGET ConfigurationAdminObjs PROPERTY COMPILE_FLAGS)
-  set_property(TARGET ConfigurationAdminObjs PROPERTY COMPILE_FLAGS "${_compile_flags} -fPIC")
-endif()
+
+get_property(_compile_flags TARGET ConfigurationAdminObjs PROPERTY COMPILE_FLAGS)
+set_property(TARGET ConfigurationAdminObjs PROPERTY COMPILE_FLAGS "${_compile_flags} -fPIC")
 
 target_include_directories(ConfigurationAdminObjs PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/src

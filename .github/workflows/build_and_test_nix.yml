@@ -17,8 +17,8 @@ env:
 
 jobs:
   linux_minimum_supported_gcc_build:
-    name: Build and Test [ubuntu-20.04, Minimum GCC]
-    runs-on: ubuntu-20.04
+    name: Build and Test [ubuntu-22.04, Minimum GCC]
+    runs-on: ubuntu-22.04
     env:
       BUILD_CONFIGURATION: 0
       WITH_COVERAGE: 0
@@ -32,17 +32,17 @@ jobs:
       run: |
         sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
         sudo apt-get update
-        sudo apt-get -yq --no-install-suggests --no-install-recommends install gcc-7 g++-7 valgrind
+        sudo apt-get -yq --no-install-suggests --no-install-recommends install gcc-11 g++-11 valgrind
       
     - name: Build and Test
       run: ctest -VV -S ${{github.workspace}}/cmake/usCTestScript_github.cmake
       env:
-        CC: gcc-7
-        CXX: g++-7
+        CC: gcc-11
+        CXX: g++-11
 
   linux_clang_build:
-    name: Build and Test [ubuntu-20.04, Supported Clang]
-    runs-on: ubuntu-20.04
+    name: Build and Test [ubuntu-22.04, Supported Clang]
+    runs-on: ubuntu-22.04
     env:
       BUILD_CONFIGURATION: 0
       WITH_COVERAGE: 0
@@ -69,7 +69,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, macOS-11, macos-12]
+        os: [ubuntu-22.04, ubuntu-22.04-arm, macos-13, macos-14]
         # build configurations:
         # 0 = threading ON / shared lib ON
         # 1 = threading ON / shared lib OFF
@@ -96,3 +96,32 @@ jobs:
       
     - name: Code Coverage
       run: bash <(curl -s https://codecov.io/bash) -X gcov -s ${{github.workspace}}/build_${{matrix.buildconfiguration}}
+
+  build_nix_deterministic_bundles:
+    name: Build and Test [${{matrix.os}},Configuration=0,Deterministic]
+    runs-on: ${{matrix.os}}
+    env:
+      BUILD_CONFIGURATION: 0
+      BUILD_WITH_DETERMINISTIC: 1
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, macos-latest]
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y valgrind
+      if: ${{matrix.os == 'ubuntu-22.04'}}
+
+    - name: Build And Test
+      run: ctest -VV -S ${{github.workspace}}/cmake/usCTestScript_github.cmake
+      env: 
+         BUILD_DIR: ${{github.workspace}}/build_0
+         

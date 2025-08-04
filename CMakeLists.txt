@@ -140,7 +140,7 @@ STRING(SUBSTRING "${CMAKE_SYSTEM_PROCESSOR}" 0 3 SYSTEM_PROCESSOR_SUBSTR)
 if("${SYSTEM_PROCESSOR_SUBSTR}" STREQUAL "arm")
   if(US_COMPILER_GNU)
     set(US_COMPILER_GNU_ARM 1)
-endif()
+  endif()
 endif()
 
 
@@ -177,6 +177,11 @@ if (US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG)
   check_cxx_compiler_flag(-Wno-missing-braces HAS_MISSING_BRACES_FLAG)
   if (HAS_MISSING_BRACES_FLAG)
     add_compile_options(-Wno-missing-braces)
+  endif()
+  
+  check_cxx_compiler_flag(-Wno-missing-template-arg-list-after-template-kw HAS_MISSING_TEMPLATE_KW_FLAG)
+  if (HAS_MISSING_TEMPLATE_KW_FLAG)
+    add_compile_options(-Wno-missing-template-arg-list-after-template-kw)
   endif()
 endif()
 
@@ -254,6 +259,7 @@ us_cache_var(US_BUILD_TESTING OFF BOOL "Build tests")
 us_cache_var(US_BUILD_EXAMPLES OFF BOOL "Build example projects")
 us_cache_var(US_USE_SYSTEM_GTEST OFF BOOL "Build using an external GTest installation" ADVANCED)
 us_cache_var(US_USE_SYSTEM_BOOST OFF BOOL "Build using an external Boost installation" ADVANCED)
+us_cache_var(US_USE_DETERMINISTIC_BUNDLE_BUILDS OFF BOOL "Build bundles deterministically" ADVANCED)
 
 set(_us_build_shared ${BUILD_SHARED_LIBS})
 
@@ -361,6 +367,17 @@ if (APPLE AND US_COMPILER_APPLE_CLANG)
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++ -lc++abi")
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -stdlib=libc++ -lc++abi")
   set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -stdlib=libc++ -lc++abi")
+endif()
+
+#-----------------------------------------------------------------------------
+# Set stack as non executable
+#-----------------------------------------------------------------------------
+
+# Add flag to force non executable stack on gcc builds
+# The -Wl,-z noexecstack link option on all gcc builds will
+# disallow executable stacks within CppMicroServices.
+if(UNIX AND NOT APPLE)
+  link_libraries("-Wl,-z,noexecstack")
 endif()
 
 #-----------------------------------------------------------------------------
@@ -522,6 +539,13 @@ if(MSVC)
   endif()
 
   set(US_CXX_FLAGS "/MP /WX /D${msvc_version_define} ${US_CXX_FLAGS}")
+
+  # UTF-8 support
+  # Differences in character sets will cause these sort orders to differ. For this
+  # reason, we set the LC_ALL environment variable to 'C' with the utf-8 character set to ensure
+  # sort ordering is correct.
+  set(US_CXX_FLAGS "/utf-8 ${US_CXX_FLAGS}")
+  set(US_C_FLAGS "/utf-8 ${US_C_FLAGS}")
 else()
 
   # If not cross-compiling, turn on Stack Smashing Protection.
@@ -539,6 +563,15 @@ else()
     usFunctionCheckCompilerFlags(${_cxxflag} US_CXX_FLAGS)
   endforeach()
 
+  # Force clang compiler to use deterministic timestamp when linking
+  # shared libraries. In order to do so, we need to set the environment variable ZERO_AR_DATE to 1
+  # before invoking the linker. To do that we use the CMAKE_CXX_LINKER_LAUNCHER variable to wrap the
+  # launch of the linker in a shell script that sets that variable. Only do this for deterministic
+  # builds. 
+  
+  if(US_COMPILER_APPLE_CLANG AND US_USE_DETERMINISTIC_BUNDLE_BUILDS)
+    set(CMAKE_CXX_LINKER_LAUNCHER ${CMAKE_SOURCE_DIR}/tools/mac_deterministic_link_wrapper.sh)
+  endif()
 
   if(US_COMPILER_GNU_ARM)
     # arm gcc warns that several reinterpret_cast need increased alignemnt in reinterpret_cast<>
@@ -567,6 +600,7 @@ else()
   if(_have_visibility)
     set(US_HAVE_VISIBILITY_ATTRIBUTE 1)
     set(US_CXX_FLAGS "${US_CXX_FLAGS} ${_have_visibility}")
+    set(US_C_FLAGS "${US_C_FLAGS} -fvisibility=hidden")
   endif()
 
   usFunctionCheckCompilerFlags("-O1 -D_FORTIFY_SOURCE=2" _fortify_source_flag)
@@ -618,6 +652,12 @@ else()
   endif()
 endif()
 
+# Allow forcing of bundle builds to be deterministic
+if (US_USE_DETERMINISTIC_BUNDLE_BUILDS)
+  set(US_CXX_FLAGS "${US_CXX_FLAGS} -DMINIZ_DETERMINISTIC_ZIP_FILES")
+  set(US_C_FLAGS "${US_C_FLAGS} -DMINIZ_DETERMINISTIC_ZIP_FILES")
+endif()
+
 if(MINGW)
   # suppress warnings about auto imported symbols
   set(US_CXX_FLAGS "-Wl,--enable-auto-import ${US_CXX_FLAGS}")
@@ -625,6 +665,9 @@ if(MINGW)
   set(US_CXX_FLAGS "-D_WIN32_WINNT=0x0600 -DNTDDI_VERSION=0x06000000 ${US_CXX_FLAGS}")
   # silence ignored attributes warnings
   add_compile_options(-Wno-attributes)
+  # silence maybe-uninitialized warnings for mingw.
+  # @todo: limit this compile option only to the offending file, jasoncpp.cpp, or fix the warning in code
+  add_compile_options(-Wno-error=maybe-uninitialized)
 endif()
 
 # Include the selected sanitizer's flags in US_CXX_FLAGS if the compiler supports the required flags
@@ -709,6 +752,12 @@ if(NOT MSVC)
   if (US_ENABLE_UBSAN AND US_CXX_UBSAN_FLAGS)
     set(US_UBSAN_LINK_FLAGS "-fsanitize=undefined")
   endif()
+else()
+  # Force MSVC compiler to use deterministic timestamp when linking
+  # shared libraries.
+  if (US_USE_DETERMINISTIC_BUNDLE_BUILDS)
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /Brepro" CACHE STRING "Forced shared linker flags" FORCE)
+  endif()
 endif()
 
 
@@ -742,6 +791,18 @@ if(APPLE AND CMAKE_GENERATOR MATCHES "Xcode")
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${US_LINK_FLAGS}")
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${US_LINK_FLAGS}")
   set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${US_LINK_FLAGS}")
+endif()
+
+#-----------------------------------------------------------------------------
+# Deterministic builds environment variables
+#-----------------------------------------------------------------------------
+if(US_USE_DETERMINISTIC_BUNDLE_BUILDS)
+  # On windows, setlocale() is used to set these variables in the ResourceCompiler.
+  # Differences in character sets will cause these sort orders to differ. For this
+  # reason, we set the LC_ALL environment variable to 'C' so that sort ordering is consistent. 
+  if(NOT MSVC)
+    set(ENV{LC_ALL} "C.UTF-8")
+  endif()
 endif()
 
 #-----------------------------------------------------------------------------
@@ -841,9 +902,6 @@ export(TARGETS ${US_RCC_EXECUTABLE_TARGET}
 
 add_subdirectory(util)
 add_subdirectory(framework)
-add_subdirectory(httpservice)
-add_subdirectory(webconsole)
-add_subdirectory(shellservice)
 
 # Declarative Services requires threading to function.
 # Static linkage is not yet supported for declarative services.
@@ -853,7 +911,6 @@ else()
   add_subdirectory(compendium/LogService)
 endif()
 
-add_subdirectory(tools/shell)
 
 #-----------------------------------------------------------------------------
 # Documentation

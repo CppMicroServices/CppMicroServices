@@ -55,6 +55,19 @@ namespace
 namespace test
 {
 
+    std::unordered_map<std::string, std::string>
+    GetPathInfo()
+    {
+        std::unordered_map<std::string, std::string> pathInfo = {
+            { "libPath", cppmicroservices::testing::LIB_PATH },
+            { "dirSep", std::string(1, cppmicroservices::util::DIR_SEP) },
+            { "usLibPrefix", US_LIB_PREFIX },
+            { "usLibPostfix", US_LIB_POSTFIX },
+            { "usLibExt", US_LIB_EXT }
+        };
+        return pathInfo;
+    }
+
     void
     InstallLib(
 #if defined(US_BUILD_SHARED_LIBS)
@@ -260,6 +273,33 @@ namespace test
         }
         return false;
 #endif
+    }
+
+    AsyncWorkServiceThreadPool::AsyncWorkServiceThreadPool(int nThreads) : cppmicroservices::async::AsyncWorkService(), threadpool(std::make_shared<boost::asio::thread_pool>(nThreads))
+    {
+    }
+
+    AsyncWorkServiceThreadPool::~AsyncWorkServiceThreadPool()
+    {
+        if (threadpool)
+        {
+            threadpool->join();
+            threadpool->stop();
+            threadpool.reset();
+        }
+    }
+
+    void
+    AsyncWorkServiceThreadPool::post(std::packaged_task<void()>&& task)
+    {
+        using Sig = void();
+        using Result = boost::asio::async_result<decltype(task), Sig>;
+        using Handler = typename Result::completion_handler_type;
+
+        Handler handler{std::move(task)};
+        Result result(handler);
+
+        boost::asio::post(threadpool->get_executor(), [handler = std::move(handler)]() mutable { handler(); });
     }
 
 } // namespace test

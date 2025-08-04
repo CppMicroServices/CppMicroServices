@@ -89,6 +89,7 @@ function(create_initial_cache var _shared _threading)
       US_ENABLE_THREADING_SUPPORT:BOOL=${_threading}
       US_ENABLE_TSAN:BOOL=$ENV{WITH_TSAN}
       US_BUILD_EXAMPLES:BOOL=ON
+      US_USE_DETERMINISTIC_BUNDLE_BUILDS:BOOL=${WITH_DETERMINISTIC}
       ")
 
   set(${var} ${_initial_cache} PARENT_SCOPE)
@@ -116,12 +117,15 @@ if(NOT US_CMAKE_GENERATOR)
   elseif (NOT WIN32)
     set(US_CMAKE_GENERATOR "Unix Makefiles")
   else()
-    if ("$ENV{BUILD_OS}" STREQUAL "windows-2019")
-      set(US_CMAKE_GENERATOR "Visual Studio 16 2019")
+    if ("$ENV{BUILD_OS}" STREQUAL "windows-2025")
+      set(US_CMAKE_GENERATOR "Visual Studio 17 2022")
       set(CMAKE_GENERATOR_PLATFORM "x64")
     elseif ("$ENV{BUILD_OS}" STREQUAL "windows-2022")
       set(US_CMAKE_GENERATOR "Visual Studio 17 2022")
       set(CMAKE_GENERATOR_PLATFORM "x64")
+    elseif ("$ENV{BUILD_OS}" STREQUAL "windows-11-arm")
+      set(US_CMAKE_GENERATOR "Visual Studio 17 2022")
+      set(CMAKE_GENERATOR_PLATFORM "ARM64")
     elseif ("$ENV{BUILD_OS}" STREQUAL "mingw-w64")
       set(US_CMAKE_GENERATOR "MinGW Makefiles")
     else()

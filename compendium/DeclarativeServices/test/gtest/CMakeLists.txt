@@ -71,6 +71,7 @@ set(_declarativeservices_tests
   TestConfigPolicies.cpp
   TestConfigurationPropertiesWithMultipleConfigurations.cpp
   TestFactoryPid.cpp
+  TestFactoryTarget.cpp
   TestFailedBoundServiceActivation.cpp
   TestMetadataParserFactory.cpp
   TestMetadataParserImplV1.cpp
@@ -92,6 +93,7 @@ set(_declarativeservices_tests
   TestFixture.hpp
   TestServiceComponentRuntime.cpp
   TestServiceProvider.cpp
+  TestServiceReferenceRetrieval.cpp
   TestSharedLibraryException.cpp
   TestUpdateConfiguration.cpp
   ImportTestBundles.cpp
@@ -191,21 +193,28 @@ set(_test_bundles
   TestBundleDSTOI16
   TestBundleDSTOI18
   TestBundleDSTOI19
+  TestBundleDSTOI20
+  TestBundleDSTOI21
+  TestBundleDSTOI22
   TestBundleDSCA01
   TestBundleDSCA02
   TestBundleDSCA03
   TestBundleDSCA04
   TestBundleDSCA05
   TestBundleDSCA05a
+  TestBundleDSCA06
   TestBundleDSCA07
   TestBundleDSCA08
   TestBundleDSCA09
+  TestBundleDSCA10
   TestBundleDSCA12
   TestBundleDSCA16
   TestBundleDSCA20
   TestBundleDSCA24
   TestBundleDSCA26
   TestBundleDSCA27
+  TestBundleDSCA28
+  TestBundleDSFAC1
   EnglishDictionary
   )
 
@@ -234,7 +243,7 @@ add_dependencies(${us_declarativeservices_test_exe_name}
 )
 
 # Needed for clock_gettime with glibc < 2.17
-if(UNIX AND NOT APPLE)
+if((UNIX AND NOT APPLE) AND NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Android")
   target_link_libraries(${us_declarativeservices_test_exe_name} PRIVATE rt)
 endif()
 

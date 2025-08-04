@@ -141,7 +141,11 @@ namespace cppmicroservices
         d->CheckValid();
         auto b = GetAndCheckBundlePrivate(d);
 
-        return b->coreCtx->bundleHooks.FilterBundle(*this, MakeBundle(b->coreCtx->bundleRegistry.GetBundle(id)));
+        // if the requesting bundle is NOT the system bundle, filter
+        if (b->id != 0){
+            return b->coreCtx->bundleHooks.FilterBundle(*this, MakeBundle(b->coreCtx->bundleRegistry.GetBundle(id)));
+        }
+        return MakeBundle(b->coreCtx->bundleRegistry.GetBundle(id));
     }
 
     std::vector<Bundle>
@@ -179,7 +183,10 @@ namespace cppmicroservices
         {
             bus.emplace_back(MakeBundle(bu));
         }
-        b->coreCtx->bundleHooks.FilterBundles(*this, bus);
+        // if the requesting bundle is NOT the system bundle, filter
+        if (b->id != 0){
+            b->coreCtx->bundleHooks.FilterBundles(*this, bus);
+        }
         return bus;
     }
 
@@ -227,52 +234,6 @@ namespace cppmicroservices
         return b->coreCtx->services.Get(b.get(), clazz);
     }
 
-    /* @brief Private helper struct used to facilitate the shared_ptr aliasing constructor
-     *        in BundleContext::GetService method. The aliasing constructor helps automate
-     *        the call to UngetService method.
-     *
-     *        Service consumers can simply call GetService to obtain a shared_ptr to the
-     *        service object and not worry about calling UngetService when they are done.
-     *        The UngetService is called when all instances of the returned shared_ptr object
-     *        go out of scope.
-     */
-    template <class S>
-    struct ServiceHolder
-    {
-        std::weak_ptr<BundlePrivate> const b;
-        ServiceReferenceBase const sref;
-        std::shared_ptr<S> const service;
-
-        ServiceHolder(std::shared_ptr<BundlePrivate> const& b, ServiceReferenceBase const& sr, std::shared_ptr<S> s)
-            : b(b)
-            , sref(sr)
-            , service(std::move(s))
-        {
-        }
-
-        ~ServiceHolder()
-        {
-            try
-            {
-                sref.d.Load()->UngetService(b.lock(), true);
-            }
-            catch (...)
-            {
-                // Make sure that we don't crash if the shared_ptr service object outlives
-                // the BundlePrivate or CoreBundleContext objects.
-                if (!b.expired())
-                {
-                    DIAG_LOG(*b.lock()->coreCtx->sink)
-                        << "UngetService threw an exception. " << util::GetLastExceptionStr();
-                }
-                // don't throw exceptions from the destructor. For an explanation, see:
-                // https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md
-                // Following this rule means that a FrameworkEvent isn't an option here
-                // since it contains an exception object which clients could throw.
-            }
-        }
-    };
-
     std::shared_ptr<void>
     BundleContext::GetService(ServiceReferenceBase const& reference)
     {
@@ -290,8 +251,8 @@ namespace cppmicroservices
         d->CheckValid();
         auto b = GetAndCheckBundlePrivate(d);
 
-        std::shared_ptr<ServiceHolder<void>> h(
-            new ServiceHolder<void>(b, reference, reference.d.Load()->GetService(b.get())));
+        auto serviceHolder = new ServiceHolder<void>(b, reference, reference.d.Load()->GetService(b.get()), nullptr);
+        std::shared_ptr<ServiceHolder<void>> h(serviceHolder, CustomServiceDeleter { serviceHolder });
         return std::shared_ptr<void>(h, h->service.get());
     }
 
@@ -314,7 +275,7 @@ namespace cppmicroservices
 
         auto serviceInterfaceMap = reference.d.Load()->GetServiceInterfaceMap(b.get());
         std::shared_ptr<ServiceHolder<InterfaceMap const>> h(
-            new ServiceHolder<InterfaceMap const>(b, reference, serviceInterfaceMap));
+            new ServiceHolder<InterfaceMap const>(b, reference, serviceInterfaceMap, nullptr));
         return InterfaceMapConstPtr(h, h->service.get());
     }
 

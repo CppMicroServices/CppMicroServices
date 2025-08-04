@@ -176,7 +176,7 @@ TEST(AnyMapTest, AnyMap)
     ASSERT_EQ(any_cast<int>(uo_anymap1.at("re")), 2);
 
     // Testing AnyMap::operator[] (const)
-    const std::string key = "re";
+    std::string const key = "re";
     o_anymap1[key] = 10;
     uo_anymap1[key] = 10;
     uo_anymap1.insert(std::make_pair(std::string("mi"), Any(3)));
@@ -442,4 +442,141 @@ TEST(AnyMapTest, InitializerList)
     EXPECT_EQ(2, unordered_any_cimap.size());
     EXPECT_EQ(Any(7), unordered_any_cimap.at("g"));
     EXPECT_EQ(Any(8), unordered_any_cimap.at("h"));
+    AnyMap nested {
+        {{ "n", 9 }, { "o", 10 }, { "p", std::string("C") }}
+    };
+    AnyMap unordered_any_nested {
+        {
+         { "j", 7 },
+         { "k", 8 },
+         { "l", std::string("B") },
+         { "m", AnyMap { { { "n", 9 }, { "o", 10 }, { "p", std::string("C") } } } },
+         }
+    };
+    EXPECT_EQ(any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS, unordered_any_nested.GetType());
+    EXPECT_EQ(4, unordered_any_nested.size());
+    EXPECT_EQ(Any(7), unordered_any_nested.at("j"));
+    EXPECT_EQ(Any(8), unordered_any_nested.at("k"));
+    EXPECT_EQ(std::string("B"), any_cast<std::string>(unordered_any_nested.at("l")));
+    EXPECT_EQ(AnyMap(nested), any_cast<AnyMap>(unordered_any_nested.at("m")));
+    EXPECT_EQ(Any(9), any_cast<AnyMap>(unordered_any_nested.at("m")).at("n"));
+    EXPECT_EQ(Any(10), any_cast<AnyMap>(unordered_any_nested.at("m")).at("o"));
+    EXPECT_EQ(std::string("C"), any_cast<std::string>(any_cast<AnyMap>(unordered_any_nested.at("m")).at("p")));
+}
+
+TEST(AnyMapTest, AnyMapToCPP)
+{
+    AnyMap::ordered_any_map o {
+        {{ "do", 1 }, { "re", 2 }}
+    };
+    AnyMap o_anymap(o);
+
+    // Testing any_value_to_* free functions
+    std::ostringstream stream1, stream2, stream3, stream4, stream5;
+    any_value_to_cpp(stream1, o_anymap);
+    ASSERT_EQ(stream1.str(), R"(AnyMap { ORDERED_MAP, {{"do" , 1}, {"re" , 2}}})");
+
+    AnyMap::ordered_any_map o1 {
+        {{ "do", std::string("try") }, { "strings", std::string("and") }, { "bools", true }, { "or", false }}
+    };
+    AnyMap o1_anymap(o1);
+
+    // Testing any_value_to_* free functions
+    any_value_to_cpp(stream2, o1_anymap);
+    ASSERT_EQ(
+        stream2.str(),
+        R"(AnyMap { ORDERED_MAP, {{"bools" , true}, {"do" , std::string("try")}, {"or" , false}, {"strings" , std::string("and")}}})");
+
+    AnyMap::ordered_any_map o2 {
+        {{ "j", 7 },
+         { "k", 8 },
+         { "l", std::string("B") },
+         { "m", AnyMap::ordered_any_map { { { "n", 9 }, { "o", 10 }, { "p", std::string("C") } } } }}
+    };
+    AnyMap o2_anymap(o2);
+
+    any_value_to_cpp(stream3, o2_anymap);
+    ASSERT_EQ(
+        stream3.str(),
+        R"(AnyMap { ORDERED_MAP, {{"j" , 7}, {"k" , 8}, {"l" , std::string("B")}, {"m" , AnyMap { ORDERED_MAP, {{"n" , 9}, {"o" , 10}, {"p" , std::string("C")}}}}}})");
+
+    any_value_to_cpp(stream4, o2_anymap, 2, 0);
+    ASSERT_EQ(stream4.str(), R"(AnyMap { ORDERED_MAP, {
+  {"j" , 7}, 
+  {"k" , 8}, 
+  {"l" , std::string("B")}, 
+  {"m" , AnyMap { ORDERED_MAP, {
+    {"n" , 9}, 
+    {"o" , 10}, 
+    {"p" , std::string("C")}
+  }}}
+}})");
+
+    AnyMap::ordered_any_map o3 {
+        {{ "mi", 7.9 },
+         { "ca", 6.7776 },
+         { "m", std::vector<cppmicroservices::Any> { { std::string("yes") }, { 5 } } }}
+    };
+    AnyMap o3_anymap(o3);
+
+    // Testing any_value_to_* free functions
+    any_value_to_cpp(stream5, o3_anymap, 2, 0);
+    ASSERT_EQ(stream5.str(), R"(AnyMap { ORDERED_MAP, {
+  {"ca" , 6.7776}, 
+  {"m" , AnyVector {{
+    std::string("yes"),
+    5
+  }}}, 
+  {"mi" , 7.9}
+}})");
+}
+
+TEST(AnyMapTest, AnyMapToCPPKitchenSink)
+{
+    std::ostringstream stream1;
+
+    AnyMap::ordered_any_map o {
+        {{ "j", 7 },
+         { "k", 8 },
+         { "l", std::string("B") },
+         { "m",
+         AnyMap::ordered_any_map {
+         { { "n", 9 },
+         { "o", 10 },
+         { "p",
+         std::vector<cppmicroservices::Any> {
+         { std::string("yes") },
+         { 5 },
+         { AnyMap::ordered_any_map {
+         { { "key1", 1 },
+         { "key2", false },
+         { "key3",
+         std::vector<cppmicroservices::Any> { { false },
+         { 6.7889 },
+         { std::string("me!") } } } } } } } } } } }}
+    };
+    AnyMap uo_anymap(o);
+    any_value_to_cpp(stream1, uo_anymap, 2, 0);
+    ASSERT_EQ(stream1.str(), R"(AnyMap { ORDERED_MAP, {
+  {"j" , 7}, 
+  {"k" , 8}, 
+  {"l" , std::string("B")}, 
+  {"m" , AnyMap { ORDERED_MAP, {
+    {"n" , 9}, 
+    {"o" , 10}, 
+    {"p" , AnyVector {{
+      std::string("yes"),
+      5,
+      AnyMap { ORDERED_MAP, {
+        {"key1" , 1}, 
+        {"key2" , false}, 
+        {"key3" , AnyVector {{
+          false,
+          6.7889,
+          std::string("me!")
+        }}}
+      }}
+    }}}
+  }}}
+}})");
 }

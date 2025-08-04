@@ -1,0 +1,26 @@
+{
+    "bundle.symbolic_name" : "TestBundleDSFAC2",
+    "scr" : {
+        "version" : 1,
+         "components" : [{
+            "enabled" : true,
+            "immediate": false,
+            "implementation-class": "sample::ServiceAImpl2",
+            "configuration-policy" : "require",
+            "configuration-pid" : ["ServiceA"],
+            "factory" : "ServiceA Factory",
+            "inject-references" : true,
+            "references":[{
+                "name": "ServiceB",
+                "interface" : "test::ServiceBInt"
+            },
+            {
+                "name": "ServiceC",
+                "interface" : "test::ServiceCInt"
+            }],
+            "service": {
+                "interfaces": ["test::ServiceAInt"]
+            }
+        }]
+    }
+}

@@ -53,6 +53,14 @@ namespace cppmicroservices
         stopEvent = FrameworkEventInternal { true, FrameworkEvent::Type::FRAMEWORK_ERROR, std::string(), nullptr };
     }
 
+    FrameworkPrivate::~FrameworkPrivate() noexcept
+    {
+        if (shutdownThread.joinable())
+        {
+            shutdownThread.join();
+        }
+    }
+
     void
     FrameworkPrivate::DoInit()
     {
@@ -121,6 +129,10 @@ namespace cppmicroservices
             }
             if (!stopEvent.valid)
             {
+                if (shutdownThread.joinable())
+                {
+                    shutdownThread.join();
+                }
                 return FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WAIT_TIMEDOUT,
                                       MakeBundle(this->shared_from_this()),
                                       std::string(),
@@ -185,6 +197,7 @@ namespace cppmicroservices
         {
             auto l = Lock();
             US_UNUSED(l);
+            auto writerLock = coreCtx->SetFrameworkStateAndBlockUntilComplete(false);
 
             switch (state.load())
             {
@@ -200,6 +213,7 @@ namespace cppmicroservices
                 default:
                     std::stringstream ss;
                     ss << state;
+
                     throw std::runtime_error("INTERNAL ERROR, Illegal state, " + ss.str());
             }
             bundlesToStart = coreCtx->storage->GetStartOnLaunchBundles();
@@ -211,7 +225,7 @@ namespace cppmicroservices
             auto b = coreCtx->bundleRegistry.GetBundle(i);
             try
             {
-                const int32_t autostartSetting = b->barchive->GetAutostartSetting();
+                int32_t const autostartSetting = b->barchive->GetAutostartSetting();
                 // Launch must not change the autostart setting of a bundle
                 int option = Bundle::START_TRANSIENT;
                 if (Bundle::START_ACTIVATION_POLICY == autostartSetting)
@@ -290,7 +304,10 @@ namespace cppmicroservices
             {
                 StopAllBundles();
             }
-            coreCtx->Uninit0();
+            {
+                auto lock = coreCtx->SetFrameworkStateAndBlockUntilComplete(true);
+                coreCtx->Uninit0();
+            }
             {
                 auto l = Lock();
                 US_UNUSED(l);

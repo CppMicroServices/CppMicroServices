@@ -1,4 +1,6 @@
+#ifndef NOMINMAX
 #define NOMINMAX
+#endif
 
 #include <gtest/gtest.h>
 
@@ -163,15 +165,22 @@ TEST_F(LogServiceImplTests, InvalidLoggerUsage)
 {
     auto logger = GetLogger();
 
+    ASSERT_NO_THROW(logger->Log(ls::SeverityLevel::LOG_INFO, "Test invalid exception_ptr", nullptr));
+    EXPECT_TRUE(ContainsRegex(log_preamble + "Test invalid exception_ptr(\\n)" + exception_preamble + "none"));
+
     ASSERT_NO_THROW(logger->Log(static_cast<ls::SeverityLevel>(-1), "Test invalid negative severity level"));
-    EXPECT_FALSE(ContainsRegex(log_preamble + "Test invalid negative severity level"));
+    EXPECT_TRUE(ContainsRegex(log_preamble + "Test invalid negative severity level")); 
+
+    logger->Log(static_cast<ls::SeverityLevel>(-1), "Test invalid negative severity level");
+    EXPECT_TRUE(ContainsRegex("trace"));
 
     ASSERT_NO_THROW(logger->Log(static_cast<ls::SeverityLevel>(std::numeric_limits<unsigned int>::max()),
                                 "Test invalid maximum severity level"));
-    EXPECT_FALSE(ContainsRegex(log_preamble + "Test invalid maximum severity level"));
+    EXPECT_TRUE(ContainsRegex(log_preamble + "Test invalid maximum severity level"));
 
-    ASSERT_NO_THROW(logger->Log(ls::SeverityLevel::LOG_INFO, "Test invalid exception_ptr", nullptr));
-    EXPECT_TRUE(ContainsRegex(log_preamble + "Test invalid exception_ptr(\\n)" + exception_preamble + "none"));
+    logger->Log(static_cast<ls::SeverityLevel>(std::numeric_limits<unsigned int>::max()),
+                                "Test invalid maximum severity level");
+    EXPECT_TRUE(ContainsRegex("trace"));
 
     ASSERT_NO_THROW(logger->Log(cppmicroservices::ServiceReferenceU {},
                                 ls::SeverityLevel::LOG_INFO,

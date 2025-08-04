@@ -43,7 +43,7 @@ namespace cppmicroservices
     {
 
         SingletonComponentConfigurationImpl::SingletonComponentConfigurationImpl(
-            std::shared_ptr<const metadata::ComponentMetadata> metadata,
+            std::shared_ptr<metadata::ComponentMetadata const> metadata,
             Bundle const& bundle,
             std::shared_ptr<ComponentRegistry> registry,
             std::shared_ptr<cppmicroservices::logservice::LogService> logger,
@@ -180,7 +180,9 @@ namespace cppmicroservices
                               {
                                   try
                                   {
-                                      compMgr->Disable().get();
+                                      std::shared_ptr<std::atomic<bool>> asyncStarted = std::make_shared<std::atomic<bool>>(false);
+                                      auto f = compMgr->Disable(asyncStarted);
+                                      compMgr->WaitForFuture(f, asyncStarted);
                                   }
                                   catch (...)
                                   {

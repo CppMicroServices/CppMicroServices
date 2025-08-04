@@ -46,6 +46,7 @@ DEALINGS IN THE SOFTWARE.
 #include <typeinfo>
 #include <utility>
 #include <vector>
+#include <cstdint>
 
 namespace cppmicroservices
 {
@@ -112,15 +113,21 @@ namespace cppmicroservices
     class Any;
 
     US_Framework_EXPORT std::ostream& newline_and_indent(std::ostream& os,
-                                                         const uint8_t increment,
-                                                         const int32_t indent);
+                                                         uint8_t const increment,
+                                                         int32_t const indent);
     US_Framework_EXPORT std::ostream& any_value_to_string(std::ostream& os, Any const& any);
-    US_Framework_EXPORT std::ostream& any_value_to_json(std::ostream& os, Any const& val, const uint8_t, const int32_t);
+    US_Framework_EXPORT std::ostream& any_value_to_json(std::ostream& os, Any const& val, uint8_t const, int32_t const);
     US_Framework_EXPORT std::ostream& any_value_to_json(std::ostream& os,
                                                         std::string const& val,
-                                                        const uint8_t,
-                                                        const int32_t);
-    US_Framework_EXPORT std::ostream& any_value_to_json(std::ostream& os, bool val, const uint8_t, const int32_t);
+                                                        uint8_t const,
+                                                        int32_t const);
+    US_Framework_EXPORT std::ostream& any_value_to_json(std::ostream& os, bool val, uint8_t const, int32_t const);
+    US_Framework_EXPORT std::ostream& any_value_to_cpp(std::ostream& os, Any const& val, uint8_t const, int32_t const);
+    US_Framework_EXPORT std::ostream& any_value_to_cpp(std::ostream& os,
+                                                       std::string const& val,
+                                                       uint8_t const,
+                                                       int32_t const);
+    US_Framework_EXPORT std::ostream& any_value_to_cpp(std::ostream& os, bool val, uint8_t const, int32_t const);
 
     template <typename T>
     std::ostream&
@@ -131,7 +138,14 @@ namespace cppmicroservices
 
     template <typename T>
     std::ostream&
-    any_value_to_json(std::ostream& os, std::function<bool(T const&)> const&, const uint8_t, const int32_t)
+    any_value_to_json(std::ostream& os, std::function<bool(T const&)> const&, uint8_t const, int32_t const)
+    {
+        return os;
+    }
+
+    template <typename T>
+    std::ostream&
+    any_value_to_cpp(std::ostream& os, std::function<bool(T const&)> const&, uint8_t const, int32_t const)
     {
         return os;
     }
@@ -152,7 +166,14 @@ namespace cppmicroservices
 
     template <class T>
     std::ostream&
-    any_value_to_json(std::ostream& os, T const& val, const uint8_t = 0, const int32_t = 0)
+    any_value_to_json(std::ostream& os, T const& val, uint8_t const = 0, int32_t const = 0)
+    {
+        return os << val;
+    }
+
+    template <class T>
+    std::ostream&
+    any_value_to_cpp(std::ostream& os, T const& val, uint8_t const = 0, int32_t const = 0)
     {
         return os << val;
     }
@@ -165,7 +186,7 @@ namespace cppmicroservices
     container_to_string(std::ostream& os, Iterator i1, Iterator i2)
     {
         os << "[";
-        const Iterator begin = i1;
+        Iterator const begin = i1;
         for (; i1 != i2; ++i1)
         {
             if (i1 == begin)
@@ -187,7 +208,7 @@ namespace cppmicroservices
      */
     template <typename Iterator>
     std::ostream&
-    container_to_json(std::ostream& os, Iterator i1, Iterator i2, const uint8_t increment = 0, const int32_t indent = 0)
+    container_to_json(std::ostream& os, Iterator i1, Iterator i2, uint8_t const increment = 0, int32_t const indent = 0)
     {
         if (i1 == i2)
         {
@@ -196,7 +217,7 @@ namespace cppmicroservices
         }
 
         os << "[";
-        const Iterator begin = i1;
+        Iterator const begin = i1;
         for (; i1 != i2; ++i1)
         {
             if (i1 != begin)
@@ -211,6 +232,35 @@ namespace cppmicroservices
         return os;
     }
 
+    /**
+     * \internal
+     */
+    template <typename Iterator>
+    std::ostream&
+    container_to_cpp(std::ostream& os, Iterator i1, Iterator i2, uint8_t const increment = 0, int32_t const indent = 0)
+    {
+        os << "AnyVector {{";
+        if (i1 == i2)
+        {
+            os << "}}";
+            return os;
+        }
+
+        Iterator const begin = i1;
+        for (; i1 != i2; ++i1)
+        {
+            if (i1 != begin)
+            {
+                os << ",";
+            }
+            newline_and_indent(os, increment, indent);
+            any_value_to_cpp(os, *i1, increment, indent + increment);
+        }
+        newline_and_indent(os, increment, indent - increment);
+        os << "}}";
+        return os;
+    }
+
     template <class E>
     std::ostream&
     any_value_to_string(std::ostream& os, std::vector<E> const& vec)
@@ -220,9 +270,16 @@ namespace cppmicroservices
 
     template <class E>
     std::ostream&
-    any_value_to_json(std::ostream& os, std::vector<E> const& vec, const uint8_t increment, const int32_t indent)
+    any_value_to_json(std::ostream& os, std::vector<E> const& vec, uint8_t const increment, int32_t const indent)
     {
         return container_to_json(os, vec.begin(), vec.end(), increment, indent);
+    }
+
+    template <class E>
+    std::ostream&
+    any_value_to_cpp(std::ostream& os, std::vector<E> const& vec, uint8_t const increment, int32_t const indent)
+    {
+        return container_to_cpp(os, vec.begin(), vec.end(), increment, indent);
     }
 
     template <class E>
@@ -234,9 +291,16 @@ namespace cppmicroservices
 
     template <class E>
     std::ostream&
-    any_value_to_json(std::ostream& os, std::list<E> const& l, const uint8_t increment, const int32_t indent)
+    any_value_to_json(std::ostream& os, std::list<E> const& l, uint8_t const increment, int32_t const indent)
     {
         return container_to_json(os, l.begin(), l.end(), increment, indent);
+    }
+
+    template <class E>
+    std::ostream&
+    any_value_to_cpp(std::ostream& os, std::list<E> const& l, uint8_t const increment, int32_t const indent)
+    {
+        return container_to_cpp(os, l.begin(), l.end(), increment, indent);
     }
 
     template <class E>
@@ -248,9 +312,16 @@ namespace cppmicroservices
 
     template <class E>
     std::ostream&
-    any_value_to_json(std::ostream& os, std::set<E> const& s, const uint8_t increment, const int32_t indent)
+    any_value_to_json(std::ostream& os, std::set<E> const& s, uint8_t const increment, int32_t const indent)
     {
         return container_to_json(os, s.begin(), s.end(), increment, indent);
+    }
+
+    template <class E>
+    std::ostream&
+    any_value_to_cpp(std::ostream& os, std::set<E> const& s, uint8_t const increment, int32_t const indent)
+    {
+        return container_to_cpp(os, s.begin(), s.end(), increment, indent);
     }
 
     template <class M>
@@ -262,14 +333,26 @@ namespace cppmicroservices
     template <class M>
     std::ostream& any_value_to_json(std::ostream& os,
                                     std::map<M, Any> const& m,
-                                    const uint8_t increment,
-                                    const int32_t indent);
+                                    uint8_t const increment,
+                                    int32_t const indent);
 
     template <class K, class V>
     std::ostream& any_value_to_json(std::ostream& os,
                                     std::map<K, V> const& m,
-                                    const uint8_t increment,
-                                    const int32_t indent);
+                                    uint8_t const increment,
+                                    int32_t const indent);
+
+    template <class M>
+    std::ostream& any_value_to_cpp(std::ostream& os,
+                                   std::map<M, Any> const& m,
+                                   uint8_t const increment,
+                                   int32_t const indent);
+
+    template <class K, class V>
+    std::ostream& any_value_to_cpp(std::ostream& os,
+                                   std::map<K, V> const& m,
+                                   uint8_t const increment,
+                                   int32_t const indent);
 
     /**
      * \ingroup gr_any
@@ -342,7 +425,9 @@ namespace cppmicroservices
         operator==(ValueType const& val) const
         {
             if (Type() != typeid(ValueType))
+            {
                 return false;
+            }
             ValueType const& my_val = cppmicroservices::ref_any_cast<ValueType>(*this);
             return cppmicroservices::any::detail::compare(my_val, val);
         }
@@ -468,7 +553,7 @@ namespace cppmicroservices
          * @param indent    The current amount of indent to apply to the current line.
          */
         std::string
-        ToJSON(const uint8_t increment, const int32_t indent) const
+        ToJSON(uint8_t const increment, int32_t const indent) const
         {
             return Empty() ? "null" : _content->ToJSON(increment, indent);
         }
@@ -479,6 +564,20 @@ namespace cppmicroservices
             // interface directly.
             uint8_t increment = prettyPrint ? 4 : 0;
             return ToJSON(increment, increment);
+        }
+
+        std::string
+        ToCPP(uint8_t const increment, int32_t const indent) const
+        {
+            return Empty() ? "null" : _content->ToCPP(increment, indent);
+        }
+        std::string
+        ToCPP(bool prettyPrint = false) const
+        {
+            // Standard indent by 4 spaces if pretty printing. If you want something else, call the general
+            // interface directly.
+            uint8_t increment = prettyPrint ? 4 : 0;
+            return ToCPP(increment, increment);
         }
         /**
          * Returns the type information of the stored content.
@@ -499,7 +598,8 @@ namespace cppmicroservices
             virtual ~Placeholder() = default;
 
             virtual std::string ToString() const = 0;
-            virtual std::string ToJSON(const uint8_t increment = 0, const int32_t indent = 0) const = 0;
+            virtual std::string ToJSON(uint8_t const increment = 0, int32_t const indent = 0) const = 0;
+            virtual std::string ToCPP(uint8_t const increment = 0, int32_t const indent = 0) const = 0;
 
             virtual std::type_info const& Type() const = 0;
             virtual std::unique_ptr<Placeholder> Clone() const = 0;
@@ -523,10 +623,18 @@ namespace cppmicroservices
             }
 
             std::string
-            ToJSON(const uint8_t increment, const int32_t indent) const override
+            ToJSON(uint8_t const increment, int32_t const indent) const override
             {
                 std::stringstream ss;
                 any_value_to_json(ss, _held, increment, indent);
+                return ss.str();
+            }
+
+            std::string
+            ToCPP(uint8_t const increment, int32_t const indent) const override
+            {
+                std::stringstream ss;
+                any_value_to_cpp(ss, _held, increment, indent);
                 return ss.str();
             }
 
@@ -586,10 +694,14 @@ namespace cppmicroservices
         what() const noexcept override
         {
             if (_msg.empty())
+            {
                 return "cppmicroservices::BadAnyCastException: "
                        "failed conversion using cppmicroservices::any_cast";
+            }
             else
+            {
                 return _msg.c_str();
+            }
         }
 
       private:
@@ -795,14 +907,18 @@ namespace cppmicroservices
         os << "{";
         using Iterator = typename std::map<K, Any>::const_iterator;
         auto i1 = m.begin();
-        const Iterator begin = i1;
-        const Iterator end = m.end();
+        Iterator const begin = i1;
+        Iterator const end = m.end();
         for (; i1 != end; ++i1)
         {
             if (i1 == begin)
+            {
                 os << i1->first << " : " << i1->second.ToString();
+            }
             else
+            {
                 os << ", " << i1->first << " : " << i1->second.ToString();
+            }
         }
         os << "}";
         return os;
@@ -815,14 +931,18 @@ namespace cppmicroservices
         os << "{";
         using Iterator = typename std::map<K, V>::const_iterator;
         Iterator i1 = m.begin();
-        const Iterator begin = i1;
-        const Iterator end = m.end();
+        Iterator const begin = i1;
+        Iterator const end = m.end();
         for (; i1 != end; ++i1)
         {
             if (i1 == begin)
+            {
                 os << i1->first << " : " << i1->second;
+            }
             else
+            {
                 os << ", " << i1->first << " : " << i1->second;
+            }
         }
         os << "}";
         return os;
@@ -830,7 +950,7 @@ namespace cppmicroservices
 
     template <class K>
     std::ostream&
-    any_value_to_json(std::ostream& os, std::map<K, Any> const& m, const uint8_t increment, const int32_t indent)
+    any_value_to_json(std::ostream& os, std::map<K, Any> const& m, uint8_t const increment, int32_t const indent)
     {
         if (m.empty())
         {
@@ -841,8 +961,8 @@ namespace cppmicroservices
         os << "{";
         using Iterator = typename std::map<K, Any>::const_iterator;
         auto i1 = m.begin();
-        const Iterator begin = i1;
-        const Iterator end = m.end();
+        Iterator const begin = i1;
+        Iterator const end = m.end();
         for (; i1 != end; ++i1)
         {
             if (i1 != begin)
@@ -859,7 +979,7 @@ namespace cppmicroservices
 
     template <class K, class V>
     std::ostream&
-    any_value_to_json(std::ostream& os, std::map<K, V> const& m, const uint8_t increment, const int32_t indent)
+    any_value_to_json(std::ostream& os, std::map<K, V> const& m, uint8_t const increment, int32_t const indent)
     {
         if (m.empty())
         {
@@ -870,8 +990,8 @@ namespace cppmicroservices
         os << "{";
         using Iterator = typename std::map<K, V>::const_iterator;
         Iterator i1 = m.begin();
-        const Iterator begin = i1;
-        const Iterator end = m.end();
+        Iterator const begin = i1;
+        Iterator const end = m.end();
         for (; i1 != end; ++i1)
         {
             if (i1 != begin)
@@ -883,6 +1003,64 @@ namespace cppmicroservices
         }
         newline_and_indent(os, increment, (std::max)(0, indent - increment));
         os << "}";
+        return os;
+    }
+
+    template <class K>
+    std::ostream&
+    any_value_to_cpp(std::ostream& os, std::map<K, Any> const& m, uint8_t const increment, int32_t const indent)
+    {
+        os << "AnyMap { ORDERED_MAP, {";
+        if (m.empty())
+        {
+            os << "}}";
+            return os;
+        }
+
+        using Iterator = typename std::map<K, Any>::const_iterator;
+        auto i1 = m.begin();
+        Iterator const begin = i1;
+        Iterator const end = m.end();
+        for (; i1 != end; ++i1)
+        {
+            if (i1 != begin)
+            {
+                os << ", ";
+            }
+            newline_and_indent(os, increment, indent);
+            os << "{\"" << i1->first << "\" , " << i1->second.ToCPP(increment, indent + increment) << "}";
+        }
+        newline_and_indent(os, increment, indent - increment);
+        os << "}}";
+        return os;
+    }
+
+    template <class K, class V>
+    std::ostream&
+    any_value_to_cpp(std::ostream& os, std::map<K, V> const& m, uint8_t const increment, int32_t const indent)
+    {
+        os << "AnyMap { ORDERED_MAP, {";
+        if (m.empty())
+        {
+            os << "}}";
+            return os;
+        }
+
+        using Iterator = typename std::map<K, V>::const_iterator;
+        Iterator i1 = m.begin();
+        Iterator const begin = i1;
+        Iterator const end = m.end();
+        for (; i1 != end; ++i1)
+        {
+            if (i1 != begin)
+            {
+                os << ", ";
+            }
+            newline_and_indent(os, increment, indent);
+            os << "{\"" << i1->first << "\" , " << i1->second << "}";
+        }
+        newline_and_indent(os, increment, (std::max)(0, indent - increment));
+        os << "}}";
         return os;
     }
 } // namespace cppmicroservices

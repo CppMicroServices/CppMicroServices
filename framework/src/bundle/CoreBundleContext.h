@@ -56,10 +56,21 @@ as specified in the OSGi R4.2 specifications.
 
 #include <map>
 #include <ostream>
+#include <shared_mutex>
 #include <string>
 
 namespace cppmicroservices
 {
+    using WriteLock = std::unique_lock<std::shared_timed_mutex>;
+    using ReadLock = std::shared_lock<std::shared_timed_mutex>;
+
+    struct FrameworkShutdownBlocker
+    {
+        bool frameworkHasStopped;
+        ReadLock lock;
+
+        FrameworkShutdownBlocker(bool s, ReadLock l) : frameworkHasStopped(s), lock(std::move(l)) {}
+    };
 
     struct BundleStorage;
     class FrameworkPrivate;
@@ -188,6 +199,23 @@ namespace cppmicroservices
         void Uninit1();
 
         /**
+         * Called when framework shutdown/startup has begun.
+         * This blocks (while returned object is held):
+         *     - other calls to start or stop the framework
+         *     - calls to start bundles
+         */
+        WriteLock SetFrameworkStateAndBlockUntilComplete(bool desiredState);
+
+        /**
+         * Called when bundle startup is occuring
+         * This blocks (while returned object is held):
+         *    - calls to start or stop the framework
+         * And allows:
+         *    - concurrent calls for bundle startup on other bundles
+         */
+        std::unique_ptr<FrameworkShutdownBlocker> GetFrameworkStateAndBlock() const;
+
+        /**
          * Get private bundle data storage file handle.
          *
          */
@@ -196,6 +224,13 @@ namespace cppmicroservices
       private:
         // The core context is exclusively constructed by the FrameworkFactory class
         friend class FrameworkFactory;
+
+        // Mutex required to be held when changing stopped.
+        // ReadLock or WriteLock construction is done using this mutex.
+        mutable std::shared_timed_mutex stoppedLock;
+
+        // Flag for whether the Framework has been stopped. See mutex stoppedLock
+        bool stopped;
 
         /**
          * Construct a core context

@@ -4,6 +4,7 @@
 #include "cppmicroservices/servicecomponent/ComponentContext.hpp"
 #include <TestInterfaces/Interfaces.hpp>
 #include <mutex>
+#include <iostream>
 
 using ComponentContext = cppmicroservices::service::component::ComponentContext;
 
@@ -164,10 +165,40 @@ namespace sample
         std::shared_ptr<test::ServiceBInt> serviceB {};
     };
 
+    class ServiceAImpl6 : public test::ServiceAInt
+    {
+      public:
+        ServiceAImpl6(std::shared_ptr<cppmicroservices::AnyMap> const& props);
+        ServiceAImpl6() = default;
+        ServiceAImpl6(ServiceAImpl const&) = delete;
+        ServiceAImpl6(ServiceAImpl&&) = delete;
+        ServiceAImpl6& operator=(ServiceAImpl const&) = delete;
+        ServiceAImpl6& operator=(ServiceAImpl&&) = delete;
+        ~ServiceAImpl6() = default;
+
+        void
+        Modified(std::shared_ptr<ComponentContext> const&, std::shared_ptr<cppmicroservices::AnyMap> const&)
+        {
+        }
+        cppmicroservices::AnyMap
+        GetProperties() override
+        {
+            return {};
+        }
+
+        [[nodiscard]] void*
+        GetRefAddr() const override
+        {
+          return nullptr;
+        }
+    };
+
     class ServiceBImpl3 : public test::ServiceBInt
     {
       public:
-        ServiceBImpl3(std::shared_ptr<cppmicroservices::AnyMap> const&) {}
+        ServiceBImpl3(std::shared_ptr<cppmicroservices::AnyMap> const&) {
+          std::cout << "ServiceBImpl3 constructed!" << std::endl;
+        }
         ServiceBImpl3() = default;
         ServiceBImpl3(ServiceBImpl3 const&) = delete;
         ServiceBImpl3(ServiceBImpl3&&) = delete;

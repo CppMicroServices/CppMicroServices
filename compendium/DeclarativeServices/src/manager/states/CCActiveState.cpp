@@ -58,7 +58,7 @@ namespace cppmicroservices
                                             std::current_exception());
                             }
                         });
-                    std::lock_guard<std::mutex> lock(oneAtATimeMutex);
+                    std::lock_guard<std::recursive_mutex> lock(oneAtATimeMutex);
 
                     // no state change, already in active state. create and return a ComponentInstance object
                     // This could throw; a scope guard is put in place to call latch.CountDown().
@@ -144,7 +144,8 @@ namespace cppmicroservices
                                         std::current_exception());
                         }
                     });
-                std::lock_guard<std::mutex> lock(oneAtATimeMutex);
+
+                std::lock_guard<std::recursive_mutex> lock(oneAtATimeMutex);
                 // Make sure the state didn't change while we were waiting
                 auto currentState = mgr.GetState();
                 if (currentState->GetValue() != service::component::runtime::dto::ComponentState::ACTIVE)
@@ -194,7 +195,7 @@ namespace cppmicroservices
                                         std::current_exception());
                         }
                     });
-                std::lock_guard<std::mutex> lock(oneAtATimeMutex);
+                std::lock_guard<std::recursive_mutex> lock(oneAtATimeMutex);
                 // Make sure the state didn't change while we were waiting
                 auto currentState = mgr.GetState();
                 if (currentState->GetValue() != service::component::runtime::dto::ComponentState::ACTIVE)

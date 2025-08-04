@@ -49,12 +49,31 @@ ManifestParserImplV1::ParseAndGetComponentInfos(Json::Value const& scr) const
         }
 
         // inject-references
-        componentInfo.injectReferences = true;
         if (jsonComponent.isMember("inject-references"))
         {
-            auto const injectReferences
-                = JsonValueValidator(jsonComponent, "inject-references", Json::ValueType::booleanValue)();
-            componentInfo.injectReferences = injectReferences.asBool();
+            bool isBool = false;
+            try {
+                auto const injectReferences = JsonValueValidator(jsonComponent, "inject-references", Json::ValueType::booleanValue)();
+                componentInfo.setInjectReferences(injectReferences.asBool());
+                isBool = true;
+            } catch(...){
+                // do nothing
+            }
+
+            // if the object was NOT a bool, try an array
+            if (!isBool){
+                try {
+                    // conversion of value to bool failed, must be array of strings
+                    auto const injectReferences = JsonValueValidator(jsonComponent, "inject-references", Json::ValueType::arrayValue)();
+                    std::unordered_set<std::string> injectedRefNames;
+                    for (auto const& refName : injectReferences){
+                        injectedRefNames.insert(refName.asString());
+                    }
+                    componentInfo.setInjectReferences(false, injectedRefNames);
+                } catch (...){
+                    throw std::runtime_error("Invalid JSON value for the name 'inject-references'. Expected boolean or non-empty array of strings");
+                }
+            }
         }
 
         // configuration-policy and configuration-pid
@@ -188,6 +207,9 @@ ManifestParserImplV1::ParseAndGetComponentInfos(Json::Value const& scr) const
                 exceptionMessage += listOfDuplicateRefNames;
                 throw std::invalid_argument(exceptionMessage);
             }
+
+            // validate that all specified injected references correspond to named references
+            componentInfo.validateInjectedRefNames();
         }
         componentInfos.push_back(componentInfo);
     }

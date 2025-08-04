@@ -103,6 +103,80 @@ extern "C" US_ABI_EXPORT void DeleteInstance_DSSpellCheck_SpellCheckImpl(scd::Co
 
 )manifestsrc";
 
+    const std::string REF_SRC_DYN_INJ_SOME = R"manifestsrc(
+#include <vector>
+#include <cppmicroservices/ServiceInterface.h>
+#include "cppmicroservices/servicecomponent/detail/ComponentInstanceImpl.hpp"
+#include "SpellCheckerImpl.hpp"
+
+namespace sc = cppmicroservices::service::component;
+namespace scd = cppmicroservices::service::component::detail;
+
+extern "C" US_ABI_EXPORT scd::ComponentInstance* NewInstance_DSSpellCheck_SpellCheckImpl()
+{
+  std::vector<std::shared_ptr<scd::Binder<DSSpellCheck::SpellCheckImpl>>> binders;
+  binders.push_back(std::make_shared<scd::DynamicBinder<DSSpellCheck::SpellCheckImpl, DictionaryService::IDictionaryService>>("dictionary1", &DSSpellCheck::SpellCheckImpl::Binddictionary1, &DSSpellCheck::SpellCheckImpl::Unbinddictionary1));
+  scd::ComponentInstance* componentInstance = new (std::nothrow) scd::ComponentInstanceImpl<DSSpellCheck::SpellCheckImpl, std::tuple<SpellCheck::ISpellCheckService>>({{}}, binders);
+
+  return componentInstance;
+}
+
+extern "C" US_ABI_EXPORT void DeleteInstance_DSSpellCheck_SpellCheckImpl(scd::ComponentInstance* componentInstance)
+{
+  delete componentInstance;
+}
+
+)manifestsrc";
+
+    const std::string REF_SRC_STAT_INJ_SOME = R"manifestsrc(
+#include <vector>
+#include <cppmicroservices/ServiceInterface.h>
+#include "cppmicroservices/servicecomponent/detail/ComponentInstanceImpl.hpp"
+#include "SpellCheckerImpl.hpp"
+
+namespace sc = cppmicroservices::service::component;
+namespace scd = cppmicroservices::service::component::detail;
+
+extern "C" US_ABI_EXPORT scd::ComponentInstance* NewInstance_DSSpellCheck_SpellCheckImpl()
+{
+  std::vector<std::shared_ptr<scd::Binder<DSSpellCheck::SpellCheckImpl>>> binders;
+  scd::ComponentInstance* componentInstance = new (std::nothrow) scd::ComponentInstanceImpl<DSSpellCheck::SpellCheckImpl, std::tuple<SpellCheck::ISpellCheckService>, std::shared_ptr<DictionaryService::IDictionaryService>>({{"dictionary1"}}, binders);
+
+  return componentInstance;
+}
+
+extern "C" US_ABI_EXPORT void DeleteInstance_DSSpellCheck_SpellCheckImpl(scd::ComponentInstance* componentInstance)
+{
+  delete componentInstance;
+}
+
+)manifestsrc";
+
+    const std::string REF_SRC_STAT_DYN_INJ_SOME = R"manifestsrc(
+#include <vector>
+#include <cppmicroservices/ServiceInterface.h>
+#include "cppmicroservices/servicecomponent/detail/ComponentInstanceImpl.hpp"
+#include "SpellCheckerImpl.hpp"
+
+namespace sc = cppmicroservices::service::component;
+namespace scd = cppmicroservices::service::component::detail;
+
+extern "C" US_ABI_EXPORT scd::ComponentInstance* NewInstance_DSSpellCheck_SpellCheckImpl()
+{
+  std::vector<std::shared_ptr<scd::Binder<DSSpellCheck::SpellCheckImpl>>> binders;
+  binders.push_back(std::make_shared<scd::DynamicBinder<DSSpellCheck::SpellCheckImpl, DictionaryService::IDictionaryService>>("dictionary0", &DSSpellCheck::SpellCheckImpl::Binddictionary0, &DSSpellCheck::SpellCheckImpl::Unbinddictionary0));
+  scd::ComponentInstance* componentInstance = new (std::nothrow) scd::ComponentInstanceImpl<DSSpellCheck::SpellCheckImpl, std::tuple<SpellCheck::ISpellCheckService>, std::shared_ptr<DictionaryService::IDictionaryService>>({{"dictionary1"}}, binders);
+
+  return componentInstance;
+}
+
+extern "C" US_ABI_EXPORT void DeleteInstance_DSSpellCheck_SpellCheckImpl(scd::ComponentInstance* componentInstance)
+{
+  delete componentInstance;
+}
+
+)manifestsrc";
+
     const std::string REF_MULT_COMPS = R"manifestsrc(
 #include <vector>
 #include <cppmicroservices/ServiceInterface.h>

@@ -51,7 +51,10 @@
               "inject-references": {
                 "default": false,
                 "id": "/properties/scr/properties/components/items/properties/inject-references",
-                "type": "boolean"
+                "oneOf": [
+                  { "type": "boolean", "default": false },
+                  { "type": "array" }
+                ]
               },
               "name": {
                 "id": "/properties/scr/properties/components/items/properties/name",

@@ -109,6 +109,34 @@ class TestBundleEventHook : public BundleEventHook
     }
 };
 
+class TestBundleBothHook : public BundleFindHook,
+                           public BundleEventHook
+{
+  public:
+    void
+    Find(BundleContext const&, ShrinkableVector<Bundle>& bundles) override
+    {
+        std::cout << "FIND INVOKED" << std::endl;
+        for (auto i = bundles.begin(); i != bundles.end();)
+        {
+            std::cout << "bundle found " << i->GetSymbolicName() << std::endl;
+            ++i;
+        }
+        findCount++;
+    }
+
+    void
+    Event(BundleEvent const& event, ShrinkableVector<BundleContext>& /*contexts*/) override
+    {
+        std::cout << "EVENT INVOKED" << std::endl;
+        std::cout << event.GetType() << std::endl;
+        eventCount++;
+    }
+    
+    size_t findCount{0};
+    size_t eventCount{0};
+};
+
 class TestBundleEventHookFailure : public BundleEventHook
 {
   public:
@@ -195,6 +223,31 @@ TEST_F(BundleHooksTest, TestFindHookBasic)
     bundleA.Stop();
 }
 
+// ensure that a hook can implement both a find and event hook
+TEST_F(BundleHooksTest, TestBothHookBundleInstall)
+{
+    auto hook = std::make_shared<TestBundleBothHook>();
+    auto findHookReg
+        = framework.GetBundleContext().RegisterService<BundleFindHook,BundleEventHook>(hook);    
+
+    // install to get diff bundleContext than framework
+    auto bundleB = cppmicroservices::testing::InstallLib(framework.GetBundleContext(), "TestBundleB");
+    ASSERT_TRUE(bundleB);
+    bundleB.Start();
+
+    Bundle bundleA = cppmicroservices::testing::InstallLib(bundleB.GetBundleContext(), "TestBundleA");
+    cppmicroservices::testing::InstallLib(bundleB.GetBundleContext(), "TestBundleA");
+    ASSERT_TRUE(bundleA);
+    bundleA.Start();
+
+    findHookReg.Unregister();
+
+    bundleA.Stop();
+    bundleB.Stop();
+    ASSERT_EQ(hook->findCount, 1);
+    ASSERT_EQ(hook->eventCount, 9);
+}
+
 TEST_F(BundleHooksTest, TestFindHookBundleInstall)
 {
     // install to get diff bundleContext than framework
@@ -231,6 +284,7 @@ TEST_F(BundleHooksTest, TestFindHookBundleInstall)
     bundleA.Stop();
     bundleB.Stop();
 }
+
 
 
 TEST_F(BundleHooksTest, TestEventHook)

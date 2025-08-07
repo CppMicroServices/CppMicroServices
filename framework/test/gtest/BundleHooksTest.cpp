@@ -114,13 +114,13 @@ class TestBundleBothHook : public BundleFindHook,
 {
   public:
     void
-    Find(BundleContext const&, ShrinkableVector<Bundle>& bundles) override
+    Find(BundleContext const&, ShrinkableVector<Bundle>& /**/) override
     {
         findCount++;
     }
 
     void
-    Event(BundleEvent const& event, ShrinkableVector<BundleContext>& /*contexts*/) override
+    Event(BundleEvent const& /**/, ShrinkableVector<BundleContext>& /*contexts*/) override
     {
         eventCount++;
     }

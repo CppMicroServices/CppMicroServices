@@ -116,20 +116,12 @@ class TestBundleBothHook : public BundleFindHook,
     void
     Find(BundleContext const&, ShrinkableVector<Bundle>& bundles) override
     {
-        std::cout << "FIND INVOKED" << std::endl;
-        for (auto i = bundles.begin(); i != bundles.end();)
-        {
-            std::cout << "bundle found " << i->GetSymbolicName() << std::endl;
-            ++i;
-        }
         findCount++;
     }
 
     void
     Event(BundleEvent const& event, ShrinkableVector<BundleContext>& /*contexts*/) override
     {
-        std::cout << "EVENT INVOKED" << std::endl;
-        std::cout << event.GetType() << std::endl;
         eventCount++;
     }
     

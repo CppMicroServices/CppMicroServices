@@ -140,7 +140,6 @@ namespace cppmicroservices
 
                 std::shared_ptr<BundleEventHook> eh = std::static_pointer_cast<BundleEventHook>(
                     sr.d.Load()->GetService(GetPrivate(GetBundleContext().GetBundle()).get()));
-
                 if (eh)
                 {
                     try

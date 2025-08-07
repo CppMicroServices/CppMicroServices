@@ -100,7 +100,24 @@ namespace cppmicroservices
             }
         }
 
-        using ServiceReferenceBase::operator=;
+        using ServiceReferenceBase::operator=; // for the nullptr overload
+
+        ServiceReference& operator=(ServiceReferenceBase const& reference) {
+            ServiceReferenceBase::operator=(reference);
+            std::string const interfaceId(us_service_interface_iid<S>());
+            if (GetInterfaceId() != interfaceId)
+            {
+                if (this->IsConvertibleTo(interfaceId))
+                {
+                    this->SetInterfaceId(interfaceId);
+                }
+                else
+                {
+                    this->operator=(nullptr);
+                }
+            }
+            return *this;
+        }
 
         using ServiceReferenceBase::operator==;
 

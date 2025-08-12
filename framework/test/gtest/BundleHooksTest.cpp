@@ -109,6 +109,26 @@ class TestBundleEventHook : public BundleEventHook
     }
 };
 
+class TestBundleBothHook : public BundleFindHook,
+                           public BundleEventHook
+{
+  public:
+    void
+    Find(BundleContext const&, ShrinkableVector<Bundle>& /**/) override
+    {
+        findCount++;
+    }
+
+    void
+    Event(BundleEvent const& /**/, ShrinkableVector<BundleContext>& /*contexts*/) override
+    {
+        eventCount++;
+    }
+    
+    size_t findCount{0};
+    size_t eventCount{0};
+};
+
 class TestBundleEventHookFailure : public BundleEventHook
 {
   public:
@@ -195,6 +215,36 @@ TEST_F(BundleHooksTest, TestFindHookBasic)
     bundleA.Stop();
 }
 
+// ensure that a hook can implement both a find and event hook
+TEST_F(BundleHooksTest, TestBothHookBundleInstall)
+{
+    auto hook = std::make_shared<TestBundleBothHook>();
+    auto findHookReg
+        = framework.GetBundleContext().RegisterService<BundleFindHook,BundleEventHook>(hook);    
+
+    // install to get diff bundleContext than framework
+    auto bundleB = cppmicroservices::testing::InstallLib(framework.GetBundleContext(), "TestBundleB");
+    ASSERT_TRUE(bundleB);
+    bundleB.Start();
+
+    Bundle bundleA = cppmicroservices::testing::InstallLib(bundleB.GetBundleContext(), "TestBundleA");
+    cppmicroservices::testing::InstallLib(bundleB.GetBundleContext(), "TestBundleA");
+    ASSERT_TRUE(bundleA);
+    bundleA.Start();
+
+    findHookReg.Unregister();
+
+    bundleA.Stop();
+    bundleB.Stop();
+#if defined(US_BUILD_SHARED_LIBS)
+    ASSERT_EQ(hook->findCount, 1);
+    ASSERT_EQ(hook->eventCount, 9);
+#else
+    ASSERT_EQ(hook->findCount, 2);
+    ASSERT_EQ(hook->eventCount, 6);
+#endif
+}
+
 TEST_F(BundleHooksTest, TestFindHookBundleInstall)
 {
     // install to get diff bundleContext than framework
@@ -231,7 +281,6 @@ TEST_F(BundleHooksTest, TestFindHookBundleInstall)
     bundleA.Stop();
     bundleB.Stop();
 }
-
 
 TEST_F(BundleHooksTest, TestEventHook)
 {

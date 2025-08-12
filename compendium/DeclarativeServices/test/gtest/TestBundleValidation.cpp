@@ -165,9 +165,9 @@ TEST(TestBundleValidation, BundleValidationFailure)
     ASSERT_NO_THROW(bundleIter->Start());
     compDesc = dsRuntimeService->GetComponentDescriptionDTO(*bundleIter, "sample::ServiceComponentBV1_3");
     ASSERT_TRUE(dsRuntimeService->IsComponentEnabled(compDesc));
-    svcRef = f.GetBundleContext().GetServiceReference<test::Interface1>();
-    ASSERT_TRUE(svcRef);
-    ASSERT_THROW(auto svcObj = f.GetBundleContext().GetService(svcRef), cppmicroservices::SecurityException);
+    auto svcRefInt1 = f.GetBundleContext().GetServiceReference<test::Interface1>();
+    ASSERT_TRUE(svcRefInt1);
+    ASSERT_THROW(auto svcObj = f.GetBundleContext().GetService(svcRefInt1), cppmicroservices::SecurityException);
     ASSERT_FALSE(dsRuntimeService->IsComponentEnabled(compDesc));
 
     // test starting a delayed activation ds component with a required configuration policy
@@ -202,9 +202,9 @@ TEST(TestBundleValidation, BundleValidationFailure)
     auto updateIfDifferentFuture = config->UpdateIfDifferent(configObj);
     ASSERT_NO_THROW(updateIfDifferentFuture.second.get());
 
-    svcRef = f.GetBundleContext().GetServiceReference<test::CAInterface>();
-    ASSERT_TRUE(svcRef);
-    ASSERT_THROW(auto svcObj = f.GetBundleContext().GetService(svcRef), cppmicroservices::SecurityException);
+    auto svcRefCAInt = f.GetBundleContext().GetServiceReference<test::CAInterface>();
+    ASSERT_TRUE(svcRefCAInt);
+    ASSERT_THROW(auto svcObj = f.GetBundleContext().GetService(svcRefCAInt), cppmicroservices::SecurityException);
 
     compDesc = dsRuntimeService->GetComponentDescriptionDTO(*bundleIter, "sample::ServiceComponentBV1_4");
     ASSERT_FALSE(dsRuntimeService->IsComponentEnabled(compDesc));
@@ -228,9 +228,9 @@ TEST(TestBundleValidation, BundleValidationFailure)
     configObj["foo"] = std::string("baz");
     ASSERT_THROW(config->UpdateIfDifferent(configObj).second.get(), cppmicroservices::SecurityException);
 
-    svcRef = f.GetBundleContext().GetServiceReference<test::CAInterface>();
-    ASSERT_TRUE(svcRef);
-    ASSERT_THROW(auto svcObj = f.GetBundleContext().GetService(svcRef), cppmicroservices::SecurityException);
+    svcRefCAInt = f.GetBundleContext().GetServiceReference<test::CAInterface>();
+    ASSERT_TRUE(svcRefCAInt);
+    ASSERT_THROW(auto svcObj = f.GetBundleContext().GetService(svcRefCAInt), cppmicroservices::SecurityException);
 
     compDesc = dsRuntimeService->GetComponentDescriptionDTO(*bundleIter, "sample::ServiceComponentBV1_5");
     ASSERT_FALSE(dsRuntimeService->IsComponentEnabled(compDesc));

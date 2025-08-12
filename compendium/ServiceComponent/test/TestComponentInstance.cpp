@@ -812,13 +812,13 @@ namespace
         EXPECT_THROW(compInstance.InvokeUnbindMethod("dep1", s), std::out_of_range);
         EXPECT_THROW(compInstance.InvokeBindMethod("dep1", s), std::out_of_range);
 
-        sRef = fc.GetServiceReference<ServiceDependency2>();
-        auto s2 = fc.GetService<ServiceDependency2>(sRef);
+        auto sRef2 = fc.GetServiceReference<ServiceDependency2>();
+        auto s2 = fc.GetService<ServiceDependency2>(sRef2);
         EXPECT_THROW(compInstance.InvokeUnbindMethod("dep2", s2), std::out_of_range);
         EXPECT_THROW(compInstance.InvokeBindMethod("dep2", s2), std::out_of_range);
 
-        sRef = fc.GetServiceReference<ServiceDependency3>();
-        auto s3 = fc.GetService<ServiceDependency3>(sRef);
+        auto sRef3 = fc.GetServiceReference<ServiceDependency3>();
+        auto s3 = fc.GetService<ServiceDependency3>(sRef3);
         EXPECT_NO_THROW(compInstance.InvokeUnbindMethod("dep3", s3));
         ASSERT_EQ(compObj->GetDep3().size(), 0);
         EXPECT_NO_THROW(compInstance.InvokeBindMethod("dep3", s3));

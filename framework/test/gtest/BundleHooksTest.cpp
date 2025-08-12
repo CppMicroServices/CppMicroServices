@@ -282,8 +282,6 @@ TEST_F(BundleHooksTest, TestFindHookBundleInstall)
     bundleB.Stop();
 }
 
-
-
 TEST_F(BundleHooksTest, TestEventHook)
 {
     TestBundleListener bundleListener;

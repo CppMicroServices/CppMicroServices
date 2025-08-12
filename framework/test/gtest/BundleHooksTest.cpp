@@ -236,8 +236,13 @@ TEST_F(BundleHooksTest, TestBothHookBundleInstall)
 
     bundleA.Stop();
     bundleB.Stop();
+#if defined(US_BUILD_SHARED_LIBS)
     ASSERT_EQ(hook->findCount, 1);
     ASSERT_EQ(hook->eventCount, 9);
+#else
+    ASSERT_EQ(hook->findCount, 2);
+    ASSERT_EQ(hook->eventCount, 6);
+#endif
 }
 
 TEST_F(BundleHooksTest, TestFindHookBundleInstall)

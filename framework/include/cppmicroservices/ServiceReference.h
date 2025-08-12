@@ -102,7 +102,13 @@ namespace cppmicroservices
 
         using ServiceReferenceBase::operator=;
 
+#if __cplusplus >= 202002L
+	bool operator==(ServiceReference const& reference) const {
+		return ServiceReferenceBase::operator==(reference);
+	}
+#else
         using ServiceReferenceBase::operator==;
+#endif
 
         using ServiceReferenceBase::Hash;
     };
@@ -133,7 +139,13 @@ namespace cppmicroservices
 
         using ServiceReferenceBase::operator=;
 
+#if __cplusplus >= 202002L
+	bool operator==(ServiceReference const& reference) const {
+		return ServiceReferenceBase::operator==(reference);
+	}
+#else
         using ServiceReferenceBase::operator==;
+#endif
 
         using ServiceReferenceBase::Hash;
 

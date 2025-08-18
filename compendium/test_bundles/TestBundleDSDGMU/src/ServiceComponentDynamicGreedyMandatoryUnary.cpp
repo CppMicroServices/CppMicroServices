@@ -36,7 +36,7 @@ namespace sample
     void
     ServiceComponentDynamicGreedyMandatoryUnary::Bindfoo(std::shared_ptr<test::Interface1> const& theFoo)
     {
-        std::cout << "BIND1" << std::endl;
+        std::cout << "BIND1 " << theFoo.get() << std::endl;
         std::lock_guard<std::mutex> lock(fooMutex);
         if (foo != theFoo)
         {

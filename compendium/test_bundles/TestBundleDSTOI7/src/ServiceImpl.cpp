@@ -34,7 +34,7 @@ namespace sample
     void
     ServiceComponent7::Bindfoo(std::shared_ptr<test::Interface1> const& theFoo)
     {
-        std::cout << "BIND4" << std::endl;
+        std::cout << "BIND4 " << theFoo.get() << std::endl;
         if (foo != theFoo)
         {
             foo = theFoo;

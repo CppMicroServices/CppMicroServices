@@ -35,7 +35,7 @@ namespace sample
     void
     ServiceComponentDynamicReluctantMandatoryUnary::Bindfoo(std::shared_ptr<test::Interface1> const& theFoo)
     {
-        std::cout << "BIND2" << std::endl;
+        std::cout << "BIND2 " << theFoo.get() << std::endl;
         std::lock_guard<std::mutex> lock(fooMutex);
         if (foo != theFoo)
         {

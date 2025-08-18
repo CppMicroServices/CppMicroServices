@@ -57,6 +57,13 @@ namespace test
         virtual ~Interface3();
     };
 
+      class US_TestInterfaces_EXPORT Interface4
+    {
+      public:
+        virtual bool isBound() = 0;
+        virtual ~Interface4();
+    };
+
     class US_TestInterfaces_EXPORT TestManagedServiceInterface
     {
       public:

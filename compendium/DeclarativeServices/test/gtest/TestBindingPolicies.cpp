@@ -1313,9 +1313,10 @@ namespace cppmicroservices
                                                                             { Constants::SERVICE_RANKING, Any(1) }
                 }));
 
-                auto depSvcReg2 = bc.RegisterService<dummy::Reference1>(std::make_shared<dummy::Reference1>(),
-                                                                        ServiceProperties({
-                                                                            { Constants::SERVICE_RANKING, Any(100) }
+                auto depSvcReg2
+                    = bc.RegisterService<dummy::Reference1>(std::make_shared<dummy::Reference1>(),
+                                                            ServiceProperties({
+                                                                { Constants::SERVICE_RANKING, Any(100) }
                 }));
 
                 depSvcReg.Unregister();
@@ -1327,6 +1328,28 @@ namespace cppmicroservices
             auto results = ConcurrentInvoke(func);
             EXPECT_TRUE(!results.empty());
             EXPECT_TRUE(std::all_of(results.cbegin(), results.cend(), [](bool result) { return result; }));
+        }
+
+        // test that concurrent service registrations and unregistrations with multiple cardinality
+        // do not cause crashes
+        TEST_F(BindingPolicyTest, TestMultipleServiceSameReferenceReceiveBind)
+        {
+            auto bc = GetFramework().GetBundleContext();
+            test::InstallAndStartDS(bc);
+
+            test::InstallAndStartBundle(bc, "TestBundleDSTOI7");
+            test::InstallAndStartBundle(bc, "TestBundleDSTOI5");
+            test::InstallAndStartBundle(bc, "TestBundleDSDRMU");
+            test::InstallAndStartBundle(bc, "TestBundleDSDGMU");
+            EXPECT_FALSE(bc.GetServiceReference<test::Interface2>())
+                << "Service must not be available before it's dependency";
+            auto depSvcReg = bc.RegisterService<test::Interface1>(std::make_shared<test::InterfaceImpl>("Interface1"));
+            auto allRefs = bc.GetServiceReferences<test::Interface4>();
+            EXPECT_EQ(allRefs.size(), 4);
+            for (auto const & r : allRefs){
+                auto s = bc.GetService<test::Interface4>(r);
+                EXPECT_TRUE(s->isBound());
+            }
         }
 
     } // namespace scrimpl

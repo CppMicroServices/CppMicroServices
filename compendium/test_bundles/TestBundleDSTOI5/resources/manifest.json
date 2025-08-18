@@ -8,7 +8,8 @@
                 "implementation-class": "sample::ServiceComponent5",
                 "service": {
                     "interfaces": [
-                        "test::Interface2"
+                        "test::Interface2",
+                        "test::Interface4"
                     ]
                 },
                 "references": [

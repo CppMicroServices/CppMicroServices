@@ -27,9 +27,14 @@ namespace sample
         return result;
     }
 
+    bool ServiceComponent5::isBound(){
+        return foo != nullptr;
+    }
+
     void
     ServiceComponent5::Bindfoo(std::shared_ptr<test::Interface1> const& theFoo)
     {
+        std::cout << "BIND3" << std::endl;
         if (foo != theFoo)
         {
             foo = theFoo;

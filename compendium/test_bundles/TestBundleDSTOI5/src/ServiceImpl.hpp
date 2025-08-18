@@ -8,11 +8,13 @@ using ComponentContext = cppmicroservices::service::component::ComponentContext;
 
 namespace sample
 {
-    class ServiceComponent5 : public test::Interface2
+    class ServiceComponent5 : public test::Interface2, public test::Interface4
     {
       public:
         ServiceComponent5() = default;
         std::string ExtendedDescription() override;
+        virtual bool isBound() override;
+
         void Activate(std::shared_ptr<ComponentContext> const&);
         void Deactivate(std::shared_ptr<ComponentContext> const&);
         ~ServiceComponent5() = default;

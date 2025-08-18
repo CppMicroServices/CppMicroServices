@@ -11,13 +11,13 @@ using ComponentContext = cppmicroservices::service::component::ComponentContext;
 namespace sample
 {
 
-    class ServiceComponentDynamicReluctantMandatoryUnary final : public test::Interface2
+    class ServiceComponentDynamicReluctantMandatoryUnary final : public test::Interface2, public test::Interface4
     {
       public:
         ServiceComponentDynamicReluctantMandatoryUnary() = default;
         ~ServiceComponentDynamicReluctantMandatoryUnary() = default;
         std::string ExtendedDescription() override;
-
+        bool isBound() override;
         void Activate(std::shared_ptr<ComponentContext> const&);
         void Deactivate(std::shared_ptr<ComponentContext> const&);
 

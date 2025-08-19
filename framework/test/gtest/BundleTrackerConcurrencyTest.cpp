@@ -146,6 +146,9 @@ TEST_F(BundleTrackerConcurrencyTest, TestOpeningTrackerWhileBundlesChange)
                          cppmicroservices::testing::InstallLib(framework.GetBundleContext(), "TestBundleR").Start();
                      });
 
+    // must return the bundle to make sure it is tracked, otherwise we can get duplicate 'addingbundle' calls
+    ON_CALL(*customizer, AddingBundle(::testing::_, ::testing::_))
+        .WillByDefault([](const Bundle& bundle, const BundleEvent&) { return bundle; });
     EXPECT_CALL(*customizer, AddingBundle).Times(7);
     gate.set_value();
 

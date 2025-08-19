@@ -21,6 +21,7 @@
   =============================================================================*/
 
 #include "ReferenceManagerImpl.hpp"
+#include "cppmicroservices/Constants.h"
 
 namespace cppmicroservices
 {
@@ -54,8 +55,14 @@ namespace cppmicroservices
                 // is optional and there are no bound refs.
                 if (0 == mgr.GetBoundReferences().size())
                 {
+                    std::cerr << "========================================= "
+                              << mgr.configName_
+                              << "("
+                              << mgr.metadata_.props.at("COMP_ID")
+                              << ") has BIND for reference "
+                              << mgr.metadata_.name
+                              << std::endl;
                     Log("Notify BIND for reference " + mgr.metadata_.name);
-
                     ClearBoundRefs();
                     mgr.UpdateBoundRefs();
 

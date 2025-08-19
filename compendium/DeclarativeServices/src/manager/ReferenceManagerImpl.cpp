@@ -64,11 +64,13 @@ namespace cppmicroservices
             metadata::ReferenceMetadata const& metadata,
             cppmicroservices::BundleContext const& bc,
             std::shared_ptr<cppmicroservices::logservice::LogService> logger,
-            std::string const& configName)
+            std::string const& configName,
+            std::string const* comp_id)
             : ReferenceManagerBaseImpl(metadata,
                                        bc,
                                        logger,
                                        configName,
+                                       comp_id,
                                        CreateBindingPolicy(*this, metadata.policy, metadata.policyOption))
         {
         }
@@ -78,11 +80,13 @@ namespace cppmicroservices
             cppmicroservices::BundleContext const& bc,
             std::shared_ptr<cppmicroservices::logservice::LogService> logger,
             std::string const& configName,
+            std::string const& comp_id,
             std::unique_ptr<BindingPolicy> policy)
             : metadata_(metadata)
             , tracker(nullptr)
             , logger_(std::move(logger))
             , configName_(configName)
+            , component_id(comp_id)
             , bindingPolicy(std::move(policy))
         {
             if (!bc || !logger_)
@@ -190,6 +194,7 @@ namespace cppmicroservices
             //
             // ASSUMPTION: If there is no component configuration name then its assumed this service was not registered
             // by DS and could not satisfy itself since it is not managed by DS.
+            std::cerr << "======================================= configName_ = " << configName_ << std::endl;
             auto const compConfigName = reference.GetProperty(COMPONENT_NAME);
             if ((true == compConfigName.Empty()) || (configName_ != compConfigName.ToStringNoExcept()))
             {

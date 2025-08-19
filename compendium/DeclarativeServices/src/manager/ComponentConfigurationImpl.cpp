@@ -84,7 +84,9 @@ namespace cppmicroservices
             }
             for (auto const& refMetadata : this->metadata->refsMetadata)
             {
-
+                std::cerr << "================================================================== implClassName = "
+                          << (!this->metadata->implClassName.empty() ? this->metadata->implClassName : "(no implClassName)")
+                          << std::endl;
                 auto refManager = std::make_shared<ReferenceManagerImpl>(refMetadata,
                                                                          bundle.GetBundleContext(),
                                                                          this->logger,

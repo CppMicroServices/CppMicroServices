@@ -55,14 +55,7 @@ namespace cppmicroservices
                 // is optional and there are no bound refs.
                 if (0 == mgr.GetBoundReferences().size())
                 {
-                    std::cerr << "========================================= "
-                              << mgr.configName_
-                              << "("
-                              << mgr.metadata_.props.at("COMP_ID")
-                              << ") has BIND for reference "
-                              << mgr.metadata_.name
-                              << std::endl;
-                    Log("Notify BIND for reference " + mgr.metadata_.name);
+                    Log(mgr.configName_ + " has BIND for reference " + mgr.metadata_.name);
                     ClearBoundRefs();
                     mgr.UpdateBoundRefs();
 
@@ -89,7 +82,7 @@ namespace cppmicroservices
 
             if (notifySatisfied)
             {
-                Log("Notify SATISFIED for reference " + mgr.metadata_.name);
+                Log(mgr.configName_ + " has been SATISFIED for reference " + mgr.metadata_.name);
                 notifications.emplace_back(mgr.metadata_.name, RefEvent::BECAME_SATISFIED);
             }
             mgr.BatchNotifyAllListeners(notifications);

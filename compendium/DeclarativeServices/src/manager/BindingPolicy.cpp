@@ -109,17 +109,17 @@ namespace cppmicroservices
                         if (!boundRefsHandle->empty() && mgr.IsUnary())
                         {
                             svcRefToBind = *(boundRefsHandle->begin());
-                            Log("Notify BIND for reference " + mgr.metadata_.name);
+                            Log(mgr.configName_ + " has BIND for reference " + mgr.metadata_.name);
                         }
                     }
 
-                    Log("Notify UNBIND for reference " + mgr.metadata_.name);
+                    Log(mgr.configName_ + " has UNBIND for reference " + mgr.metadata_.name);
                     notifications.emplace_back(mgr.metadata_.name, RefEvent::REBIND, svcRefToBind, reference);
                 }
 
                 if (!mgr.IsSatisfied())
                 {
-                    Log("Notify UNSATISFIED for reference " + mgr.metadata_.name);
+                    Log(mgr.configName_ + " has been UNSATISFIED for reference " + mgr.metadata_.name);
                     notifications.emplace_back(mgr.metadata_.name, RefEvent::BECAME_UNSATISFIED);
                 }
 

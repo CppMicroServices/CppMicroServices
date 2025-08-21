@@ -92,7 +92,7 @@ namespace cppmicroservices
             std::vector<RefChangeNotification> notifications;
             if (replacementNeeded)
             {
-                Log("Notify UNSATISFIED for reference " + mgr.metadata_.name);
+                Log(mgr.configName_ + " has been UNSATISFIED for reference " + mgr.metadata_.name);
                 notifications.emplace_back(mgr.metadata_.name, RefEvent::BECAME_UNSATISFIED, reference);
                 // The following "clear and copy" strategy is sufficient for
                 // updating the boundRefs for static binding policy
@@ -104,7 +104,7 @@ namespace cppmicroservices
             }
             if (notifySatisfied)
             {
-                Log("Notify SATISFIED for reference " + mgr.metadata_.name);
+                Log(mgr.configName_ + " has been SATISFIED for reference " + mgr.metadata_.name);
                 notifications.emplace_back(mgr.metadata_.name, RefEvent::BECAME_SATISFIED, reference);
             }
             mgr.BatchNotifyAllListeners(notifications);

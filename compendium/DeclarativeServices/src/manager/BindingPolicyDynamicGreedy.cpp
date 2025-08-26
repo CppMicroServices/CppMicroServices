@@ -102,7 +102,7 @@ namespace cppmicroservices
 
             if (notifySatisfied)
             {
-                Log("Notify SATISFIED for reference " + mgr.metadata_.name);
+                Log(mgr.configName_ + " has been SATISFIED for reference " + mgr.metadata_.name);
                 notifications.emplace_back(mgr.metadata_.name, RefEvent::BECAME_SATISFIED);
             }
             mgr.BatchNotifyAllListeners(notifications);

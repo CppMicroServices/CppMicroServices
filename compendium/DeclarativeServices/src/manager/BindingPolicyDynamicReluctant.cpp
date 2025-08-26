@@ -21,6 +21,7 @@
   =============================================================================*/
 
 #include "ReferenceManagerImpl.hpp"
+#include "cppmicroservices/Constants.h"
 
 namespace cppmicroservices
 {
@@ -54,8 +55,7 @@ namespace cppmicroservices
                 // is optional and there are no bound refs.
                 if (0 == mgr.GetBoundReferences().size())
                 {
-                    Log("Notify BIND for reference " + mgr.metadata_.name);
-
+                    Log(mgr.configName_ + " has BIND for reference " + mgr.metadata_.name);
                     ClearBoundRefs();
                     mgr.UpdateBoundRefs();
 
@@ -82,7 +82,7 @@ namespace cppmicroservices
 
             if (notifySatisfied)
             {
-                Log("Notify SATISFIED for reference " + mgr.metadata_.name);
+                Log(mgr.configName_ + " has been SATISFIED for reference " + mgr.metadata_.name);
                 notifications.emplace_back(mgr.metadata_.name, RefEvent::BECAME_SATISFIED);
             }
             mgr.BatchNotifyAllListeners(notifications);

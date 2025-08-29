@@ -23,6 +23,10 @@
 #ifndef CPPMICROSERVICES_THREADS_H
 #define CPPMICROSERVICES_THREADS_H
 
+#if defined(__cplusplus) && __cplusplus >= 202002L
+#define _SILENCE_CXX20_OLD_SHARED_PTR_ATOMIC_SUPPORT_DEPRECATION_WARNING
+#endif
+
 #include "cppmicroservices/FrameworkConfig.h"
 
 #include <atomic>

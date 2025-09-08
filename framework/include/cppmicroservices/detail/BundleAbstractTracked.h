@@ -29,6 +29,7 @@
 
 #include <atomic>
 #include <optional>
+#include <unordered_set>
 #include <vector>
 
 namespace cppmicroservices
@@ -268,6 +269,12 @@ namespace cppmicroservices
              * @GuardedBy this
              */
             TrackingMap tracked;
+
+            /**
+             * set of objects that have seen an invocation of TrackAdding, including whether the customizer decided to
+             * track the object or not
+             */
+            std::unordered_set<S> previouslyAdded;
 
             /**
              * Modification count. This field is initialized to zero and incremented by

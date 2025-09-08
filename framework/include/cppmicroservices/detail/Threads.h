@@ -23,10 +23,6 @@
 #ifndef CPPMICROSERVICES_THREADS_H
 #define CPPMICROSERVICES_THREADS_H
 
-#if defined(__cplusplus) && __cplusplus >= 202002L
-#define _SILENCE_CXX20_OLD_SHARED_PTR_ATOMIC_SUPPORT_DEPRECATION_WARNING
-#endif
-
 #include "cppmicroservices/FrameworkConfig.h"
 
 #include <atomic>
@@ -236,13 +232,16 @@ namespace cppmicroservices
             }
         };
 
-#if !defined(__GNUC__) || __GNUC__ > 4
-        // The std::atomic_load() et.al. overloads for std::shared_ptr are only available
-        // in libstdc++ since GCC 5.0. Visual Studio 2013 has it, but the Clang version
-        // is unknown so far.
 
-        // Specialize cppmicroservices::Atomic for std::shared_ptr to use the standard library atomic
-        // functions:
+// Check for C++17 atomic shared_ptr support
+#if defined(__cpp_lib_atomic_shared_ptr) && __cpp_lib_atomic_shared_ptr >= 201711L
+        template <typename T>
+        class Atomic<std::shared_ptr<T>> : public std::atomic<std::shared_ptr<T>>
+        {
+        public:
+            using std::atomic<std::shared_ptr<T>>::atomic; // inherit constructors
+        };
+#else
         template <class T>
         class Atomic<std::shared_ptr<T>>
         {

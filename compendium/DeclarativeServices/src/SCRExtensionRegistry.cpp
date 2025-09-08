@@ -21,60 +21,57 @@
   =============================================================================*/
 #include "SCRExtensionRegistry.hpp"
 
-namespace cppmicroservices
+namespace cppmicroservices::scrimpl
 {
-    namespace scrimpl
+    SCRExtensionRegistry::SCRExtensionRegistry(std::shared_ptr<cppmicroservices::logservice::LogService> logger)
+        : logger(std::move(logger))
     {
-        SCRExtensionRegistry::SCRExtensionRegistry(std::shared_ptr<cppmicroservices::logservice::LogService> logger)
-            : logger(std::move(logger))
+        if (!(this->logger))
         {
-            if (!(this->logger))
-            {
-                throw std::invalid_argument(" SCRExtensionRegistry Constructor "
-                                            "provided with invalid arguments");
-            }
+            throw std::invalid_argument(" SCRExtensionRegistry Constructor "
+                                        "provided with invalid arguments");
         }
+    }
 
-        std::shared_ptr<SCRBundleExtension>
-        SCRExtensionRegistry::Find(long bundleId) noexcept
+    std::shared_ptr<SCRBundleExtension>
+    SCRExtensionRegistry::Find(long bundleId) noexcept
+    {
+        std::lock_guard<std::mutex> l(extensionRegMutex);
+        if (auto const& it = extensionRegistry.find(bundleId); it != extensionRegistry.end())
         {
-            std::lock_guard<std::mutex> l(extensionRegMutex);
-            if (auto const& it = extensionRegistry.find(bundleId); it != extensionRegistry.end())
-            {
-                return it->second;
-            }
-            return nullptr;
+            return it->second;
         }
+        return nullptr;
+    }
 
-        void
-        SCRExtensionRegistry::Add(long bundleId, std::shared_ptr<SCRBundleExtension> extension)
+    void
+    SCRExtensionRegistry::Add(long bundleId, std::shared_ptr<SCRBundleExtension> extension)
+    {
+        if (!extension)
         {
-            if (!extension)
-            {
-                throw std::invalid_argument("SCRExtensionRegistry::Add invalid extension");
-            }
-            std::lock_guard<std::mutex> l(extensionRegMutex);
-            if (extensionRegistry.find(bundleId) == extensionRegistry.end())
-            {
-                extensionRegistry.insert(std::make_pair(bundleId, std::move(extension)));
-            }
+            throw std::invalid_argument("SCRExtensionRegistry::Add invalid extension");
         }
+        std::lock_guard<std::mutex> l(extensionRegMutex);
+        if (extensionRegistry.find(bundleId) == extensionRegistry.end())
+        {
+            extensionRegistry.insert(std::make_pair(bundleId, std::move(extension)));
+        }
+    }
 
-        void
-        SCRExtensionRegistry::Remove(long bundleId)
-        {
-            std::unique_lock<std::mutex> l(extensionRegMutex);
-            auto removedEntry = extensionRegistry.extract(bundleId);
-            l.unlock(); // don't hold lock while destructing removedEntry;
-        }
+    void
+    SCRExtensionRegistry::Remove(long bundleId)
+    {
+        std::unique_lock<std::mutex> l(extensionRegMutex);
+        auto removedEntry = extensionRegistry.extract(bundleId);
+        l.unlock(); // don't hold lock while destructing removedEntry;
+    }
 
-        void
-        SCRExtensionRegistry::Clear()
-        {
-            std::unique_lock<std::mutex> l(extensionRegMutex);
-            decltype(extensionRegistry) extensionRegistryToClear;
-            std::swap(extensionRegistry, extensionRegistryToClear);
-            l.unlock(); // don't hold lock while destructing extensionRegistryToClear.
-        }
-    } // namespace scrimpl
-} // namespace cppmicroservices
+    void
+    SCRExtensionRegistry::Clear()
+    {
+        std::unique_lock<std::mutex> l(extensionRegMutex);
+        decltype(extensionRegistry) extensionRegistryToClear;
+        std::swap(extensionRegistry, extensionRegistryToClear);
+        l.unlock(); // don't hold lock while destructing extensionRegistryToClear.
+    }
+} // namespace cppmicroservices::scrimpl

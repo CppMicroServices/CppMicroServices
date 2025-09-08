@@ -78,7 +78,11 @@ namespace cppmicroservices
         return *this ? (rhs ? (d < rhs.d) : true) : false;
     }
 
-    BundleContext::operator bool() const { return d && d->IsValid(); }
+    BundleContext::
+    operator bool() const
+    {
+        return d && d->IsValid();
+    }
 
     BundleContext&
     BundleContext::operator=(std::nullptr_t)
@@ -141,7 +145,11 @@ namespace cppmicroservices
         d->CheckValid();
         auto b = GetAndCheckBundlePrivate(d);
 
-        return b->coreCtx->bundleHooks.FilterBundle(*this, MakeBundle(b->coreCtx->bundleRegistry.GetBundle(id)));
+        // if the requesting bundle is NOT the system bundle, filter
+        if (b->id != 0){
+            return b->coreCtx->bundleHooks.FilterBundle(*this, MakeBundle(b->coreCtx->bundleRegistry.GetBundle(id)));
+        }
+        return MakeBundle(b->coreCtx->bundleRegistry.GetBundle(id));
     }
 
     std::vector<Bundle>
@@ -179,7 +187,10 @@ namespace cppmicroservices
         {
             bus.emplace_back(MakeBundle(bu));
         }
-        b->coreCtx->bundleHooks.FilterBundles(*this, bus);
+        // if the requesting bundle is NOT the system bundle, filter
+        if (b->id != 0){
+            b->coreCtx->bundleHooks.FilterBundles(*this, bus);
+        }
         return bus;
     }
 
@@ -243,7 +254,6 @@ namespace cppmicroservices
 
         d->CheckValid();
         auto b = GetAndCheckBundlePrivate(d);
-
         auto serviceHolder = new ServiceHolder<void>(b, reference, reference.d.Load()->GetService(b.get()), nullptr);
         std::shared_ptr<ServiceHolder<void>> h(serviceHolder, CustomServiceDeleter { serviceHolder });
         return std::shared_ptr<void>(h, h->service.get());

@@ -1,0 +1,18 @@
+{
+    "bundle.symbolic_name": "TestBundleDSUpstreamDependencyC",
+    "bundle.name": "TestBundleDSUpstreamDependencyC",
+    "scr": {
+        "version": 1,
+        "components": [
+            {
+                "implementation-class": "dependent::TestBundleDSUpstreamDependencyIsActivatedImpl",
+                "service": {
+                    "scope": "prototype",
+                    "interfaces": [
+                        "test::TestBundleDSUpstreamDependencyIsActivated"
+                    ]
+                }
+            }
+        ]
+    }
+}

@@ -86,6 +86,34 @@
                 }
             },
             {
+                "name": "ServiceAImpl6_Non_factory",
+                "enabled" : true,
+                "immediate": true,
+                "implementation-class": "sample::ServiceAImpl6",
+                "inject-references" : false,
+                "references":[{
+                    "name": "ServiceB",
+                    "interface" : "test::ServiceBInt",
+                    "target": "(key1=true)"
+                }],
+                "service": {
+                    "interfaces": ["test::ServiceAInt"]
+                }
+            },
+            {
+                "name": "serviceB_different_config",
+                "enabled" : true,
+                "immediate": true,
+                "implementation-class": "sample::ServiceBImpl3",
+                "configuration-policy" : "require",
+                "factory" : "ServiceB3 Factory2",
+                "configuration-pid" : ["sharedConfiguration1"],
+                "service": {
+                    "interfaces": ["test::ServiceBInt"],
+                    "scope" : "singleton"
+                }
+            },
+            {
                 "enabled" : true,
                 "immediate": true,
                 "implementation-class": "sample::ServiceBImpl3",

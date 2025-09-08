@@ -1,4 +1,0 @@
-HttpServletResponse
--------------------
-
-.. doxygenclass:: cppmicroservices::HttpServletResponse

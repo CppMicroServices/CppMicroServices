@@ -88,7 +88,7 @@ namespace cppmicroservices
           protected:
             // Mutex to make sure that one operation (Activate, Rebind, Modified) completes before another
             // operation begins.
-            mutable std::mutex oneAtATimeMutex;
+            mutable std::recursive_mutex oneAtATimeMutex;
 
           private:
             std::shared_future<void> ready;

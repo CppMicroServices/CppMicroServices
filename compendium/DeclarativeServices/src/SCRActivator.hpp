@@ -35,6 +35,7 @@
 #include "manager/ConfigurationNotifier.hpp"
 #include <map>
 #include <vector>
+#include <shared_mutex>
 
 using cppmicroservices::service::component::runtime::ServiceComponentRuntime;
 
@@ -42,6 +43,8 @@ namespace cppmicroservices
 {
     namespace scrimpl
     {
+        using WriteLock = std::unique_lock<std::shared_mutex>;
+        using ReadLock = std::shared_lock<std::shared_mutex>;
 
         class SCRActivator : public cppmicroservices::BundleActivator
         {
@@ -78,7 +81,11 @@ namespace cppmicroservices
             cppmicroservices::ServiceRegistration<ServiceComponentRuntime> scrServiceReg;
             std::shared_ptr<ComponentRegistry> componentRegistry;
             std::shared_ptr<SCRLogger> logger;
+
+            std::shared_ptr<std::shared_mutex> notificationLock;
+            std::shared_ptr<bool> activatorStopped;
             std::shared_ptr<SCRExtensionRegistry> bundleRegistry;
+
             ListenerToken bundleListenerToken;
             std::shared_ptr<SCRAsyncWorkService> asyncWorkService;
             cppmicroservices::ServiceRegistration<cppmicroservices::service::cm::ConfigurationListener>

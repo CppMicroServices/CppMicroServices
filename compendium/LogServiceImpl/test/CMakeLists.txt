@@ -33,6 +33,11 @@ if (US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG)
   endif()
 endif()
 
+if(MINGW)
+  # silence dangling references warning due to false positives
+  add_compile_options(-Wno-dangling-reference)
+endif()
+
 if(MSVC)
   add_compile_definitions(GTEST_HAS_STD_TUPLE_=1)
   add_compile_definitions(GTEST_HAS_TR1_TUPLE=0)

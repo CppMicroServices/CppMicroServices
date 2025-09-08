@@ -21,12 +21,12 @@
   =============================================================================*/
 
 #include "SingletonComponentConfiguration.hpp"
-#include "SingleInvokeTask.hpp"
 #include "../ComponentRegistry.hpp"
 #include "ComponentManager.hpp"
 #include "ReferenceManager.hpp"
 #include "ReferenceManagerImpl.hpp"
 #include "RegistrationManager.hpp"
+#include "SingleInvokeTask.hpp"
 #include "cppmicroservices/SecurityException.h"
 #include "cppmicroservices/SharedLibraryException.h"
 #include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
@@ -215,7 +215,8 @@ namespace cppmicroservices
         SingletonComponentConfigurationImpl::BindReference(std::string const& refName, ServiceReferenceBase const& ref)
         {
             auto context = GetComponentContext();
-            if (!context->AddToBoundServicesCache(refName, ref))
+            auto svcToBind = context->AddToBoundServicesCache(refName, ref);
+            if (!svcToBind)
             {
                 GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
                                  "Failure while adding reference " + refName + " to the bound services cache.");
@@ -223,7 +224,7 @@ namespace cppmicroservices
             }
             try
             {
-                GetComponentInstance()->InvokeBindMethod(refName, ref);
+                GetComponentInstance()->InvokeBindMethod(refName, svcToBind);
             }
             catch (std::exception const&)
             {
@@ -239,9 +240,11 @@ namespace cppmicroservices
         SingletonComponentConfigurationImpl::UnbindReference(std::string const& refName,
                                                              ServiceReferenceBase const& ref)
         {
+            auto context = GetComponentContext();
             try
             {
-                GetComponentInstance()->InvokeUnbindMethod(refName, ref);
+                auto svcToUnbind = context->LocateService(refName, ref);
+                GetComponentInstance()->InvokeUnbindMethod(refName, svcToUnbind);
             }
             catch (std::exception const&)
             {
@@ -251,7 +254,6 @@ namespace cppmicroservices
                                      + refName + ".",
                                  std::current_exception());
             }
-            auto context = GetComponentContext();
             context->RemoveFromBoundServicesCache(refName, ref);
         }
 

@@ -108,7 +108,7 @@ namespace codegen
 
                 for (auto const& ref : componentInfo.references)
                 {
-                    if (componentInfo.injectReferences && ref.policy == "dynamic")
+                    if (componentInfo.injectRef(ref.name) && ref.policy == "dynamic")
                     {
                         mStrStream << "  binders.push_back("
                                    << util::Substitute(

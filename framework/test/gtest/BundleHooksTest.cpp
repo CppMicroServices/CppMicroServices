@@ -109,6 +109,26 @@ class TestBundleEventHook : public BundleEventHook
     }
 };
 
+class TestBundleBothHook : public BundleFindHook,
+                           public BundleEventHook
+{
+  public:
+    void
+    Find(BundleContext const&, ShrinkableVector<Bundle>& /**/) override
+    {
+        findCount++;
+    }
+
+    void
+    Event(BundleEvent const& /**/, ShrinkableVector<BundleContext>& /*contexts*/) override
+    {
+        eventCount++;
+    }
+    
+    size_t findCount{0};
+    size_t eventCount{0};
+};
+
 class TestBundleEventHookFailure : public BundleEventHook
 {
   public:
@@ -143,7 +163,7 @@ class BundleHooksTest : public ::testing::Test
     }
 };
 
-TEST_F(BundleHooksTest, TestFindHook)
+TEST_F(BundleHooksTest, TestFindHookBasic)
 {
     auto bundleA = cppmicroservices::testing::InstallLib(framework.GetBundleContext(), "TestBundleA");
     ASSERT_TRUE(bundleA);
@@ -161,22 +181,105 @@ TEST_F(BundleHooksTest, TestFindHook)
 
     // Test for non-filtered GetBundle(long) result
     ASSERT_TRUE(framework.GetBundleContext().GetBundle(bundleAId));
+    ASSERT_TRUE(bundleA.GetBundleContext().GetBundle(bundleAId));
 
     auto findHookReg
         = framework.GetBundleContext().RegisterService<BundleFindHook>(std::make_shared<TestBundleFindHook>());
 
     // Test for filtered GetBundle(long) result
-    ASSERT_FALSE(framework.GetBundleContext().GetBundle(bundleAId));
+    ASSERT_TRUE(framework.GetBundleContext().GetBundle(bundleAId)); // framework context should NEVER filter
+    ASSERT_FALSE(bundleA.GetBundleContext().GetBundle(bundleAId));
 
     auto bundles = framework.GetBundleContext().GetBundles();
+    bool foundBundle = false;
     for (auto const& i : bundles)
     {
-        ASSERT_NE(i.GetSymbolicName(), "TestBundleA");
+        if(i.GetSymbolicName() == "TestBundleA"){
+            foundBundle = true;
+        }
     }
+    ASSERT_TRUE(foundBundle);
+
+    bundles = bundleA.GetBundleContext().GetBundles();
+    foundBundle = false;
+    for (auto const& i : bundles)
+    {
+        if(i.GetSymbolicName() == "TestBundleA"){
+            foundBundle = true;
+        }
+    }
+    ASSERT_FALSE(foundBundle);
 
     findHookReg.Unregister();
 
     bundleA.Stop();
+}
+
+// ensure that a hook can implement both a find and event hook
+TEST_F(BundleHooksTest, TestBothHookBundleInstall)
+{
+    auto hook = std::make_shared<TestBundleBothHook>();
+    auto findHookReg
+        = framework.GetBundleContext().RegisterService<BundleFindHook,BundleEventHook>(hook);    
+
+    // install to get diff bundleContext than framework
+    auto bundleB = cppmicroservices::testing::InstallLib(framework.GetBundleContext(), "TestBundleB");
+    ASSERT_TRUE(bundleB);
+    bundleB.Start();
+
+    Bundle bundleA = cppmicroservices::testing::InstallLib(bundleB.GetBundleContext(), "TestBundleA");
+    cppmicroservices::testing::InstallLib(bundleB.GetBundleContext(), "TestBundleA");
+    ASSERT_TRUE(bundleA);
+    bundleA.Start();
+
+    findHookReg.Unregister();
+
+    bundleA.Stop();
+    bundleB.Stop();
+#if defined(US_BUILD_SHARED_LIBS)
+    ASSERT_EQ(hook->findCount, 1);
+    ASSERT_EQ(hook->eventCount, 9);
+#else
+    ASSERT_EQ(hook->findCount, 2);
+    ASSERT_EQ(hook->eventCount, 6);
+#endif
+}
+
+TEST_F(BundleHooksTest, TestFindHookBundleInstall)
+{
+    // install to get diff bundleContext than framework
+    auto bundleB = cppmicroservices::testing::InstallLib(framework.GetBundleContext(), "TestBundleB");
+    ASSERT_TRUE(bundleB);
+    bundleB.Start();
+
+    auto findHookReg
+        = framework.GetBundleContext().RegisterService<BundleFindHook>(std::make_shared<TestBundleFindHook>());
+    Bundle bundleA;
+    
+    // if NOT building shared_libs
+        // install just invokes getBundles which will filter always
+        // because it invoked getBundles, nothing is thrown... that only happens on an actual instal
+#if defined(US_BUILD_SHARED_LIBS)
+    // on first installation, the bundle will not exist and therefore will be installed regardless of hooks
+    bundleA = cppmicroservices::testing::InstallLib(bundleB.GetBundleContext(), "TestBundleA");
+    ASSERT_TRUE(bundleA);
+    ASSERT_EQ(bundleA.GetSymbolicName(), "TestBundleA");
+
+
+    // now that it exists, if installed with non-system bundle it will fail
+    ASSERT_THROW(cppmicroservices::testing::InstallLib(bundleB.GetBundleContext(), "TestBundleA"), std::runtime_error);
+#endif
+    // if installed with system, it should still succeed because no filtering
+    bundleA = cppmicroservices::testing::InstallLib(framework.GetBundleContext(), "TestBundleA");
+    ASSERT_TRUE(bundleA);
+    ASSERT_EQ(bundleA.GetSymbolicName(), "TestBundleA");
+
+    bundleA.Start();
+
+    findHookReg.Unregister();
+
+    bundleA.Stop();
+    bundleB.Stop();
 }
 
 TEST_F(BundleHooksTest, TestEventHook)
@@ -262,6 +365,10 @@ TEST_F(BundleHooksTest, TestEventHookFailure)
 
 TEST_F(BundleHooksTest, TestFindHookFailure)
 {
+    auto bundleB = cppmicroservices::testing::InstallLib(framework.GetBundleContext(), "TestBundleB");
+    ASSERT_TRUE(bundleB);
+    bundleB.Start();
+
     auto eventHookReg
         = framework.GetBundleContext().RegisterService<BundleFindHook>(std::make_shared<TestBundleFindHookFailure>());
 
@@ -269,11 +376,11 @@ TEST_F(BundleHooksTest, TestFindHookFailure)
     auto fwkListenerToken = framework.GetBundleContext().AddFrameworkListener(
         std::bind(&TestFrameworkListener::Event, &listener, std::placeholders::_1));
 
-    auto bundleA = cppmicroservices::testing::InstallLib(framework.GetBundleContext(), "TestBundleA");
+    auto bundleA = cppmicroservices::testing::InstallLib(bundleB.GetBundleContext(), "TestBundleA");
     ASSERT_TRUE(bundleA);
     bundleA.Start();
 
-    framework.GetBundleContext().GetBundle(bundleA.GetBundleId());
+    bundleB.GetBundleContext().GetBundle(bundleA.GetBundleId());
 
     // bundle starting and bundle started events
     // Test for expected number of framework events
@@ -297,6 +404,7 @@ TEST_F(BundleHooksTest, TestFindHookFailure)
                   });
 
     bundleA.Stop();
+    bundleB.Stop();
     eventHookReg.Unregister();
     framework.GetBundleContext().RemoveListener(std::move(fwkListenerToken));
 }

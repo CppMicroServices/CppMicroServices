@@ -8,11 +8,9 @@ macro(_us_create_test_bundle_helper)
   set_property(TARGET ${name}
                APPEND PROPERTY COMPILE_DEFINITIONS US_BUNDLE_NAME=${_bundle_symbolic_name})
   set_property(TARGET ${name} PROPERTY US_BUNDLE_NAME ${_bundle_symbolic_name})
-  # Clear a possible debug postfix
-  if(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
-    get_property(_compile_flags TARGET ${name} PROPERTY COMPILE_FLAGS)
-    set_property(TARGET ${name} PROPERTY COMPILE_FLAGS "${_compile_flags} -fPIC")
-  endif()
+
+  get_property(_compile_flags TARGET ${name} PROPERTY COMPILE_FLAGS)
+  set_property(TARGET ${name} PROPERTY COMPILE_FLAGS "${_compile_flags} -fPIC")
 
   target_include_directories(${name}
     PRIVATE $<TARGET_PROPERTY:util,INCLUDE_DIRECTORIES>

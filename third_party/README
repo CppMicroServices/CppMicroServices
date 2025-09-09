@@ -66,24 +66,6 @@ Patches
  * Disable Windows warnings C4244 and C4267.
  * Do not use dllexport/dllimport specs on Windows
 
-Linenoise
----------
-
-BSD license
-
-https://github.com/msteveb/linenoise
-0f2343d2bc763b735b6242b5831be611703965a1
-
-This is a fork of the original antirez/linenoise project
-which contains Windows support and a few additional features.
-
-Patches
-
- * Don't depend on utf8.h because it is not supported
-   on Windows.
- * Disable Windows warnings C4244 and C4267.
- * Do not define snprintf for MSC_VER 1900 or higher
-
 The Lean Mean C++ Option Parser
 -------------------------------
 
@@ -96,31 +78,6 @@ Patches
 
  * Added virtual destructors
  * Converted old-style casts to C++ casts
-
-Civetweb
---------
-
-MIT License
-
-https://github.com/civetweb/civetweb
-1.8
-
-Patches
-
- * Use system function clock_gettime on Mac OS X 10.12 and above
-
-Mustache
---------
-
-See webconsole/include/cppmicroservices/webconsole/mustache.hpp for license information.
-
-https://github.com/kainjow/Mustache/releases
-2.0
-
-Patches
-
- * Support GCC 4.6
-
 
 Google Test and Google Mock
 ----------------------------
@@ -149,10 +106,10 @@ https://github.com/google/benchmark
 spdlog
 ------
 
-See https://github.com/gabime/spdlog/blob/v1.x/LICENSE for license information
+See https://github.com/gabime/spdlog/blob/v1.15.2/LICENSE for license information
 
 https://github.com/gabime/spdlog
-v1.12.0
+v1.15.2
 
 * We only use the include folder since we aren't statically linking to the library
 * version reflects the version from which we copied the include folder

@@ -45,4 +45,8 @@ namespace sample
     {
     }
 
+    ServiceAImpl6::ServiceAImpl6(std::shared_ptr<cppmicroservices::AnyMap> const&)
+    {
+    }
+
 } // namespace sample

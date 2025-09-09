@@ -37,251 +37,245 @@ using cppmicroservices::service::component::runtime::dto::ReferenceDTO;
 using std::chrono::steady_clock;
 using std::chrono::system_clock;
 
-namespace cppmicroservices
+namespace cppmicroservices::scrimpl
 {
-    namespace scrimpl
+    /**
+     * Utility Methods used in ServiceComponentRuntimeImpl
+     */
+    time_t
+    steady_clock_to_time_t(steady_clock::time_point t)
     {
-        /**
-         * Utility Methods used in ServiceComponentRuntimeImpl
-         */
-        time_t
-        steady_clock_to_time_t(steady_clock::time_point t)
-        {
-            return system_clock::to_time_t(
-                system_clock::now() + std::chrono::duration_cast<system_clock::duration>(t - steady_clock::now()));
-        }
+        return system_clock::to_time_t(system_clock::now()
+                                       + std::chrono::duration_cast<system_clock::duration>(t - steady_clock::now()));
+    }
 
-        BundleDTO
-        ToDTO(cppmicroservices::Bundle const& bundle)
-        {
-            BundleDTO bundleDTO = {};
-            bundleDTO.id = bundle.GetBundleId();
-            bundleDTO.symbolicName = bundle.GetSymbolicName();
-            bundleDTO.lastModified = static_cast<unsigned long>(steady_clock_to_time_t(bundle.GetLastModified()));
-            bundleDTO.state = bundle.GetState();
-            bundleDTO.version = bundle.GetVersion().ToString();
-            return bundleDTO;
-        }
+    BundleDTO
+    ToDTO(cppmicroservices::Bundle const& bundle)
+    {
+        BundleDTO bundleDTO = {};
+        bundleDTO.id = bundle.GetBundleId();
+        bundleDTO.symbolicName = bundle.GetSymbolicName();
+        bundleDTO.lastModified = static_cast<unsigned long>(steady_clock_to_time_t(bundle.GetLastModified()));
+        bundleDTO.state = bundle.GetState();
+        bundleDTO.version = bundle.GetVersion().ToString();
+        return bundleDTO;
+    }
 
-        ServiceReferenceDTO
-        ToDTO(cppmicroservices::ServiceReferenceBase const& sRef)
+    ServiceReferenceDTO
+    ToDTO(cppmicroservices::ServiceReferenceBase const& sRef)
+    {
+        ServiceReferenceDTO refDTO = {};
+        refDTO.id = cppmicroservices::any_cast<long>(sRef.GetProperty(cppmicroservices::Constants::SERVICE_ID));
+        refDTO.bundle = sRef ? sRef.GetBundle().GetBundleId() : 0;
+        std::vector<std::string> keys;
+        sRef.GetPropertyKeys(keys);
+        for (auto& key : keys)
         {
-            ServiceReferenceDTO refDTO = {};
-            refDTO.id = cppmicroservices::any_cast<long>(sRef.GetProperty(cppmicroservices::Constants::SERVICE_ID));
-            refDTO.bundle = sRef ? sRef.GetBundle().GetBundleId() : 0;
-            std::vector<std::string> keys;
-            sRef.GetPropertyKeys(keys);
-            for (auto& key : keys)
+            cppmicroservices::Any val = sRef.GetProperty(key);
+            refDTO.properties.insert(std::make_pair(key, val));
+        }
+        std::vector<cppmicroservices::Bundle> bundles = sRef.GetUsingBundles();
+        for (auto& bundle : bundles)
+        {
+            if (bundle)
             {
-                cppmicroservices::Any val = sRef.GetProperty(key);
-                refDTO.properties.insert(std::make_pair(key, val));
+                refDTO.usingBundles.push_back(bundle.GetBundleId());
             }
-            std::vector<cppmicroservices::Bundle> bundles = sRef.GetUsingBundles();
+        }
+        return refDTO;
+    }
+
+    ReferenceDTO
+    ToDTO(ReferenceMetadata const& refData)
+    {
+        ReferenceDTO refDTO = {};
+        refDTO.cardinality = refData.cardinality;
+        refDTO.interfaceName = refData.interfaceName;
+        refDTO.name = refData.name;
+        refDTO.policy = refData.policy;
+        refDTO.policyOption = refData.policyOption;
+        refDTO.scope = refData.scope;
+        refDTO.target = refData.target;
+        return refDTO;
+    }
+
+    ServiceComponentRuntimeImpl::ServiceComponentRuntimeImpl(
+        cppmicroservices::BundleContext context,
+        std::shared_ptr<ComponentRegistry> componentRegistry,
+        std::shared_ptr<cppmicroservices::logservice::LogService> logger)
+        : scrContext(std::move(context))
+        , registry(std::move(componentRegistry))
+        , logger(std::move(logger))
+    {
+        if (!scrContext || !registry || !(this->logger))
+        {
+            throw std::invalid_argument("ServiceComponentRuntimeImpl Constructor "
+                                        "provided with invalid arguments");
+        }
+    }
+
+    std::vector<ComponentDescriptionDTO>
+    ServiceComponentRuntimeImpl::GetComponentDescriptionDTOs(std::vector<cppmicroservices::Bundle> const& bundles) const
+    {
+        std::vector<std::shared_ptr<ComponentManager>> compMgrs;
+        if (bundles.empty())
+        {
+            compMgrs = registry->GetComponentManagers();
+        }
+        else
+        {
             for (auto& bundle : bundles)
             {
-                if (bundle)
-                {
-                    refDTO.usingBundles.push_back(bundle.GetBundleId());
-                }
-            }
-            return refDTO;
-        }
-
-        ReferenceDTO
-        ToDTO(ReferenceMetadata const& refData)
-        {
-            ReferenceDTO refDTO = {};
-            refDTO.cardinality = refData.cardinality;
-            refDTO.interfaceName = refData.interfaceName;
-            refDTO.name = refData.name;
-            refDTO.policy = refData.policy;
-            refDTO.policyOption = refData.policyOption;
-            refDTO.scope = refData.scope;
-            refDTO.target = refData.target;
-            return refDTO;
-        }
-
-        ServiceComponentRuntimeImpl::ServiceComponentRuntimeImpl(
-            cppmicroservices::BundleContext context,
-            std::shared_ptr<ComponentRegistry> componentRegistry,
-            std::shared_ptr<cppmicroservices::logservice::LogService> logger)
-            : scrContext(std::move(context))
-            , registry(std::move(componentRegistry))
-            , logger(std::move(logger))
-        {
-            if (!scrContext || !registry || !(this->logger))
-            {
-                throw std::invalid_argument("ServiceComponentRuntimeImpl Constructor "
-                                            "provided with invalid arguments");
+                auto managersInBundle = registry->GetComponentManagers(bundle.GetBundleId());
+                compMgrs.insert(std::end(compMgrs), std::begin(managersInBundle), std::end(managersInBundle));
             }
         }
-
-        std::vector<ComponentDescriptionDTO>
-        ServiceComponentRuntimeImpl::GetComponentDescriptionDTOs(
-            std::vector<cppmicroservices::Bundle> const& bundles) const
+        std::vector<ComponentDescriptionDTO> componentDTOs;
+        for (auto holder : compMgrs)
         {
-            std::vector<std::shared_ptr<ComponentManager>> compMgrs;
-            if (bundles.empty())
+            componentDTOs.push_back(CreateDTO(holder));
+        }
+        return componentDTOs;
+    }
+
+    ComponentDescriptionDTO
+    ServiceComponentRuntimeImpl::GetComponentDescriptionDTO(cppmicroservices::Bundle const& bundle,
+                                                            std::string const& name) const
+    {
+        ComponentDescriptionDTO compDTO = {};
+        try
+        {
+            std::shared_ptr<ComponentManager> manager = registry->GetComponentManager(bundle.GetBundleId(), name);
+            compDTO = CreateDTO(manager);
+        }
+        catch (std::exception const&)
+        {
+            logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
+                        "Exception: ",
+                        std::current_exception());
+        }
+        return compDTO;
+    }
+
+    std::vector<ComponentConfigurationDTO>
+    ServiceComponentRuntimeImpl::GetComponentConfigurationDTOs(ComponentDescriptionDTO const& description) const
+    {
+        std::vector<ComponentConfigurationDTO> compConfigDTOs;
+        std::shared_ptr<ComponentManager> manager
+            = registry->GetComponentManager(description.bundle.id, description.name);
+        if (manager)
+        {
+            std::vector<std::shared_ptr<ComponentConfiguration>> configs = manager->GetComponentConfigurations();
+            for (auto& aConfig : configs)
             {
-                compMgrs = registry->GetComponentManagers();
+                auto compConfigDTO = CreateComponentConfigurationDTO(aConfig);
+                compConfigDTO.description = CreateDTO(manager);
+                compConfigDTOs.push_back(compConfigDTO);
+            }
+        }
+        return compConfigDTOs;
+    }
+
+    bool
+    ServiceComponentRuntimeImpl::IsComponentEnabled(ComponentDescriptionDTO const& description) const
+    {
+        std::shared_ptr<ComponentManager> mgr = registry->GetComponentManager(description.bundle.id, description.name);
+        return mgr ? mgr->IsEnabled() : false;
+    }
+
+    std::shared_future<void>
+    ServiceComponentRuntimeImpl::EnableComponent(ComponentDescriptionDTO const& description)
+    {
+        std::shared_ptr<ComponentManager> holder
+            = registry->GetComponentManager(description.bundle.id, description.name);
+        return holder->Enable();
+    }
+
+    std::shared_future<void>
+    ServiceComponentRuntimeImpl::DisableComponent(ComponentDescriptionDTO const& description)
+    {
+        std::shared_ptr<ComponentManager> holder
+            = registry->GetComponentManager(description.bundle.id, description.name);
+        return holder->Disable();
+    }
+
+    ComponentDescriptionDTO
+    ServiceComponentRuntimeImpl::CreateDTO(std::shared_ptr<ComponentManager> const& compManager) const
+    {
+        ComponentDescriptionDTO compDescription = {};
+        auto compMetadata = compManager->GetMetadata();
+        if (compMetadata)
+        {
+            compDescription.name = compMetadata->name;
+            auto bundleId = compManager->GetBundleId();
+            compDescription.bundle = ToDTO(scrContext.GetBundle(bundleId));
+            compDescription.immediate = compMetadata->immediate;
+            compDescription.activate = compMetadata->activateMethodName;
+            compDescription.deactivate = compMetadata->deactivateMethodName;
+            compDescription.modified = compMetadata->modifiedMethodName;
+            auto serviceData = compMetadata->serviceMetadata;
+            compDescription.scope = serviceData.scope;
+            compDescription.serviceInterfaces = serviceData.interfaces;
+            compDescription.implementationClass = compMetadata->implClassName;
+            compDescription.defaultEnabled = compMetadata->enabled;
+            compDescription.properties = compMetadata->properties;
+            for (auto oneRef : compMetadata->refsMetadata)
+            {
+                compDescription.references.push_back(ToDTO(oneRef));
+            }
+        }
+        return compDescription;
+    }
+
+    ComponentConfigurationDTO
+    ServiceComponentRuntimeImpl::CreateComponentConfigurationDTO(
+        std::shared_ptr<ComponentConfiguration> const& config) const
+    {
+        ComponentConfigurationDTO configDTO = {};
+        configDTO.id = config->GetId();
+        configDTO.properties = config->GetProperties();
+        configDTO.state = config->GetConfigState();
+        auto refManagers = config->GetAllDependencyManagers();
+        for (auto& refManager : refManagers)
+        {
+            if (refManager->IsSatisfied())
+            {
+                configDTO.satisfiedReferences.push_back(CreateSatisfiedReferenceDTO(refManager));
             }
             else
             {
-                for (auto& bundle : bundles)
-                {
-                    auto managersInBundle = registry->GetComponentManagers(bundle.GetBundleId());
-                    compMgrs.insert(std::end(compMgrs), std::begin(managersInBundle), std::end(managersInBundle));
-                }
+                configDTO.unsatisfiedReferences.push_back(CreateUnsatisfiedReferenceDTO(refManager));
             }
-            std::vector<ComponentDescriptionDTO> componentDTOs;
-            for (auto holder : compMgrs)
-            {
-                componentDTOs.push_back(CreateDTO(holder));
-            }
-            return componentDTOs;
         }
+        return configDTO;
+    }
 
-        ComponentDescriptionDTO
-        ServiceComponentRuntimeImpl::GetComponentDescriptionDTO(cppmicroservices::Bundle const& bundle,
-                                                                std::string const& name) const
+    SatisfiedReferenceDTO
+    ServiceComponentRuntimeImpl::CreateSatisfiedReferenceDTO(std::shared_ptr<ReferenceManager> const& refManager) const
+    {
+        SatisfiedReferenceDTO refDTO = {};
+        refDTO.name = refManager->GetReferenceName();
+        refDTO.target = refManager->GetLDAPString();
+        auto sRefs = refManager->GetBoundReferences();
+        for (auto& sRef : sRefs)
         {
-            ComponentDescriptionDTO compDTO = {};
-            try
-            {
-                std::shared_ptr<ComponentManager> manager = registry->GetComponentManager(bundle.GetBundleId(), name);
-                compDTO = CreateDTO(manager);
-            }
-            catch (std::exception const&)
-            {
-                logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
-                            "Exception: ",
-                            std::current_exception());
-            }
-            return compDTO;
+            refDTO.boundServices.push_back(ToDTO(sRef));
         }
+        return refDTO;
+    }
 
-        std::vector<ComponentConfigurationDTO>
-        ServiceComponentRuntimeImpl::GetComponentConfigurationDTOs(ComponentDescriptionDTO const& description) const
+    UnsatisfiedReferenceDTO
+    ServiceComponentRuntimeImpl::CreateUnsatisfiedReferenceDTO(
+        std::shared_ptr<ReferenceManager> const& refManager) const
+    {
+        UnsatisfiedReferenceDTO refDTO = {};
+        refDTO.name = refManager->GetReferenceName();
+        refDTO.target = refManager->GetLDAPString();
+        auto sRefs = refManager->GetTargetReferences();
+        for (auto& sRef : sRefs)
         {
-            std::vector<ComponentConfigurationDTO> compConfigDTOs;
-            std::shared_ptr<ComponentManager> manager
-                = registry->GetComponentManager(description.bundle.id, description.name);
-            if (manager)
-            {
-                std::vector<std::shared_ptr<ComponentConfiguration>> configs = manager->GetComponentConfigurations();
-                for (auto& aConfig : configs)
-                {
-                    auto compConfigDTO = CreateComponentConfigurationDTO(aConfig);
-                    compConfigDTO.description = CreateDTO(manager);
-                    compConfigDTOs.push_back(compConfigDTO);
-                }
-            }
-            return compConfigDTOs;
+            refDTO.targetServices.push_back(ToDTO(sRef));
         }
-
-        bool
-        ServiceComponentRuntimeImpl::IsComponentEnabled(ComponentDescriptionDTO const& description) const
-        {
-            std::shared_ptr<ComponentManager> mgr
-                = registry->GetComponentManager(description.bundle.id, description.name);
-            return mgr ? mgr->IsEnabled() : false;
-        }
-
-        std::shared_future<void>
-        ServiceComponentRuntimeImpl::EnableComponent(ComponentDescriptionDTO const& description)
-        {
-            std::shared_ptr<ComponentManager> holder
-                = registry->GetComponentManager(description.bundle.id, description.name);
-            return holder->Enable();
-        }
-
-        std::shared_future<void>
-        ServiceComponentRuntimeImpl::DisableComponent(ComponentDescriptionDTO const& description)
-        {
-            std::shared_ptr<ComponentManager> holder
-                = registry->GetComponentManager(description.bundle.id, description.name);
-            return holder->Disable();
-        }
-
-        ComponentDescriptionDTO
-        ServiceComponentRuntimeImpl::CreateDTO(std::shared_ptr<ComponentManager> const& compManager) const
-        {
-            ComponentDescriptionDTO compDescription = {};
-            auto compMetadata = compManager->GetMetadata();
-            if (compMetadata)
-            {
-                compDescription.name = compMetadata->name;
-                auto bundleId = compManager->GetBundleId();
-                compDescription.bundle = ToDTO(scrContext.GetBundle(bundleId));
-                compDescription.immediate = compMetadata->immediate;
-                compDescription.activate = compMetadata->activateMethodName;
-                compDescription.deactivate = compMetadata->deactivateMethodName;
-                compDescription.modified = compMetadata->modifiedMethodName;
-                auto serviceData = compMetadata->serviceMetadata;
-                compDescription.scope = serviceData.scope;
-                compDescription.serviceInterfaces = serviceData.interfaces;
-                compDescription.implementationClass = compMetadata->implClassName;
-                compDescription.defaultEnabled = compMetadata->enabled;
-                compDescription.properties = compMetadata->properties;
-                for (auto oneRef : compMetadata->refsMetadata)
-                {
-                    compDescription.references.push_back(ToDTO(oneRef));
-                }
-            }
-            return compDescription;
-        }
-
-        ComponentConfigurationDTO
-        ServiceComponentRuntimeImpl::CreateComponentConfigurationDTO(
-            std::shared_ptr<ComponentConfiguration> const& config) const
-        {
-            ComponentConfigurationDTO configDTO = {};
-            configDTO.id = config->GetId();
-            configDTO.properties = config->GetProperties();
-            configDTO.state = config->GetConfigState();
-            auto refManagers = config->GetAllDependencyManagers();
-            for (auto& refManager : refManagers)
-            {
-                if (refManager->IsSatisfied())
-                {
-                    configDTO.satisfiedReferences.push_back(CreateSatisfiedReferenceDTO(refManager));
-                }
-                else
-                {
-                    configDTO.unsatisfiedReferences.push_back(CreateUnsatisfiedReferenceDTO(refManager));
-                }
-            }
-            return configDTO;
-        }
-
-        SatisfiedReferenceDTO
-        ServiceComponentRuntimeImpl::CreateSatisfiedReferenceDTO(
-            std::shared_ptr<ReferenceManager> const& refManager) const
-        {
-            SatisfiedReferenceDTO refDTO = {};
-            refDTO.name = refManager->GetReferenceName();
-            refDTO.target = refManager->GetLDAPString();
-            auto sRefs = refManager->GetBoundReferences();
-            for (auto& sRef : sRefs)
-            {
-                refDTO.boundServices.push_back(ToDTO(sRef));
-            }
-            return refDTO;
-        }
-
-        UnsatisfiedReferenceDTO
-        ServiceComponentRuntimeImpl::CreateUnsatisfiedReferenceDTO(
-            std::shared_ptr<ReferenceManager> const& refManager) const
-        {
-            UnsatisfiedReferenceDTO refDTO = {};
-            refDTO.name = refManager->GetReferenceName();
-            refDTO.target = refManager->GetLDAPString();
-            auto sRefs = refManager->GetTargetReferences();
-            for (auto& sRef : sRefs)
-            {
-                refDTO.targetServices.push_back(ToDTO(sRef));
-            }
-            return refDTO;
-        }
-    } // namespace scrimpl
-} // namespace cppmicroservices
+        return refDTO;
+    }
+} // namespace cppmicroservices::scrimpl

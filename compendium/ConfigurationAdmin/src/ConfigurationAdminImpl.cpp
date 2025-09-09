@@ -501,15 +501,12 @@ namespace cppmicroservices
                 {
                     NotifyConfigurationUpdated(pid, pidAndChangeCountAndID.changeCount);
                     logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
-                                "AddConfigurations: Created or Updated Configuration "
-                                "instance with PID "
-                                    + pid);
+                                "AddConfigurations: Created or Updated Configuration instance with PID " + pid);
                 }
                 else
                 {
                     logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
-                                "AddConfigurations: Configuration already existed with "
-                                "identical properties with PID "
+                                "AddConfigurations: Configuration already existed with identical properties with PID "
                                     + pid);
                 }
                 ++idx;
@@ -591,8 +588,7 @@ namespace cppmicroservices
                 {
                     logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
                                 "RemoveConfigurations: Configuration with PID " + pid
-                                    + " was not removed"
-                                      " (either already removed, or it has been subsequently updated)");
+                                    + " was not removed (either already removed, or it has been subsequently updated)");
                 }
                 ++idx;
             }
@@ -703,40 +699,46 @@ namespace cppmicroservices
                             }
                         });
 
-                    auto const factoryPid = getFactoryPid(pid);
-                    if (factoryPid.empty())
+                    if (auto const factoryPid = getFactoryPid(pid); !factoryPid.empty())
                     {
-                        return;
-                    }
-
-                    std::for_each(
-                        managedServiceFactoryWrappers.begin(),
-                        managedServiceFactoryWrappers.end(),
-                        [&](auto const& managedServiceFactoryWrapper)
-                        {
-                            // The ServiceTracker will return a default constructed shared_ptr for each
-                            // ManagedServiceFactory that we aren't tracking. We must be careful not to dereference
-                            // these!
-                            if ((managedServiceFactoryWrapper)
-                                && (managedServiceFactoryWrapper->getPid() == factoryPid))
+                        std::for_each(
+                            managedServiceFactoryWrappers.begin(),
+                            managedServiceFactoryWrappers.end(),
+                            [&](auto const& managedServiceFactoryWrapper)
                             {
-                                if (removed)
+                                // The ServiceTracker will return a default constructed shared_ptr for each
+                                // ManagedServiceFactory that we aren't tracking. We must be careful not to dereference
+                                // these!
+                                if ((managedServiceFactoryWrapper)
+                                    && (managedServiceFactoryWrapper->getPid() == factoryPid))
                                 {
-                                    notifyServiceRemoved(pid,
-                                                         *(managedServiceFactoryWrapper->getTrackedService()),
-                                                         *logger);
-                                    managedServiceFactoryWrapper->removeLastUpdatedChangeCount(pid);
+                                    if (removed)
+                                    {
+                                        notifyServiceRemoved(pid,
+                                                             *(managedServiceFactoryWrapper->getTrackedService()),
+                                                             *logger);
+                                        managedServiceFactoryWrapper->removeLastUpdatedChangeCount(pid);
+                                    }
+                                    else if (managedServiceFactoryWrapper->needsAnUpdateNotification(pid, changeCount))
+                                    {
+                                        notifyServiceUpdated(pid,
+                                                             *(managedServiceFactoryWrapper->getTrackedService()),
+                                                             properties,
+                                                             *logger);
+                                        managedServiceFactoryWrapper->setLastUpdatedChangeCount(pid, changeCount);
+                                    }
                                 }
-                                else if (managedServiceFactoryWrapper->needsAnUpdateNotification(pid, changeCount))
-                                {
-                                    notifyServiceUpdated(pid,
-                                                         *(managedServiceFactoryWrapper->getTrackedService()),
-                                                         properties,
-                                                         *logger);
-                                    managedServiceFactoryWrapper->setLastUpdatedChangeCount(pid, changeCount);
-                                }
-                            }
-                        });
+                            });
+                    }
+                    if (!removed)
+                    {
+                        std::ostringstream configValue;
+                        any_value_to_json(configValue, properties);
+
+                        logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
+                                    "Configuration Updated: Configuration instance with PID " + pid + " version: "
+                                        + std::to_string(changeCount) + " properties: " + configValue.str());
+                    }
                 });
         }
 
@@ -891,12 +893,11 @@ namespace cppmicroservices
             // Lock because we are modifying the container of tracked managed services.
             std::lock_guard<std::mutex> lk { configurationsMutex };
 
-            auto elemIter
-                = std::find_if(std::begin(trackedManagedServices_),
-                               std::end(trackedManagedServices_),
-                               [&service](auto const& trackedServiceWrapper) {
-                                   return (service->getTrackedService() == trackedServiceWrapper->getTrackedService());
-                               });
+            auto elemIter = std::find_if(
+                std::begin(trackedManagedServices_),
+                std::end(trackedManagedServices_),
+                [&service](auto const& trackedServiceWrapper)
+                { return (service->getTrackedService() == trackedServiceWrapper->getTrackedService()); });
             if (elemIter != trackedManagedServices_.end())
             {
                 trackedManagedServices_.erase(elemIter);
@@ -986,8 +987,7 @@ namespace cppmicroservices
 
             logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
                         "New ManagedServiceFactory with PID " + pid
-                            + " has been added, and async Update has been queued for all "
-                              "updated instances.");
+                            + " has been added, and async Update has been queued for all updated instances.");
             auto trackedManagedServiceFactory
                 = std::make_shared<TrackedServiceWrapper<cppmicroservices::service::cm::ManagedServiceFactory>>(
                     pid,
@@ -1014,12 +1014,11 @@ namespace cppmicroservices
             // Lock because we are modifying the container of tracked managed services.
             std::lock_guard<std::mutex> lk { configurationsMutex };
 
-            auto elemIter
-                = std::find_if(std::begin(trackedManagedServiceFactories_),
-                               std::end(trackedManagedServiceFactories_),
-                               [&service](auto const& trackedServiceWrapper) {
-                                   return (service->getTrackedService() == trackedServiceWrapper->getTrackedService());
-                               });
+            auto elemIter = std::find_if(
+                std::begin(trackedManagedServiceFactories_),
+                std::end(trackedManagedServiceFactories_),
+                [&service](auto const& trackedServiceWrapper)
+                { return (service->getTrackedService() == trackedServiceWrapper->getTrackedService()); });
             if (elemIter != trackedManagedServiceFactories_.end())
             {
                 trackedManagedServiceFactories_.erase(elemIter);

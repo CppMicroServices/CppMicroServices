@@ -1,4 +1,0 @@
-ServletContainer
-----------------
-
-.. doxygenclass:: cppmicroservices::ServletContainer

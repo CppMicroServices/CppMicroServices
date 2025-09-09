@@ -9,6 +9,7 @@ add_library(util OBJECT
   include/cppmicroservices/util/FileSystem.h
   include/cppmicroservices/util/MappedFile.h
   include/cppmicroservices/util/String.h
+  include/cppmicroservices/util/StringReplace.h
   
   src/BundleObjFactory.cpp
   src/BundleObjFile.cpp

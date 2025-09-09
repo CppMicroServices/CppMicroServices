@@ -140,7 +140,7 @@ STRING(SUBSTRING "${CMAKE_SYSTEM_PROCESSOR}" 0 3 SYSTEM_PROCESSOR_SUBSTR)
 if("${SYSTEM_PROCESSOR_SUBSTR}" STREQUAL "arm")
   if(US_COMPILER_GNU)
     set(US_COMPILER_GNU_ARM 1)
-endif()
+  endif()
 endif()
 
 
@@ -177,6 +177,11 @@ if (US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG)
   check_cxx_compiler_flag(-Wno-missing-braces HAS_MISSING_BRACES_FLAG)
   if (HAS_MISSING_BRACES_FLAG)
     add_compile_options(-Wno-missing-braces)
+  endif()
+  
+  check_cxx_compiler_flag(-Wno-missing-template-arg-list-after-template-kw HAS_MISSING_TEMPLATE_KW_FLAG)
+  if (HAS_MISSING_TEMPLATE_KW_FLAG)
+    add_compile_options(-Wno-missing-template-arg-list-after-template-kw)
   endif()
 endif()
 
@@ -660,6 +665,9 @@ if(MINGW)
   set(US_CXX_FLAGS "-D_WIN32_WINNT=0x0600 -DNTDDI_VERSION=0x06000000 ${US_CXX_FLAGS}")
   # silence ignored attributes warnings
   add_compile_options(-Wno-attributes)
+  # silence maybe-uninitialized warnings for mingw.
+  # @todo: limit this compile option only to the offending file, jasoncpp.cpp, or fix the warning in code
+  add_compile_options(-Wno-error=maybe-uninitialized)
 endif()
 
 # Include the selected sanitizer's flags in US_CXX_FLAGS if the compiler supports the required flags
@@ -888,14 +896,15 @@ configure_file(
 add_subdirectory(tools/rc)
 add_subdirectory(tools/jsonschemavalidator)
 
+if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/tools/change_namespace)
+    add_subdirectory(tools/change_namespace)
+endif()
+
 export(TARGETS ${US_RCC_EXECUTABLE_TARGET}
        FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake)
 
 add_subdirectory(util)
 add_subdirectory(framework)
-add_subdirectory(httpservice)
-add_subdirectory(webconsole)
-add_subdirectory(shellservice)
 
 # Declarative Services requires threading to function.
 # Static linkage is not yet supported for declarative services.
@@ -905,7 +914,6 @@ else()
   add_subdirectory(compendium/LogService)
 endif()
 
-add_subdirectory(tools/shell)
 
 #-----------------------------------------------------------------------------
 # Documentation

@@ -83,10 +83,8 @@ set(_private_headers
   
 add_library(DeclarativeServicesObjs OBJECT ${_srcs} ${_private_headers})
 
-if(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
-  get_property(_compile_flags TARGET DeclarativeServicesObjs PROPERTY COMPILE_FLAGS)
-  set_property(TARGET DeclarativeServicesObjs PROPERTY COMPILE_FLAGS "${_compile_flags} -fPIC")
-endif()
+get_property(_compile_flags TARGET DeclarativeServicesObjs PROPERTY COMPILE_FLAGS)
+set_property(TARGET DeclarativeServicesObjs PROPERTY COMPILE_FLAGS "${_compile_flags} -fPIC")
 
 add_compile_definitions(US_BUNDLE_NAME=${${PROJECT_NAME}_SYMBOLIC_NAME})
 add_compile_definitions(BOOST_DATE_TIME_NO_LIB)
@@ -105,6 +103,7 @@ include_directories(${CppMicroServices_SOURCE_DIR}/framework/include
   ${CppMicroServices_SOURCE_DIR}/compendium/CM/include
   ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googletest/include
   ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googlemock/include
+  ${CppMicroServices_SOURCE_DIR}/util/include
   )
 
 usFunctionBoostPath(BOOST_SYSTEM ${US_USE_SYSTEM_BOOST} CPPMS_SOURCE_DIR ${CppMicroServices_SOURCE_DIR} BOOST_DIR ${BOOST_INCLUDEDIR})

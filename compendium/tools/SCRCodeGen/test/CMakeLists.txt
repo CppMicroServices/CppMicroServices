@@ -28,6 +28,11 @@ set(_scrcodegen_tests
   TestCodeGenerator.cpp
 )
 
+if(("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MINGW"))
+  # Suppress warnings for specific files
+  set_source_files_properties(${_scrcodegen_tests} PROPERTIES COMPILE_FLAGS -Wno-maybe-uninitialized )
+endif()
+
 include_directories(${CppMicroServices_SOURCE_DIR}/framework/include
   ${CppMicroServices_BINARY_DIR}/include
   ${CppMicroServices_BINARY_DIR}/framework/include

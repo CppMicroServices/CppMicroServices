@@ -79,6 +79,7 @@ class ServiceReferenceTest : public ::testing::Test
     SetUp() override
     {
         framework.Start();
+        context = framework.GetBundleContext();
     }
 
     void
@@ -88,7 +89,26 @@ class ServiceReferenceTest : public ::testing::Test
         framework.WaitForStop(std::chrono::milliseconds::zero());
     }
     Framework framework;
+    BundleContext context;
 };
+
+
+TEST_F(ServiceReferenceTest, TestServiceReferenceAssignmentAndCopy)
+{
+    auto s1 = std::make_shared<TestServiceA>();
+
+    ServiceRegistrationBase reg1 = context.RegisterService<ServiceNS::ITestServiceA>(s1);
+    ServiceReferenceBase ref1 = reg1.GetReference();
+
+    ASSERT_EQ(ref1.GetInterfaceId(), "");
+    ServiceReference<ServiceNS::ITestServiceA> typedRefAssign;
+    ServiceReference<ServiceNS::ITestServiceA> typedRefCopy = ref1;
+    typedRefAssign = ref1;
+    ASSERT_EQ(typedRefAssign.GetInterfaceId(), "ServiceNS::ITestServiceA");
+    ASSERT_EQ(typedRefCopy.GetInterfaceId(), "ServiceNS::ITestServiceA");
+
+    reg1.Unregister();
+}
 
 // This test exercises the 2 ways to register a service
 //   a. using the name of the interface i.e. "Foo::Bar"

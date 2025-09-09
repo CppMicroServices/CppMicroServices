@@ -99,7 +99,8 @@ namespace cppmicroservices
             cppmicroservices::Bundle bundle_;
             std::shared_ptr<ComponentRegistry> registry;
             std::shared_ptr<LogService> logger;
-            std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers;
+            std::vector<std::shared_ptr<ComponentManager>> managers;
+            std::mutex managersMutex; // protects the managers
             std::shared_ptr<ConfigurationNotifier> configNotifier;
         };
     } // namespace scrimpl

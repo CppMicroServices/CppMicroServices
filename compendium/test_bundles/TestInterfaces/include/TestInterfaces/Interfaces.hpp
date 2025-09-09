@@ -98,6 +98,15 @@ namespace test
         virtual ~TestBundleDSUpstreamDependency();
     };
 
+    
+    class US_TestInterfaces_EXPORT TestBundleDSUpstreamDependencyIsActivated
+    {
+      public:
+        virtual ~TestBundleDSUpstreamDependencyIsActivated();
+        virtual bool isActivated() = 0;
+        virtual size_t numberCreated() = 0;
+    };
+
     // Use this bundle in test bundles & test points to validate if bundle
     // static data is initialized correctly
     class US_TestInterfaces_EXPORT TestInitialization

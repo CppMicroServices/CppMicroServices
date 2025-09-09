@@ -3,7 +3,16 @@ set(_srcs
     Main.cpp
     ManifestParserImpl.cpp
     Util.cpp
-      ../../../third_party/jsoncpp.cpp)
+    ../../../third_party/jsoncpp.cpp)
+
+if(MINGW)
+  # Suppress warnings for specific files
+  set_source_files_properties(
+    ../../../third_party/jsoncpp.cpp
+    PROPERTIES COMPILE_FLAGS -Wno-maybe-uninitialized
+  )
+
+endif()
 
 set(_private_headers
     ComponentCallbackGenerator.hpp
@@ -15,7 +24,9 @@ set(_private_headers
 
 include_directories(../../../third_party
 		    ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googletest/include
-		    ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googlemock/include)
+		    ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googlemock/include
+        ${CppMicroServices_SOURCE_DIR}/framework/include
+        ${CppMicroServices_SOURCE_DIR}/util/include)
 
 set(US_SCRCODEGEN_EXECUTABLE_TARGET SCRCodeGen)
 set(US_SCRCODEGEN_EXECUTABLE_OUTPUT_NAME ${US_SCRCODEGEN_EXECUTABLE_TARGET}${US_GLOBAL_VERSION_SUFFIX})

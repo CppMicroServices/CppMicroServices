@@ -1214,5 +1214,59 @@ namespace cppmicroservices
             // make sure all async stuff finishes (add configurations has async calls)
             std::this_thread::sleep_for(std::chrono::seconds(1));
         }
+
+        TEST_F(TestConfigurationAdminImpl, VerifyConfigurationInstanceNumberingAndIsolation)
+        {
+            auto bundleContext = GetFramework().GetBundleContext();
+            auto fakeLogger = std::make_shared<FakeLogger>();
+            std::shared_ptr<cppmicroservices::cmimpl::CMAsyncWorkService> asyncWorkService
+                = std::make_shared<cppmicroservices::cmimpl::CMAsyncWorkService>(bundleContext, fakeLogger);
+            ConfigurationAdminImpl configAdmin(bundleContext, fakeLogger, asyncWorkService);
+
+            // Create first configuration for "test.pid"
+            auto const conf1 = configAdmin.GetConfiguration("test.pid");
+            ASSERT_TRUE(conf1);
+            EXPECT_EQ(conf1->GetPid(), "test.pid");
+            EXPECT_EQ(conf1->GetInstanceCount(), 1);
+
+            // Create a configuration for a different PID
+            auto const confOther = configAdmin.GetConfiguration("other.pid");
+            ASSERT_TRUE(confOther);
+            EXPECT_EQ(confOther->GetPid(), "other.pid");
+            EXPECT_EQ(confOther->GetInstanceCount(), 1);
+
+            // Remove "test.pid", create a new one, check instance incremented
+            EXPECT_NO_THROW(conf1->Remove());
+            auto const conf2 = configAdmin.GetConfiguration("test.pid");
+            ASSERT_TRUE(conf2);
+            EXPECT_EQ(conf2->GetPid(), "test.pid");
+            EXPECT_EQ(conf2->GetInstanceCount(), 2);
+
+            // "other.pid" should be unaffected
+            auto const confOther2 = configAdmin.GetConfiguration("other.pid");
+            ASSERT_TRUE(confOther2);
+            EXPECT_EQ(confOther2, confOther);        // Should be the same object
+            EXPECT_EQ(confOther2->GetInstanceCount(), 1); // Instance should not have changed
+
+            // Remove "other.pid", create a new one, check its instance increments independently
+            EXPECT_NO_THROW(confOther->Remove());
+            auto const confOther3 = configAdmin.GetConfiguration("other.pid");
+            ASSERT_TRUE(confOther3);
+            EXPECT_EQ(confOther3->GetPid(), "other.pid");
+            EXPECT_EQ(confOther3->GetInstanceCount(), 2);
+
+            // Remove and recreate "test.pid" again, should now be instance 3
+            EXPECT_NO_THROW(conf2->Remove());
+            auto const conf3 = configAdmin.GetConfiguration("test.pid");
+            ASSERT_TRUE(conf3);
+            EXPECT_EQ(conf3->GetPid(), "test.pid");
+            EXPECT_EQ(conf3->GetInstanceCount(), 3);
+
+            // Final checks: configs are not overwritten, instance numbers are correct
+            EXPECT_NE(conf1, conf2);
+            EXPECT_NE(conf2, conf3);
+            EXPECT_NE(confOther, confOther3);
+            EXPECT_NE(conf3, confOther3); // Different PIDs, different objects
+        }
     } // namespace cmimpl
 } // namespace cppmicroservices

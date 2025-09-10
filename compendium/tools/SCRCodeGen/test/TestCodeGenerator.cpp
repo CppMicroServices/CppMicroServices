@@ -782,6 +782,7 @@ namespace codegen
     // output by the code-generator to be exactly errorOutput.
     // Instead, if we expect the errorOutput to be contained in the generated error message,
     // we set isPartial = true. (This is useful when we don't want to specify really long error messages)
+
     struct CodegenInvalidManifestState
     {
         CodegenInvalidManifestState(std::string _manifest, std::string _errorOutput, bool _isPartial = false)
@@ -816,7 +817,8 @@ namespace codegen
             auto scr = GetManifestSCRData(ics.manifest);
             auto version = util::JsonValueValidator(scr, "version", Json::ValueType::intValue)();
             auto manifestParser = ManifestParserFactory::Create(version.asInt());
-            manifestParser->ParseAndGetComponentInfos(scr);
+            auto componentInfos = manifestParser->ParseAndGetComponentInfos(scr);
+	    (void)componentInfos;
             FAIL() << "This failure suggests that parsing has succeeded. "
                       "Shouldn't happen for failure mode tests";
         }

@@ -28,8 +28,8 @@ namespace cppmicroservices::cmimpl
 {
     ThreadpoolSafeFuturePrivate::ThreadpoolSafeFuturePrivate(std::shared_future<void> future,
                                                              std::shared_ptr<SingleInvokeTask> task)
-        : future(future)
-        , task(task)
+        : future(std::move(future))
+        , task(std::move(task))
     {
     }
     void

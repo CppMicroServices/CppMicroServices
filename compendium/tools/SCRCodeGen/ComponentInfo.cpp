@@ -26,13 +26,11 @@
 #include "ComponentInfo.hpp"
 #include "cppmicroservices/util/StringReplace.h"
 
-namespace codegen
+namespace codegen::datamodel
 {
-    namespace datamodel
-    {
-        std::string const ComponentInfo::CONFIG_POLICY_IGNORE = "ignore";
-        std::string const ComponentInfo::CONFIG_POLICY_REQUIRE = "require";
-        std::string const ComponentInfo::CONFIG_POLICY_OPTIONAL = "optional";
+	std::string const ComponentInfo::CONFIG_POLICY_IGNORE = "ignore";
+	std::string const ComponentInfo::CONFIG_POLICY_REQUIRE = "require";
+	std::string const ComponentInfo::CONFIG_POLICY_OPTIONAL = "optional";
 
         std::string
         GetComponentNameStr(ComponentInfo const& compInfo)
@@ -107,6 +105,4 @@ namespace codegen
                          << ", &{0}::Unbind" << ref.name << ")";
             return binderObjStr.str();
         }
-
-    } // namespace datamodel
-} // namespace codegen
+}

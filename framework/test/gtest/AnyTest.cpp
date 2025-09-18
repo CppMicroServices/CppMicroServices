@@ -28,6 +28,36 @@ limitations under the License.
 
 using namespace cppmicroservices;
 
+// type used to track move vs. copy constructor calls in the AnyMove test
+struct MyType final {
+
+    MyType() = default;
+    ~MyType() = default;
+
+    MyType(const MyType&) {
+        ++copies;
+    }
+    MyType& operator =(const MyType&) {
+        ++copies;
+        return *this;
+    }
+
+    MyType(MyType&&) {
+        ++moves;
+    }
+    MyType& operator =(MyType&&) {
+        ++moves;
+        return *this;
+    }
+
+    static unsigned long copies;
+    static unsigned long moves;
+};
+std::ostream& operator<<(std::ostream& o, MyType const&) { return o; }
+
+unsigned long MyType::copies = 0;
+unsigned long MyType::moves = 0;
+
 template <typename T>
 void
 TestUnsafeAnyCast(Any& anyObj, T val)
@@ -306,7 +336,28 @@ TEST(AnyTest, AnyEquality)
     rhs["int"] = 1;
     EXPECT_EQ(lhs, rhs); // now they should be equal again
     rhs.erase("int");
-    EXPECT_NE(lhs,
-              rhs); // and finally, with the "int" element erased, they should not be equal
-                    // anymore.
+    EXPECT_NE(lhs, rhs); // and finally, with the "int" element erased, they should not be equal 
+                         // anymore.
+}
+
+TEST(AnyTest, AnyMove)
+{
+    cppmicroservices::AnyMap anyMap;
+    anyMap.emplace("key1", MyType{}); // default
+
+    cppmicroservices::AnyMap anyMap2;
+    anyMap2.emplace("key2", MyType{}); // default
+
+    anyMap.emplace("key3", std::move(anyMap2)); // move
+
+    Any a1{ MyType{} }; // move
+    Any a2 { a1 }; // copy
+    Any a3 { std::move(a1) }; // move
+
+    MyType m1;
+    Any a4{ m1 }; // copy
+    Any a5{ std::move(m1) }; // move
+    
+    EXPECT_EQ(2, MyType::copies);
+    EXPECT_EQ(4, MyType::moves);
 }

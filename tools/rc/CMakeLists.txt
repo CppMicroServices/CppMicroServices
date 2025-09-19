@@ -22,7 +22,7 @@ if(MINGW)
   )
 endif()
 
-if(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64|ARM64|arm64")
+if(NOT APPLE AND CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64|ARM64|arm64")
   add_compile_options(-Wno-error=maybe-uninitialized)
 endif()
 

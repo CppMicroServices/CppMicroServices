@@ -5,13 +5,21 @@ set(_srcs
     Util.cpp
     ../../../third_party/jsoncpp.cpp)
 
-#if(MINGW OR US_COMPILER_GNU_ARM)
+if(MINGW)
   # Suppress warnings for specific files
   set_source_files_properties(
     ../../../third_party/jsoncpp.cpp
     PROPERTIES COMPILE_FLAGS -Wno-maybe-uninitialized
   )
-#endif()
+endif()
+
+if(US_COMPILER_GNU_ARM)
+  # Suppress warnings for specific files
+  set_source_files_properties(
+    ../../third_party/jsoncpp.cpp
+    PROPERTIES COMPILE_FLAGS -Wno-maybe-uninitialized
+  )
+endif()
 
 set(_private_headers
     ComponentCallbackGenerator.hpp

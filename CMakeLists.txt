@@ -580,7 +580,7 @@ else()
 
     # a change in the github ubuntu images started throwing this error while compiling
     # jsoncpp.cpp. Trying this to see if it fixes the issue.
-    add_compile_options(-Werror -Wno-error=maybe-uninitialized)
+    usFunctionCheckCompilerFlags(-Wno-maybe-uninitialized US_CXX_FLAGS)
   endif()
 
   if(US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG)

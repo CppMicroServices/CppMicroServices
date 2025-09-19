@@ -6,6 +6,54 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog <http://keepachangelog.com/>`_
 and this project adheres to `Semantic Versioning <http://semver.org/>`_.
 
+`v3.8.8 <https://github.com/cppmicroservices/cppmicroservices/tree/3.8.8>`_ (2025-9-1)
+---------------------------------------------------------------------------------------------------------
+
+`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.8.7...3.8.8>`_
+
+Added
+-----
+- `[Configuration Admin] Configuration State Logging <https://github.com/CppMicroServices/CppMicroServices/pull/1073>`_
+- `[Core Framework] enable windows and linux arm build <https://github.com/CppMicroServices/CppMicroServices/pull/1089>`_
+- `[Core Framework] Namespace renaming tool <https://github.com/CppMicroServices/CppMicroServices/pull/1050>`_
+
+Changed
+-------
+- `[Declarative Services] replace use of std::regex_replace <https://github.com/CppMicroServices/CppMicroServices/pull/1085>`_
+- `[Core Framework] Update spdlog to version 1.15.2 <https://github.com/CppMicroServices/CppMicroServices/pull/1115>`_
+- `[Declarative Services] new inject-references mechanism <https://github.com/CppMicroServices/CppMicroServices/pull/1112>`_
+
+Removed
+-------
+- `[Core Framework] Remove httpservice, webconsole, third_party/civetweb, shellservices, shell, third_party/linenoise <https://github.com/CppMicroServices/CppMicroServices/pull/1095>`_
+- `[Core Framework] Remove windows-2019 runner <https://github.com/CppMicroServices/CppMicroServices/pull/1104>`_
+
+Deprecated
+----------
+- `[Core Framework] Remove ubuntu 20.04 from github actions <https://github.com/CppMicroServices/CppMicroServices/pull/1063>`_
+- `[Core Framework] Remove unnecessary android workaround <https://github.com/CppMicroServices/CppMicroServices/pull/1096>`_
+
+Fixed
+-----
+- `[Configuration Admin] concurrent configuration creations for factories race <https://github.com/CppMicroServices/CppMicroServices/pull/1072>`_
+- `[Core Framework] Update performance testing <https://github.com/CppMicroServices/CppMicroServices/pull/1081>`_
+- `[Declarative Services] Fix binding of prototype services <https://github.com/CppMicroServices/CppMicroServices/pull/1079>`_
+- `[Core Framework] Fix benchmark workflvow <https://github.com/CppMicroServices/CppMicroServices/pull/1088>`_
+- `[Core Framework] fix space in tempdir for windows <https://github.com/CppMicroServices/CppMicroServices/pull/1093>`_
+- `[Declarative Services] export locateService <https://github.com/CppMicroServices/CppMicroServices/pull/1086>`_
+- `[Declarative Services] Ensure locateService from within activate returns the ptr to the activated reference <https://github.com/CppMicroServices/CppMicroServices/pull/1092>`_
+- `[Core Framework] I161 <https://github.com/CppMicroServices/CppMicroServices/pull/1097>`_
+- `[Declarative Services] I0268 <https://github.com/CppMicroServices/CppMicroServices/pull/1100>`_
+- `[Core Framework] I0184 <https://github.com/CppMicroServices/CppMicroServices/pull/1102>`_
+- `[Declarative Services] RW locks on bundle notifications in the SCR Activator <https://github.com/CppMicroServices/CppMicroServices/pull/1098>`_
+- `[Declarative Services] resolve valgrind possibly lost leaks <https://github.com/CppMicroServices/CppMicroServices/pull/1067>`_
+- `[Core Framework] Fix Bundle Find Hooks to take into consideration systemBundle <https://github.com/CppMicroServices/CppMicroServices/pull/1107>`_
+- `[Declarative Services] Don't unnecessarly reassign the AWS <https://github.com/CppMicroServices/CppMicroServices/pull/1105>`_
+- `[Core Framework] Fix changelog formatting <https://github.com/CppMicroServices/CppMicroServices/pull/1180>`_
+- `[Declarative Services] Fix clang-tidy warnings in DS, LogService, AWS <https://github.com/CppMicroServices/CppMicroServices/pull/1117>`_
+- `[Declarative Services] updates to factory service with Modified method deadlock fix <https://github.com/CppMicroServices/CppMicroServices/pull/1141>`_
+- `[Core Framework] Ensure serviceReference object properly manages interface on assignment <https://github.com/CppMicroServices/CppMicroServices/pull/1193>`_
+
 `v3.8.7 <https://github.com/cppmicroservices/cppmicroservices/tree/3.8.7>`_ (2025-5-1)
 ---------------------------------------------------------------------------------------------------------
 

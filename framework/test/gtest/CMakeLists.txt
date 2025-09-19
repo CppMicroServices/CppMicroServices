@@ -119,12 +119,8 @@ if(MINGW)
   )
 endif()
 
-if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "ARM")
-  # Suppress warnings for specific files
-  set_source_files_properties(
-    ../../third_party/jsoncpp.cpp
-    PROPERTIES COMPILE_FLAGS -Wno-maybe-uninitialized
-  )
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64|ARM64|arm64")
+  add_compile_options(-Wno-error=maybe-uninitialized)
 endif()
 
 # Generate a custom "bundle init" file for the test driver executable

@@ -14,14 +14,13 @@ endif()
 
 set(srcs ResourceCompiler.cpp ../../third_party/miniz.c ../../third_party/jsoncpp.cpp)
 
-if(MINGW OR US_COMPILER_GNU_ARM)
+#if(MINGW OR US_COMPILER_GNU_ARM)
   # Suppress warnings for specific files
   set_source_files_properties(
     ../../third_party/jsoncpp.cpp
     PROPERTIES COMPILE_FLAGS -Wno-maybe-uninitialized
   )
-
-endif()
+#endif()
 
 add_executable(${US_RCC_EXECUTABLE_TARGET} ${srcs})
 set_property(TARGET ${US_RCC_EXECUTABLE_TARGET} PROPERTY OUTPUT_NAME ${US_RCC_EXECUTABLE_OUTPUT_NAME})

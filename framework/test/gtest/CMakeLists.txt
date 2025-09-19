@@ -111,14 +111,13 @@ set(_third_party_srcs
   ../../../third_party/jsoncpp.cpp
 )
 
-if(MINGW OR US_COMPILER_GNU_ARM)
+#if(MINGW OR US_COMPILER_GNU_ARM)
   # Suppress warnings for specific files
   set_source_files_properties(
     ../../../third_party/jsoncpp.cpp
     PROPERTIES COMPILE_FLAGS -Wno-maybe-uninitialized
   )
-
-endif()
+#endif()
 
 
 # Generate a custom "bundle init" file for the test driver executable

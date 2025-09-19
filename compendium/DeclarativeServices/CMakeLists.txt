@@ -39,7 +39,7 @@ add_compile_definitions(BOOST_REGEX_NO_LIB)
 
 
 usMacroCreateBundle(DeclarativeServices
-  VERSION "1.5.14"
+  VERSION "1.5.15"
   DEPENDS Framework
   TARGET DeclarativeServices
   SYMBOLIC_NAME declarative_services

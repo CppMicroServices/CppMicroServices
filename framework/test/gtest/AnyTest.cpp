@@ -42,11 +42,9 @@ struct MyType final {
         return *this;
     }
 
-    MyType(MyType&&) {
-        ++moves;
-    }
+    MyType(MyType&&) noexcept { ++moves; }
     MyType&
-    operator=(MyType&&)
+    operator=(MyType&&) noexcept
     {
         ++moves;
         return *this;

@@ -14,7 +14,7 @@ endif()
 
 set(srcs ResourceCompiler.cpp ../../third_party/miniz.c ../../third_party/jsoncpp.cpp)
 
-if(MINGW)
+if(MINGW OR US_COMPILER_GNU_ARM)
   # Suppress warnings for specific files
   set_source_files_properties(
     ../../third_party/jsoncpp.cpp

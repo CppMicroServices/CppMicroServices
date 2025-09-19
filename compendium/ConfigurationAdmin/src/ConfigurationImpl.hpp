@@ -201,7 +201,7 @@ namespace cppmicroservices
             }
 
           private:
-            std::shared_ptr<AsyncWorkService> strand { nullptr };
+            std::shared_ptr<AsyncWorkService> strand;
             std::mutex configAdminMutex;
             ConfigurationAdminPrivate* configAdminImpl;
             mutable std::mutex propertiesMutex;

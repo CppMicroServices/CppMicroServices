@@ -32,7 +32,9 @@
 
 #include "../../src/ConfigurationAdminImpl.hpp"
 #include "Mocks.hpp"
+#include <mutex>
 #include <thread>
+#include <vector>
 
 namespace cppmicroservices
 {
@@ -1245,7 +1247,7 @@ namespace cppmicroservices
             // "other.pid" should be unaffected
             auto const confOther2 = configAdmin.GetConfiguration("other.pid");
             ASSERT_TRUE(confOther2);
-            EXPECT_EQ(confOther2, confOther);        // Should be the same object
+            EXPECT_EQ(confOther2, confOther);             // Should be the same object
             EXPECT_EQ(confOther2->GetInstanceCount(), 1); // Instance should not have changed
 
             // Remove "other.pid", create a new one, check its instance increments independently
@@ -1267,6 +1269,108 @@ namespace cppmicroservices
             EXPECT_NE(conf2, conf3);
             EXPECT_NE(confOther, confOther3);
             EXPECT_NE(conf3, confOther3); // Different PIDs, different objects
+        }
+
+        class MockManagedServiceWithSerialization : public cppmicroservices::service::cm::ManagedService
+        {
+          public:
+            MockManagedServiceWithSerialization(std::mutex& mtx, std::vector<int>& updates)
+                : mtx_(mtx)
+                , updates_(updates)
+            {
+            }
+
+            void
+            Updated(AnyMap const& props) override
+            {
+                std::lock_guard<std::mutex> lock(mtx_);
+                auto it = props.find("update_id");
+                if (it == props.end())
+                {
+                    return;
+                }
+                updates_.push_back(cppmicroservices::any_cast<int>(it->second));
+            }
+
+          private:
+            std::mutex& mtx_;
+            std::vector<int>& updates_;
+        };
+
+        /**
+         * verify that config updates within a given config happen serially.
+         * because serially doesn't actually mean anything here (cfg->update(1) vs cfg->update(2) happening serially
+         * doesn't mean that 1 gets there before 2 unless we really spread those calls out in which case this test would
+         * pass with or without strands), we need to verify NOT that they happen serially in terms of call order, but
+         * they happen serially in the context of many concurrent updates with multiple listeners and all of the
+         * listeners hear the updates in the same order
+         */
+        TEST_F(TestConfigurationAdminImpl, VerifySerializedEventsWithinAGivenConfig)
+        {
+            auto bundleContext = GetFramework().GetBundleContext();
+            auto fakeLogger = std::make_shared<FakeLogger>();
+            auto asyncWorkService
+                = std::make_shared<cppmicroservices::cmimpl::CMAsyncWorkService>(bundleContext, fakeLogger);
+            ConfigurationAdminImpl configAdmin(bundleContext, fakeLogger, asyncWorkService);
+
+            auto conf = configAdmin.GetConfiguration("test.pid");
+            ASSERT_TRUE(conf);
+
+            constexpr int numListeners = 3;
+            constexpr int numUpdates = 10;
+
+            // Each listener records the order of updates it receives
+            std::vector<std::vector<int>> listenerUpdates(numListeners);
+            std::vector<std::mutex> listenerMutexes(numListeners);
+
+            // Register listeners
+            std::vector<cppmicroservices::ServiceRegistration<cppmicroservices::service::cm::ManagedService>> listeners;
+            for (int i = 0; i < numListeners; ++i)
+            {
+                listeners.push_back(bundleContext.RegisterService<cppmicroservices::service::cm::ManagedService>(
+                    std::make_shared<MockManagedServiceWithSerialization>(listenerMutexes[i], listenerUpdates[i]),
+                    cppmicroservices::ServiceProperties({
+                        { std::string("service.pid"), std::string("test.pid") }
+                })));
+            }
+
+            // Prepare concurrent updates using std::async
+            std::vector<std::future<void>> futures;
+            for (int i = 0; i < numUpdates; ++i)
+            {
+                futures.push_back(std::async(std::launch::async,
+                                             [conf, i]()
+                                             {
+                                                 std::unordered_map<std::string, cppmicroservices::Any> props;
+                                                 props["update_id"] = i;
+                                                 conf->Update(props).get();
+                                             }));
+            }
+
+            // Wait for all updates to finish
+            for (auto& fut : futures)
+            {
+                fut.get();
+            }
+
+            // All listeners should have received the same number of updates
+            for (int i = 1; i < numListeners; ++i)
+            {
+                EXPECT_EQ(listenerUpdates[i].size(), listenerUpdates[0].size())
+                    << "All listeners did not receive same number of updates";
+            }
+
+            // All listeners should have received the updates in the same order
+            for (int i = 1; i < numListeners; ++i)
+            {
+                EXPECT_EQ(listenerUpdates[i], listenerUpdates[0])
+                    << "Listener " << i << " saw a different update order";
+            }
+            // unreg lists
+            for (auto& listener : listeners)
+            {
+                listener.Unregister();
+            }
         }
     } // namespace cmimpl
 } // namespace cppmicroservices

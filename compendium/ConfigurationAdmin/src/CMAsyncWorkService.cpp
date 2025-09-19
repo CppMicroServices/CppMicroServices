@@ -26,6 +26,7 @@
 #include "boost/asio/packaged_task.hpp"
 #include "boost/asio/post.hpp"
 #include "boost/asio/thread_pool.hpp"
+#include <boost/asio.hpp>
 
 namespace cppmicroservices
 {
@@ -42,6 +43,8 @@ namespace cppmicroservices
         class FallbackAsyncWorkService final : public AWSInt
         {
           public:
+            using Strand = boost::asio::strand<boost::asio::thread_pool::executor_type>;
+
             FallbackAsyncWorkService(std::shared_ptr<cppmicroservices::logservice::LogService> const& logger_)
                 : logger(logger_)
             {
@@ -83,20 +86,51 @@ namespace cppmicroservices
             {
                 if (threadpool)
                 {
-                    using Sig = void();
-                    using Result = boost::asio::async_result<decltype(task), Sig>;
-                    using Handler = typename Result::completion_handler_type;
-
-                    Handler handler(std::forward<decltype(task)>(task));
-
-                    boost::asio::post(threadpool->get_executor(),
-                                      [handler = std::move(handler)]() mutable { handler(); });
+                    boost::asio::post(threadpool->get_executor(), std::move(task));
                 }
+            }
+
+            // createStrand returns a new AsyncWorkService instance posting to a strand
+            std::shared_ptr<AsyncWorkService>
+            createStrand() override
+            {
+                if (!threadpool)
+                {
+                    return nullptr;
+                }
+                auto strand = std::make_shared<Strand>(threadpool->get_executor());
+                // Pass shared_ptr to threadpool to keep it alive as long as strand is alive
+                return std::make_shared<StrandAsyncWorkService>(strand, logger);
             }
 
           private:
             std::shared_ptr<boost::asio::thread_pool> threadpool;
             std::shared_ptr<cppmicroservices::logservice::LogService> logger;
+
+            // Inner class for strand-based async work service
+            class StrandAsyncWorkService : public AsyncWorkService
+            {
+              public:
+                StrandAsyncWorkService(std::shared_ptr<Strand> strand_,
+                                       std::shared_ptr<cppmicroservices::logservice::LogService> logger_)
+                    : strand(std::move(strand_))
+                    , logger(std::move(logger_))
+                {
+                }
+
+                void
+                post(std::packaged_task<void()>&& task) override
+                {
+                    if (strand)
+                    {
+                        boost::asio::post(*strand, std::move(task));
+                    }
+                }
+
+              private:
+                std::shared_ptr<Strand> strand;
+                std::shared_ptr<cppmicroservices::logservice::LogService> logger;
+            };
         };
 
         CMAsyncWorkService::CMAsyncWorkService(cppmicroservices::BundleContext context,
@@ -138,17 +172,17 @@ namespace cppmicroservices
         std::shared_ptr<AWSInt>
         CMAsyncWorkService::AddingService(ServiceReference<AWSInt> const& reference)
         {
-            std::unique_lock<std::mutex> lock{m};
+            std::unique_lock<std::mutex> lock { m };
             auto currAsync = asyncWorkService;
             std::shared_ptr<AWSInt> newService;
             if (reference)
             {
                 try
                 {
-                   newService = scrContext.GetService<AWSInt>(reference);
+                    newService = scrContext.GetService<AWSInt>(reference);
                     // if the new ref exists and:
-                        // we are using the fallback OR
-                        // our current < new (based on ranking and id), reassign
+                    // we are using the fallback OR
+                    // our current < new (based on ranking and id), reassign
                     if (newService && (usingFallback || currRef < reference))
                     {
                         asyncWorkService = newService;
@@ -167,19 +201,17 @@ namespace cppmicroservices
         }
 
         void
-        CMAsyncWorkService::ModifiedService(
-            ServiceReference<AWSInt> const& /* reference */,
-            std::shared_ptr<AWSInt> const& /* service */)
+        CMAsyncWorkService::ModifiedService(ServiceReference<AWSInt> const& /* reference */,
+                                            std::shared_ptr<AWSInt> const& /* service */)
         {
             // no-op
         }
 
         void
-        CMAsyncWorkService::RemovedService(
-            ServiceReference<AWSInt> const& /* reference */,
-            std::shared_ptr<AWSInt> const& service)
+        CMAsyncWorkService::RemovedService(ServiceReference<AWSInt> const& /* reference */,
+                                           std::shared_ptr<AWSInt> const& service)
         {
-            std::unique_lock<std::mutex> lock{m};
+            std::unique_lock<std::mutex> lock { m };
             auto currAsync = asyncWorkService;
             if (service == currAsync)
             {
@@ -193,8 +225,14 @@ namespace cppmicroservices
         void
         CMAsyncWorkService::post(std::packaged_task<void()>&& task)
         {
-            std::unique_lock<std::mutex> lock{m};
+            std::unique_lock<std::mutex> lock { m };
             asyncWorkService->post(std::move(task));
+        }
+
+        std::shared_ptr<AWSInt>
+        CMAsyncWorkService::createStrand()
+        {
+            return asyncWorkService->createStrand();
         }
 
     } // namespace cmimpl

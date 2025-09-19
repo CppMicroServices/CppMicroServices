@@ -22,7 +22,7 @@ if(MINGW)
   )
 endif()
 
-if(US_COMPILER_GNU_ARM)
+if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "ARM")
   # Suppress warnings for specific files
   set_source_files_properties(
     ../../third_party/jsoncpp.cpp

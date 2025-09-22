@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef CPPMICROSERVICES_IllegalStateException_H
-#define CPPMICROSERVICES_IllegalStateException_H
+#ifndef CPPMICROSERVICES_ILLEGALSTATEEXCEPTION_H
+#define CPPMICROSERVICES_ILLEGALSTATEEXCEPTION_H
 
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/FrameworkConfig.h"
@@ -49,4 +49,4 @@ namespace cppmicroservices
 #endif
 } // namespace cppmicroservices
 
-#endif /* CPPMICROSERVICES_IllegalStateException_H */
+#endif /* CPPMICROSERVICES_ILLEGALSTATEEXCEPTION_H */

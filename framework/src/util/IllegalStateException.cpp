@@ -20,14 +20,14 @@
 
 =============================================================================*/
 
-#include "cppmicroservices/BundleContextException.h"
+#include "cppmicroservices/IllegalStateException.h"
 
 namespace cppmicroservices
 {
 
-    BundleContextException::~BundleContextException() = default;
+    IllegalStateException::~IllegalStateException() = default;
 
-    BundleContextException::BundleContextException(std::string msg)
+    IllegalStateException::IllegalStateException(std::string msg)
         : std::runtime_error(std::move(msg))
     {
     }

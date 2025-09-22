@@ -77,7 +77,7 @@ namespace cppmicroservices
     {
         if (!valid)
         {
-            throw cppmicroservices::BundleContextException("The bundle context is no longer valid");
+            throw cppmicroservices::IllegalStateException("The bundle context is no longer valid");
         }
     }
 

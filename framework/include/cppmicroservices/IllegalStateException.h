@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef CPPMICROSERVICES_BUNDLECONTEXTEXCEPTION_H
-#define CPPMICROSERVICES_BUNDLECONTEXTEXCEPTION_H
+#ifndef CPPMICROSERVICES_IllegalStateException_H
+#define CPPMICROSERVICES_IllegalStateException_H
 
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/FrameworkConfig.h"
@@ -38,15 +38,15 @@
 namespace cppmicroservices
 {
 
-    class US_Framework_EXPORT BundleContextException final : public std::runtime_error
+    class US_Framework_EXPORT IllegalStateException final : public std::runtime_error
     {
       public:
-        explicit BundleContextException(std::string what);
-        ~BundleContextException() override;
+        explicit IllegalStateException(std::string what);
+        ~IllegalStateException() override;
     };
 #ifdef _MSC_VER
 #    pragma warning(pop)
 #endif
 } // namespace cppmicroservices
 
-#endif /* CPPMICROSERVICES_BUNDLECONTEXTEXCEPTION_H */
+#endif /* CPPMICROSERVICES_IllegalStateException_H */

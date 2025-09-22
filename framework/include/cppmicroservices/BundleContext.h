@@ -29,7 +29,7 @@
 #include "cppmicroservices/ListenerToken.h"
 #include "cppmicroservices/ServiceInterface.h"
 #include "cppmicroservices/ServiceRegistration.h"
-#include "cppmicroservices/BundleContextException.h"
+#include "cppmicroservices/IllegalStateException.h"
 
 #include <memory>
 
@@ -652,7 +652,7 @@ namespace cppmicroservices
         {
             if (!d)
             {
-                throw cppmicroservices::BundleContextException("The bundle context is no longer valid");
+                throw cppmicroservices::IllegalStateException("The bundle context is no longer valid");
             }
             return ServiceObjects<S>(d, reference);
         }

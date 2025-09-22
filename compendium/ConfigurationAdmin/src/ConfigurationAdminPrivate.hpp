@@ -25,6 +25,8 @@
 
 #include "ThreadpoolSafeFuturePrivate.hpp"
 #include "metadata/ConfigurationMetadata.hpp"
+#include <cppmicroservices/asyncworkservice/AsyncWorkService.hpp>
+
 #include <cstdint>
 #include <future>
 #include <vector>
@@ -33,6 +35,7 @@ namespace cppmicroservices
 {
     namespace cmimpl
     {
+        using cppmicroservices::async::AsyncWorkService;
         /**
          * This class is a convenience container for tracking added Configurations.
          */
@@ -100,7 +103,8 @@ namespace cppmicroservices
              */
             virtual std::shared_ptr<ThreadpoolSafeFuturePrivate> NotifyConfigurationUpdated(
                 std::string const& pid,
-                unsigned long const changeCount)
+                unsigned long const changeCount,
+                std::shared_ptr<AsyncWorkService> strand = nullptr)
                 = 0;
 
             /**
@@ -115,7 +119,8 @@ namespace cppmicroservices
             virtual std::shared_ptr<ThreadpoolSafeFuturePrivate> NotifyConfigurationRemoved(
                 std::string const& pid,
                 std::uintptr_t configurationId,
-                unsigned long changeCount)
+                unsigned long changeCount,
+                std::shared_ptr<AsyncWorkService> strand = nullptr)
                 = 0;
         };
     } // namespace cmimpl

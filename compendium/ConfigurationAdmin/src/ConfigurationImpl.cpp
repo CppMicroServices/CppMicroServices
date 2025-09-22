@@ -39,13 +39,17 @@ namespace cppmicroservices
                                              std::string thePid,
                                              std::string theFactoryPid,
                                              AnyMap props,
+                                             std::shared_ptr<AsyncWorkService> aws,
+                                             unsigned long const iCount,
                                              unsigned long const cCount)
-            : configAdminImpl(configAdmin)
+            : strand(aws->createStrand())
+            , configAdminImpl(configAdmin)
             , pid(std::move(thePid))
             , factoryPid(std::move(theFactoryPid))
             , properties(std::move(props))
             , changeCount { cCount }
             , removed { false }
+            , instance { iCount }
         {
             assert(configAdminImpl != nullptr && "Invalid ConfigurationAdminPrivate pointer");
             // constructing a configuration object with properties is the equivalent
@@ -127,7 +131,7 @@ namespace cppmicroservices
             std::lock_guard<std::mutex> lk { configAdminMutex };
             if (configAdminImpl)
             {
-                return configAdminImpl->NotifyConfigurationUpdated(pid, changeCount);
+                return configAdminImpl->NotifyConfigurationUpdated(pid, changeCount, strand);
             }
             std::promise<void> ready;
             std::shared_future<void> fut = ready.get_future();
@@ -165,7 +169,7 @@ namespace cppmicroservices
             std::lock_guard<std::mutex> lk { configAdminMutex };
             if (configAdminImpl)
             {
-                auto fut = configAdminImpl->NotifyConfigurationUpdated(pid, changeCount);
+                auto fut = configAdminImpl->NotifyConfigurationUpdated(pid, changeCount, strand);
                 return std::pair<bool, std::shared_ptr<ThreadpoolSafeFuturePrivate>>(true, fut);
             }
 
@@ -202,7 +206,8 @@ namespace cppmicroservices
             {
                 auto fut = configAdminImpl->NotifyConfigurationRemoved(pid,
                                                                        reinterpret_cast<std::uintptr_t>(this),
-                                                                       changeCount);
+                                                                       changeCount,
+                                                                       strand);
                 configAdminImpl = nullptr;
                 return fut;
             }
@@ -249,5 +254,12 @@ namespace cppmicroservices
             std::lock_guard<std::mutex> lk { configAdminMutex };
             configAdminImpl = nullptr;
         }
+
+        unsigned long
+        ConfigurationImpl::GetInstanceCount()
+        {
+            return instance;
+        }
+
     } // namespace cmimpl
 } // namespace cppmicroservices

@@ -204,7 +204,8 @@ namespace cppmicroservices
              */
             std::shared_ptr<ThreadpoolSafeFuturePrivate> NotifyConfigurationUpdated(
                 std::string const& pid,
-                unsigned long const changeCount) override;
+                unsigned long const changeCount,
+                std::shared_ptr<AsyncWorkService> strand) override;
 
             /**
              * Internal method used by {@code ConfigurationImpl} to notify any {@code ManagedService} or
@@ -213,9 +214,11 @@ namespace cppmicroservices
              *
              * See {@code ConfigurationAdminPrivate#NotifyConfigurationRemoved}
              */
-            std::shared_ptr<ThreadpoolSafeFuturePrivate> NotifyConfigurationRemoved(std::string const& pid,
-                                                                                    std::uintptr_t configurationId,
-                                                                                    unsigned long changeCount) override;
+            std::shared_ptr<ThreadpoolSafeFuturePrivate> NotifyConfigurationRemoved(
+                std::string const& pid,
+                std::uintptr_t configurationId,
+                unsigned long changeCount,
+                std::shared_ptr<AsyncWorkService> strand) override;
 
             // methods from the cppmicroservices::ServiceTrackerCustomizer interface for ManagedService
             std::shared_ptr<TrackedServiceWrapper<cppmicroservices::service::cm::ManagedService>> AddingService(
@@ -250,7 +253,9 @@ namespace cppmicroservices
           private:
             // Convenience wrapper which is used to perform asyncronous operations
             template <typename Functor>
-            std::shared_ptr<ThreadpoolSafeFuturePrivate> PerformAsync(Functor&& f);
+            std::shared_ptr<ThreadpoolSafeFuturePrivate> PerformAsync(Functor&& f,
+                                                                      std::shared_ptr<AsyncWorkService> strand
+                                                                      = nullptr);
 
             // Flag set to false when the activator has stopped the bundle
             bool active = true;
@@ -267,6 +272,7 @@ namespace cppmicroservices
             std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkService;
             std::mutex configurationsMutex;
             std::unordered_map<std::string, std::shared_ptr<ConfigurationImpl>> configurations;
+            std::unordered_map<std::string, unsigned long> instanceCount;
             std::unordered_map<std::string, std::set<std::string>> factoryInstances;
             std::mutex futuresMutex;
             std::uint64_t futuresID;

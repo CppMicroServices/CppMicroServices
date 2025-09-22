@@ -86,7 +86,7 @@ namespace cppmicroservices
             {
                 if (threadpool)
                 {
-                    boost::asio::post(threadpool->get_executor(), std::move(task));
+                    boost::asio::post(threadpool->get_executor(), [task = std::move(task)]() mutable { task(); });
                 }
             }
 
@@ -100,7 +100,7 @@ namespace cppmicroservices
                 }
                 auto strand = std::make_shared<Strand>(threadpool->get_executor());
                 // Pass shared_ptr to threadpool to keep it alive as long as strand is alive
-                return std::make_shared<StrandAsyncWorkService>(strand, logger);
+                return std::make_shared<StrandAsyncWorkService>(strand);
             }
 
           private:
@@ -111,19 +111,14 @@ namespace cppmicroservices
             class StrandAsyncWorkService : public AsyncWorkService
             {
               public:
-                StrandAsyncWorkService(std::shared_ptr<Strand> strand_,
-                                       std::shared_ptr<cppmicroservices::logservice::LogService> logger_)
-                    : strand(std::move(strand_))
-                    , logger(std::move(logger_))
-                {
-                }
+                StrandAsyncWorkService(std::shared_ptr<Strand> strand_) : strand(std::move(strand_)) {}
 
                 void
                 post(std::packaged_task<void()>&& task) override
                 {
                     if (strand)
                     {
-                        boost::asio::post(*strand, std::move(task));
+                        boost::asio::post(*strand, [task = std::move(task)]() mutable { task(); });
                     }
                 }
 

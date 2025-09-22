@@ -387,6 +387,19 @@ namespace cppmicroservices
         }
 
         /**
+         * Creates an Any moving value into the internal storage
+         *
+         * @tparam ValueType the type of the value to move into the Any
+         * @param value a ValueType value to move into the Any
+         */
+        template <typename ValueType
+                  , typename = std::enable_if_t<!std::is_same_v<Any, std::decay_t<ValueType>>
+                               && !std::is_reference_v<ValueType>>>
+        Any(ValueType&& value) : _content(new Holder<std::decay_t<ValueType>>(std::forward<ValueType>(value)))
+        {
+        }
+        
+        /**
          * Copy constructor, works with empty Anys and initialized Any values.
          *
          * \param other The Any to copy
@@ -481,6 +494,24 @@ namespace cppmicroservices
         operator=(ValueType const& rhs)
         {
             Any(rhs).Swap(*this);
+            return *this;
+        }
+        
+        /**
+         * Assignment operator which moves rhs into the internal storage of the Any
+         *
+         * @tparam ValueType the type of the value to move
+         * @param value a ValueType value to move into the internal storage
+         */
+        template <typename ValueType
+                  , typename = std::enable_if_t<!std::is_same_v<Any, std::decay_t<ValueType>>
+                               && !std::is_reference_v<ValueType>>>
+        Any&
+        operator=(ValueType&& rhs)
+        {
+            // Create a new Holder with rhs moved into its storage and store a unique_ptr to it in
+            // _content replacing the previously held value
+            _content = std::unique_ptr<Placeholder>(new Holder<ValueType>(std::forward<ValueType>(rhs)));
             return *this;
         }
 

@@ -117,9 +117,11 @@ if(MINGW)
     ../../../third_party/jsoncpp.cpp
     PROPERTIES COMPILE_FLAGS -Wno-maybe-uninitialized
   )
-
 endif()
 
+if(NOT APPLE AND US_COMPILER_GNU_ARM AND  CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64|ARM64|arm64")
+  add_compile_options(-Wno-error=maybe-uninitialized)
+endif()
 
 # Generate a custom "bundle init" file for the test driver executable
 usFunctionGenerateBundleInit(TARGET ${us_gtest_test_exe_name} OUT _additional_srcs)

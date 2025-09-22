@@ -18,6 +18,7 @@ set(_srcs
   util/SecurityException.cpp
   util/SharedLibrary.cpp
   util/SharedLibraryException.cpp
+  util/BundleContextException.cpp
   util/Utils.cpp
   util/ServiceRegistrationLocks.cpp
   util/ThreadpoolSafeFuture.cpp

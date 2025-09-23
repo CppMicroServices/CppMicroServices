@@ -23,9 +23,7 @@
 #ifndef CPPMICROSERVICES_ILLEGALSTATEEXCEPTION_H
 #define CPPMICROSERVICES_ILLEGALSTATEEXCEPTION_H
 
-#include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/FrameworkConfig.h"
-
 #include <stdexcept>
 
 // ignore warning c4275 per MS documentation

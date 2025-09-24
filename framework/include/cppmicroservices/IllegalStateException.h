@@ -25,6 +25,8 @@
 
 #include "cppmicroservices/FrameworkConfig.h"
 #include <stdexcept>
+#include <string>
+#include <utility>
 
 // ignore warning c4275 per MS documentation
 // https://docs.microsoft.com/en-us/cpp/error-messages/compiler-warnings/compiler-warning-level-2-c4275

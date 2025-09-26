@@ -224,7 +224,14 @@ namespace cppmicroservices
             }
             try
             {
-                GetComponentInstance()->InvokeBindMethod(refName, svcToBind);
+                if (auto inst = GetComponentInstance(); inst)
+                {
+                    inst->InvokeBindMethod(refName, svcToBind);
+                }
+                else
+                {
+                    throw std::runtime_error("Invalid Singleton Component Instance, likely destroyed");
+                }
             }
             catch (std::exception const&)
             {
@@ -244,7 +251,10 @@ namespace cppmicroservices
             try
             {
                 auto svcToUnbind = context->LocateService(refName, ref);
-                GetComponentInstance()->InvokeUnbindMethod(refName, svcToUnbind);
+                if (auto inst = GetComponentInstance(); inst)
+                {
+                    inst->InvokeUnbindMethod(refName, svcToUnbind);
+                }
             }
             catch (std::exception const&)
             {

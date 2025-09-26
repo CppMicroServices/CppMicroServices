@@ -172,7 +172,7 @@ namespace cppmicroservices
     {
         rapidjson::IStreamWrapper jsonStream(is);
         rapidjson::Document root;
-        if (root.ParseStream(jsonStream).HasParseError())
+        if (root.ParseStream<rapidjson::ParseFlag::kParseCommentsFlag>(jsonStream).HasParseError())
         {
             throw std::runtime_error(rapidjson::GetParseError_En(root.GetParseError()));
         }

@@ -215,6 +215,9 @@ namespace cppmicroservices
         SingletonComponentConfigurationImpl::BindReference(std::string const& refName, ServiceReferenceBase const& ref)
         {
             auto context = GetComponentContext();
+            if (!context){
+                throw std::runtime_error("Invalid Singleton Component Context, likely destroyed");
+            }
             auto svcToBind = context->AddToBoundServicesCache(refName, ref);
             if (!svcToBind)
             {
@@ -248,6 +251,9 @@ namespace cppmicroservices
                                                              ServiceReferenceBase const& ref)
         {
             auto context = GetComponentContext();
+            if (!context){
+                throw std::runtime_error("Invalid Singleton Component Context, likely destroyed");
+            }
             try
             {
                 auto svcToUnbind = context->LocateService(refName, ref);

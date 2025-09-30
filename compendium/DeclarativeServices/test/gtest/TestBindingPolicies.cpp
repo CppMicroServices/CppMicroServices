@@ -1313,9 +1313,10 @@ namespace cppmicroservices
                                                                             { Constants::SERVICE_RANKING, Any(1) }
                 }));
 
-                auto depSvcReg2 = bc.RegisterService<dummy::Reference1>(std::make_shared<dummy::Reference1>(),
-                                                                        ServiceProperties({
-                                                                            { Constants::SERVICE_RANKING, Any(100) }
+                auto depSvcReg2
+                    = bc.RegisterService<dummy::Reference1>(std::make_shared<dummy::Reference1>(),
+                                                            ServiceProperties({
+                                                                { Constants::SERVICE_RANKING, Any(100) }
                 }));
 
                 depSvcReg.Unregister();
@@ -1329,5 +1330,68 @@ namespace cppmicroservices
             EXPECT_TRUE(std::all_of(results.cbegin(), results.cend(), [](bool result) { return result; }));
         }
 
+        class MockImpl : public test::Interface1
+        {
+          public:
+            MockImpl() = default;
+            ~MockImpl() override = default;
+            std::string
+            Description() override
+            {
+                return "";
+            }
+        };
+
+        TEST_F(BindingPolicyTest, TestRebindConcurrentWithBundleStop)
+        {
+            auto bc = GetFramework().GetBundleContext();
+
+            // make sure there is concurrency
+            auto aws = std::make_shared<test::AsyncWorkServiceThreadPool>(20);
+            auto reg = bc.RegisterService<cppmicroservices::async::AsyncWorkService>(aws);
+
+            test::InstallAndStartDS(bc);
+            auto testBundle = test::InstallAndStartBundle(bc, "TestBundleDSTOI5");
+
+            int const numServices = 15;
+            std::vector<ServiceRegistration<test::Interface1>> registrations;
+
+            // Register 100 services with rankings 1..100
+            for (int i = 1; i <= numServices; ++i)
+            {
+                registrations.push_back(
+                    bc.RegisterService<test::Interface1>(std::make_shared<MockImpl>(),
+                                                         ServiceProperties({
+                                                             { Constants::SERVICE_RANKING, Any(i) }
+                })));
+            }
+
+            Barrier sync_point(numServices + 1); // 100 threads to synchronize
+
+            std::vector<std::future<void>> unregs;
+            unregs.reserve(numServices);
+
+            for (int i = 0; i < numServices; ++i)
+            {
+                unregs.push_back(std::async(std::launch::async,
+                                            [&registrations, &sync_point, i]()
+                                            {
+                                                sync_point.Wait(); // Wait for all threads to reach this point
+                                                registrations[i].Unregister();
+                                            }));
+            }
+
+            auto bun = std::async(std::launch::async,
+                                  [&testBundle, &sync_point]()
+                                  {
+                                      sync_point.Wait(); // Wait for all threads to reach this point
+                                      testBundle.Stop();
+                                  });
+            bun.get();
+            for (auto& f : unregs)
+            {
+                f.get();
+            }
+        }
     } // namespace scrimpl
 } // namespace cppmicroservices

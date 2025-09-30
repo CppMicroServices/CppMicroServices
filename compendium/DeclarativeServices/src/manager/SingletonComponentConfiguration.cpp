@@ -215,7 +215,8 @@ namespace cppmicroservices
         SingletonComponentConfigurationImpl::BindReference(std::string const& refName, ServiceReferenceBase const& ref)
         {
             auto context = GetComponentContext();
-            if (!context){
+            if (!context)
+            {
                 throw std::runtime_error("Invalid Singleton Component Context, likely destroyed");
             }
             auto svcToBind = context->AddToBoundServicesCache(refName, ref);
@@ -236,13 +237,14 @@ namespace cppmicroservices
                     throw std::runtime_error("Invalid Singleton Component Instance, likely destroyed");
                 }
             }
-            catch (std::exception const&)
+            catch (std::exception const& ex)
             {
                 GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
                                  "Exception received from user code while binding "
                                  "service reference"
                                      + refName + ".",
                                  std::current_exception());
+                std::cout << ex.what() << std::endl;
             }
         }
 
@@ -251,7 +253,8 @@ namespace cppmicroservices
                                                              ServiceReferenceBase const& ref)
         {
             auto context = GetComponentContext();
-            if (!context){
+            if (!context)
+            {
                 throw std::runtime_error("Invalid Singleton Component Context, likely destroyed");
             }
             try
@@ -261,14 +264,19 @@ namespace cppmicroservices
                 {
                     inst->InvokeUnbindMethod(refName, svcToUnbind);
                 }
+                else
+                {
+                    throw std::runtime_error("Invalid Singleton Component Instance, likely destroyed");
+                }
             }
-            catch (std::exception const&)
+            catch (std::exception const& ex)
             {
                 GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
                                  "Exception received from user code while unbinding "
                                  "service reference"
                                      + refName + ".",
                                  std::current_exception());
+                std::cout << ex.what() << std::endl;
             }
             context->RemoveFromBoundServicesCache(refName, ref);
         }

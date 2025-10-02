@@ -233,24 +233,48 @@ namespace cppmicroservices
         };
 
 
-// Check for C++17 atomic shared_ptr support
-#if defined(__cpp_lib_atomic_shared_ptr) && __cpp_lib_atomic_shared_ptr >= 201711L
         template <typename T>
-        class Atomic<std::shared_ptr<T>> : public std::atomic<std::shared_ptr<T>>
-        {
-        public:
-            using std::atomic<std::shared_ptr<T>>::atomic; // inherit constructors
-        };
-#else
-        template <class T>
         class Atomic<std::shared_ptr<T>>
         {
+#if defined(__cpp_lib_atomic_shared_ptr) && __cpp_lib_atomic_shared_ptr >= 201711L
+            std::atomic<std::shared_ptr<T>> m_t;
 
+          public:
+            Atomic() noexcept = default;
+            explicit Atomic(std::shared_ptr<T> t) noexcept : m_t(std::move(t)) {}
+
+            std::shared_ptr<T>
+            Load() const noexcept
+            {
+                return m_t.load();
+            }
+
+            void
+            Store(std::shared_ptr<T> const& t) noexcept
+            {
+                m_t.store(t);
+            }
+
+            std::shared_ptr<T>
+            Exchange(std::shared_ptr<T> const& t) noexcept
+            {
+                return m_t.exchange(t);
+            }
+
+            bool
+            CompareExchange(std::shared_ptr<T>& expected, std::shared_ptr<T> const& desired) noexcept
+            {
+                return m_t.compare_exchange_strong(expected, desired);
+            }
+#else
             std::shared_ptr<T> m_t;
 
           public:
+            Atomic() noexcept = default;
+            explicit Atomic(std::shared_ptr<T> t) noexcept : m_t(std::move(t)) {}
+
             std::shared_ptr<T>
-            Load() const
+            Load() const noexcept
             {
                 return std::atomic_load(&m_t);
             }
@@ -272,8 +296,8 @@ namespace cppmicroservices
             {
                 return std::atomic_compare_exchange_strong(&m_t, &expected, desired);
             }
-        };
 #endif
+        };
 
     } // namespace detail
 

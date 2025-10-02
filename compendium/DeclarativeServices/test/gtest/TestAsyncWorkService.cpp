@@ -38,7 +38,9 @@
 #include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
 #include "cppmicroservices/servicecomponent/runtime/ServiceComponentRuntime.hpp"
 
+#include <fstream>
 #include <future>
+#include <iostream>
 #include <thread>
 
 namespace test
@@ -469,4 +471,69 @@ namespace test
         ASSERT_NO_THROW(reg.Unregister());
     }
 
+    TEST_F(TestAsyncWorkServiceEndToEnd, TestConcurrentBundleInstalls)
+    {
+        auto const& param = std::make_shared<AsyncWorkServiceThreadPool>(20);
+        auto ctx = framework.GetBundleContext();
+        auto reg = ctx.RegisterService<cppmicroservices::async::AsyncWorkService>(param);
+
+        auto paths = ::test::GetAllTestBundleLocations();
+
+        constexpr int numThreads = 18;
+        Barrier b(numThreads);
+        std::vector<std::future<void>> futures;
+        std::atomic<bool> failed = false;
+        for (int i = 0; i < numThreads; ++i)
+        {
+            futures.emplace_back(
+                std::async(std::launch::async,
+                           [&, i]()
+                           {
+                               b.Wait();
+                               auto threadCtx = framework.GetBundleContext();
+
+                               std::map<std::string, std::string> installedBundles;
+
+                               for (auto const& path : paths)
+                               {
+                                   std::vector<cppmicroservices::Bundle> bundles;
+                                   try
+                                   {
+                                       bundles = threadCtx.InstallBundles(path); // returns std::vector<Bundle>
+                                   }
+                                   catch (...)
+                                   {
+                                       // ignore malformed bundles
+                                       continue;
+                                   }
+                                   for (auto const& bundle : bundles)
+                                   {
+                                       std::string name = bundle.GetSymbolicName();
+                                       auto it = installedBundles.find(name);
+                                       if (it != installedBundles.end())
+                                       {
+                                           std::cout << "Bundle '" << name << "' already installed from '" << it->second
+                                                     << "'. New install attempt from '" << path << "'." << std::endl;
+                                           failed.store(true);
+                                       }
+                                       else
+                                       {
+                                           installedBundles[name] = path;
+                                       }
+                                   }
+                               }
+                           }));
+        }
+
+        // Wait for all threads to complete
+        for (auto& fut : futures)
+        {
+            fut.get();
+        }
+
+        ASSERT_FALSE(failed.load());
+
+        framework.Stop();
+        framework.WaitForStop(std::chrono::milliseconds::zero());
+    }
 }; // namespace test

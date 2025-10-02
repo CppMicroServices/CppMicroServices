@@ -70,6 +70,11 @@ namespace test
      */
     cppmicroservices::Bundle InstallAndStartBundle(::cppmicroservices::BundleContext frameworkCtx,
                                                    std::string const& libName);
+    /**
+     * Convenience Method to retrieve all bundles in test bundle directory.
+     */
+    std::vector<std::string> 
+    GetAllTestBundleLocations();
 
     /**
      * Convenience Method to install and start DS.

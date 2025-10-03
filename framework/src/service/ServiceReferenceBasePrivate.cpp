@@ -79,8 +79,8 @@ namespace cppmicroservices
                         MakeBundle(bundle->shared_from_this()),
                         message,
                         std::make_exception_ptr(ServiceException(message, ServiceException::Type::FACTORY_ERROR))));
-                    return smap;
                 }
+                return smap;
             }
             {
                 auto l = coreInfo->properties.Lock();

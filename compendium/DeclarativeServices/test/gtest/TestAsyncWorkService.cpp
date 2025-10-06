@@ -487,7 +487,7 @@ namespace test
         {
             futures.emplace_back(
                 std::async(std::launch::async,
-                           [&, i]()
+                           [&]()
                            {
                                b.Wait();
                                auto threadCtx = framework.GetBundleContext();

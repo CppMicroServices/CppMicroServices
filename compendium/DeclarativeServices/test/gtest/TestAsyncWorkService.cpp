@@ -509,16 +509,14 @@ namespace test
                                    for (auto const& bundle : bundles)
                                    {
                                        std::string name = bundle.GetSymbolicName();
-                                       auto it = installedBundles.find(name);
-                                       if (it != installedBundles.end())
+                                       auto const [preexistingBundle, newBundleWasInserted]
+                                           = installedBundles.try_emplace(name, path);
+                                       if (!newBundleWasInserted)
                                        {
-                                           std::cout << "Bundle '" << name << "' already installed from '" << it->second
-                                                     << "'. New install attempt from '" << path << "'." << std::endl;
+                                           std::cout << "Bundle '" << name << "' already installed from '"
+                                                     << preexistingBundle->second << "'. New install attempt from '"
+                                                     << path << "'." << std::endl;
                                            failed.store(true);
-                                       }
-                                       else
-                                       {
-                                           installedBundles[name] = path;
                                        }
                                    }
                                }

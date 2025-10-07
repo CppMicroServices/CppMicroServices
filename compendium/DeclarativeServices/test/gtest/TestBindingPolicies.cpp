@@ -1351,7 +1351,6 @@ namespace cppmicroservices
             auto reg = bc.RegisterService<cppmicroservices::async::AsyncWorkService>(aws);
 
             test::InstallAndStartDS(bc);
-            auto testBundle = test::InstallAndStartBundle(bc, "TestBundleDSTOI5");
 
             int const numServices = 15;
             std::vector<ServiceRegistration<test::Interface1>> registrations;
@@ -1366,32 +1365,44 @@ namespace cppmicroservices
                 })));
             }
 
-            Barrier sync_point(numServices + 1); // 100 threads to synchronize
+            auto testBundle = test::InstallAndStartBundle(bc, "TestBundleDSTOI5");
 
-            std::vector<std::future<void>> unregs;
-            unregs.reserve(numServices);
+            Barrier sync_point(2); // 2 threads to synchronize
 
-            for (int i = 0; i < numServices; ++i)
-            {
-                unregs.push_back(std::async(std::launch::async,
-                                            [&registrations, &sync_point, i]()
-                                            {
-                                                sync_point.Wait(); // Wait for all threads to reach this point
-                                                registrations[i].Unregister();
-                                            }));
-            }
+            // std::vector<std::future<void>> unregs;
+            // unregs.reserve(numServices);
 
-            auto bun = std::async(std::launch::async,
-                                  [&testBundle, &sync_point]()
-                                  {
-                                      sync_point.Wait(); // Wait for all threads to reach this point
-                                      testBundle.Stop();
-                                  });
+            auto unreg = std::async(
+                std::launch::async,
+                [&registrations, &sync_point]()
+                {
+                    sync_point.Wait(); // Wait for all threads to reach this point
+                    for (auto i = registrations.size() - 1; i != 0; --i)
+                    {
+                        // auto unreg_start = std::chrono::steady_clock::now();
+                        registrations[i].Unregister();
+                        // auto unreg_end = std::chrono::steady_clock::now();
+                        // std::cout
+                        //     << "unreg: "
+                        //     << std::chrono::duration_cast<std::chrono::microseconds>(unreg_end - unreg_start).count()
+                        //     << std::endl;
+                    }
+                });
+
+            auto bun = std::async(
+                std::launch::async,
+                [&testBundle, &sync_point]()
+                {
+                    sync_point.Wait(); // Wait for all threads to reach this point
+                    // auto unreg_start = std::chrono::steady_clock::now();
+                    testBundle.Stop();
+                    // auto unreg_end = std::chrono::steady_clock::now();
+                    // std::cout << "stop : "
+                    //           << std::chrono::duration_cast<std::chrono::microseconds>(unreg_end - unreg_start).count()
+                    //           << std::endl;
+                });
             bun.get();
-            for (auto& f : unregs)
-            {
-                f.get();
-            }
+            unreg.get();
         }
     } // namespace scrimpl
 } // namespace cppmicroservices

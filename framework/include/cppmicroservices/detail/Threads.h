@@ -232,22 +232,49 @@ namespace cppmicroservices
             }
         };
 
-#if !defined(__GNUC__) || __GNUC__ > 4
-        // The std::atomic_load() et.al. overloads for std::shared_ptr are only available
-        // in libstdc++ since GCC 5.0. Visual Studio 2013 has it, but the Clang version
-        // is unknown so far.
 
-        // Specialize cppmicroservices::Atomic for std::shared_ptr to use the standard library atomic
-        // functions:
-        template <class T>
+        template <typename T>
         class Atomic<std::shared_ptr<T>>
         {
+#if defined(__cpp_lib_atomic_shared_ptr) && __cpp_lib_atomic_shared_ptr >= 201711L
+            std::atomic<std::shared_ptr<T>> m_t;
 
+          public:
+            Atomic() noexcept = default;
+            explicit Atomic(std::shared_ptr<T> t) noexcept : m_t(std::move(t)) {}
+
+            std::shared_ptr<T>
+            Load() const noexcept
+            {
+                return m_t.load();
+            }
+
+            void
+            Store(std::shared_ptr<T> const& t) noexcept
+            {
+                m_t.store(t);
+            }
+
+            std::shared_ptr<T>
+            Exchange(std::shared_ptr<T> const& t) noexcept
+            {
+                return m_t.exchange(t);
+            }
+
+            bool
+            CompareExchange(std::shared_ptr<T>& expected, std::shared_ptr<T> const& desired) noexcept
+            {
+                return m_t.compare_exchange_strong(expected, desired);
+            }
+#else
             std::shared_ptr<T> m_t;
 
           public:
+            Atomic() noexcept = default;
+            explicit Atomic(std::shared_ptr<T> t) noexcept : m_t(std::move(t)) {}
+
             std::shared_ptr<T>
-            Load() const
+            Load() const noexcept
             {
                 return std::atomic_load(&m_t);
             }
@@ -269,8 +296,8 @@ namespace cppmicroservices
             {
                 return std::atomic_compare_exchange_strong(&m_t, &expected, desired);
             }
-        };
 #endif
+        };
 
     } // namespace detail
 

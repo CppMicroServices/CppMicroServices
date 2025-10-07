@@ -155,7 +155,6 @@ namespace cppmicroservices
          *                         location.
          */
         std::shared_ptr<BundleResourceContainer> GetAlreadyInstalledBundlesAtLocation(
-            std::pair<BundleMap::iterator, BundleMap::iterator> range,
             std::string const& location,
             cppmicroservices::AnyMap const& bundleManifest,
             std::vector<Bundle>& res,

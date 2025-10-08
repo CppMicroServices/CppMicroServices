@@ -1355,7 +1355,7 @@ namespace cppmicroservices
             int const numServices = 15;
             std::vector<ServiceRegistration<test::Interface1>> registrations;
 
-            // Register 100 services with rankings 1..100
+            // Register numServices services with rankings 1..numServices
             for (int i = 1; i <= numServices; ++i)
             {
                 registrations.push_back(
@@ -1370,7 +1370,6 @@ namespace cppmicroservices
             Barrier sync_point(2); // 2 threads to synchronize
 
             // std::vector<std::future<void>> unregs;
-            // unregs.reserve(numServices);
 
             auto unreg = std::async(
                 std::launch::async,
@@ -1379,13 +1378,7 @@ namespace cppmicroservices
                     sync_point.Wait(); // Wait for all threads to reach this point
                     for (auto i = registrations.size() - 1; i != 0; --i)
                     {
-                        // auto unreg_start = std::chrono::steady_clock::now();
                         registrations[i].Unregister();
-                        // auto unreg_end = std::chrono::steady_clock::now();
-                        // std::cout
-                        //     << "unreg: "
-                        //     << std::chrono::duration_cast<std::chrono::microseconds>(unreg_end - unreg_start).count()
-                        //     << std::endl;
                     }
                 });
 
@@ -1394,12 +1387,7 @@ namespace cppmicroservices
                 [&testBundle, &sync_point]()
                 {
                     sync_point.Wait(); // Wait for all threads to reach this point
-                    // auto unreg_start = std::chrono::steady_clock::now();
                     testBundle.Stop();
-                    // auto unreg_end = std::chrono::steady_clock::now();
-                    // std::cout << "stop : "
-                    //           << std::chrono::duration_cast<std::chrono::microseconds>(unreg_end - unreg_start).count()
-                    //           << std::endl;
                 });
             bun.get();
             unreg.get();

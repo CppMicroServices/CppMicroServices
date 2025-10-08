@@ -244,7 +244,6 @@ namespace cppmicroservices
                                  "service reference"
                                      + refName + ".",
                                  std::current_exception());
-                std::cout << ex.what() << std::endl;
             }
         }
 
@@ -253,7 +252,6 @@ namespace cppmicroservices
                                                              ServiceReferenceBase const& ref)
         {
             auto context = GetComponentContext();
-            std::cout << any_cast<int>(ref.GetProperty(Constants::SERVICE_RANKING)) << std::endl;
             if (!context)
             {
                 throw std::runtime_error("Invalid Singleton Component Context, likely destroyed");
@@ -277,7 +275,6 @@ namespace cppmicroservices
                                  "service reference"
                                      + refName + ".",
                                  std::current_exception());
-                std::cout << ex.what() << std::endl;
             }
             context->RemoveFromBoundServicesCache(refName, ref);
         }

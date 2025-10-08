@@ -110,7 +110,7 @@ namespace cppmicroservices
                         // do nothing, just make sure that the config is stopped
                         logger->Log(
                             cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
-                            "CMEnabledState::DeleteConfigurations Deactivate threw error, swallowing and continuing",
+                            "CMEnabledState::DeleteConfigurations Deactivate threw error, swallowing and continuing: ",
                             std::current_exception());
                     }
                     config->Stop();

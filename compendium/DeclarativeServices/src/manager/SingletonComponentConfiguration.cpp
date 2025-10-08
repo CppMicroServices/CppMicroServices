@@ -237,7 +237,7 @@ namespace cppmicroservices
                     throw std::runtime_error("Invalid Singleton Component Instance, likely destroyed");
                 }
             }
-            catch (std::exception const& ex)
+            catch (std::exception const&)
             {
                 GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
                                  "Exception received from user code while binding "
@@ -268,7 +268,7 @@ namespace cppmicroservices
                     throw std::runtime_error("Invalid Singleton Component Instance, likely destroyed");
                 }
             }
-            catch (std::exception const& ex)
+            catch (std::exception const&)
             {
                 GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
                                  "Exception received from user code while unbinding "

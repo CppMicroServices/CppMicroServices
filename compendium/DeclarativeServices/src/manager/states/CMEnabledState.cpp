@@ -101,7 +101,14 @@ namespace cppmicroservices
                 auto configs = std::move(configurations);
                 for (auto const& config : configs)
                 {
-                    config->Deactivate();
+                    try
+                    {
+                        config->Deactivate();
+                    }
+                    catch (...)
+                    {
+                        // do nothing, just make sure that the config is stopped
+                    }
                     config->Stop();
                 }
             }

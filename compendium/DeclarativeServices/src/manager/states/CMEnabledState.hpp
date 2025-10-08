@@ -127,7 +127,7 @@ namespace cppmicroservices
             /**
              * Helper function used to remove all the configuration objects created by this state.
              */
-            void DeleteConfigurations();
+            void DeleteConfigurations(std::shared_ptr<logservice::LogService> logger);
 
             FRIEND_TEST(CMEnabledStateTest, TestCtor);
             FRIEND_TEST(CMEnabledStateTest, TestEnable);

@@ -54,7 +54,11 @@ namespace cppmicroservices
         d.Load()->interfaceId = interfaceId;
     }
 
-    ServiceReferenceBase::operator bool() const { return static_cast<bool>(GetBundle()); }
+    ServiceReferenceBase::
+    operator bool() const
+    {
+        return static_cast<bool>(GetBundle());
+    }
 
     ServiceReferenceBase&
     ServiceReferenceBase::operator=(std::nullptr_t)
@@ -123,6 +127,11 @@ namespace cppmicroservices
     }
 
     bool
+    ServiceReferenceBase::operator>(ServiceReferenceBase const& reference) const {
+        return reference < *this;
+    }
+
+    bool
     ServiceReferenceBase::operator<(ServiceReferenceBase const& reference) const
     {
         if (d.Load() == reference.d.Load())
@@ -132,7 +141,14 @@ namespace cppmicroservices
 
         if (!(*this))
         {
-            return true;
+            if (reference)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         if (!reference)
@@ -195,7 +211,9 @@ namespace cppmicroservices
     bool
     ServiceReferenceBase::operator==(ServiceReferenceBase const& reference) const
     {
-        return d.Load()->registration.lock() == reference.d.Load()->registration.lock();
+        // because core info stays valid even after unregistration, this guarantees that two references to two
+        // different, but both unregistered, services do NOT evaluate to be the same
+        return d.Load()->coreInfo == reference.d.Load()->coreInfo;
     }
 
     ServiceReferenceBase&

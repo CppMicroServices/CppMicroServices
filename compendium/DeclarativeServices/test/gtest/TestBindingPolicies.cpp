@@ -1356,7 +1356,7 @@ namespace cppmicroservices
             std::vector<ServiceRegistration<test::Interface1>> registrations;
 
             // Register numServices services with rankings 1..numServices
-            for (int i = 1; i <= numServices; ++i)
+            for (int i = numServices; i >= 0; --i)
             {
                 registrations.push_back(
                     bc.RegisterService<test::Interface1>(std::make_shared<MockImpl>(),
@@ -1371,24 +1371,22 @@ namespace cppmicroservices
 
             // std::vector<std::future<void>> unregs;
 
-            auto unreg = std::async(
-                std::launch::async,
-                [&registrations, &sync_point]()
-                {
-                    sync_point.Wait(); // Wait for all threads to reach this point
-                    for (auto i = registrations.size() - 1; i != 0; --i)
-                    {
-                        registrations[i].Unregister();
-                    }
-                });
+            auto unreg = std::async(std::launch::async,
+                                    [&registrations, &sync_point]()
+                                    {
+                                        sync_point.Wait(); // Wait for all threads to reach this point
+                                        for (auto& reg : registrations)
+                                        {
+                                            reg.Unregister();
+                                        }
+                                    });
 
-            auto bun = std::async(
-                std::launch::async,
-                [&testBundle, &sync_point]()
-                {
-                    sync_point.Wait(); // Wait for all threads to reach this point
-                    testBundle.Stop();
-                });
+            auto bun = std::async(std::launch::async,
+                                  [&testBundle, &sync_point]()
+                                  {
+                                      sync_point.Wait(); // Wait for all threads to reach this point
+                                      testBundle.Stop();
+                                  });
             bun.get();
             unreg.get();
         }

@@ -217,7 +217,9 @@ namespace cppmicroservices
             auto context = GetComponentContext();
             if (!context)
             {
-                throw std::runtime_error("Invalid Singleton Component Context, likely destroyed");
+                GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
+                                 "Failure while binding reference " + refName + "; invalid componentContext");
+                return;
             }
             auto svcToBind = context->AddToBoundServicesCache(refName, ref);
             if (!svcToBind)
@@ -254,7 +256,9 @@ namespace cppmicroservices
             auto context = GetComponentContext();
             if (!context)
             {
-                throw std::runtime_error("Invalid Singleton Component Context, likely destroyed");
+                GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
+                                 "Failure while unbinding reference " + refName + "; invalid componentContext");
+                return;
             }
             try
             {

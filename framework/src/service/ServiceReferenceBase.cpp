@@ -127,11 +127,6 @@ namespace cppmicroservices
     }
 
     bool
-    ServiceReferenceBase::operator>(ServiceReferenceBase const& reference) const {
-        return reference < *this;
-    }
-
-    bool
     ServiceReferenceBase::operator<(ServiceReferenceBase const& reference) const
     {
         if (d.Load() == reference.d.Load())

@@ -285,8 +285,7 @@ namespace cppmicroservices
             std::string const
                 configName_; ///< Keep track of which component configuration object this reference manager belongs to.
 
-            mutable Guarded<
-                std::set<cppmicroservices::ServiceReferenceBase, std::greater<cppmicroservices::ServiceReferenceBase>>>
+            mutable Guarded<std::set<cppmicroservices::ServiceReferenceBase>>
                 boundRefs; ///< guarded set of bound references
             mutable Guarded<std::set<cppmicroservices::ServiceReferenceBase>>
                 matchedRefs; ///< guarded set of matched references

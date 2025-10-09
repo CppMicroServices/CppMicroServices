@@ -199,11 +199,6 @@ namespace cppmicroservices
          */
         bool operator<(ServiceReferenceBase const& reference) const;
 
-        /**
-         * returns reference < *this. See above
-         */
-        bool operator>(ServiceReferenceBase const& reference) const;
-
         bool operator==(ServiceReferenceBase const& reference) const;
 
         ServiceReferenceBase& operator=(ServiceReferenceBase const& reference);

@@ -282,9 +282,9 @@ namespace cppmicroservices
         std::vector<ServiceRegistrationBase> sr;
         std::vector<ServiceReferenceU> res;
         d->coreCtx->services.GetRegisteredByBundle(d.get(), sr);
-        for (std::vector<ServiceRegistrationBase>::const_iterator i = sr.begin(); i != sr.end(); ++i)
+        for (const auto& registration : sr)
         {
-            res.emplace_back(i->GetReference());
+            res.emplace_back(registration.GetReference());
         }
         return res;
     }
@@ -301,9 +301,9 @@ namespace cppmicroservices
         std::vector<ServiceRegistrationBase> sr;
         std::vector<ServiceReferenceU> res;
         d->coreCtx->services.GetUsedByBundle(d.get(), sr);
-        for (std::vector<ServiceRegistrationBase>::const_iterator i = sr.begin(); i != sr.end(); ++i)
+        for (const auto& registration : sr)
         {
-            res.emplace_back(i->GetReference());
+            res.emplace_back(registration.GetReference());
         }
         return res;
     }

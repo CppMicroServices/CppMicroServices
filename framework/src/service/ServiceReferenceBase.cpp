@@ -134,28 +134,12 @@ namespace cppmicroservices
             return false;
         }
 
-        if (!(*this))
-        {
-            if (reference)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
         if (!reference)
         {
             return false;
         }
         auto self = d.Load();
         auto ref = reference.d.Load();
-        if (self->registration.lock() == ref->registration.lock())
-        {
-            return false;
-        }
 
         /// A deadlock caused by mutex order locking will happen if these two scoped blocks
         /// are combined into one. Multiple threads can enter this function as a result of
@@ -199,6 +183,7 @@ namespace cppmicroservices
 
             // otherwise compare using IDs,
             // is less than if it has a higher ID.
+            std::cout << "mark 8" << std::endl;
             return id2 < id1;
         }
     }

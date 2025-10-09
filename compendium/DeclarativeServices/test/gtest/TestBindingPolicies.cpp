@@ -1368,23 +1368,28 @@ namespace cppmicroservices
             auto testBundle = test::InstallAndStartBundle(bc, "TestBundleDSTOI5");
 
             Barrier sync_point(2); // 2 threads to synchronize
-
-            // std::vector<std::future<void>> unregs;
+            Barrier sync_point1(2); // 2 threads to synchronize
 
             auto unreg = std::async(std::launch::async,
-                                    [&registrations, &sync_point]()
+                                    [&registrations, &sync_point, &sync_point1]()
                                     {
                                         sync_point.Wait(); // Wait for all threads to reach this point
+                                        bool first = true;
                                         for (auto& reg : registrations)
                                         {
                                             reg.Unregister();
+                                            if (first) {
+                                                first = false;
+                                                sync_point1.Wait();
+                                            }
                                         }
                                     });
 
             auto bun = std::async(std::launch::async,
-                                  [&testBundle, &sync_point]()
+                                  [&testBundle, &sync_point, &sync_point1]()
                                   {
                                       sync_point.Wait(); // Wait for all threads to reach this point
+                                      sync_point1.Wait(); // Wait for all threads to reach this point
                                       testBundle.Stop();
                                   });
             bun.get();

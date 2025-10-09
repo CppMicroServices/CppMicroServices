@@ -182,7 +182,6 @@ namespace cppmicroservices
 
             // otherwise compare using IDs,
             // is less than if it has a higher ID.
-            std::cout << "mark 8" << std::endl;
             return id2 < id1;
         }
     }

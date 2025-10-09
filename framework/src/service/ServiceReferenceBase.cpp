@@ -54,8 +54,7 @@ namespace cppmicroservices
         d.Load()->interfaceId = interfaceId;
     }
 
-    ServiceReferenceBase::
-    operator bool() const
+    ServiceReferenceBase::operator bool() const
     {
         return static_cast<bool>(GetBundle());
     }

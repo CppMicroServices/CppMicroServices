@@ -143,6 +143,10 @@ namespace cppmicroservices
             // if they are valid, we are less
             return ref->coreInfo != nullptr;
         }
+
+        if (!ref->coreInfo){
+            return false;
+        }
         /// A deadlock caused by mutex order locking will happen if these two scoped blocks
         /// are combined into one. Multiple threads can enter this function as a result of
         /// adding/removing ServiceReferenceBase objects from STL containers. If that occurs

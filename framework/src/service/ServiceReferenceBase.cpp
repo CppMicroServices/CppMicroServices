@@ -136,6 +136,13 @@ namespace cppmicroservices
         auto self = d.Load();
         auto ref = reference.d.Load();
 
+        // if we don't have core info, this is an invalid serviceReference which was never valid
+        // should be safe and consistent across the process to use this as a mechanism of comparison
+        if (!self->coreInfo){
+            // if we are invalid, return whether they are valid.
+            // if they are valid, we are less
+            return ref->coreInfo != nullptr;
+        }
         /// A deadlock caused by mutex order locking will happen if these two scoped blocks
         /// are combined into one. Multiple threads can enter this function as a result of
         /// adding/removing ServiceReferenceBase objects from STL containers. If that occurs

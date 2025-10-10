@@ -133,10 +133,6 @@ namespace cppmicroservices
             return false;
         }
 
-        if (!reference)
-        {
-            return false;
-        }
         auto self = d.Load();
         auto ref = reference.d.Load();
 

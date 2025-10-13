@@ -215,6 +215,12 @@ namespace cppmicroservices
         SingletonComponentConfigurationImpl::BindReference(std::string const& refName, ServiceReferenceBase const& ref)
         {
             auto context = GetComponentContext();
+            if (!context)
+            {
+                GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
+                                 "Failure while binding reference " + refName + "; invalid componentContext");
+                return;
+            }
             auto svcToBind = context->AddToBoundServicesCache(refName, ref);
             if (!svcToBind)
             {
@@ -224,7 +230,14 @@ namespace cppmicroservices
             }
             try
             {
-                GetComponentInstance()->InvokeBindMethod(refName, svcToBind);
+                if (auto inst = GetComponentInstance(); inst)
+                {
+                    inst->InvokeBindMethod(refName, svcToBind);
+                }
+                else
+                {
+                    throw std::runtime_error("Invalid Singleton Component Instance, likely destroyed");
+                }
             }
             catch (std::exception const&)
             {
@@ -241,10 +254,23 @@ namespace cppmicroservices
                                                              ServiceReferenceBase const& ref)
         {
             auto context = GetComponentContext();
+            if (!context)
+            {
+                GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
+                                 "Failure while unbinding reference " + refName + "; invalid componentContext");
+                return;
+            }
             try
             {
                 auto svcToUnbind = context->LocateService(refName, ref);
-                GetComponentInstance()->InvokeUnbindMethod(refName, svcToUnbind);
+                if (auto inst = GetComponentInstance(); inst)
+                {
+                    inst->InvokeUnbindMethod(refName, svcToUnbind);
+                }
+                else
+                {
+                    throw std::runtime_error("Invalid Singleton Component Instance, likely destroyed");
+                }
             }
             catch (std::exception const&)
             {

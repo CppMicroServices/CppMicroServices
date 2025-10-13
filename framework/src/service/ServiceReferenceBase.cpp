@@ -54,7 +54,10 @@ namespace cppmicroservices
         d.Load()->interfaceId = interfaceId;
     }
 
-    ServiceReferenceBase::operator bool() const { return static_cast<bool>(GetBundle()); }
+    ServiceReferenceBase::operator bool() const
+    {
+        return static_cast<bool>(GetBundle());
+    }
 
     ServiceReferenceBase&
     ServiceReferenceBase::operator=(std::nullptr_t)
@@ -130,22 +133,20 @@ namespace cppmicroservices
             return false;
         }
 
-        if (!(*this))
-        {
-            return true;
-        }
-
-        if (!reference)
-        {
-            return false;
-        }
         auto self = d.Load();
         auto ref = reference.d.Load();
-        if (self->registration.lock() == ref->registration.lock())
-        {
-            return false;
+
+        // if we don't have core info, this is an invalid serviceReference which was never valid
+        // should be safe and consistent across the process to use this as a mechanism of comparison
+        if (!self->coreInfo){
+            // if we are invalid, return whether they are valid.
+            // if they are valid, we are less
+            return ref->coreInfo != nullptr;
         }
 
+        if (!ref->coreInfo){
+            return false;
+        }
         /// A deadlock caused by mutex order locking will happen if these two scoped blocks
         /// are combined into one. Multiple threads can enter this function as a result of
         /// adding/removing ServiceReferenceBase objects from STL containers. If that occurs
@@ -195,7 +196,9 @@ namespace cppmicroservices
     bool
     ServiceReferenceBase::operator==(ServiceReferenceBase const& reference) const
     {
-        return d.Load()->registration.lock() == reference.d.Load()->registration.lock();
+        // because core info stays valid even after unregistration, this guarantees that two references to two
+        // different, but both unregistered, services do NOT evaluate to be the same
+        return d.Load()->coreInfo == reference.d.Load()->coreInfo;
     }
 
     ServiceReferenceBase&

@@ -276,6 +276,11 @@ namespace cppmicroservices
              */
             std::unordered_set<S> previouslyAdded;
 
+            /** bool indicating that the initial tracking phase has finished and we no longer need to check the
+             * previouslyAdded set
+             */
+            bool trackInitialFinished { false };
+
             /**
              * Modification count. This field is initialized to zero and incremented by
              * modified.

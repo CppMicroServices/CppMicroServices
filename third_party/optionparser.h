@@ -541,7 +541,7 @@ public:
    */
   int index() const
   {
-    return desc == 0 ? -1 : static_cast<int>( desc->index );
+    return desc == 0 ? -1 : (int)desc->index;
   }
 
   /**
@@ -852,17 +852,17 @@ private:
 
   static Option* tag(Option* ptr)
   {
-    return reinterpret_cast<Option*>( reinterpret_cast<unsigned long long>( ptr ) | 1 );
+    return (Option*) ((unsigned long long) ptr | 1);
   }
 
   static Option* untag(Option* ptr)
   {
-    return reinterpret_cast<Option*>( reinterpret_cast<unsigned long long>( ptr ) & ~1ull);
+    return (Option*) ((unsigned long long) ptr & ~1ull);
   }
 
   static bool isTagged(Option* ptr)
   {
-    return (reinterpret_cast<unsigned long long>( ptr ) & 1);
+    return ((unsigned long long) ptr & 1);
   }
 };
 
@@ -1002,7 +1002,7 @@ struct Stats
         bool single_minus_longopt = false) :
       buffer_max(1), options_max(1) // 1 more than necessary as sentinel
   {
-    add(gnu, usage, argc, const_cast<const char**>( argv ), min_abbr_len, single_minus_longopt);
+    add(gnu, usage, argc, (const char**) argv, min_abbr_len, single_minus_longopt);
   }
 
   //! @brief POSIX Stats(...) (gnu==false).
@@ -1018,7 +1018,7 @@ struct Stats
         bool single_minus_longopt = false) :
       buffer_max(1), options_max(1) // 1 more than necessary as sentinel
   {
-    add(false, usage, argc, const_cast<const char**>( argv ), min_abbr_len, single_minus_longopt);
+    add(false, usage, argc, (const char**) argv, min_abbr_len, single_minus_longopt);
   }
 
   /**
@@ -1037,7 +1037,7 @@ struct Stats
   void add(bool gnu, const Descriptor usage[], int argc, char** argv, int min_abbr_len = 0, //
            bool single_minus_longopt = false)
   {
-    add(gnu, usage, argc, const_cast<const char**>( argv ), min_abbr_len, single_minus_longopt);
+    add(gnu, usage, argc, (const char**) argv, min_abbr_len, single_minus_longopt);
   }
 
   //! @brief POSIX add() (gnu==false).
@@ -1051,7 +1051,7 @@ struct Stats
   void add(const Descriptor usage[], int argc, char** argv, int min_abbr_len = 0, //
            bool single_minus_longopt = false)
   {
-    add(false, usage, argc, const_cast<const char**>( argv ), min_abbr_len, single_minus_longopt);
+    add(false, usage, argc, (const char**) argv, min_abbr_len, single_minus_longopt);
   }
 private:
   class CountOptionsAction;
@@ -1109,7 +1109,7 @@ public:
          int min_abbr_len = 0, bool single_minus_longopt = false, int bufmax = -1) :
       op_count(0), nonop_count(0), nonop_args(0), err(false)
   {
-    parse(gnu, usage, argc, const_cast<const char**>( argv ), options, buffer, min_abbr_len, single_minus_longopt, bufmax);
+    parse(gnu, usage, argc, (const char**) argv, options, buffer, min_abbr_len, single_minus_longopt, bufmax);
   }
 
   //! @brief POSIX Parser(...) (gnu==false).
@@ -1125,7 +1125,7 @@ public:
          bool single_minus_longopt = false, int bufmax = -1) :
       op_count(0), nonop_count(0), nonop_args(0), err(false)
   {
-    parse(false, usage, argc, const_cast<const char**>( argv ), options, buffer, min_abbr_len, single_minus_longopt, bufmax);
+    parse(false, usage, argc, (const char**) argv, options, buffer, min_abbr_len, single_minus_longopt, bufmax);
   }
 
   /**
@@ -1191,7 +1191,7 @@ public:
   void parse(bool gnu, const Descriptor usage[], int argc, char** argv, Option options[], Option buffer[],
              int min_abbr_len = 0, bool single_minus_longopt = false, int bufmax = -1)
   {
-    parse(gnu, usage, argc, const_cast<const char**>( argv ), options, buffer, min_abbr_len, single_minus_longopt, bufmax);
+    parse(gnu, usage, argc, (const char**) argv, options, buffer, min_abbr_len, single_minus_longopt, bufmax);
   }
 
   //! @brief POSIX parse() (gnu==false).
@@ -1205,7 +1205,7 @@ public:
   void parse(const Descriptor usage[], int argc, char** argv, Option options[], Option buffer[], int min_abbr_len = 0,
              bool single_minus_longopt = false, int bufmax = -1)
   {
-    parse(false, usage, argc, const_cast<const char**>( argv ), options, buffer, min_abbr_len, single_minus_longopt, bufmax);
+    parse(false, usage, argc, (const char**) argv, options, buffer, min_abbr_len, single_minus_longopt, bufmax);
   }
 
   /**
@@ -1392,9 +1392,6 @@ private:
  */
 struct Parser::Action
 {
-
-  virtual ~Action() {}
-
   /**
    * @brief Called by Parser::workhorse() for each Option that has been successfully
    * parsed (including unknown
@@ -1732,7 +1729,6 @@ struct PrintUsageImplementation
    */
   struct IStringWriter
   {
-    virtual ~IStringWriter() {}
     /**
      * @brief Writes the given number of chars beginning at the given pointer somewhere.
      */
@@ -1975,16 +1971,16 @@ struct PrintUsageImplementation
       for (len = 0; ptr[len] != 0 && ptr[len] != '\v' && ptr[len] != '\t' && ptr[len] != '\n'; ++len)
       {
         ++screenlen;
-        unsigned ch = static_cast<unsigned char>( ptr[len] );
+        unsigned ch = (unsigned char) ptr[len];
         if (ch > 0xC1) // everything <= 0xC1 (yes, even 0xC1 itself) is not a valid UTF-8 start byte
         {
           // int __builtin_clz (unsigned int x)
           // Returns the number of leading 0-bits in x, starting at the most significant bit
-          unsigned mask = static_cast<unsigned>( -1 ) >> __builtin_clz(ch ^ 0xff);
+          unsigned mask = (unsigned) -1 >> __builtin_clz(ch ^ 0xff);
           ch = ch & mask; // mask out length bits, we don't verify their correctness
-          while ((static_cast<unsigned char>( ptr[len + 1] ) ^ 0x80) <= 0x3F) // while next byte is continuation byte
+          while (((unsigned char) ptr[len + 1] ^ 0x80) <= 0x3F) // while next byte is continuation byte
           {
-            ch = (ch << 6) ^ static_cast<unsigned char>( ptr[len + 1] ) ^ 0x80; // add continuation to char code
+            ch = (ch << 6) ^ (unsigned char) ptr[len + 1] ^ 0x80; // add continuation to char code
             ++len;
           }
           // ch is the decoded unicode code point
@@ -2370,17 +2366,17 @@ struct PrintUsageImplementation
           while (maxi < len && utf8width < width)
           {
             int charbytes = 1;
-            unsigned ch = static_cast<unsigned char>( data[maxi] );
+            unsigned ch = (unsigned char) data[maxi];
             if (ch > 0xC1) // everything <= 0xC1 (yes, even 0xC1 itself) is not a valid UTF-8 start byte
             {
               // int __builtin_clz (unsigned int x)
               // Returns the number of leading 0-bits in x, starting at the most significant bit
-              unsigned mask = static_cast<unsigned>( -1 ) >> __builtin_clz(ch ^ 0xff);
+              unsigned mask = (unsigned) -1 >> __builtin_clz(ch ^ 0xff);
               ch = ch & mask; // mask out length bits, we don't verify their correctness
               while ((maxi + charbytes < len) && //
-                  ((static_cast<unsigned char>( data[maxi + charbytes] ) ^ 0x80) <= 0x3F)) // while next byte is continuation byte
+                  (((unsigned char) data[maxi + charbytes] ^ 0x80) <= 0x3F)) // while next byte is continuation byte
               {
-                ch = (ch << 6) ^ static_cast<unsigned char>( data[maxi + charbytes] ) ^ 0x80; // add continuation to char code
+                ch = (ch << 6) ^ (unsigned char) data[maxi + charbytes] ^ 0x80; // add continuation to char code
                 ++charbytes;
               }
               // ch is the decoded unicode code point

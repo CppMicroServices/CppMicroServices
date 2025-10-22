@@ -7,6 +7,12 @@ include_directories(../../third_party)
 
 set(srcs main.cpp "AddPaths.cpp" "CopyPaths.cpp" "ChangeNamespace.cpp")
 
+if(US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG OR US_COMPILER_GNU)
+  set_property(SOURCE main.cpp 
+               APPEND PROPERTY COMPILE_OPTIONS 
+               -Wno-old-style-cast -Wno-non-virtual-dtor)
+endif()
+
 add_executable(change_namespace ${srcs})
 set_property(TARGET change_namespace PROPERTY OUTPUT_NAME change_namespace)
 

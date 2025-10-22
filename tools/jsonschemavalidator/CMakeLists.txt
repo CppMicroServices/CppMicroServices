@@ -4,9 +4,19 @@ enable_language(CXX)
 include_directories(../../third_party)
 
 set(srcs main.cpp)
+if(US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG OR US_COMPILER_GNU)
+  set_property(SOURCE main.cpp 
+               APPEND PROPERTY COMPILE_OPTIONS 
+               -Wno-old-style-cast -Wno-non-virtual-dtor)
+endif()
 
 add_executable(jsonschemavalidator ${srcs})
 set_property(TARGET jsonschemavalidator PROPERTY OUTPUT_NAME jsonschemavalidator)
+
+if(US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG)
+  add_compile_options(-Wno-old-style-cast)
+  add_compile_options(-Wno-non-virtual-dtor)
+endif()
 
 if(NOT US_NO_INSTALL)
     install(TARGETS jsonschemavalidator

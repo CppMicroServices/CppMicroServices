@@ -1,4 +1,3 @@
-
 enable_language(C)
 
 # Temporarily disable enable exports for executables
@@ -27,6 +26,13 @@ if(NOT APPLE AND US_COMPILER_GNU_ARM AND CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64
 endif()
 
 add_executable(${US_RCC_EXECUTABLE_TARGET} ${srcs})
+
+if(US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG OR US_COMPILER_GNU)
+  set_property(SOURCE ResourceCompiler.cpp 
+               APPEND PROPERTY COMPILE_OPTIONS 
+               -Wno-old-style-cast -Wno-non-virtual-dtor)
+endif()
+
 set_property(TARGET ${US_RCC_EXECUTABLE_TARGET} PROPERTY OUTPUT_NAME ${US_RCC_EXECUTABLE_OUTPUT_NAME})
 if(WIN32)
     target_link_libraries(${US_RCC_EXECUTABLE_TARGET} Shlwapi)

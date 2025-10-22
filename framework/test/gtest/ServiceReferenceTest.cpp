@@ -371,6 +371,9 @@ TEST_F(ServiceReferenceTest, TestLessThanOperator_SameRanking_DifferentIDs)
     // Clean up
     regA.Unregister();
     regB.Unregister();
+
+    ASSERT_TRUE(srB < srA);
+    ASSERT_FALSE(srA < srB);
 }
 
 TEST_F(ServiceReferenceTest, TestLessThanOperator_InvalidReferences)

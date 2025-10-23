@@ -6,6 +6,7 @@
 
 #include <chrono>
 
+#include "TestUtils.h"
 #include "benchmark/benchmark.h"
 
 #include "fooservice.h"

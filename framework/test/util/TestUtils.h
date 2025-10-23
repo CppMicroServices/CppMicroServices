@@ -38,6 +38,9 @@ limitations under the License.
 #        error Monotonic clock support missing on this POSIX platform
 #    endif
 #elif defined(US_PLATFORM_WINDOWS)
+#    ifndef NOMINMAX
+#        define NOMINMAX
+#    endif
 #    ifndef WIN32_LEAN_AND_MEAN
 #        define WIN32_LEAN_AND_MEAN
 #    endif

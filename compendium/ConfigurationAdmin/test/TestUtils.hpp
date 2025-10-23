@@ -34,6 +34,12 @@
 #include <random>
 #include <string>
 
+#if defined(US_PLATFORM_WINDOWS)
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#endif
+
 namespace test
 {
 

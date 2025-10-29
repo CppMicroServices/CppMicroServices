@@ -6,6 +6,38 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog <http://keepachangelog.com/>`_
 and this project adheres to `Semantic Versioning <http://semver.org/>`_.
 
+`v3.8.9 <https://github.com/cppmicroservices/cppmicroservices/tree/3.8.9>`_ (2025-10-31)
+---------------------------------------------------------------------------------------------------------
+
+`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.8.8...3.8.9>`_
+
+Added
+-----
+
+Changed
+-------
+- `[Declarative Services] Enhance bind logs <https://github.com/CppMicroServices/CppMicroServices/pull/1197>`_
+- `[Configuration Admin] Ensure synchronous config updates per-config <https://github.com/CppMicroServices/CppMicroServices/pull/1202>`_
+- `[Core Framework] Create custom error for invalid bundleContext <https://github.com/CppMicroServices/CppMicroServices/pull/1206>`_
+
+Removed
+-------
+
+Deprecated
+----------
+
+Fixed
+-----
+- `[Core Framework] Fix ambiguous overload for c++20 builds <https://github.com/CppMicroServices/CppMicroServices/pull/1195>`_
+- `[Core Framework] Fix sporadic test failure with bundle trackers <https://github.com/CppMicroServices/CppMicroServices/pull/1198>`_
+- `[Core Framework] Added new value move constructor and move assign operator <https://github.com/CppMicroServices/CppMicroServices/pull/1204>`_
+- `[Core Framework] Ensure GetServiceFromFactory is safe <https://github.com/CppMicroServices/CppMicroServices/pull/1210>`_
+- `[Core Framework] Solve issue where many threads install the same bundles concurrently <https://github.com/CppMicroServices/CppMicroServices/pull/1209>`_
+- `[Core Framework] Silence warning for use of std::atomic_load for use with shared_ptr <https://github.com/CppMicroServices/CppMicroServices/pull/1199>`_
+- `[Declarative Services] Ensure that the ComponentConfigurationImpl is stopped and referenceManagers stopTracking before destruction <https://github.com/CppMicroServices/CppMicroServices/pull/1211>`_
+- `[Declarative Services] Verify that a singleton's instance is valid before invoking unbind <https://github.com/CppMicroServices/CppMicroServices/pull/1208>`_
+- `[Declarative Services] Fix 1207 <https://github.com/CppMicroServices/CppMicroServices/pull/1213>`_
+
 `v3.8.8 <https://github.com/cppmicroservices/cppmicroservices/tree/3.8.8>`_ (2025-9-1)
 ---------------------------------------------------------------------------------------------------------
 

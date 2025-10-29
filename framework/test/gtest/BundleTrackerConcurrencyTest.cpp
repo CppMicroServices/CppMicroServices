@@ -26,6 +26,8 @@
 #include "cppmicroservices/FrameworkFactory.h"
 
 #include <future>
+#include <optional>
+#include <unordered_set>
 
 #include "TestUtils.h"
 #include "gmock/gmock.h"
@@ -146,7 +148,36 @@ TEST_F(BundleTrackerConcurrencyTest, TestOpeningTrackerWhileBundlesChange)
                          cppmicroservices::testing::InstallLib(framework.GetBundleContext(), "TestBundleR").Start();
                      });
 
-    EXPECT_CALL(*customizer, AddingBundle).Times(7);
+    std::unordered_set<std::string> trackInitial {};
+    std::unordered_set<std::string> rcvdEvt {};
+
+    // can receive anywhere between 7-13 evts.
+    // 7 calls from trackInitial (one for each bundle + 1 for system bundle)
+    // 6 calls from bundleEvts (1 for each bundle.
+    //     - If these events are fired after the initial bundles to be tracked are set but don't run till after the
+    //     trackInitial calls are made
+    //     - we will first see the AddingBundle call with a null evt and then a real bundle event.
+    //     - It cannot be the other way around (bundleEvent and then the trackInitial))
+    ON_CALL(*customizer, AddingBundle(::testing::_, ::testing::_))
+        .WillByDefault(
+            [&trackInitial, &rcvdEvt](Bundle const& bundle, BundleEvent const& evt)
+            {
+                auto name = bundle.GetSymbolicName();
+                if (!evt)
+                {
+                    // from trackInitial
+                    EXPECT_TRUE(trackInitial.count(name) == 0);
+                    EXPECT_TRUE(rcvdEvt.count(name) == 0);
+                    trackInitial.insert(name);
+                    return std::optional<Bundle> {};
+                };
+                // shouldn't get more than one evt per bundle
+                EXPECT_TRUE(rcvdEvt.count(name) == 0);
+
+                rcvdEvt.insert(name);
+                return std::optional<Bundle> {};
+            });
+
     gate.set_value();
 
     openTrackerFuture.get();

@@ -57,10 +57,10 @@ namespace cppmicroservices
 
             // methods from the AWSInt interface
             void post(std::packaged_task<void()>&& task) override;
+            std::shared_ptr<AWSInt> createStrand() override;
 
             // methods from the cppmicroservices::ServiceTrackerCustomizer interface
-            std::shared_ptr<TrackedParamType> AddingService(
-                ServiceReference<AWSInt> const& reference) override;
+            std::shared_ptr<TrackedParamType> AddingService(ServiceReference<AWSInt> const& reference) override;
             void ModifiedService(ServiceReference<AWSInt> const& reference,
                                  std::shared_ptr<AWSInt> const& service) override;
             void RemovedService(ServiceReference<AWSInt> const& reference,

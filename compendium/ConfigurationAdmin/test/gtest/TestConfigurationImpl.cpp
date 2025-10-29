@@ -53,7 +53,9 @@ namespace cppmicroservices
             props["foo"] = std::string("bar");
             std::string pid { "test~instance" };
             std::string factoryPid { "test" };
-            ConfigurationImpl conf { mockConfigAdmin.get(), pid, factoryPid, props };
+            ConfigurationImpl conf {
+                mockConfigAdmin.get(), pid, factoryPid, props, std::make_shared<async::MockAsyncWorkService>(), 1
+            };
             EXPECT_EQ(conf.GetPid(), pid);
             EXPECT_EQ(conf.GetFactoryPid(), factoryPid);
             EXPECT_THAT(conf.GetProperties(), AnyMapEquals(props));
@@ -66,11 +68,14 @@ namespace cppmicroservices
             props["foo"] = std::string("bar");
             std::string pid { "test~instance" };
             std::string factoryPid { "test" };
-            ConfigurationImpl conf { mockConfigAdmin.get(), pid, factoryPid, props };
+            ConfigurationImpl conf {
+                mockConfigAdmin.get(), pid, factoryPid, props, std::make_shared<async::MockAsyncWorkService>(), 1
+            };
             auto validFuture = std::make_shared<ThreadpoolSafeFuturePrivate>();
 
-            EXPECT_CALL(*mockConfigAdmin,
-                        NotifyConfigurationRemoved(pid, reinterpret_cast<std::uintptr_t>(&conf), testing::_))
+            EXPECT_CALL(
+                *mockConfigAdmin,
+                NotifyConfigurationRemoved(pid, reinterpret_cast<std::uintptr_t>(&conf), testing::_, testing::_))
                 .Times(1)
                 .WillOnce(testing::Return(validFuture));
             ;
@@ -93,9 +98,12 @@ namespace cppmicroservices
             props["foo"] = std::string("bar");
             std::string pid { "test~instance" };
             std::string factoryPid { "test" };
-            ConfigurationImpl conf { mockConfigAdmin.get(), pid, factoryPid, props };
-            EXPECT_CALL(*mockConfigAdmin, NotifyConfigurationRemoved(testing::_, testing::_, testing::_)).Times(0);
-            EXPECT_CALL(*mockConfigAdmin, NotifyConfigurationUpdated(testing::_, testing::_)).Times(0);
+            ConfigurationImpl conf {
+                mockConfigAdmin.get(), pid, factoryPid, props, std::make_shared<async::MockAsyncWorkService>(), 1
+            };
+            EXPECT_CALL(*mockConfigAdmin, NotifyConfigurationRemoved(testing::_, testing::_, testing::_, testing::_))
+                .Times(0);
+            EXPECT_CALL(*mockConfigAdmin, NotifyConfigurationUpdated(testing::_, testing::_, testing::_)).Times(0);
             EXPECT_NO_THROW(conf.Invalidate());
             EXPECT_NO_THROW(conf.Update(props));
             props["bar"] = std::string("foo");
@@ -111,10 +119,12 @@ namespace cppmicroservices
             props["foo"] = std::string("bar");
             std::string pid { "test~instance" };
             std::string factoryPid { "test" };
-            ConfigurationImpl conf { mockConfigAdmin.get(), pid, factoryPid, props };
+            ConfigurationImpl conf {
+                mockConfigAdmin.get(), pid, factoryPid, props, std::make_shared<async::MockAsyncWorkService>(), 1
+            };
             auto validFuture = std::make_shared<ThreadpoolSafeFuturePrivate>();
 
-            EXPECT_CALL(*mockConfigAdmin, NotifyConfigurationUpdated(pid, testing::_))
+            EXPECT_CALL(*mockConfigAdmin, NotifyConfigurationUpdated(pid, testing::_, testing::_))
                 .Times(1)
                 .WillOnce(testing::Return(validFuture));
             ;
@@ -128,10 +138,12 @@ namespace cppmicroservices
             props["foo"] = std::string("bar");
             std::string pid { "test~instance" };
             std::string factoryPid { "test" };
-            ConfigurationImpl conf { mockConfigAdmin.get(), pid, factoryPid, props };
+            ConfigurationImpl conf {
+                mockConfigAdmin.get(), pid, factoryPid, props, std::make_shared<async::MockAsyncWorkService>(), 1
+            };
             auto validFuture = std::make_shared<ThreadpoolSafeFuturePrivate>();
 
-            EXPECT_CALL(*mockConfigAdmin, NotifyConfigurationUpdated(pid, testing::_))
+            EXPECT_CALL(*mockConfigAdmin, NotifyConfigurationUpdated(pid, testing::_, testing::_))
                 .Times(1)
                 .WillOnce(testing::Return(validFuture));
             auto result = conf.UpdateIfDifferent(props);
@@ -148,8 +160,10 @@ namespace cppmicroservices
             props["foo"] = std::string("bar");
             std::string pid { "test~instance" };
             std::string factoryPid { "test" };
-            ConfigurationImpl conf { mockConfigAdmin.get(), pid, factoryPid, props };
-            EXPECT_CALL(*mockConfigAdmin, NotifyConfigurationUpdated(pid, testing::_)).Times(0);
+            ConfigurationImpl conf {
+                mockConfigAdmin.get(), pid, factoryPid, props, std::make_shared<async::MockAsyncWorkService>(), 1
+            };
+            EXPECT_CALL(*mockConfigAdmin, NotifyConfigurationUpdated(pid, testing::_, testing::_)).Times(0);
             EXPECT_EQ(conf.UpdateWithoutNotificationIfDifferent(props), std::make_pair(false, 0ul));
             props["bar"] = std::string("baz");
             EXPECT_EQ(conf.UpdateWithoutNotificationIfDifferent(props), std::make_pair(true, 2ul));
@@ -162,8 +176,11 @@ namespace cppmicroservices
             props["foo"] = std::string("bar");
             std::string pid { "test~instance" };
             std::string factoryPid { "test" };
-            ConfigurationImpl conf { mockConfigAdmin.get(), pid, factoryPid, props };
-            EXPECT_CALL(*mockConfigAdmin, NotifyConfigurationRemoved(testing::_, testing::_, testing::_)).Times(0);
+            ConfigurationImpl conf {
+                mockConfigAdmin.get(), pid, factoryPid, props, std::make_shared<async::MockAsyncWorkService>(), 1
+            };
+            EXPECT_CALL(*mockConfigAdmin, NotifyConfigurationRemoved(testing::_, testing::_, testing::_, testing::_))
+                .Times(0);
             EXPECT_FALSE(conf.RemoveWithoutNotificationIfChangeCountEquals(0ul));
             EXPECT_TRUE(conf.RemoveWithoutNotificationIfChangeCountEquals(1ul));
         }

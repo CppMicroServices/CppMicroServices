@@ -192,8 +192,18 @@ namespace cppmicroservices
                  * AsyncWorkService
                  */
                 virtual std::shared_future<void> Remove() = 0;
+
+                /**
+                 * Retrieve the instance count of a configuration sharing the same config-id
+                 *
+                 * Duplicate ids can be created if the first instance is created and then removed, after which another
+                 * configuration with the same id is created
+                 * 
+                 * @return A monotonically increasing value reflecting the instance of configuration sharing this id
+                 */
+                virtual unsigned long GetInstanceCount() = 0;
             };
         } // namespace cm
-    }     // namespace service
+    } // namespace service
 } // namespace cppmicroservices
 #endif // Configuration_hpp

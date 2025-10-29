@@ -67,6 +67,15 @@ namespace cppmicroservices
              * with the std::packaged_task<void()> in order to wait on the async task.
              */
             virtual void post(std::packaged_task<void()>&& task) = 0;
+
+            /**
+             * Create a strand to allow clients to serialize specific tasks
+             */
+            virtual std::shared_ptr<AsyncWorkService>
+            createStrand()
+            {
+                return nullptr;
+            }
         };
     } // namespace async
 } // namespace cppmicroservices

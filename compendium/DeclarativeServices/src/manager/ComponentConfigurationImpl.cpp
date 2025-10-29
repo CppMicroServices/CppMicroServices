@@ -84,7 +84,6 @@ namespace cppmicroservices
             }
             for (auto const& refMetadata : this->metadata->refsMetadata)
             {
-
                 auto refManager = std::make_shared<ReferenceManagerImpl>(refMetadata,
                                                                          bundle.GetBundleContext(),
                                                                          this->logger,

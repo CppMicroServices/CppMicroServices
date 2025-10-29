@@ -247,11 +247,13 @@ namespace cppmicroservices
             using ActualTask = std::packaged_task<void(std::shared_ptr<CMEnabledState>)>;
             using PostTask = std::packaged_task<void()>;
 
+            auto logger = GetLogger();
+
             ActualTask task(
-                [](std::shared_ptr<CMEnabledState> enabledState) mutable
+                [logger](std::shared_ptr<CMEnabledState> enabledState) mutable
                 {
                     // do task
-                    enabledState->DeleteConfigurations();
+                    enabledState->DeleteConfigurations(logger);
                 });
 
             auto disabledState = std::make_shared<CMDisabledState>(task.get_future().share());

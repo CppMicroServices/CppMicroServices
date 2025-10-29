@@ -27,6 +27,7 @@
 #include "cppmicroservices/util/Error.h"
 #include "cppmicroservices/util/FileSystem.h"
 #include <iostream>
+#include <filesystem>
 
 #if defined(US_PLATFORM_WINDOWS)
 #    include <Windows.h>
@@ -82,6 +83,31 @@ namespace test
 #if defined(US_BUILD_SHARED_LIBS)
         frameworkCtx.InstallBundles(PathToLib(libName));
 #endif
+    }
+
+    std::vector<std::string> 
+    GetAllTestBundleLocations()
+    {
+        namespace fs = std::filesystem;
+        std::vector<std::string> bundlePaths;
+
+        // Construct the directory path
+        std::string dirPath = cppmicroservices::testing::LIB_PATH + cppmicroservices::util::DIR_SEP;
+
+        // Get the extension (ensure it starts with a dot)
+        std::string ext = US_LIB_EXT;
+        if (!ext.empty() && ext[0] != '.') {
+            ext = "." + ext;
+        }
+
+        // Iterate over directory entries
+        for (const auto& entry : fs::directory_iterator(dirPath)) {
+            if (entry.is_regular_file() && entry.path().extension() == ext) {
+                bundlePaths.push_back(entry.path().string());
+            }
+        }
+
+        return bundlePaths;
     }
 
     cppmicroservices::Bundle

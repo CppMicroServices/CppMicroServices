@@ -213,7 +213,62 @@ namespace test
     }
 
     /* test concurrentFactoryCreation.
-     * This test creates 100 factory objects concurrently 
+     * This test creates 100 factory objects concurrently
+     */
+    TEST_F(tServiceComponent, testConcurrentFactoryCreationAndBundleStop)
+    {
+        auto const& aws = std::make_shared<AsyncWorkServiceThreadPool>(10);
+        auto reg = context.RegisterService<cppmicroservices::async::AsyncWorkService>(aws);
+
+        std::string configurationPid = "ServiceComponentPid";
+
+        // Start the test bundle containing the factory component.
+        cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA21");
+
+        // Get a service reference to ConfigAdmin to create the factory component instances.
+        auto configAdminService = GetInstance<cppmicroservices::service::cm::ConfigurationAdmin>();
+        ASSERT_TRUE(configAdminService) << "GetService failed for ConfigurationAdmin";
+
+        // Create some factory configuration objects. Don't wait for one to complete before
+        // creating the next one.
+        constexpr auto count = 100;
+        std::vector<std::shared_future<void>> futures;
+        Barrier postConfigCreation(count + 1); // 100 threads to synchronize
+
+        for (int i = 0; i < count; i++)
+        {
+            auto removeConfig
+                = [&postConfigCreation](std::shared_ptr<cppmicroservices::service::cm::Configuration> factoryConfig)
+            {
+                postConfigCreation.Wait();
+                auto fut = factoryConfig->Update({});
+                fut.wait();
+            };
+
+            // Create the factory configuration object
+            auto factoryConfig = configAdminService->CreateFactoryConfiguration(configurationPid);
+            // auto fut = factoryConfig->Update({});
+
+            futures.emplace_back(std::async(std::launch::async, removeConfig, factoryConfig));
+        }
+        futures.emplace_back(std::async(std::launch::async,
+                                        [&testBundle, &postConfigCreation]()
+                                        {
+                                            postConfigCreation.Wait();
+                                            testBundle.Stop();
+                                        }));
+
+        // Wait for all factory objects to finish updating.
+        for (auto const& item : futures)
+        {
+            item.get();
+        }
+
+        reg.Unregister();
+    }
+
+    /* test concurrentFactoryCreation.
+     * This test creates 100 factory objects concurrently
      */
     TEST_F(tServiceComponent, testConcurrentFactoryCreation)
     {
@@ -261,11 +316,13 @@ namespace test
         // cause DS to construct the factory instances.
         auto instances = GetInstances<test::CAInterface>();
         EXPECT_EQ(instances.size(), count);
+        reg.Unregister();
     }
 
-    class dsGraph1Impl : public test::DSGraph01 {
+    class dsGraph1Impl : public test::DSGraph01
+    {
       public:
-        dsGraph1Impl() : test::DSGraph01(){}
+        dsGraph1Impl() : test::DSGraph01() {}
         ~dsGraph1Impl() = default;
 
         std::string
@@ -278,19 +335,20 @@ namespace test
     TEST_F(tServiceComponent, TestServicePropsChangeForBind)
     {
         auto ctx = framework.GetBundleContext();
-        auto configAdmin = ctx.GetService<cppmicroservices::service::cm::ConfigurationAdmin>(  
+        auto configAdmin = ctx.GetService<cppmicroservices::service::cm::ConfigurationAdmin>(
             ctx.GetServiceReference<cppmicroservices::service::cm::ConfigurationAdmin>());
 
         auto bundle = StartTestBundle("TestBundleDSCA20");
 
-        auto bundle1  = StartTestBundle("TestBundleDSCA20_5");
+        auto bundle1 = StartTestBundle("TestBundleDSCA20_5");
         auto dsgraph1 = std::make_shared<dsGraph1Impl>();
 
-        ctx.RegisterService<test::DSGraph01>(dsgraph1);
+        auto depReg = ctx.RegisterService<test::DSGraph01>(dsgraph1);
 
         std::string configID = "sample::ServiceComponentCA20";
 
-        cppmicroservices::AnyMap properties = cppmicroservices::AnyMap { cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS };
+        cppmicroservices::AnyMap properties
+            = cppmicroservices::AnyMap { cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS };
         properties["someKey"] = true;
         auto config = configAdmin->CreateFactoryConfiguration(configID);
         config->Update(properties).get();
@@ -303,6 +361,8 @@ namespace test
         properties["someKey"] = false;
         config->Update(properties).get();
         ASSERT_FALSE(mainSvc->isDependencyInjected());
+
+        depReg.Unregister();
     }
 
     /* test testDependencyOnFactoryServiceWithModifiedMethod.
@@ -344,5 +404,7 @@ namespace test
 
         // assert DEPENDING service does not exist
         ASSERT_TRUE(GetInstance<test::ServiceAInt>()) << "GetService FAILED for test::ServiceAInt";
+
+        reg.Unregister();
     }
 } // namespace test

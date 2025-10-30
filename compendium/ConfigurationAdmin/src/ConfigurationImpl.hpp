@@ -36,7 +36,7 @@ namespace cppmicroservices
 {
     namespace cmimpl
     {
-
+        using cppmicroservices::async::AsyncWorkService;
         /**
          * This class implements the {@code cppmicroservices::service::cm::Configuration} interface.
          */
@@ -49,6 +49,8 @@ namespace cppmicroservices
                               std::string pid,
                               std::string factoryPid,
                               AnyMap properties,
+                              std::shared_ptr<AsyncWorkService> aws,
+                              unsigned long const iCount,
                               unsigned long const cCount = 0);
             ~ConfigurationImpl() override = default;
             ConfigurationImpl(ConfigurationImpl const&) = delete;
@@ -137,6 +139,15 @@ namespace cppmicroservices
             std::shared_future<void> Remove() override;
 
             /**
+             * Retrieve the instance of a configuration sharing this config-id
+             *
+             * @return unsigned long
+             *
+             * See {@code Configuration#GetInstanceCount}
+             */
+            unsigned long GetInstanceCount() override;
+
+            /**
              * Remove this Configuration from ConfigurationAdmin.
              *
              * @return A std::shared_ptr<ThreadpoolSafeFuture>, safe to wait on from within the
@@ -190,6 +201,7 @@ namespace cppmicroservices
             }
 
           private:
+            std::shared_ptr<AsyncWorkService> strand;
             std::mutex configAdminMutex;
             ConfigurationAdminPrivate* configAdminImpl;
             mutable std::mutex propertiesMutex;
@@ -198,6 +210,7 @@ namespace cppmicroservices
             AnyMap properties;
             unsigned long changeCount;
             bool removed;
+            unsigned long instance;
         };
     } // namespace cmimpl
 } // namespace cppmicroservices

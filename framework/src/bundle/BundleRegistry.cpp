@@ -107,16 +107,18 @@ namespace cppmicroservices
       the iterators to be incorrect.
     */
     std::shared_ptr<BundleResourceContainer>
-    BundleRegistry::GetAlreadyInstalledBundlesAtLocation(
-        std::pair<BundleMap::iterator, BundleMap::iterator> foundBundles,
-        std::string const& location,
-        cppmicroservices::AnyMap const& bundleManifest,
-        std::vector<Bundle>& resultingBundles,
-        std::vector<std::string>& alreadyInstalled,
-        bool filter)
+    BundleRegistry::GetAlreadyInstalledBundlesAtLocation(std::string const& location,
+                                                         cppmicroservices::AnyMap const& bundleManifest,
+                                                         std::vector<Bundle>& resultingBundles,
+                                                         std::vector<std::string>& alreadyInstalled,
+                                                         bool filter)
     {
         auto l = bundles.Lock();
         US_UNUSED(l);
+
+        // access the found bundles range within the critical region
+        auto foundBundles = bundles.v.equal_range(location);
+
         // First, get a BundleResourceContainer to work with. Either create a new one (if one hasn't been
         // made yet for this location), or use one from another BundleArchive at this location.
         auto resourceContainer = (foundBundles.first == foundBundles.second
@@ -128,13 +130,17 @@ namespace cppmicroservices
             auto installedBundlePrivate = foundBundles.first->second;
             alreadyInstalled.emplace_back(installedBundlePrivate->symbolicName);
             Bundle actualBundle;
-            if (filter) {
-                actualBundle = coreCtx->bundleHooks.FilterBundle(MakeBundleContext(installedBundlePrivate->bundleContext.Load()),
-                                                    MakeBundle(installedBundlePrivate));
-            } else {
+            if (filter)
+            {
+                actualBundle
+                    = coreCtx->bundleHooks.FilterBundle(MakeBundleContext(installedBundlePrivate->bundleContext.Load()),
+                                                        MakeBundle(installedBundlePrivate));
+            }
+            else
+            {
                 actualBundle = MakeBundle(installedBundlePrivate);
             }
-                
+
             if (actualBundle)
             {
                 resultingBundles.push_back(actualBundle);
@@ -145,7 +151,9 @@ namespace cppmicroservices
     }
 
     std::vector<Bundle>
-    BundleRegistry::Install(std::string const& location, BundlePrivate* installingBundle, cppmicroservices::AnyMap const& bundleManifest)
+    BundleRegistry::Install(std::string const& location,
+                            BundlePrivate* installingBundle,
+                            cppmicroservices::AnyMap const& bundleManifest)
     {
         using namespace std::chrono_literals;
 
@@ -181,6 +189,11 @@ namespace cppmicroservices
             that it is able to continue with it's install, it goes ahead and performs the regular
             install procedure.
         */
+
+        /**
+         * safe to use these iterators to say 'there are already bundles here matching that location' but not to use
+         * them outside of the bundles.lock() critical region
+         */
         if (bundlesAtLocationRange.first != bundlesAtLocationRange.second)
         {
             l.UnLock();
@@ -188,8 +201,7 @@ namespace cppmicroservices
             std::vector<std::string> alreadyInstalled;
             // Populate the resultingBundles and alreadyInstalled vectors with the appropriate data
             // based on what bundles are already installed
-            auto resCont = GetAlreadyInstalledBundlesAtLocation(bundlesAtLocationRange,
-                                                                location,
+            auto resCont = GetAlreadyInstalledBundlesAtLocation(location,
                                                                 bundleManifest,
                                                                 resultingBundles,
                                                                 alreadyInstalled,
@@ -269,16 +281,9 @@ namespace cppmicroservices
                         ;
                 }
 
-                // Re-acquire the range because while this thread was waiting, the installing
-                // thread made a modification to bundles.v
-                l.Lock();
-                bundlesAtLocationRange = (bundles.Lock(), bundles.v.equal_range(location));
-                l.UnLock();
-
                 std::vector<Bundle> resultingBundles;
                 std::vector<std::string> alreadyInstalled;
-                auto resCont = GetAlreadyInstalledBundlesAtLocation(bundlesAtLocationRange,
-                                                                    location,
+                auto resCont = GetAlreadyInstalledBundlesAtLocation(location,
                                                                     bundleManifest,
                                                                     resultingBundles,
                                                                     alreadyInstalled,

@@ -49,7 +49,7 @@ namespace cppmicroservices
             auto b = (d->Lock(), d->bundle.lock());
             if (!b)
             {
-                throw std::runtime_error("The bundle context is no longer valid");
+                throw cppmicroservices::IllegalStateException("The bundle context is no longer valid");
             }
 
             return b;
@@ -96,7 +96,7 @@ namespace cppmicroservices
     {
         if (!d)
         {
-            throw std::runtime_error("The bundle context is no longer valid");
+            throw cppmicroservices::IllegalStateException("The bundle context is no longer valid");
         }
 
         d->CheckValid();
@@ -111,7 +111,7 @@ namespace cppmicroservices
     {
         if (!d)
         {
-            throw std::runtime_error("The bundle context is no longer valid");
+            throw cppmicroservices::IllegalStateException("The bundle context is no longer valid");
         }
 
         d->CheckValid();
@@ -125,7 +125,7 @@ namespace cppmicroservices
     {
         if (!d)
         {
-            throw std::runtime_error("The bundle context is no longer valid");
+            throw cppmicroservices::IllegalStateException("The bundle context is no longer valid");
         }
 
         d->CheckValid();
@@ -139,14 +139,15 @@ namespace cppmicroservices
     {
         if (!d)
         {
-            throw std::runtime_error("The bundle context is no longer valid");
+            throw cppmicroservices::IllegalStateException("The bundle context is no longer valid");
         }
 
         d->CheckValid();
         auto b = GetAndCheckBundlePrivate(d);
 
         // if the requesting bundle is NOT the system bundle, filter
-        if (b->id != 0){
+        if (b->id != 0)
+        {
             return b->coreCtx->bundleHooks.FilterBundle(*this, MakeBundle(b->coreCtx->bundleRegistry.GetBundle(id)));
         }
         return MakeBundle(b->coreCtx->bundleRegistry.GetBundle(id));
@@ -157,7 +158,7 @@ namespace cppmicroservices
     {
         if (!d)
         {
-            throw std::runtime_error("The bundle context is no longer valid");
+            throw cppmicroservices::IllegalStateException("The bundle context is no longer valid");
         }
 
         d->CheckValid();
@@ -176,7 +177,7 @@ namespace cppmicroservices
     {
         if (!d)
         {
-            throw std::runtime_error("The bundle context is no longer valid");
+            throw cppmicroservices::IllegalStateException("The bundle context is no longer valid");
         }
 
         d->CheckValid();
@@ -188,7 +189,8 @@ namespace cppmicroservices
             bus.emplace_back(MakeBundle(bu));
         }
         // if the requesting bundle is NOT the system bundle, filter
-        if (b->id != 0){
+        if (b->id != 0)
+        {
             b->coreCtx->bundleHooks.FilterBundles(*this, bus);
         }
         return bus;
@@ -199,7 +201,7 @@ namespace cppmicroservices
     {
         if (!d)
         {
-            throw std::runtime_error("The bundle context is no longer valid");
+            throw cppmicroservices::IllegalStateException("The bundle context is no longer valid");
         }
 
         d->CheckValid();
@@ -213,7 +215,7 @@ namespace cppmicroservices
     {
         if (!d)
         {
-            throw std::runtime_error("The bundle context is no longer valid");
+            throw cppmicroservices::IllegalStateException("The bundle context is no longer valid");
         }
 
         d->CheckValid();
@@ -229,7 +231,7 @@ namespace cppmicroservices
     {
         if (!d)
         {
-            throw std::runtime_error("The bundle context is no longer valid");
+            throw cppmicroservices::IllegalStateException("The bundle context is no longer valid");
         }
 
         d->CheckValid();
@@ -249,7 +251,7 @@ namespace cppmicroservices
 
         if (!d)
         {
-            throw std::runtime_error("The bundle context is no longer valid");
+            throw cppmicroservices::IllegalStateException("The bundle context is no longer valid");
         }
 
         d->CheckValid();
@@ -270,7 +272,7 @@ namespace cppmicroservices
 
         if (!d)
         {
-            throw std::runtime_error("The bundle context is no longer valid");
+            throw cppmicroservices::IllegalStateException("The bundle context is no longer valid");
         }
 
         d->CheckValid();
@@ -287,7 +289,7 @@ namespace cppmicroservices
     {
         if (!d)
         {
-            throw std::runtime_error("The bundle context is no longer valid");
+            throw cppmicroservices::IllegalStateException("The bundle context is no longer valid");
         }
 
         d->CheckValid();
@@ -301,7 +303,7 @@ namespace cppmicroservices
     {
         if (!d)
         {
-            throw std::runtime_error("The bundle context is no longer valid");
+            throw cppmicroservices::IllegalStateException("The bundle context is no longer valid");
         }
 
         d->CheckValid();
@@ -315,7 +317,7 @@ namespace cppmicroservices
     {
         if (!d)
         {
-            throw std::runtime_error("The bundle context is no longer valid");
+            throw cppmicroservices::IllegalStateException("The bundle context is no longer valid");
         }
 
         d->CheckValid();
@@ -329,7 +331,7 @@ namespace cppmicroservices
     {
         if (!d)
         {
-            throw std::runtime_error("The bundle context is no longer valid");
+            throw cppmicroservices::IllegalStateException("The bundle context is no longer valid");
         }
 
         d->CheckValid();
@@ -343,7 +345,7 @@ namespace cppmicroservices
     {
         if (!d)
         {
-            throw std::runtime_error("The bundle context is no longer valid");
+            throw cppmicroservices::IllegalStateException("The bundle context is no longer valid");
         }
 
         d->CheckValid();
@@ -357,7 +359,7 @@ namespace cppmicroservices
     {
         if (!d)
         {
-            throw std::runtime_error("The bundle context is no longer valid");
+            throw cppmicroservices::IllegalStateException("The bundle context is no longer valid");
         }
 
         d->CheckValid();
@@ -371,7 +373,7 @@ namespace cppmicroservices
     {
         if (!d)
         {
-            throw std::runtime_error("The bundle context is no longer valid");
+            throw cppmicroservices::IllegalStateException("The bundle context is no longer valid");
         }
 
         d->CheckValid();
@@ -385,7 +387,7 @@ namespace cppmicroservices
     {
         if (!d)
         {
-            throw std::runtime_error("The bundle context is no longer valid");
+            throw cppmicroservices::IllegalStateException("The bundle context is no longer valid");
         }
 
         d->CheckValid();
@@ -399,7 +401,7 @@ namespace cppmicroservices
     {
         if (!d)
         {
-            throw std::runtime_error("The bundle context is no longer valid");
+            throw cppmicroservices::IllegalStateException("The bundle context is no longer valid");
         }
 
         d->CheckValid();
@@ -413,7 +415,7 @@ namespace cppmicroservices
     {
         if (!d)
         {
-            throw std::runtime_error("The bundle context is no longer valid");
+            throw cppmicroservices::IllegalStateException("The bundle context is no longer valid");
         }
 
         d->CheckValid();
@@ -427,7 +429,7 @@ namespace cppmicroservices
     {
         if (!d)
         {
-            throw std::runtime_error("The bundle context is no longer valid");
+            throw cppmicroservices::IllegalStateException("The bundle context is no longer valid");
         }
 
         d->CheckValid();
@@ -441,7 +443,7 @@ namespace cppmicroservices
     {
         if (!d)
         {
-            throw std::runtime_error("The bundle context is no longer valid");
+            throw cppmicroservices::IllegalStateException("The bundle context is no longer valid");
         }
 
         d->CheckValid();
@@ -464,7 +466,7 @@ namespace cppmicroservices
     {
         if (!d)
         {
-            throw std::runtime_error("The bundle context is no longer valid");
+            throw cppmicroservices::IllegalStateException("The bundle context is no longer valid");
         }
 
         d->CheckValid();

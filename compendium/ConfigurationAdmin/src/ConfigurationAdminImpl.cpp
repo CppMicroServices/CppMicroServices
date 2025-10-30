@@ -194,10 +194,11 @@ namespace cppmicroservices
 {
     namespace cmimpl
     {
+        using cppmicroservices::async::AsyncWorkService;
         ConfigurationAdminImpl::ConfigurationAdminImpl(
             cppmicroservices::BundleContext context,
             std::shared_ptr<cppmicroservices::logservice::LogService> const& lggr,
-            std::shared_ptr<cppmicroservices::async::AsyncWorkService> const& asyncWS)
+            std::shared_ptr<AsyncWorkService> const& asyncWS)
             : cmContext(std::move(context))
             , logger(lggr)
             , asyncWorkService(asyncWS)
@@ -303,13 +304,16 @@ namespace cppmicroservices
                 {
                     auto factoryPid = getFactoryPid(pid);
                     AddFactoryInstanceIfRequired(pid, factoryPid);
+                    // set the instance count
                     it = configurations
                              .emplace(pid,
                                       std::make_shared<ConfigurationImpl>(
                                           this,
                                           pid,
                                           std::move(factoryPid),
-                                          AnyMap { AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS }))
+                                          AnyMap { AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS },
+                                          asyncWorkService,
+                                          ++instanceCount[pid]))
                              .first;
                     created = true;
                 }
@@ -341,7 +345,9 @@ namespace cppmicroservices
                              std::make_shared<ConfigurationImpl>(this,
                                                                  pid,
                                                                  factoryPid,
-                                                                 AnyMap { AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS }))
+                                                                 AnyMap { AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS },
+                                                                 asyncWorkService,
+                                                                 ++instanceCount[pid]))
                          .first;
                 result = it->second;
             }
@@ -453,6 +459,8 @@ namespace cppmicroservices
                                                                              pid,
                                                                              std::move(factoryPid),
                                                                              configMetadata.properties,
+                                                                             asyncWorkService,
+                                                                             ++instanceCount[pid],
                                                                              1u);
                         changeCount = newConfig->GetChangeCount();
                         it = configurations.emplace(pid, std::move(newConfig)).first;
@@ -480,7 +488,9 @@ namespace cppmicroservices
                         it->second = std::make_shared<ConfigurationImpl>(this,
                                                                          pid,
                                                                          getFactoryPid(pid),
-                                                                         configMetadata.properties);
+                                                                         configMetadata.properties,
+                                                                         asyncWorkService,
+                                                                         ++instanceCount[pid]);
                         pidsAndChangeCountsAndIDs.emplace_back(pid,
                                                                changeCount,
                                                                reinterpret_cast<std::uintptr_t>(it->second.get()));
@@ -499,7 +509,7 @@ namespace cppmicroservices
                 auto const& pid = pidAndChangeCountAndID.pid;
                 if (createdOrUpdated[idx])
                 {
-                    NotifyConfigurationUpdated(pid, pidAndChangeCountAndID.changeCount);
+                    NotifyConfigurationUpdated(pid, pidAndChangeCountAndID.changeCount, nullptr);
                     logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
                                 "AddConfigurations: Created or Updated Configuration instance with PID " + pid);
                 }
@@ -579,7 +589,7 @@ namespace cppmicroservices
                 {
                     if (removedAndUpdated[idx].second)
                     {
-                        NotifyConfigurationUpdated(pid, pidAndChangeCountAndID.changeCount);
+                        NotifyConfigurationUpdated(pid, pidAndChangeCountAndID.changeCount, nullptr);
                     }
                     logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
                                 "RemoveConfigurations: Removed Configuration instance with PID " + pid);
@@ -595,7 +605,9 @@ namespace cppmicroservices
         }
 
         std::shared_ptr<ThreadpoolSafeFuturePrivate>
-        ConfigurationAdminImpl::NotifyConfigurationUpdated(std::string const& pid, unsigned long const changeCount)
+        ConfigurationAdminImpl::NotifyConfigurationUpdated(std::string const& pid,
+                                                           unsigned long const changeCount,
+                                                           std::shared_ptr<AsyncWorkService> strand)
         {
             // NotifyConfigurationUpdated will only send a notification to the service if
             // the configuration object has been updated at least once. In order to determine whether or not
@@ -739,13 +751,15 @@ namespace cppmicroservices
                                     "Configuration Updated: Configuration instance with PID " + pid + " version: "
                                         + std::to_string(changeCount) + " properties: " + configValue.str());
                     }
-                });
+                },
+                strand);
         }
 
         std::shared_ptr<ThreadpoolSafeFuturePrivate>
         ConfigurationAdminImpl::NotifyConfigurationRemoved(std::string const& pid,
                                                            std::uintptr_t configurationId,
-                                                           unsigned long changeCount)
+                                                           unsigned long changeCount,
+                                                           std::shared_ptr<AsyncWorkService> strand)
         {
             std::promise<void> ready;
             auto alreadyRemoved = std::make_shared<ThreadpoolSafeFuturePrivate>(ready.get_future().share());
@@ -776,7 +790,7 @@ namespace cppmicroservices
             }
             if (configurationToInvalidate && hasBeenUpdated)
             {
-                auto removeFuture = NotifyConfigurationUpdated(pid, changeCount);
+                auto removeFuture = NotifyConfigurationUpdated(pid, changeCount, strand);
                 // This functor will run on another thread. Just being overly cautious to guarantee that the
                 // ConfigurationImpl which has called this method doesn't run its own destructor.
                 PerformAsync(
@@ -784,7 +798,8 @@ namespace cppmicroservices
                     {
                         logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
                                     "Configuration with PID " + pid + " has been removed.");
-                    });
+                    },
+                    strand);
 
                 return removeFuture;
             }
@@ -1033,7 +1048,7 @@ namespace cppmicroservices
 
         template <typename Functor>
         std::shared_ptr<ThreadpoolSafeFuturePrivate>
-        ConfigurationAdminImpl::PerformAsync(Functor&& f)
+        ConfigurationAdminImpl::PerformAsync(Functor&& f, std::shared_ptr<AsyncWorkService> strand)
         {
 
             std::lock_guard<std::mutex> lk { futuresMutex };
@@ -1076,7 +1091,14 @@ namespace cppmicroservices
 
             incompleteFutures.emplace(id, fut);
 
-            asyncWorkService->post(std::move(post_task));
+            if (strand)
+            {
+                strand->post(std::move(post_task));
+            }
+            else
+            {
+                asyncWorkService->post(std::move(post_task));
+            }
 
             return std::make_shared<ThreadpoolSafeFuturePrivate>(fut, singleInvokeTask);
         }

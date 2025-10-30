@@ -279,10 +279,10 @@ namespace cppmicroservices
              */
             void BatchNotifyAllListeners(std::vector<RefChangeNotification> const& notification) noexcept;
 
-            const metadata::ReferenceMetadata metadata_;    ///< reference information from the component description
+            metadata::ReferenceMetadata const metadata_;   ///< reference information from the component description
             std::unique_ptr<ServiceTracker<void>> tracker; ///< used to track service availability
             std::shared_ptr<cppmicroservices::logservice::LogService> logger_; ///< logger for this runtime
-            const std::string
+            std::string const
                 configName_; ///< Keep track of which component configuration object this reference manager belongs to.
 
             mutable Guarded<std::set<cppmicroservices::ServiceReferenceBase>>

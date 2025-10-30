@@ -20,7 +20,10 @@ if(MINGW)
     ../../third_party/jsoncpp.cpp
     PROPERTIES COMPILE_FLAGS -Wno-maybe-uninitialized
   )
+endif()
 
+if(NOT APPLE AND US_COMPILER_GNU_ARM AND CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64|ARM64|arm64")
+  add_compile_options(-Wno-error=maybe-uninitialized)
 endif()
 
 add_executable(${US_RCC_EXECUTABLE_TARGET} ${srcs})

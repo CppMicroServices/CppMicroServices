@@ -290,3 +290,118 @@ TEST_F(ServiceReferenceTest, TestRegisterUnregisterCompareReference)
 
     ASSERT_NE(set.find(sr2), set.end());
 }
+
+TEST_F(ServiceReferenceTest, TestEqualityOperator)
+{
+    auto context = framework.GetBundleContext();
+
+    auto impl = std::make_shared<TestServiceA>();
+    auto reg = context.RegisterService<ServiceNS::ITestServiceA>(impl);
+
+    auto sr1 = reg.GetReference();
+    auto sr2 = reg.GetReference();
+
+    // Should be equal: both refer to the same service
+    ASSERT_TRUE(sr1 == sr2);
+
+    // Different service
+    auto implB = std::make_shared<TestServiceB>();
+    auto regB = context.RegisterService<ServiceNS::ITestServiceB>(implB);
+    auto srB = regB.GetReference();
+
+    ASSERT_FALSE(sr1 == srB);
+
+    // After unregistration, references to different services should still not be equal
+    reg.Unregister();
+    regB.Unregister();
+    ASSERT_FALSE(sr1 == srB);
+
+    // References to the same (now unregistered) service should still compare equal
+    ASSERT_TRUE(sr1 == sr2);
+}
+
+TEST_F(ServiceReferenceTest, TestLessThanOperator_Ranking)
+{
+    auto context = framework.GetBundleContext();
+
+    // Register first service with ranking 10
+    ServiceProperties propsA;
+    propsA[Constants::SERVICE_RANKING] = 10;
+    auto implA = std::make_shared<TestServiceA>();
+    auto regA = context.RegisterService<ServiceNS::ITestServiceA>(implA, propsA);
+    auto srA = regA.GetReference();
+
+    // Register second service with ranking 20
+    ServiceProperties propsB;
+    propsB[Constants::SERVICE_RANKING] = 20;
+    auto implB = std::make_shared<TestServiceA>();
+    auto regB = context.RegisterService<ServiceNS::ITestServiceA>(implB, propsB);
+    auto srB = regB.GetReference();
+
+    // Lower ranking is less
+    ASSERT_TRUE(srA < srB);
+    ASSERT_FALSE(srB < srA);
+
+    // Clean up
+    regA.Unregister();
+    regB.Unregister();
+
+    ASSERT_TRUE(srA < srB);
+    ASSERT_FALSE(srB < srA);
+}
+
+TEST_F(ServiceReferenceTest, TestLessThanOperator_SameRanking_DifferentIDs)
+{
+    auto context = framework.GetBundleContext();
+
+    // Register first service (will have lower ID)
+    auto implA = std::make_shared<TestServiceA>();
+    auto regA = context.RegisterService<ServiceNS::ITestServiceA>(implA);
+    auto srA = regA.GetReference();
+
+    // Register second service (will have higher ID)
+    auto implB = std::make_shared<TestServiceA>();
+    auto regB = context.RegisterService<ServiceNS::ITestServiceA>(implB);
+    auto srB = regB.GetReference();
+    // Same ranking (default), so compare by ID
+    // Higher ID is less than lower ID
+    ASSERT_TRUE(srB < srA);
+    ASSERT_FALSE(srA < srB);
+
+    // Clean up
+    regA.Unregister();
+    regB.Unregister();
+
+    ASSERT_TRUE(srB < srA);
+    ASSERT_FALSE(srA < srB);
+}
+
+TEST_F(ServiceReferenceTest, TestLessThanOperator_InvalidReferences)
+{
+    // Create two invalid references
+    cppmicroservices::ServiceReference<ServiceNS::ITestServiceA> sr1;
+    cppmicroservices::ServiceReference<ServiceNS::ITestServiceA> sr2;
+
+    // Both are invalid, so neither is less than the other
+    ASSERT_FALSE(sr1 < sr2);
+    ASSERT_FALSE(sr2 < sr1);
+}
+
+TEST_F(ServiceReferenceTest, TestLessThanOperator_InvalidVsValid)
+{
+    auto context = framework.GetBundleContext();
+
+    // Invalid reference
+    cppmicroservices::ServiceReference<ServiceNS::ITestServiceA> invalidRef;
+
+    // Valid reference
+    auto impl = std::make_shared<TestServiceA>();
+    auto reg = context.RegisterService<ServiceNS::ITestServiceA>(impl);
+    auto validRef = reg.GetReference();
+
+    // Invalid reference is less than valid reference
+    ASSERT_TRUE(invalidRef < validRef);
+    ASSERT_FALSE(validRef < invalidRef);
+
+    reg.Unregister();
+}

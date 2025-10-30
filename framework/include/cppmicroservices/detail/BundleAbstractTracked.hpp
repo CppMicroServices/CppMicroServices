@@ -22,6 +22,7 @@
 
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/detail/Log.h"
+#include "cppmicroservices/detail/ScopeGuard.h"
 
 #include <iterator>
 
@@ -53,6 +54,14 @@ namespace cppmicroservices
         void
         BundleAbstractTracked<S, T, R>::TrackInitial()
         {
+            detail::ScopeGuard cleanupFutures(
+                [this]()
+                {
+                    auto l = this->Lock();
+                    US_UNUSED(l);
+                    previouslyAdded.clear();
+                    trackInitialFinished = true;
+                });
             while (true)
             {
                 S item;
@@ -72,9 +81,10 @@ namespace cppmicroservices
                      */
                     item = initial.front();
                     initial.pop_front();
-                    if (tracked.end() != tracked.find(item))
+                    if (previouslyAdded.find(item) != previouslyAdded.end())
                     {
-                        /* if we are already tracking this item */
+                        /* if we have already notified customizer for this bundle,
+                        that was done through an event which takes precedence over a trackInitial call */
                         continue; /* skip this item */
                     }
                     if (std::find(adding.begin(), adding.end(), item) != adding.end())
@@ -129,6 +139,10 @@ namespace cppmicroservices
                         return;
                     }
                     adding.push_back(item); /* mark this item is being added */
+                    if (!trackInitialFinished)
+                    {
+                        previouslyAdded.insert(item);
+                    }
                 }
                 else
                 {               /* we are currently tracking this item */

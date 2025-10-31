@@ -212,8 +212,9 @@ namespace test
         EXPECT_EQ(instances.size(), count);
     }
 
-    /* test concurrentFactoryCreation.
+    /* test factory creation concurrent with bundle stop.
      * This test creates 100 factory objects concurrently
+     * while at the same time stopping their owning bundle
      */
     TEST_F(tServiceComponent, testConcurrentFactoryCreationAndBundleStop)
     {

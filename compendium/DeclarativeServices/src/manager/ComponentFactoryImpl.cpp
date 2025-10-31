@@ -179,10 +179,10 @@ namespace cppmicroservices::scrimpl
         {
             throw;
         }
-        catch (...)
+        catch (std::exception const& e)
         {
             logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-                        "Failed to create ComponentManager with name " + newMetadata->name);
+                        "Failed to create ComponentManager with name " + newMetadata->name + ": " + e.what());
         }
     }
 

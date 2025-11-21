@@ -34,6 +34,7 @@ DEALINGS IN THE SOFTWARE.
 #define CPPMICROSERVICES_ANY_H
 
 #include "cppmicroservices/FrameworkConfig.h"
+#include "detail/ScopeGuard.h"
 
 #include <algorithm>
 #include <array>
@@ -158,20 +159,6 @@ namespace cppmicroservices
     template <typename ValueType>
     ValueType const& ref_any_cast(Any const& operand);
 
-    // Guard to restore stream state
-    struct OStreamFormatGuard
-    {
-        std::ostream& os;
-        std::ios::fmtflags flags;
-        std::streamsize prec;
-        explicit OStreamFormatGuard(std::ostream& o) : os(o), flags(o.flags()), prec(o.precision()) {}
-        ~OStreamFormatGuard()
-        {
-            os.flags(flags);
-            os.precision(prec);
-        }
-    };
-
     constexpr int DOUBLE_PRECISION = 12;
 
     // --------------------
@@ -203,8 +190,7 @@ namespace cppmicroservices
     std::enable_if_t<std::is_floating_point_v<T>, std::ostream&>
     any_value_to_json(std::ostream& os, T const& val, uint8_t const, int32_t const)
     {
-        OStreamFormatGuard g(os);
-        os.unsetf(std::ios::floatfield);    // defaultfloat semantics
+        detail::ScopeGuard sg([&os, oldPrec = os.precision()]() { os.precision(oldPrec); });
         os << std::setprecision(12) << val; // up to 12 significant digits, no trailing zeros
         return os;
     }
@@ -213,8 +199,7 @@ namespace cppmicroservices
     std::enable_if_t<std::is_floating_point_v<T>, std::ostream&>
     any_value_to_string(std::ostream& os, T const& val)
     {
-        OStreamFormatGuard g(os);
-        os.unsetf(std::ios::floatfield);
+        detail::ScopeGuard sg([&os, oldPrec = os.precision()]() { os.precision(oldPrec); });
         os << std::setprecision(12) << val;
         return os;
     }
@@ -223,8 +208,7 @@ namespace cppmicroservices
     std::enable_if_t<std::is_floating_point_v<T>, std::ostream&>
     any_value_to_cpp(std::ostream& os, T const& val, uint8_t const, int32_t const)
     {
-        OStreamFormatGuard g(os);
-        os.unsetf(std::ios::floatfield);
+        detail::ScopeGuard sg([&os, oldPrec = os.precision()]() { os.precision(oldPrec); });
         os << std::setprecision(12) << val;
         return os;
     }

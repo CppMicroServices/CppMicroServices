@@ -191,7 +191,7 @@ namespace cppmicroservices
     any_value_to_json(std::ostream& os, T const& val, uint8_t const, int32_t const)
     {
         detail::ScopeGuard sg([&os, oldPrec = os.precision()]() { os.precision(oldPrec); });
-        os << std::setprecision(12) << val; // up to 12 significant digits, no trailing zeros
+        os << std::setprecision(DOUBLE_PRECISION) << val;
         return os;
     }
 
@@ -200,7 +200,7 @@ namespace cppmicroservices
     any_value_to_string(std::ostream& os, T const& val)
     {
         detail::ScopeGuard sg([&os, oldPrec = os.precision()]() { os.precision(oldPrec); });
-        os << std::setprecision(12) << val;
+        os << std::setprecision(DOUBLE_PRECISION) << val;
         return os;
     }
 
@@ -209,7 +209,7 @@ namespace cppmicroservices
     any_value_to_cpp(std::ostream& os, T const& val, uint8_t const, int32_t const)
     {
         detail::ScopeGuard sg([&os, oldPrec = os.precision()]() { os.precision(oldPrec); });
-        os << std::setprecision(12) << val;
+        os << std::setprecision(DOUBLE_PRECISION) << val;
         return os;
     }
     /**

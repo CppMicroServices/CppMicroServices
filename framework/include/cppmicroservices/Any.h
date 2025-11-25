@@ -186,31 +186,35 @@ namespace cppmicroservices
         return os << val;
     }
 
+    // Helper for floating-point output with scope-based precision guard
     template <class T>
-    std::enable_if_t<std::is_floating_point_v<T>, std::ostream&>
-    any_value_to_json(std::ostream& os, T const& val, uint8_t const, int32_t const)
+    std::ostream&
+    stream_floating_point(std::ostream& os, T const& val)
     {
         detail::ScopeGuard sg([&os, oldPrec = os.precision()]() { os.precision(oldPrec); });
         os << std::setprecision(DOUBLE_PRECISION) << val;
         return os;
+    }
+
+    template <class T>
+    std::enable_if_t<std::is_floating_point_v<T>, std::ostream&>
+    any_value_to_json(std::ostream& os, T const& val, uint8_t const, int32_t const)
+    {
+        return stream_floating_point(os, val);
     }
 
     template <class T>
     std::enable_if_t<std::is_floating_point_v<T>, std::ostream&>
     any_value_to_string(std::ostream& os, T const& val)
     {
-        detail::ScopeGuard sg([&os, oldPrec = os.precision()]() { os.precision(oldPrec); });
-        os << std::setprecision(DOUBLE_PRECISION) << val;
-        return os;
+        return stream_floating_point(os, val);
     }
 
     template <class T>
     std::enable_if_t<std::is_floating_point_v<T>, std::ostream&>
     any_value_to_cpp(std::ostream& os, T const& val, uint8_t const, int32_t const)
     {
-        detail::ScopeGuard sg([&os, oldPrec = os.precision()]() { os.precision(oldPrec); });
-        os << std::setprecision(DOUBLE_PRECISION) << val;
-        return os;
+        return stream_floating_point(os, val);
     }
     /**
      * \internal

@@ -331,7 +331,7 @@ namespace cppmicroservices
         std::size_t length = references.size();
         if (length == 0)
         { /* if no service is being tracked */
-            throw ServiceException("No service is being tracked");
+            return ServiceReference<S>();
         }
         auto selectedRef = references.begin();
         if (length > 1)
@@ -442,21 +442,14 @@ namespace cppmicroservices
             return service;
         }
 
-        try
-        {
-            auto reference = GetServiceReference();
-            if (!reference.GetBundle())
-            {
-                return std::shared_ptr<TrackedParamType>();
-            }
-            service = GetService(reference);
-            d->cachedService.Store(service);
-            return service;
-        }
-        catch (ServiceException const&)
+        auto reference = GetServiceReference();
+        if (!reference || !reference.GetBundle())
         {
             return std::shared_ptr<TrackedParamType>();
         }
+        service = GetService(reference);
+        d->cachedService.Store(service);
+        return service;
     }
 
     template <class S, class T>

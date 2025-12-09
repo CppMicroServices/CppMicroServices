@@ -478,6 +478,15 @@ namespace cppmicroservices
                             std::shared_ptr<TrackedParamType> const& service) override;
 
       private:
+        /**
+         * Internal method to retrieve a reference following same rules for retrieval
+         * as exported <code>GetServiceReference</code> method
+         *
+         * @return A <code>ServiceReference</code> for a tracked service.
+         * @note If no services are being tracked, a default <code>ServiceReference</code> is returned
+         */
+        virtual ServiceReference<S> GetServiceReference_internal() const;
+
         using TypeTraits = typename ServiceTrackerCustomizer<S, T>::TypeTraits;
 
         using _ServiceTracker = ServiceTracker<S, T>;

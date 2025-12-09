@@ -322,6 +322,17 @@ namespace cppmicroservices
     ServiceReference<S>
     ServiceTracker<S, T>::GetServiceReference() const
     {
+        auto ref = GetServiceReference_internal();
+        if (!ref){
+            throw ServiceException("No service is being tracked");
+        }
+        return ref;
+    }
+
+    template <class S, class T>
+    ServiceReference<S>
+    ServiceTracker<S, T>::GetServiceReference_internal() const
+    {
         ServiceReference<S> reference = d->cachedReference.Load();
         if (reference.GetBundle())
         {
@@ -442,7 +453,7 @@ namespace cppmicroservices
             return service;
         }
 
-        auto reference = GetServiceReference();
+        auto reference = GetServiceReference_internal();
         if (!reference || !reference.GetBundle())
         {
             return std::shared_ptr<TrackedParamType>();

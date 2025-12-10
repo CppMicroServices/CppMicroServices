@@ -331,7 +331,7 @@ namespace cppmicroservices
 
     template <class S, class T>
     ServiceReference<S>
-    ServiceTracker<S, T>::GetServiceReference_internal() const
+    ServiceTracker<S, T>::GetServiceReference_internal() const noexcept
     {
         ServiceReference<S> reference = d->cachedReference.Load();
         if (reference.GetBundle())

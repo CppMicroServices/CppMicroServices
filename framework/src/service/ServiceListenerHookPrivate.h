@@ -46,7 +46,7 @@ namespace cppmicroservices
         void* data;
         ListenerTokenId tokenId;
         std::string filter;
-        bool bRemoved;
+        std::atomic_bool bRemoved;
     };
 } // namespace cppmicroservices
 

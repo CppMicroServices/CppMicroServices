@@ -242,7 +242,7 @@ namespace cppmicroservices
          * <p>
          * This implementation calls GetService() to determine if a service
          * is being tracked.
-         * 
+         *
          * @throws std::logic_error If the <code>BundleContext</code>
          *         with which this <code>ServiceTracker</code> was created is no
          *         longer valid or became invalid while waiting on Service.
@@ -478,6 +478,18 @@ namespace cppmicroservices
                             std::shared_ptr<TrackedParamType> const& service) override;
 
       private:
+        /**
+         * Internal method to retrieve a reference following same rules for retrieval
+         * as exported <code>GetServiceReference</code> method, except that if no service is tracked,
+         * we return a default <code>ServiceReference</code> rather than throw.
+         *
+         * @return A <code>ServiceReference</code> for a tracked service.
+         * @note If no services are being tracked, a default <code>ServiceReference</code> is returned.
+         * This is needed as throwing to control code flow in <code>GetService</code> causes performance
+         * bottlenecks
+         */
+        virtual ServiceReference<S> GetServiceReference_internal() const noexcept;
+
         using TypeTraits = typename ServiceTrackerCustomizer<S, T>::TypeTraits;
 
         using _ServiceTracker = ServiceTracker<S, T>;

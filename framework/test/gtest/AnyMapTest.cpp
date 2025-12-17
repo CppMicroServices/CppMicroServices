@@ -620,3 +620,19 @@ TEST(AnyMapTest, AnyMapToCPPKitchenSink)
   }}}
 }})");
 }
+
+
+TEST(AnyMapTest, doublePrecision)
+{
+    AnyMap map(AnyMap::ORDERED_MAP);
+    double preciseValue = 1.12345678; // 12 significant digits
+    map["precise_double"] = preciseValue;
+
+    std::ostringstream jsonStream;
+    any_value_to_json(jsonStream, map);
+    std::string jsonOutput = jsonStream.str();
+
+    // Verify that the JSON contains the full precision
+    ASSERT_NE(jsonOutput.find("1.12345678"), std::string::npos)
+        << "JSON output did not preserve double precision: " << jsonOutput;
+}

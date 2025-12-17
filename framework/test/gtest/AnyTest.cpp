@@ -118,8 +118,8 @@ TEST(AnyTest, AnyFloat)
     Any anyFloat = 0.2f;
     EXPECT_EQ(anyFloat.Type(), typeid(float));
     EXPECT_LT(any_cast<float>(anyFloat) - 0.2f, std::numeric_limits<float>::epsilon());
-    EXPECT_EQ(anyFloat.ToString(), "0.2");
-    EXPECT_EQ(anyFloat.ToJSON(), "0.2");
+    EXPECT_EQ(anyFloat.ToString(), "0.20000000298");
+    EXPECT_EQ(anyFloat.ToJSON(), "0.20000000298");
     TestUnsafeAnyCast<float>(anyFloat, 0.2f);
 }
 

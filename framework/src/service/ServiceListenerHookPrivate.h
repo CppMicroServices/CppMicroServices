@@ -27,6 +27,8 @@
 
 #include "ServiceListenerEntry.h"
 
+#include <atomimc>
+
 namespace cppmicroservices
 {
 

@@ -534,4 +534,79 @@ namespace test
         framework.Stop();
         framework.WaitForStop(std::chrono::milliseconds::zero());
     }
+
+    TEST_F(TestAsyncWorkServiceEndToEnd, TestConcurrentBundleStops)
+    {
+        auto const& param = std::make_shared<AsyncWorkServiceThreadPool>(20);
+        auto ctx = framework.GetBundleContext();
+        auto reg = ctx.RegisterService<cppmicroservices::async::AsyncWorkService>(param);
+
+        auto paths = ::test::GetAllTestBundleLocations();
+        std::vector<cppmicroservices::Bundle> installedBundles;
+        std::unordered_set<std::string> dontStart { "TestBundleNestedBundleStartManagedService",
+                                                    "TestBundleBA_10",
+                                                    "TestBundleStopFail",
+                                                    "declarative_services" };
+
+        for (auto const& path : paths)
+        {
+            std::vector<cppmicroservices::Bundle> bundles;
+            try
+            {
+                bundles = ctx.InstallBundles(path);
+            }
+            catch (...)
+            {
+                // ignore malformed bundles
+                continue;
+            }
+            try
+            {
+                for (auto& bundle : bundles)
+                {
+                    if (dontStart.count(bundle.GetSymbolicName()) == 0)
+                    {
+                        bundle.Start();
+                        installedBundles.push_back(bundle);
+                    }
+                }
+            }
+            catch (std::exception const& e)
+            {
+                std::cout << "Exception: " << e.what() << std::endl;
+            }
+        }
+
+        constexpr int numThreads = 18;
+        Barrier b(numThreads + 1);
+        std::vector<std::future<void>> futures;
+        for (int i = 0; i < numThreads; ++i)
+        {
+            futures.emplace_back(std::async(std::launch::async,
+                                            [&]()
+                                            {
+                                                b.Wait();
+                                                for (auto& b : installedBundles)
+                                                {
+                                                    b.Stop();
+                                                }
+                                            }));
+        }
+
+        futures.emplace_back(std::async(std::launch::async,
+                                        [&]()
+                                        {
+                                            b.Wait();
+
+                                            framework.Stop();
+                                            framework.WaitForStop(std::chrono::milliseconds::zero());
+                                        }));
+
+        // Wait for all threads to complete
+        for (auto& fut : futures)
+        {
+            fut.get();
+        }
+    }
+
 }; // namespace test

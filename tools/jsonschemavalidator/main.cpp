@@ -27,7 +27,7 @@ limitations under the License.
 #include <stdexcept> // std::runtime_error
 #include <string>    // std::to_string
 
-#include "optionparser.h"
+#include "CLI/CLI11.hpp"
 #include "rapidjson/error/en.h"
 #include "rapidjson/istreamwrapper.h" // depends on ifstream included above
 #include "rapidjson/prettywriter.h"
@@ -99,86 +99,47 @@ validate(std::string const& jsonfile, std::string const& schemafile) noexcept
     return std::make_pair(true, "JSON file" + jsonfile + " matches the schema " + schemafile);
 }
 
-/**
- * Subclass of option::Arg used to validate input options for the program
- */
-struct Custom_Arg : public option::Arg
-{
-    /**
-     * This callback is used to error out if the option is empty
-     */
-    static option::ArgStatus
-    NonEmpty(option::Option const& option, bool msg)
-    {
-        auto retVal = option::ARG_OK;
-        if (option.arg == 0 || option.arg[0] == 0)
-        {
-            retVal = option::ARG_ILLEGAL;
-            if (msg)
-            {
-                std::cerr << "ERROR: Option '" << option.name << "' requires a non-empty argument" << std::endl;
-            }
-        }
-        return retVal;
-    }
-};
-
-enum OptionIndex
-{
-    UNKNOWN,
-    HELP,
-    SCHEMAFILE,
-    JSONFILE
-};
-
-const option::Descriptor usage[] = {
-    {   UNKNOWN,
-     0,  "",
-     "",     Custom_Arg::None,
-     "\nUSAGE: jsonschemavalidator [options]\n\n"
-     "Options:"                                                                                             },
-    {      HELP, 0, "h",        "help",     Custom_Arg::None,         " --help, -h  \tPrint usage and exit."},
-    {SCHEMAFILE, 0, "s", "schema-file", Custom_Arg::NonEmpty,        " --schema-file, -s \tSchema file path"},
-    {  JSONFILE, 0, "j",   "json-file", Custom_Arg::NonEmpty, " --json-file, -j \tJSON file to be validated"},
-    {         0, 0,   0,             0,                    0,                                              0}
-};
-
 int
 main(int argc, char* argv[])
 {
-    if (argc > 0)
-    {
-        --argc;
-        ++argv; // skip program name in argv[0]
-    }
-    option::Stats stats(usage, argc, argv);
-    std::unique_ptr<option::Option[]> options(new option::Option[stats.options_max]);
-    std::unique_ptr<option::Option[]> buffer(new option::Option[stats.buffer_max]);
-    option::Parser parse(true, usage, argc, argv, options.get(), buffer.get());
+    CLI::App app{"jsonschemavalidator: Validate a JSON file against a JSON schema."};
 
-    auto retVal = EXIT_SUCCESS;
-    if (argc == 0 || options[HELP])
-    {
-        option::printUsage(std::clog, usage);
+    std::string schemafilepath;
+    std::string jsonfilepath;
+
+    app.add_option("-s,--schema-file", schemafilepath, "Schema file path")
+        ->required()
+        ->check(CLI::ExistingFile)
+        ->type_name("SCHEMAFILE");
+
+    app.add_option("-j,--json-file", jsonfilepath, "JSON file to be validated")
+        ->required()
+        ->check(CLI::ExistingFile)
+        ->type_name("JSONFILE");
+
+    app.set_help_flag("-h,--help", "Print usage and exit.");
+
+    // Custom usage message
+    app.footer("\nExample:\n  jsonschemavalidator -s myschema.json -j mydata.json\n");
+
+    int retVal = EXIT_SUCCESS;
+    
+    // If no arguments (argc==1) or only --help/-h, print usage and exit 0
+    bool only_help = false;
+    for(int i=1; i<argc; ++i) {
+        std::string arg(argv[i]);
+        if(arg == "-h" || arg == "--help") {
+            only_help = true;
+            break;
+        }
     }
-    else if (!options[SCHEMAFILE])
-    {
-        std::cerr << "A schema file must be specified using the --schema-file(-s) "
-                     "option. Check usage."
-                  << std::endl;
-        retVal = EXIT_FAILURE;
+    if(argc == 1 || only_help) {
+        std::cout << app.help() << std::endl;
+        return EXIT_SUCCESS;
     }
-    else if (!options[JSONFILE])
-    {
-        std::cerr << "A json file must be specified using the --json-file(-j) "
-                     "option. Check usage."
-                  << std::endl;
-        retVal = EXIT_FAILURE;
-    }
-    else
-    {
-        std::string jsonfilepath(options[JSONFILE].arg);
-        std::string schemafilepath(options[SCHEMAFILE].arg);
+
+    try {
+        app.parse(argc, argv);
         auto result = validate(jsonfilepath, schemafilepath);
         if (!result.first)
         {
@@ -186,5 +147,10 @@ main(int argc, char* argv[])
             retVal = EXIT_FAILURE;
         }
     }
+    catch(const CLI::ParseError &e) {
+        // CLI11 will print the error and usage
+        return app.exit(e);
+    }
+
     return retVal;
 }

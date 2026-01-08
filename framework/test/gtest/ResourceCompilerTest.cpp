@@ -708,14 +708,18 @@ TEST_F(ResourceCompilerTest, testFailureModes)
     cmd << " --bundle-file test1.dll ";
     cmd << " --bundle-file test2.dll";
     // test Failure mode: Multiple bundle-file args
-    ASSERT_EQ(EXIT_FAILURE, runExecutable(cmd.str()));
+    // Note: CLI11 detects duplicate single-value options during parsing and returns error code 114,
+    // whereas the old optionparser validated after parsing and returned EXIT_FAILURE (1).
+    // Both correctly reject the invalid input; we just check for non-zero exit code.
+    ASSERT_NE(0, runExecutable(cmd.str()));
 
     cmd.str(std::string());
     cmd << rcbinpath;
     cmd << " --out-file test1.zip ";
     cmd << " --out-file test2.zip";
     // Test Failure mode: Multiple out-file args
-    ASSERT_EQ(EXIT_FAILURE, runExecutable(cmd.str()));
+    // CLI11 migration note: Returns error code 114 for duplicate single-value options.
+    ASSERT_NE(0, runExecutable(cmd.str()));
 
     cmd.str(std::string());
     cmd << rcbinpath;
@@ -723,7 +727,8 @@ TEST_F(ResourceCompilerTest, testFailureModes)
     cmd << " --bundle-name bar ";
     cmd << " --bundle-file bundlefile";
     // Test Failure mode: Multiple bundle-name args
-    ASSERT_EQ(EXIT_FAILURE, runExecutable(cmd.str()));
+    // CLI11 migration note: Returns error code 114 for duplicate single-value options.
+    ASSERT_NE(0, runExecutable(cmd.str()));
 
     cmd.str(std::string());
     cmd << rcbinpath;
@@ -750,7 +755,9 @@ TEST_F(ResourceCompilerTest, testFailureModes)
     cmd << " --bundle-name foo ";
     cmd << " --compression-level 11";
     // Test Failure mode: invalid --compression-level argument (11)
-    ASSERT_EQ(EXIT_FAILURE, runExecutable(cmd.str()));
+    // CLI11 migration note: Range validator rejects invalid values during parsing (error 105)
+    // instead of after parsing (EXIT_FAILURE). Both correctly detect the error.
+    ASSERT_NE(0, runExecutable(cmd.str()));
 
     cmd.str(std::string());
     cmd << rcbinpath;
@@ -758,7 +765,8 @@ TEST_F(ResourceCompilerTest, testFailureModes)
     cmd << " --bundle-name foo ";
     cmd << " --compression-level -1";
     // Test Failure mode: invalid --compression-level argument (-1)
-    ASSERT_EQ(EXIT_FAILURE, runExecutable(cmd.str()));
+    // CLI11 migration note: Range validator rejects invalid values during parsing (error 105).
+    ASSERT_NE(0, runExecutable(cmd.str()));
 
     cmd.str(std::string());
     cmd << rcbinpath;

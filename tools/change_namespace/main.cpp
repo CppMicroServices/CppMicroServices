@@ -1,4 +1,4 @@
-#include <CLI/CLI.hpp>
+#include <CLI/CLI11.hpp>
 #include <iostream>
 #include "ChangeNamespace.hpp"
 

@@ -109,6 +109,24 @@ namespace cppmicroservices
     FrameworkEvent
     FrameworkPrivate::WaitForStop(std::chrono::milliseconds const& timeout)
     {
+        auto shutdownFuncIter
+            = coreCtx->frameworkProperties.find(cppmicroservices::Constants::FRAMEWORK_EXTRA_SHUTDOWN_FUNC);
+        detail::ScopeGuard extraFunc(
+            [func = shutdownFuncIter == coreCtx->frameworkProperties.end() ? Any() : shutdownFuncIter->second]()
+            {
+                try
+                {
+                    if (!func.Empty())
+                    {
+                        any_cast<std::function<void(void)>>(func)();
+                    }
+                }
+                catch (...)
+                {
+                    throw std::runtime_error { "The framework shutdown callback threw an exception" };
+                }
+            });
+
         auto l = Lock();
         // Already stopped?
         if (((Bundle::STATE_INSTALLED | Bundle::STATE_RESOLVED) & state) == 0)

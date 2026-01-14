@@ -317,6 +317,13 @@ namespace cppmicroservices
         US_Framework_EXPORT extern const std::string
             FRAMEWORK_BUNDLE_VALIDATION_FUNC; // = "org.cppmicroservices.framework.bundle.validation.function"
 
+        /**
+         * Framework extra shutdown functionality property specifying a function that is invoked by the framework after
+         * waitForStop has finished
+         */
+        US_Framework_EXPORT extern std::string const
+            FRAMEWORK_EXTRA_SHUTDOWN_FUNC; // = "org.cppmicroservices.framework.shutdown.function"
+
         /*
          * Service properties.
          */

@@ -25,6 +25,8 @@
 #include "cppmicroservices/logservice/LogService.hpp"
 #include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
 
+#include <thread>
+
 namespace cppmicroservices
 {
     namespace scrimpl
@@ -42,9 +44,11 @@ namespace cppmicroservices
                     "service reference");
                 return;
             }
+            std::cout << std::this_thread::get_id() << " ADDING SERVICE: in service added\n";
             auto notifySatisfied = ShouldNotifySatisfied();
             if (notifySatisfied)
             {
+                std::cout << std::this_thread::get_id() << " ADDING SERVICE notify satisfied\n";
                 Log(mgr.configName_ + " has been SATISFIED for reference " + mgr.metadata_.name);
                 notifications.emplace_back(mgr.metadata_.name, RefEvent::BECAME_SATISFIED, reference);
             }

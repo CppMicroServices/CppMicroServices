@@ -27,6 +27,8 @@
 #include "cppmicroservices/ServiceReference.h"
 #include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
 
+#include <thread>
+
 using cppmicroservices::Constants::SCOPE_PROTOTYPE;
 using cppmicroservices::Constants::SERVICE_SCOPE;
 using cppmicroservices::logservice::SeverityLevel;
@@ -165,10 +167,12 @@ namespace cppmicroservices
         bool
         ReferenceManagerBaseImpl::UpdateBoundRefs()
         {
+            std::cout << std::this_thread::get_id() << " Update bound refs\n";
             auto matchedRefsHandle = matchedRefs.lock(); // acquires lock on matchedRefs
             auto const matchedRefsHandleSize = matchedRefsHandle->size();
             if (matchedRefsHandleSize >= metadata_.minCardinality)
             {
+                std::cout << std::this_thread::get_id() << " update bound refs in if\n";
                 auto boundRefsHandle = boundRefs.lock(); // acquires lock on boundRefs
                 boundRefsHandle->clear();
                 std::copy_n(matchedRefsHandle->rbegin(),
@@ -176,6 +180,7 @@ namespace cppmicroservices
                             std::inserter(*(boundRefsHandle), boundRefsHandle->begin()));
                 return true;
             }
+            std::cout << std::this_thread::get_id() << " update bound refs in else\n";
             return false;
             // release locks on matchedRefs and boundRefs
         }
@@ -193,6 +198,7 @@ namespace cppmicroservices
             auto const compConfigName = reference.GetProperty(COMPONENT_NAME);
             if ((true == compConfigName.Empty()) || (configName_ != compConfigName.ToStringNoExcept()))
             {
+                std::cout << std::this_thread::get_id() << " ADDING SERVICE: CLEAR MATCHED REFS\n";
                 // acquire lock on matchedRefs
                 auto matchedRefsHandle = matchedRefs.lock();
                 matchedRefsHandle->insert(reference);
@@ -227,6 +233,7 @@ namespace cppmicroservices
                                                  cppmicroservices::InterfaceMapConstPtr const& /*service*/)
         {
             { // acquire lock on matchedRefs
+                std::cout << std::this_thread::get_id() << " REMOVE SERVICE: CLEAR matched\n";
                 auto matchedRefsHandle = matchedRefs.lock();
                 matchedRefsHandle->erase(reference);
             } // release lock on matchedRefs

@@ -23,6 +23,8 @@
 #include "ReferenceManagerImpl.hpp"
 #include "cppmicroservices/logservice/LogService.hpp"
 
+#include <thread>
+
 namespace cppmicroservices
 {
     namespace scrimpl
@@ -62,12 +64,14 @@ namespace cppmicroservices
             std::vector<RefChangeNotification> notifications;
             if (ShouldClearBoundRefs(reference))
             {
+                std::cout << std::this_thread::get_id() << " REMOVE SERVICE: should clear bound\n";
                 Log("Notify UNSATISFIED for reference " + mgr.metadata_.name);
                 notifications.emplace_back(mgr.metadata_.name, RefEvent::BECAME_UNSATISFIED);
 
                 ClearBoundRefs();
                 if (mgr.UpdateBoundRefs())
                 {
+                    std::cout << std::this_thread::get_id() << " REMOVE SERVICE: service satisfied\n";
                     Log("Notify SATISFIED for reference " + mgr.metadata_.name);
                     notifications.emplace_back(mgr.metadata_.name, RefEvent::BECAME_SATISFIED);
                 }

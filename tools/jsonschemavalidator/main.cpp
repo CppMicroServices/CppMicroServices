@@ -121,21 +121,13 @@ main(int argc, char* argv[])
 
     // Custom usage message
     app.footer("\nExample:\n  jsonschemavalidator -s myschema.json -j mydata.json\n");
-
+    
     int retVal = EXIT_SUCCESS;
     
-    // If no arguments (argc==1) or only --help/-h, print usage and exit 0
-    bool only_help = false;
-    for(int i=1; i<argc; ++i) {
-        std::string arg(argv[i]);
-        if(arg == "-h" || arg == "--help") {
-            only_help = true;
-            break;
-        }
-    }
-    if(argc == 1 || only_help) {
+    // If no arguments provided, print usage and exit
+    if(argc == 1) {
         std::cout << app.help() << std::endl;
-        return EXIT_SUCCESS;
+        return retVal;
     }
 
     try {
@@ -146,6 +138,11 @@ main(int argc, char* argv[])
             std::cerr << result.second << std::endl;
             retVal = EXIT_FAILURE;
         }
+    }
+    catch(const CLI::CallForHelp &e) {
+        // When help is requested, print it and return success
+        std::cout << app.help() << std::endl;
+        return retVal;
     }
     catch(const CLI::ParseError &e) {
         // CLI11 will print the error and usage

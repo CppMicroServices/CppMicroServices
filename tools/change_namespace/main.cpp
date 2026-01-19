@@ -57,7 +57,7 @@ int main(int argc, char* argv[])
     } catch(const CLI::Error &e) {
         std::cerr << e.what() << std::endl;
         std::cerr << app.help() << std::endl;
-        throw std::runtime_error(e.what());
+        return EXIT_FAILURE;
     }
     
     // Set up and run your app

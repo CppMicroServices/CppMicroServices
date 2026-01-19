@@ -626,6 +626,8 @@ int main(int argc, char** argv) {
     nowide::args _(argc, argv);
 
     int const BUNDLE_MANIFEST_VALIDATION_ERROR_CODE(2);
+    constexpr int MIN_COMPRESSION_LEVEL = 0;
+    constexpr int MAX_COMPRESSION_LEVEL = 9;
     int compressionLevel = MZ_DEFAULT_LEVEL; // default compression level
     int return_code = EXIT_SUCCESS;
     std::string bundleName;
@@ -641,7 +643,7 @@ int main(int argc, char** argv) {
 
     int cli_compressionLevel = MZ_DEFAULT_LEVEL;
     app.add_option("-c,--compression-level", cli_compressionLevel, "Compression level used for zip. Value range is 0 to 9. Default value is 6.")
-        ->check(CLI::Range(0, 9));
+        ->check(CLI::Range(MIN_COMPRESSION_LEVEL, MAX_COMPRESSION_LEVEL));
 
     std::string outFile;
     auto out_file_opt = app.add_option("-o,--out-file", outFile, "Path to output zip file. If the file exists it will be overwritten. If this option is not provided, a temporary zip file will be created.");
@@ -662,8 +664,15 @@ int main(int argc, char** argv) {
 
     try {
         app.parse(argc, argv);
+    } catch(const CLI::CallForHelp &e) {
+        // When help is requested, print it and return success
+        std::cout << app.help() << std::endl;
+        return EXIT_SUCCESS;
     } catch(const CLI::ParseError &e) {
-        return app.exit(e);
+        // Print the error message to stderr for user visibility
+        std::cerr << "Error: " << e.what() << std::endl;
+        // Always return EXIT_FAILURE for backward compatibility
+        return EXIT_FAILURE;
     }
 
     // If not in verbose mode, suppress the clog stream

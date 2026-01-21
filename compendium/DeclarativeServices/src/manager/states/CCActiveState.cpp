@@ -116,9 +116,7 @@ namespace cppmicroservices
                                              std::current_exception());
                     }
                     mgr.DestroyComponentInstances();
-                    std::cout << "BEFORE the set_value" << std::endl;
                     transitionAction.set_value();
-                    std::cout << "AFTER the set_value" << std::endl;
                     break;
                 }
             }

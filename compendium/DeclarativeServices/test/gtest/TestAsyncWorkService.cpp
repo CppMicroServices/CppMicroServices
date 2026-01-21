@@ -590,35 +590,17 @@ namespace test
                            auto reg = ctx.RegisterService<test::DSGraph05>(std::make_shared<test::basicDS5>(), props);
                        }));
 
-        // futures.emplace_back(
-        //     std::async(std::launch::async,
-        //                [&]()
-        //                {
-        //                    beforeStart.Wait();
-
-        //                    auto props = cppmicroservices::ServiceProperties({
-        //                        { std::string("component.name"), std::string("test2") }
-        //                    });
-
-        //                    auto reg = ctx.RegisterService<test::DSGraph05>(std::make_shared<test::basicDS5>(), props);
-        //                }));
-
-        // Wait for all threads to complete
         for (auto& fut : futures)
         {
             fut.get();
         }
-
 
         sRef = ctx.GetServiceReference<test::DSGraph04>();
         ASSERT_TRUE(sRef);
         svc = ctx.GetService<test::DSGraph04>(sRef);
         ASSERT_EQ(svc->Description(), "DSGraph04");
 
-        std::cout << "RIGHT BEFORE STOP\n";
         framework.Stop();
-        std::cout << "RIGHT AFTER STOP\n";
         framework.WaitForStop(std::chrono::milliseconds::zero());
-        
     }
 }; // namespace test

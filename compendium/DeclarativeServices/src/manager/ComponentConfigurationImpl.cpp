@@ -256,11 +256,9 @@ namespace cppmicroservices
             switch (notification.event)
             {
                 case RefEvent::BECAME_SATISFIED:
-                    std::cout << std::this_thread::get_id() << " REF   SATISFIED" << std::endl;
                     RefSatisfied(notification.senderName);
                     break;
                 case RefEvent::BECAME_UNSATISFIED:
-                    std::cout << std::this_thread::get_id() << " REF UNSATISFIED" << std::endl;
                     RefUnsatisfied(notification.senderName);
                     break;
                 case RefEvent::REBIND:

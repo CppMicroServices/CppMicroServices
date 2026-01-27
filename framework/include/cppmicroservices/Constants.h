@@ -322,9 +322,9 @@ namespace cppmicroservices
          * waitForStop() completes.
          *
          * @return void
-         * @note This method will be invoked **once and only once**
          * @note The value must be a callable convertible to: std::function<void()>
-         * @note The callback MAY NOT throw exceptions.
+         * @note MUST NOT throw exceptions.
+         * @note MUST be idempotent -- callable repeatedly.
          * @note The callback may create threads or async work, but **must wait for all such
          * work to finish before returning**.
          * 

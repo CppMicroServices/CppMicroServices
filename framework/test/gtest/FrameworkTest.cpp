@@ -850,12 +850,9 @@ TEST(FrameworkTest, LoadLibraryLogsMessagesTest)
 
 TEST(FrameworkTest, ConfigurationWithExtraShutdownWork)
 {
-    std::mutex m;
     int capt { 0 };
-    std::function<void()> shutdownFun = [&capt, &m]()
+    std::function<void()> shutdownFun = [&capt]()
     {
-        std::unique_lock<std::mutex> l(m);
-        std::cout << "CALLBACK HAPPENING\n";
         capt++;
     };
 
@@ -866,22 +863,13 @@ TEST(FrameworkTest, ConfigurationWithExtraShutdownWork)
     auto f = FrameworkFactory().NewFramework(std::move(configuration));
     ASSERT_NO_THROW(f.Start());
 
-    {
-        std::unique_lock<std::mutex> l(m);
         ASSERT_EQ(capt, 0);
-    }
     f.Stop();
     f.WaitForStop(std::chrono::milliseconds::zero());
-    {
-        std::unique_lock<std::mutex> l(m);
         ASSERT_EQ(capt, 1);
-    }
 
-    // ensure the callback is only ever invoked once
+    // ensure the callback is invoked on each invocation of waitforStop
     f.WaitForStop(std::chrono::milliseconds::zero());
-    {
-        std::unique_lock<std::mutex> l(m);
-        ASSERT_EQ(capt, 1);
-    }
+        ASSERT_EQ(capt, 2);
 }
 US_MSVC_POP_WARNING

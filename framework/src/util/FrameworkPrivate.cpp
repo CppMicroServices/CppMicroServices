@@ -114,15 +114,10 @@ namespace cppmicroservices
         detail::ScopeGuard extraFunc(
             [func = shutdownFuncIter == coreCtx->frameworkProperties.end() ? Any() : shutdownFuncIter->second]()
             {
-                static auto executeOnce = [&func]()
+                if (!func.Empty())
                 {
-                    if (!func.Empty())
-                    {
-                        any_cast<std::function<void(void)>>(func)();
-                    }
-                    return true;
-                }();
-                std::cout << "EXECUTEoNCE" << executeOnce << std::endl;
+                    any_cast<std::function<void(void)>>(func)();
+                }
             });
 
         auto l = Lock();

@@ -850,8 +850,14 @@ TEST(FrameworkTest, LoadLibraryLogsMessagesTest)
 
 TEST(FrameworkTest, ConfigurationWithExtraShutdownWork)
 {
+    std::mutex m;
     int capt { 0 };
-    std::function<void()> shutdownFun = [&capt]() { capt++; };
+    std::function<void()> shutdownFun = [&capt, &m]()
+    {
+        std::unique_lock<std::mutex> l(m);
+        std::cout << "CALLBACK HAPPENING\n";
+        capt++;
+    };
 
     cppmicroservices::FrameworkConfiguration configuration {
         { cppmicroservices::Constants::FRAMEWORK_EXTRA_SHUTDOWN_FUNC, shutdownFun }
@@ -860,13 +866,22 @@ TEST(FrameworkTest, ConfigurationWithExtraShutdownWork)
     auto f = FrameworkFactory().NewFramework(std::move(configuration));
     ASSERT_NO_THROW(f.Start());
 
-    ASSERT_EQ(capt, 0);
+    {
+        std::unique_lock<std::mutex> l(m);
+        ASSERT_EQ(capt, 0);
+    }
     f.Stop();
     f.WaitForStop(std::chrono::milliseconds::zero());
-    ASSERT_EQ(capt, 1);
+    {
+        std::unique_lock<std::mutex> l(m);
+        ASSERT_EQ(capt, 1);
+    }
 
     // ensure the callback is only ever invoked once
     f.WaitForStop(std::chrono::milliseconds::zero());
-    ASSERT_EQ(capt, 1);
+    {
+        std::unique_lock<std::mutex> l(m);
+        ASSERT_EQ(capt, 1);
+    }
 }
 US_MSVC_POP_WARNING

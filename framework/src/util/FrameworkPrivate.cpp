@@ -122,7 +122,7 @@ namespace cppmicroservices
                     }
                     return true;
                 }();
-                (void)executeOnce;
+                std::cout << "EXECUTEoNCE" << executeOnce << std::endl;
             });
 
         auto l = Lock();

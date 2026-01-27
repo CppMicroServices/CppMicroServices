@@ -297,6 +297,7 @@ namespace cppmicroservices
                                                                                 /// listeners
 
             std::unique_ptr<BindingPolicy> bindingPolicy;
+            std::mutex stateChangeMutex;
         };
 
         /**

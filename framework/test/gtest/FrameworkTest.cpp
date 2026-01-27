@@ -864,5 +864,9 @@ TEST(FrameworkTest, ConfigurationWithExtraShutdownWork)
     f.Stop();
     f.WaitForStop(std::chrono::milliseconds::zero());
     ASSERT_EQ(capt, 1);
+
+    // ensure the callback is only ever invoked once
+    f.WaitForStop(std::chrono::milliseconds::zero());
+    ASSERT_EQ(capt, 1);
 }
 US_MSVC_POP_WARNING

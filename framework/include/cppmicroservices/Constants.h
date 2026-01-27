@@ -321,14 +321,13 @@ namespace cppmicroservices
          * Framework property specifying a shutdown callback invoked after
          * waitForStop() completes.
          *
-         * The value must be a callable convertible to: std::function<void()>
-         *
-         * The callback may throw exceptions derived from std::exception; any such
-         * exception is caught and wrapped by the framework. Throwing non‑std::exception
-         * types results in a generic runtime_error.
-         *
-         * The callback may create threads or async work, but **must wait for all such
+         * @return void
+         * @note This method will be invoked **once and only once**
+         * @note The value must be a callable convertible to: std::function<void()>
+         * @note The callback MAY NOT throw exceptions.
+         * @note The callback may create threads or async work, but **must wait for all such
          * work to finish before returning**.
+         * 
          */
         US_Framework_EXPORT extern std::string const FRAMEWORK_EXTRA_SHUTDOWN_FUNC;; // = "org.cppmicroservices.framework.shutdown.function"
 

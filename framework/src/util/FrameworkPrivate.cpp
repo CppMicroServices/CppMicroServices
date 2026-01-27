@@ -114,25 +114,15 @@ namespace cppmicroservices
         detail::ScopeGuard extraFunc(
             [func = shutdownFuncIter == coreCtx->frameworkProperties.end() ? Any() : shutdownFuncIter->second]()
             {
-                try
+                static auto executeOnce = [&func]()
                 {
                     if (!func.Empty())
                     {
                         any_cast<std::function<void(void)>>(func)();
                     }
-                }
-                catch (std::exception const& e)
-                {
-                    // Append the original error message
-                    throw std::runtime_error { std::string { "The framework shutdown callback threw an exception: " }
-                                               + e.what() };
-                }
-                catch (...)
-                {
-                    throw std::runtime_error {
-                        "The framework shutdown callback threw an unknown (non-std::exception) exception"
-                    };
-                }
+                    return true;
+                }();
+                (void)executeOnce;
             });
 
         auto l = Lock();

@@ -111,9 +111,14 @@ namespace cppmicroservices
     {
         auto shutdownFuncIter
             = coreCtx->frameworkProperties.find(cppmicroservices::Constants::FRAMEWORK_EXTRA_SHUTDOWN_FUNC);
+        bool successful_wait = false;
         detail::ScopeGuard extraFunc(
-            [func = shutdownFuncIter == coreCtx->frameworkProperties.end() ? Any() : shutdownFuncIter->second]()
+            [func = shutdownFuncIter == coreCtx->frameworkProperties.end() ? Any() : shutdownFuncIter->second, &successful_wait]()
             {
+                // if we didn't finish the wait, don't invoke the callback
+                if(!successful_wait){
+                    return;
+                }
                 if (!func.Empty())
                 {
                     any_cast<std::function<void(void)>>(func)();
@@ -130,6 +135,7 @@ namespace cppmicroservices
                                                  std::exception_ptr() };
             if (timeout == std::chrono::milliseconds::zero())
             {
+                successful_wait = true;
                 Wait(l, [&] { return stopEvent.valid; });
             }
             else
@@ -161,6 +167,7 @@ namespace cppmicroservices
         {
             shutdownThread.join();
         }
+        successful_wait = true;
         return FrameworkEvent(stopEvent.type, MakeBundle(this->shared_from_this()), stopEvent.msg, stopEvent.excPtr);
     }
 

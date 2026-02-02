@@ -850,7 +850,7 @@ TEST(FrameworkTest, LoadLibraryLogsMessagesTest)
 
 TEST(FrameworkTest, ConfigurationWithExtraShutdownWork)
 {
-    int capt { 0 };
+    std::atomic<int> capt { 0 };
     std::function<void()> shutdownFun = [&capt]() { capt++; };
 
     cppmicroservices::FrameworkConfiguration configuration {
@@ -860,13 +860,13 @@ TEST(FrameworkTest, ConfigurationWithExtraShutdownWork)
     auto f = FrameworkFactory().NewFramework(std::move(configuration));
     ASSERT_NO_THROW(f.Start());
 
-    ASSERT_EQ(capt, 0);
+    ASSERT_EQ(capt.load(), 0);
     f.Stop();
     f.WaitForStop(std::chrono::milliseconds::zero());
-    ASSERT_EQ(capt, 1);
+    ASSERT_EQ(capt.load(), 1);
 
     // ensure the callback is invoked on each invocation of waitforStop
     f.WaitForStop(std::chrono::milliseconds::zero());
-    ASSERT_EQ(capt, 2);
+    ASSERT_EQ(capt.load(), 2);
 }
 US_MSVC_POP_WARNING

@@ -329,7 +329,7 @@ namespace cppmicroservices
          * work to finish before returning**.
          * 
          */
-        US_Framework_EXPORT extern std::string const FRAMEWORK_EXTRA_SHUTDOWN_FUNC;; // = "org.cppmicroservices.framework.shutdown.function"
+        US_Framework_EXPORT extern std::string const FRAMEWORK_EXTRA_SHUTDOWN_FUNC; // = "org.cppmicroservices.framework.shutdown.function"
 
         /*
          * Service properties.

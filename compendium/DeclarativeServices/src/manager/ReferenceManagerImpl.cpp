@@ -183,6 +183,7 @@ namespace cppmicroservices
         cppmicroservices::InterfaceMapConstPtr
         ReferenceManagerBaseImpl::AddingService(cppmicroservices::ServiceReference<void> const& reference)
         {
+            std::lock_guard l(stateChangeMutex);
             // Each service registered by DS contains a service property representing the component configuration name
             // to which it belongs. By checking the component configuration name of a service it can be determined
             // whether this service will satisfy its own reference. If it would, it is not a matched reference as
@@ -226,6 +227,7 @@ namespace cppmicroservices
         ReferenceManagerBaseImpl::RemovedService(cppmicroservices::ServiceReference<void> const& reference,
                                                  cppmicroservices::InterfaceMapConstPtr const& /*service*/)
         {
+            std::lock_guard l(stateChangeMutex);
             { // acquire lock on matchedRefs
                 auto matchedRefsHandle = matchedRefs.lock();
                 matchedRefsHandle->erase(reference);

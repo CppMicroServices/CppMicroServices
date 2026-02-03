@@ -132,23 +132,23 @@ namespace cppmicroservices
                                                        int32_t const);
     US_Framework_EXPORT std::ostream& any_value_to_cpp(std::ostream& os, bool val, uint8_t const, int32_t const);
 
-    template <typename T>
+    template <typename ReturnT, typename... Args>
     std::ostream&
-    any_value_to_string(std::ostream& os, std::function<bool(T const&)> const&)
+    any_value_to_string(std::ostream& os, std::function<ReturnT(Args...)> const&)
     {
         return os;
     }
 
-    template <typename T>
+    template <typename ReturnT, typename... Args>
     std::ostream&
-    any_value_to_json(std::ostream& os, std::function<bool(T const&)> const&, uint8_t const, int32_t const)
+    any_value_to_json(std::ostream& os, std::function<ReturnT(Args...)> const&, uint8_t const, int32_t const)
     {
         return os;
     }
 
-    template <typename T>
+    template <typename ReturnT, typename... Args>
     std::ostream&
-    any_value_to_cpp(std::ostream& os, std::function<bool(T const&)> const&, uint8_t const, int32_t const)
+    any_value_to_cpp(std::ostream& os, std::function<ReturnT(Args...)> const&, uint8_t const, int32_t const)
     {
         return os;
     }

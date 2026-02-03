@@ -75,11 +75,10 @@ namespace
                           cppmicroservices::logservice::SeverityLevel,
                           std::string const&,
                           std::exception_ptr const));
-	MOCK_CONST_METHOD1(getLogger,
-                     std::shared_ptr<cppmicroservices::logservice::Logger>(const std::string&));
-	MOCK_CONST_METHOD2(getLogger,
-                     std::shared_ptr<cppmicroservices::logservice::Logger>(const cppmicroservices::Bundle&, const std::string&));
-
+        MOCK_CONST_METHOD1(getLogger, std::shared_ptr<cppmicroservices::logservice::Logger>(std::string const&));
+        MOCK_CONST_METHOD2(getLogger,
+                           std::shared_ptr<cppmicroservices::logservice::Logger>(cppmicroservices::Bundle const&,
+                                                                                 std::string const&));
     };
 } // namespace
 
@@ -775,7 +774,7 @@ TEST(FrameworkTest, ConfigurationWithBundleValidation)
 
     validationFuncType validationFunc = [](cppmicroservices::Bundle const&) -> bool { return false; };
     cppmicroservices::FrameworkConfiguration configuration {
-        {cppmicroservices::Constants::FRAMEWORK_BUNDLE_VALIDATION_FUNC, validationFunc}
+        { cppmicroservices::Constants::FRAMEWORK_BUNDLE_VALIDATION_FUNC, validationFunc }
     };
 
     Any callableFunction = validationFunc;
@@ -832,4 +831,25 @@ TEST(FrameworkTest, LoadLibraryLogsMessagesTest)
 }
 #endif
 
+TEST(FrameworkTest, ConfigurationWithExtraShutdownWork)
+{
+    std::atomic<int> capt { 0 };
+    std::function<void()> shutdownFun = [&capt]() { capt++; };
+
+    cppmicroservices::FrameworkConfiguration configuration {
+        { cppmicroservices::Constants::FRAMEWORK_EXTRA_SHUTDOWN_FUNC, shutdownFun }
+    };
+
+    auto f = FrameworkFactory().NewFramework(std::move(configuration));
+    ASSERT_NO_THROW(f.Start());
+
+    ASSERT_EQ(capt.load(), 0);
+    f.Stop();
+    f.WaitForStop(std::chrono::milliseconds::zero());
+    ASSERT_EQ(capt.load(), 1);
+
+    // ensure the callback is invoked on each invocation of waitforStop
+    f.WaitForStop(std::chrono::milliseconds::zero());
+    ASSERT_EQ(capt.load(), 2);
+}
 US_MSVC_POP_WARNING

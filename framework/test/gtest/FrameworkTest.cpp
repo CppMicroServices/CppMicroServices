@@ -897,8 +897,6 @@ TEST(FrameworkTest, BundleStartAfterFrameworkStopKitchenSink)
     };
 
 #else
-    // since all bundles are embedded in the main executable, all bundles are
-    // installed at framework start.
     auto installAndStart = [&barrier, &fmc](std::string const& libName, bool wait = true)
     {
         if (wait)

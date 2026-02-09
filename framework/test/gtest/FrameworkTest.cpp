@@ -22,10 +22,12 @@ limitations under the License.
 
 #include <chrono>
 #include <fstream>
+#include <future>
 #include <mutex>
 #include <thread>
 #include <type_traits>
 
+#include "ConcurrencyTestUtil.hpp"
 #include "TestUtilBundleListener.h"
 #include "TestUtils.h"
 #include "cppmicroservices/Bundle.h"
@@ -852,4 +854,89 @@ TEST(FrameworkTest, ConfigurationWithExtraShutdownWork)
     f.WaitForStop(std::chrono::milliseconds::zero());
     ASSERT_EQ(capt.load(), 2);
 }
+
+TEST(FrameworkTest, BundleStartAfterFrameworkStopKitchenSink)
+{
+    auto f = FrameworkFactory().NewFramework();
+
+    f.Start();
+
+    auto fmc = f.GetBundleContext();
+    bool hasSeenStop = false;
+    fmc.AddBundleListener(
+        [&hasSeenStop](cppmicroservices::BundleEvent const& event) mutable
+        {
+            static std::mutex m;
+            std::unique_lock lock(m);
+            auto type = event.GetType();
+            if (type == cppmicroservices::BundleEvent::BUNDLE_STOPPING && event.GetBundle().GetBundleId() != 0)
+            {
+                hasSeenStop = true;
+            }
+            else if (type == cppmicroservices::BundleEvent::BUNDLE_STARTING && hasSeenStop)
+            {
+                ASSERT_TRUE(false) << "bundle stop event followed by bundle start event -- not allowed";
+            }
+        });
+    cppmicroservices::detail::test::Barrier barrier(6);
+
+#ifdef US_BUILD_SHARED_LIBS
+    auto installAndStart = [&barrier, &fmc](std::string const& libName, bool wait = true)
+    {
+        if (wait)
+        {
+            barrier.Wait();
+        }
+        try
+        {
+            cppmicroservices::testing::InstallLib(fmc, libName).Start();
+        }
+        catch (...)
+        {
+        }
+    };
+
+#else
+    // since all bundles are embedded in the main executable, all bundles are
+    // installed at framework start.
+    auto installAndStart = [&barrier, &fmc](std::string const& libName, bool wait = true)
+    {
+        if (wait)
+        {
+            barrier.Wait();
+        }
+        cppmicroservices::testing::GetBundle("TestBundleB", fmc).Start()
+    };
+#endif
+
+    installAndStart("TestBundleA", false);
+    installAndStart("TestBundleA2", false);
+    installAndStart("TestBundleB", false);
+    installAndStart("TestBundleH", false);
+    installAndStart("TestBundleLQ", false);
+    installAndStart("TestBundleM", false);
+    installAndStart("TestBundleR", false);
+    installAndStart("TestBundleRA", false);
+
+    std::vector<std::shared_future<void>> futures;
+    // Launch asynchronous tasks using std::async
+    futures.emplace_back(std::async(std::launch::async, installAndStart, "TestBundleRL"));
+    futures.emplace_back(std::async(std::launch::async, installAndStart, "TestBundleS"));
+    futures.emplace_back(std::async(std::launch::async, installAndStart, "TestBundleSL1"));
+    futures.emplace_back(std::async(std::launch::async, installAndStart, "TestBundleSL3"));
+    futures.emplace_back(std::async(std::launch::async, installAndStart, "TestBundleSL4"));
+    futures.emplace_back(std::async(std::launch::async,
+                                    [&f, &barrier]()
+                                    {
+                                        barrier.Wait();
+                                        f.Stop();
+                                        f.WaitForStop(std::chrono::milliseconds::zero());
+                                    }));
+
+    for (auto& fut : futures)
+    {
+        fut.get();
+    }
+}
+
 US_MSVC_POP_WARNING

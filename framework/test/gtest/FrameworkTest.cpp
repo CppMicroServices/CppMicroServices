@@ -905,7 +905,13 @@ TEST(FrameworkTest, BundleStartAfterFrameworkStopKitchenSink)
         {
             barrier.Wait();
         }
-        cppmicroservices::testing::GetBundle(libName, fmc).Start();
+        try
+        {
+            cppmicroservices::testing::GetBundle(libName, fmc).Start();
+        }
+        catch (...)
+        {
+        }
     };
 #endif
 

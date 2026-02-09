@@ -855,6 +855,7 @@ TEST(FrameworkTest, ConfigurationWithExtraShutdownWork)
     ASSERT_EQ(capt.load(), 2);
 }
 
+#ifdef US_ENABLE_THREADING_SUPPORT
 TEST(FrameworkTest, BundleStartAfterFrameworkStopKitchenSink)
 {
     auto f = FrameworkFactory().NewFramework();
@@ -942,5 +943,5 @@ TEST(FrameworkTest, BundleStartAfterFrameworkStopKitchenSink)
         fut.get();
     }
 }
-
+#endif
 US_MSVC_POP_WARNING

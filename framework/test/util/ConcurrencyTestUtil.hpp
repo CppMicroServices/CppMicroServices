@@ -14,6 +14,36 @@ namespace cppmicroservices
     {
         namespace test
         {
+
+        class Barrier
+        {
+        public:
+            Barrier(std::size_t count) : threshold(count), count(count), generation(0) {}
+
+            void
+            Wait()
+            {
+                std::unique_lock<std::mutex> lock(mutex);
+                auto gen = generation;
+                if (--count == 0)
+                {
+                    generation++;
+                    count = threshold;
+                    cond.notify_all();
+                }
+                else
+                {
+                    cond.wait(lock, [this, gen] { return gen != generation; });
+                }
+            }
+
+        private:
+            std::mutex mutex;
+            std::condition_variable cond;
+            std::size_t threshold;
+            std::size_t count;
+            std::size_t generation{0};
+        };
             /**
              * Util method to determine if a future object is ready
              */
@@ -39,24 +69,18 @@ namespace cppmicroservices
                 std::vector<std::promise<void>> readies(numCalls);
 
                 // TODO: use std::barrier when available
+                Barrier beforeWork(numCalls);
+
                 std::vector<std::future<R>> enable_async_futs(numCalls);
                 for (size_t i = 0; i < numCalls; ++i)
                 {
                     enable_async_futs[i] = std::async(std::launch::async,
-                                                      [&readies, i, &ready, &func]()
+                                                      [&beforeWork, &func]()
                                                       {
-                                                          readies[i].set_value();
-                                                          ready.wait();
+                                                          beforeWork.Wait();
                                                           return func();
                                                       });
                 }
-
-                for (size_t i = 0; i < numCalls; ++i)
-                {
-                    readies[i].get_future().wait();
-                }
-
-                go.set_value();
 
                 for (size_t i = 0; i < numCalls; ++i)
                 {

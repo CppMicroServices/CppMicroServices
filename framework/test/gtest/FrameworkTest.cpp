@@ -52,18 +52,6 @@ using cppmicroservices::testing::GetTempDirectory;
 using cppmicroservices::testing::MakeUniqueTempDirectory;
 using cppmicroservices::testing::TempDir;
 
-#if !defined(__clang__) && defined(__GNUC__)
-#    define US_GCC_VER (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
-#endif
-
-// TODO: Remove all occurences of US_TYPE_OPERATIONS_AVAILABLE macro
-// once the minimum GCC compiler required is 4.7 or above
-#if defined(US_GCC_VER) && (US_GCC_VER < 40700)
-#    define US_TYPE_OPERATIONS_AVAILABLE 0
-#else
-#    define US_TYPE_OPERATIONS_AVAILABLE 1
-#endif
-
 US_MSVC_PUSH_DISABLE_WARNING(4996)
 
 namespace
@@ -87,20 +75,18 @@ namespace
                           cppmicroservices::logservice::SeverityLevel,
                           std::string const&,
                           std::exception_ptr const));
-	MOCK_CONST_METHOD1(getLogger,
-                     std::shared_ptr<cppmicroservices::logservice::Logger>(const std::string&));
-	MOCK_CONST_METHOD2(getLogger,
-                     std::shared_ptr<cppmicroservices::logservice::Logger>(const cppmicroservices::Bundle&, const std::string&));
-
+        MOCK_CONST_METHOD1(getLogger, std::shared_ptr<cppmicroservices::logservice::Logger>(std::string const&));
+        MOCK_CONST_METHOD2(getLogger,
+                           std::shared_ptr<cppmicroservices::logservice::Logger>(cppmicroservices::Bundle const&,
+                                                                                 std::string const&));
     };
 } // namespace
 
 TEST(FrameworkTest, Ctor)
 {
-#if US_TYPE_OPERATIONS_AVAILABLE
     ASSERT_FALSE(std::is_default_constructible<Framework>::value);
     ASSERT_TRUE((std::is_constructible<Framework, Bundle>::value));
-#endif
+
     // Bundle b;
     // ASSERT_THROW(Framework(Bundle(b)), std::logic_error); This causes a crash. TODO: Fix crash and uncomment this
     // line.
@@ -118,9 +104,8 @@ TEST(FrameworkTest, Ctor)
 
 TEST(FrameworkTest, MoveCtor)
 {
-#if US_TYPE_OPERATIONS_AVAILABLE
     ASSERT_TRUE(std::is_move_constructible<Framework>::value);
-#endif
+
     auto f = FrameworkFactory().NewFramework();
     ASSERT_TRUE(f);
     f.Start();
@@ -131,9 +116,8 @@ TEST(FrameworkTest, MoveCtor)
 
 TEST(FrameworkTest, MoveAssign)
 {
-#if US_TYPE_OPERATIONS_AVAILABLE
     ASSERT_TRUE(std::is_move_assignable<Framework>::value);
-#endif
+
     auto f = FrameworkFactory().NewFramework();
     ASSERT_TRUE(f);
     f.Start();
@@ -147,9 +131,8 @@ TEST(FrameworkTest, MoveAssign)
 
 TEST(FrameworkTest, CopyCtor)
 {
-#if US_TYPE_OPERATIONS_AVAILABLE
     ASSERT_TRUE(std::is_copy_constructible<Framework>::value);
-#endif
+
     auto f = FrameworkFactory().NewFramework();
     ASSERT_TRUE(f);
     f.Start();
@@ -164,9 +147,8 @@ TEST(FrameworkTest, CopyCtor)
 
 TEST(FrameworkTest, CopyAssign)
 {
-#if US_TYPE_OPERATIONS_AVAILABLE
     ASSERT_TRUE(std::is_copy_assignable<Framework>::value);
-#endif
+
     auto f = FrameworkFactory().NewFramework();
     ASSERT_TRUE(f);
     f.Start();
@@ -792,7 +774,7 @@ TEST(FrameworkTest, ConfigurationWithBundleValidation)
 
     validationFuncType validationFunc = [](cppmicroservices::Bundle const&) -> bool { return false; };
     cppmicroservices::FrameworkConfiguration configuration {
-        {cppmicroservices::Constants::FRAMEWORK_BUNDLE_VALIDATION_FUNC, validationFunc}
+        { cppmicroservices::Constants::FRAMEWORK_BUNDLE_VALIDATION_FUNC, validationFunc }
     };
 
     Any callableFunction = validationFunc;
@@ -849,4 +831,25 @@ TEST(FrameworkTest, LoadLibraryLogsMessagesTest)
 }
 #endif
 
+TEST(FrameworkTest, ConfigurationWithExtraShutdownWork)
+{
+    std::atomic<int> capt { 0 };
+    std::function<void()> shutdownFun = [&capt]() { capt++; };
+
+    cppmicroservices::FrameworkConfiguration configuration {
+        { cppmicroservices::Constants::FRAMEWORK_EXTRA_SHUTDOWN_FUNC, shutdownFun }
+    };
+
+    auto f = FrameworkFactory().NewFramework(std::move(configuration));
+    ASSERT_NO_THROW(f.Start());
+
+    ASSERT_EQ(capt.load(), 0);
+    f.Stop();
+    f.WaitForStop(std::chrono::milliseconds::zero());
+    ASSERT_EQ(capt.load(), 1);
+
+    // ensure the callback is invoked on each invocation of waitforStop
+    f.WaitForStop(std::chrono::milliseconds::zero());
+    ASSERT_EQ(capt.load(), 2);
+}
 US_MSVC_POP_WARNING

@@ -1,3 +1,4 @@
+#include "TestUtils.h"
 #include "benchmark/benchmark.h"
 #include "cppmicroservices/ServiceEvent.h"
 #include <cppmicroservices/Bundle.h>

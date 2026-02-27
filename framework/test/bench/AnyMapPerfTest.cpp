@@ -1,3 +1,4 @@
+#include "TestUtils.h"
 #include "benchmark/benchmark.h"
 
 #include <cppmicroservices/AnyMap.h>
@@ -10,8 +11,6 @@
 
 #include <cassert>
 #include <iostream>
-
-#include "TestUtils.h"
 
 using namespace cppmicroservices;
 

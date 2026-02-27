@@ -117,6 +117,7 @@ namespace cppmicroservices
                     }
                     mgr.DestroyComponentInstances();
                     transitionAction.set_value();
+                    break;
                 }
             }
         }

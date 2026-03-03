@@ -1,3 +1,4 @@
+#include "TestUtils.h"
 #include "benchmark/benchmark.h"
 #include <cppmicroservices/LDAPProp.h>
 

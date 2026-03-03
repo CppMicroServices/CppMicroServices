@@ -100,8 +100,8 @@ Google benchmark
 
 See https://github.com/google/benchmark/blob/master/LICENSE for license information
 
-https://github.com/google/benchmark
-12235e24652fc7f809373e7c11a5f73c5763fc4c
+https://github.com/google/benchmark/tree/v1.9.4
+v1.9.4
 
 spdlog
 ------
@@ -127,3 +127,14 @@ Boost nowide
 See https://www.boost.org/users/license.html for license information
 https://github.com/boostorg/nowide/tree/standalone
 https://github.com/boostorg/nowide/commit/2a0543f8279f3f416b5c84fcf7e40db46c3a659a
+
+CLI11
+------
+
+See https://github.com/CLIUtils/CLI11/blob/main/LICENSE for license information
+
+https://github.com/CLIUtils/CLI11
+v2.6.1
+
+* We only use the include folder since we aren't statically linking to the library
+* version reflects the version from which we copied the include folder

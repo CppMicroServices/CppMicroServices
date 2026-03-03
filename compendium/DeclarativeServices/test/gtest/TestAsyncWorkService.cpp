@@ -534,4 +534,73 @@ namespace test
         framework.Stop();
         framework.WaitForStop(std::chrono::milliseconds::zero());
     }
+
+    class basicDS5 : public test::DSGraph05
+    {
+      public:
+        basicDS5() = default;
+        ~basicDS5() override = default;
+        std::string
+        Description() override
+        {
+            return "basicDS5";
+        };
+    };
+
+    TEST_F(TestAsyncWorkServiceEndToEnd, VerifyNoDuplicateDeactivate)
+    {
+        auto ctx = framework.GetBundleContext();
+        auto reg = ctx.RegisterService<cppmicroservices::async::AsyncWorkService>(
+            std::make_shared<AsyncWorkServiceThreadPool>(20));
+
+        // install And start referencING service
+        auto path = "DSGraph04";
+        auto bundle = ::test::InstallAndStartBundle(ctx, path);
+
+        // create referencED service instance
+        auto initialRefdSvcReg = ctx.RegisterService<test::DSGraph05>(std::make_shared<test::basicDS5>());
+
+        auto sRef = ctx.GetServiceReference<test::DSGraph04>();
+        ASSERT_TRUE(sRef);
+        auto svc = ctx.GetService<test::DSGraph04>(sRef);
+
+        ASSERT_EQ(svc->Description(), "DSGraph04");
+
+        constexpr int numThreads = 2;
+        Barrier beforeStart(numThreads);
+        std::vector<std::future<void>> futures;
+
+        futures.emplace_back(std::async(std::launch::async,
+                                        [&]()
+                                        {
+                                            beforeStart.Wait();
+                                            initialRefdSvcReg.Unregister();
+                                        }));
+
+        futures.emplace_back(
+            std::async(std::launch::async,
+                       [&]()
+                       {
+                           beforeStart.Wait();
+
+                           auto props = cppmicroservices::ServiceProperties({
+                               { std::string("component.name"), std::string("test1") }
+                           });
+
+                           auto reg = ctx.RegisterService<test::DSGraph05>(std::make_shared<test::basicDS5>(), props);
+                       }));
+
+        for (auto& fut : futures)
+        {
+            fut.get();
+        }
+
+        sRef = ctx.GetServiceReference<test::DSGraph04>();
+        ASSERT_TRUE(sRef);
+        svc = ctx.GetService<test::DSGraph04>(sRef);
+        ASSERT_EQ(svc->Description(), "DSGraph04");
+
+        framework.Stop();
+        framework.WaitForStop(std::chrono::milliseconds::zero());
+    }
 }; // namespace test

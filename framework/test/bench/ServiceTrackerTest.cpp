@@ -9,6 +9,7 @@
 #include <chrono>
 #include <unordered_set>
 
+#include "TestUtils.h"
 #include "benchmark/benchmark.h"
 #include "fooservice.h"
 

@@ -299,6 +299,7 @@ namespace test
                             exceptionCount++;
                             std::cerr << "Unexpected unknown exception in GetComponentDescriptionDTOs" << std::endl;
                         }
+                        std::this_thread::yield();
                     }
                 }));
         }
@@ -325,6 +326,7 @@ namespace test
                                                 {
                                                     // Bundle might already be stopped, that's ok
                                                 }
+                                                std::this_thread::sleep_for(std::chrono::milliseconds(10));
                                             }
                                         }));
 
@@ -336,7 +338,7 @@ namespace test
             {
                 break; // Timeout after 5 seconds
             }
-            std::this_thread::yield();
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
 
         // Let a few more calls happen after bundles are stopped

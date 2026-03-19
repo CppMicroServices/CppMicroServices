@@ -584,6 +584,10 @@ else()
     usFunctionCheckCompilerFlags(-Wno-mismatched-tags US_CXX_FLAGS)
   endif()
 
+  if(UNIX)
+    usFunctionCheckCompilerFlags(-Wno-old-style-cast US_CXX_FLAGS)
+  endif()
+
   # Issue #56: Workaround a clang compiler issue (https://llvm.org/bugs/show_bug.cgi?id=26749).
   # The typeinfo symbols do not have reliable symbol visibility. Instead of exporting only
   # symbols and associated typeinfo symbols which have explicit "default" visibility,

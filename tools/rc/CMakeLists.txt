@@ -27,6 +27,11 @@ if(NOT APPLE AND US_COMPILER_GNU_ARM AND CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64
 endif()
 
 add_executable(${US_RCC_EXECUTABLE_TARGET} ${srcs})
+
+if(UNIX)
+  target_compile_options(${US_RCC_EXECUTABLE_TARGET} PRIVATE -Wno-old-style-cast)
+endif()
+
 set_property(TARGET ${US_RCC_EXECUTABLE_TARGET} PROPERTY OUTPUT_NAME ${US_RCC_EXECUTABLE_OUTPUT_NAME})
 if(WIN32)
     target_link_libraries(${US_RCC_EXECUTABLE_TARGET} Shlwapi)

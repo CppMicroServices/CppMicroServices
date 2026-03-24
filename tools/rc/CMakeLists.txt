@@ -28,6 +28,8 @@ endif()
 
 add_executable(${US_RCC_EXECUTABLE_TARGET} ${srcs})
 
+# Suppress this compilation warning on unix OSes. Required with removing our patches
+# to miniz.
 if(UNIX)
   target_compile_options(${US_RCC_EXECUTABLE_TARGET} PRIVATE -Wno-old-style-cast)
 endif()

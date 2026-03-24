@@ -134,6 +134,8 @@ if (US_COMPILER_MSVC AND BUILD_SHARED_LIBS)
   target_compile_options(${us_gtest_test_exe_name} PRIVATE -DGTEST_LINKED_AS_SHARED_LIBRARY)
 endif()
 
+# Suppress this compilation warning on unix OSes. Required with removing our patches
+# to miniz.
 if(UNIX)
   target_compile_options(${us_gtest_test_exe_name} PRIVATE -Wno-unused-function)  
 endif()

@@ -584,6 +584,8 @@ else()
     usFunctionCheckCompilerFlags(-Wno-mismatched-tags US_CXX_FLAGS)
   endif()
 
+  # Suppress this compilation warning on unix OSes. Required with removing our patches
+  # to miniz.
   if(UNIX)
     usFunctionCheckCompilerFlags(-Wno-old-style-cast US_CXX_FLAGS)
   endif()
@@ -600,8 +602,6 @@ else()
   else()
     usFunctionCheckCompilerFlags("-fvisibility=hidden -fvisibility-inlines-hidden" _have_visibility)
   endif()
-
-  usFunctionCheckCompilerFlags("-O0" US_CXX_FLAGS)
 
   if(_have_visibility)
     set(US_HAVE_VISIBILITY_ATTRIBUTE 1)

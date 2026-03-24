@@ -223,7 +223,7 @@ namespace cppmicroservices
             m_ObjFile = BundleObjFactory().CreateBundleFileObj(m_Location);
             rawBundleResourceData = m_ObjFile->GetRawBundleResourceContainer();
         }
-        catch (...)
+        catch (std::exception const&)
         {
         }
 

@@ -130,9 +130,17 @@ namespace cppmicroservices
         }
 
         // This calls into service event listener hooks. We must not hold any locks here
-        if (auto bundle = d->coreInfo->bundle_.lock())
         {
-            bundle->coreCtx->listeners.GetMatchingServiceListeners(modifiedEndMatchEvent, before);
+            std::shared_ptr<BundlePrivate> bundle;
+            {
+                auto l = LockServiceRegistration();
+                US_UNUSED(l);
+                bundle = d->coreInfo->bundle_.lock();
+            }
+            if (bundle)
+            {
+                bundle->coreCtx->listeners.GetMatchingServiceListeners(modifiedEndMatchEvent, before);
+            }
         }
 
         int old_rank = 0;
@@ -183,7 +191,13 @@ namespace cppmicroservices
         if (old_rank != new_rank)
         {
             auto const& classes = ref_any_cast<std::vector<std::string>>(objectClasses);
-            if (auto bundle = d->coreInfo->bundle_.lock())
+            std::shared_ptr<BundlePrivate> bundle;
+            {
+                auto l = LockServiceRegistration();
+                US_UNUSED(l);
+                bundle = d->coreInfo->bundle_.lock();
+            }
+            if (bundle)
             {
                 bundle->coreCtx->services.UpdateServiceRegistrationOrder(classes);
             }
@@ -191,11 +205,19 @@ namespace cppmicroservices
 
         // Notify listeners, we must not hold any locks here
         ServiceListeners::ServiceListenerEntries matchingListeners;
-        if (auto bundle = d->coreInfo->bundle_.lock())
         {
-            bundle->coreCtx->listeners.GetMatchingServiceListeners(modifiedEvent, matchingListeners);
-            bundle->coreCtx->listeners.ServiceChanged(matchingListeners, modifiedEvent, before);
-            bundle->coreCtx->listeners.ServiceChanged(before, modifiedEndMatchEvent);
+            std::shared_ptr<BundlePrivate> bundle;
+            {
+                auto l = LockServiceRegistration();
+                US_UNUSED(l);
+                bundle = d->coreInfo->bundle_.lock();
+            }
+            if (bundle)
+            {
+                bundle->coreCtx->listeners.GetMatchingServiceListeners(modifiedEvent, matchingListeners);
+                bundle->coreCtx->listeners.ServiceChanged(matchingListeners, modifiedEvent, before);
+                bundle->coreCtx->listeners.ServiceChanged(before, modifiedEndMatchEvent);
+            }
         }
     }
 

@@ -28,6 +28,7 @@
 #include "BundlePrivate.h"
 #include "CoreBundleContext.h"
 #include "ServiceRegistrationBasePrivate.h"
+#include "ServiceRegistrationLocks.h"
 
 #include <cassert>
 #include <iterator>
@@ -107,7 +108,7 @@ namespace cppmicroservices
         bool isPrototypeFactory = (isFactory ? static_cast<bool>(std::dynamic_pointer_cast<PrototypeServiceFactory>(
                                                    std::static_pointer_cast<ServiceFactory>(
                                                        service->find("org.cppmicroservices.factory")->second)))
-                                             : false);
+                         : false);
 
         std::vector<std::string> classes;
         // Check if service implements claimed classes and that they exist.
@@ -339,6 +340,7 @@ namespace cppmicroservices
 
         for (auto& sr : serviceRegistrations)
         {
+            auto regLock = sr.LockServiceRegistration();
             if (auto bundle_ = sr.d->coreInfo->bundle_.lock())
             {
                 if (bundle_.get() == p)

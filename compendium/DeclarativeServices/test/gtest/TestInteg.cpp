@@ -17,23 +17,8 @@
 #include <thread>
 #include <vector>
 
-// Add these test classes and helper classes
-
 namespace test
 {
-    // Helper class for DSGraph05 test
-    class basicDS5 : public test::DSGraph05
-    {
-      public:
-        basicDS5() = default;
-        ~basicDS5() override = default;
-        std::string
-        Description() override
-        {
-            return "basicDS5";
-        };
-    };
-
     // Test fixture for integration tests
     class IntegrationTestFixture : public ::testing::Test
     {

@@ -148,9 +148,10 @@ namespace cppmicroservices
                         if (section.size >= zipFileSizeThreshold)
                         {
                             off_t pa_offset = (fileOffset + section.offset) & ~(sysconf(_SC_PAGESIZE) - 1);
-                            size_t mappedLength = section.size + (fileOffset + section.offset) - pa_offset;
+                            size_t dataOffset = (fileOffset + section.offset) - static_cast<size_t>(pa_offset);
+                            size_t mappedLength = section.size + dataOffset;
                             return std::make_shared<RawBundleResources>(
-                                std::make_unique<MappedFile>(filePath, mappedLength, pa_offset));
+                                std::make_unique<MappedFile>(filePath, mappedLength, pa_offset, dataOffset));
                         }
                         else
                         {

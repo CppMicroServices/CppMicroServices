@@ -139,13 +139,8 @@ namespace cppmicroservices::scrimpl
             }
             catch (std::exception const& e)
             {
-                logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
+                logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
                            "Failed to create ComponentDescriptionDTO: " + std::string(e.what()));
-            }
-            catch (...)
-            {
-                logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
-                           "Failed to create ComponentDescriptionDTO: Unknown exception");
             }
         }
         return componentDTOs;

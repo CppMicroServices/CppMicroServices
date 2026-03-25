@@ -178,9 +178,6 @@ namespace test
         }
 
         ASSERT_FALSE(failed.load());
-
-        framework.Stop();
-        framework.WaitForStop(std::chrono::milliseconds::zero());
     }
 
     TEST_F(IntegrationTestFixture, VerifyNoDuplicateDeactivate)
@@ -235,9 +232,6 @@ namespace test
         ASSERT_TRUE(sRef);
         svc = ctx.GetService<test::DSGraph04>(sRef);
         ASSERT_EQ(svc->Description(), "DSGraph04");
-
-        framework.Stop();
-        framework.WaitForStop(std::chrono::milliseconds::zero());
     }
 
     TEST_F(IntegrationTestFixture, TestGetComponentDescriptionDTOsWithConcurrentBundleStops)

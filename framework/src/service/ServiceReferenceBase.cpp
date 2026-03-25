@@ -102,13 +102,13 @@ namespace cppmicroservices
             return Bundle();
         }
 
-        auto l = refP->LockServiceRegistration();
+        auto [l, bundle] = refP->LockAndGetBundle();
         US_UNUSED(l);
-        if (refP->coreInfo->bundle_.lock() == nullptr)
+        if (!bundle)
         {
             return Bundle();
         }
-        return MakeBundle(refP->coreInfo->bundle_.lock()->shared_from_this());
+        return MakeBundle(bundle->shared_from_this());
     }
 
     std::vector<Bundle>

@@ -340,9 +340,9 @@ namespace cppmicroservices
 
         for (auto& sr : serviceRegistrations)
         {
-            auto regLock = sr.LockServiceRegistration();
+            auto [regLock, bundle_] = sr.LockAndGetBundle();
             US_UNUSED(regLock);
-            if (auto bundle_ = sr.d->coreInfo->bundle_.lock())
+            if (bundle_)
             {
                 if (bundle_.get() == p)
                 {

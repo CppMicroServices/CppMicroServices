@@ -133,9 +133,9 @@ namespace cppmicroservices
         {
             std::shared_ptr<BundlePrivate> bundle;
             {
-                auto l = LockServiceRegistration();
+                auto [l, b] = LockAndGetBundle();
                 US_UNUSED(l);
-                bundle = d->coreInfo->bundle_.lock();
+                bundle = std::move(b);
             }
             if (bundle)
             {
@@ -193,9 +193,9 @@ namespace cppmicroservices
             auto const& classes = ref_any_cast<std::vector<std::string>>(objectClasses);
             std::shared_ptr<BundlePrivate> bundle;
             {
-                auto l = LockServiceRegistration();
+                auto [l, b] = LockAndGetBundle();
                 US_UNUSED(l);
-                bundle = d->coreInfo->bundle_.lock();
+                bundle = std::move(b);
             }
             if (bundle)
             {
@@ -208,9 +208,9 @@ namespace cppmicroservices
         {
             std::shared_ptr<BundlePrivate> bundle;
             {
-                auto l = LockServiceRegistration();
+                auto [l, b] = LockAndGetBundle();
                 US_UNUSED(l);
-                bundle = d->coreInfo->bundle_.lock();
+                bundle = std::move(b);
             }
             if (bundle)
             {
@@ -362,6 +362,14 @@ namespace cppmicroservices
     ServiceRegistrationBase::LockServiceRegistration() const
     {
         return ServiceRegistrationLocks(d, d->coreInfo);
+    }
+
+    std::pair<ServiceRegistrationLocks, std::shared_ptr<BundlePrivate>>
+    ServiceRegistrationBase::LockAndGetBundle() const
+    {
+        auto regLock = LockServiceRegistration();
+        auto bundle = d->coreInfo->bundle_.lock();
+        return { std::move(regLock), std::move(bundle) };
     }
 
     bool

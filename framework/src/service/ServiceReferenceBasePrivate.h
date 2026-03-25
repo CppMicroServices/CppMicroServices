@@ -37,6 +37,7 @@
 
 #include <atomic>
 #include <string>
+#include <utility>
 
 namespace cppmicroservices
 {
@@ -62,6 +63,13 @@ namespace cppmicroservices
         ~ServiceReferenceBasePrivate();
 
         ServiceRegistrationLocks LockServiceRegistration() const;
+
+        /**
+         * Lock the service registration and return the locked bundle along with the held lock.
+         *
+         * @return A pair of the RAII lock object and the locked bundle shared_ptr.
+         */
+        std::pair<ServiceRegistrationLocks, std::shared_ptr<BundlePrivate>> LockAndGetBundle() const;
 
         /**
          * Get the service object.

@@ -60,6 +60,14 @@ namespace cppmicroservices
         return ServiceRegistrationLocks(registration.lock(), coreInfo);
     }
 
+    std::pair<ServiceRegistrationLocks, std::shared_ptr<BundlePrivate>>
+    ServiceReferenceBasePrivate::LockAndGetBundle() const
+    {
+        auto regLock = LockServiceRegistration();
+        auto bundle = coreInfo->bundle_.lock();
+        return { std::move(regLock), std::move(bundle) };
+    }
+
     InterfaceMapConstPtr
     ServiceReferenceBasePrivate::GetServiceFromFactory(BundlePrivate* bundle,
                                                        std::shared_ptr<ServiceFactory> const& factory)
@@ -73,9 +81,9 @@ namespace cppmicroservices
             {
                 std::shared_ptr<BundlePrivate> bundle_;
                 {
-                    auto regLock = LockServiceRegistration();
-                    US_UNUSED(regLock);
-                    bundle_ = coreInfo->bundle_.lock();
+                    auto [l, b] = LockAndGetBundle();
+                    US_UNUSED(l);
+                    bundle_ = std::move(b);
                 }
                 if (bundle_)
                 {
@@ -91,9 +99,9 @@ namespace cppmicroservices
             {
                 std::shared_ptr<BundlePrivate> bundleSnapshot;
                 {
-                    auto regLock = LockServiceRegistration();
-                    US_UNUSED(regLock);
-                    bundleSnapshot = coreInfo->bundle_.lock();
+                    auto [l, bundleSnapshot_] = LockAndGetBundle();
+                    US_UNUSED(l);
+                    bundleSnapshot = std::move(bundleSnapshot_);
                 }
                 auto l = coreInfo->properties.Lock();
                 US_UNUSED(l);
@@ -121,9 +129,9 @@ namespace cppmicroservices
         {
             std::shared_ptr<BundlePrivate> regBundle;
             {
-                auto regLock = LockServiceRegistration();
-                US_UNUSED(regLock);
-                regBundle = coreInfo->bundle_.lock();
+                auto [l, b] = LockAndGetBundle();
+                US_UNUSED(l);
+                regBundle = std::move(b);
             }
             if (regBundle)
             {
@@ -151,9 +159,9 @@ namespace cppmicroservices
             std::string message = "ServiceFactory threw an unknown exception.";
             std::shared_ptr<BundlePrivate> bundle_;
             {
-                auto regLock = LockServiceRegistration();
-                US_UNUSED(regLock);
-                bundle_ = coreInfo->bundle_.lock();
+                auto [l, b] = LockAndGetBundle();
+                US_UNUSED(l);
+                bundle_ = std::move(b);
             }
             if (bundle_)
             {
@@ -366,9 +374,9 @@ namespace cppmicroservices
                 {
                     std::shared_ptr<BundlePrivate> bundle_;
                     {
-                        auto regLock = LockServiceRegistration();
-                        US_UNUSED(regLock);
-                        bundle_ = coreInfo->bundle_.lock();
+                        auto [l, b] = LockAndGetBundle();
+                        US_UNUSED(l);
+                        bundle_ = std::move(b);
                     }
                     if (bundle_)
                     {
@@ -477,9 +485,9 @@ namespace cppmicroservices
             {
                 std::shared_ptr<BundlePrivate> bundle_;
                 {
-                    auto regLock = LockServiceRegistration();
-                    US_UNUSED(regLock);
-                    bundle_ = coreInfo->bundle_.lock();
+                    auto [l, b] = LockAndGetBundle();
+                    US_UNUSED(l);
+                    bundle_ = std::move(b);
                 }
                 if (bundle_)
                 {

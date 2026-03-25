@@ -26,6 +26,7 @@
 #include "cppmicroservices/ServiceProperties.h"
 #include "cppmicroservices/ServiceReference.h"
 #include <functional>
+#include <utility>
 
 namespace cppmicroservices
 {
@@ -202,6 +203,8 @@ namespace cppmicroservices
         ServiceRegistrationBase(BundlePrivate* bundle, InterfaceMapConstPtr const& service, Properties&& props);
 
         ServiceRegistrationLocks LockServiceRegistration() const;
+
+        std::pair<ServiceRegistrationLocks, std::shared_ptr<BundlePrivate>> LockAndGetBundle() const;
 
         std::shared_ptr<ServiceRegistrationBasePrivate> d;
     };

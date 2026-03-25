@@ -586,7 +586,7 @@ else()
 
   # Suppress this compilation warning on unix OSes. Required with removing our patches
   # to miniz.
-  if(UNIX)
+  if(UNIX OR MINGW)
     usFunctionCheckCompilerFlags(-Wno-old-style-cast US_CXX_FLAGS)
   endif()
 

@@ -173,7 +173,9 @@ namespace cppmicroservices
 #ifdef US_PLATFORM_WINDOWS
                 DWORD bufSize = ::GetCurrentDirectoryW(0, NULL);
                 if (bufSize == 0)
+                {
                     bufSize = 1;
+                }
                 std::vector<wchar_t> buf(bufSize, L'\0');
                 if (::GetCurrentDirectoryW(bufSize, buf.data()) != 0)
                 {
@@ -220,9 +222,13 @@ namespace cppmicroservices
             if (us_stat(path.c_str(), &s))
             {
                 if (not_found_c_error(errno))
+                {
                     return false;
+                }
                 else
+                {
                     throw std::invalid_argument(GetLastCErrorStr());
+                }
             }
 #else
             std::wstring wpath(ToWString(path));
@@ -230,9 +236,13 @@ namespace cppmicroservices
             if (attr == INVALID_FILE_ATTRIBUTES)
             {
                 if (not_found_win32_error(::GetLastError()))
+                {
                     return false;
+                }
                 else
+                {
                     throw std::invalid_argument(GetLastWin32ErrorStr());
+                }
             }
 #endif
             return true;
@@ -246,9 +256,13 @@ namespace cppmicroservices
             if (us_stat(path.c_str(), &s))
             {
                 if (not_found_c_error(errno))
+                {
                     return false;
+                }
                 else
+                {
                     throw std::invalid_argument(GetLastCErrorStr());
+                }
             }
             return S_ISDIR(s.st_mode);
         }
@@ -261,9 +275,13 @@ namespace cppmicroservices
             if (us_stat(path.c_str(), &s))
             {
                 if (not_found_c_error(errno))
+                {
                     return false;
+                }
                 else
+                {
                     throw std::invalid_argument(GetLastCErrorStr());
+                }
             }
             return S_ISREG(s.st_mode);
         }
@@ -273,7 +291,9 @@ namespace cppmicroservices
         {
 #ifdef US_PLATFORM_WINDOWS
             if (path.size() > MAX_PATH)
+            {
                 return false;
+            }
             std::wstring wpath(ToWString(path));
             return (TRUE == ::PathIsRelativeW(wpath.c_str())) ? true : false;
 #else
@@ -285,7 +305,9 @@ namespace cppmicroservices
         GetAbsolute(std::string const& path, std::string const& base)
         {
             if (IsRelative(path))
+            {
                 return base + DIR_SEP + path;
+            }
             return path;
         }
 
@@ -295,7 +317,9 @@ namespace cppmicroservices
             std::string subPath;
             auto dirs = SplitString(path, std::string() + DIR_SEP_WIN32 + DIR_SEP_POSIX);
             if (dirs.empty())
+            {
                 return;
+            }
 
             auto iter = dirs.begin();
 #ifdef US_PLATFORM_POSIX
@@ -317,7 +341,9 @@ namespace cppmicroservices
 #endif
                 {
                     if (errno != EEXIST)
+                    {
                         throw std::invalid_argument(GetLastCErrorStr());
+                    }
                 }
                 subPath += DIR_SEP;
             }
@@ -326,6 +352,12 @@ namespace cppmicroservices
         void
         RemoveDirectoryRecursive(std::string const& path)
         {
+            if (path.size() > PATH_MAX)
+            {
+                errno = ENAMETOOLONG;
+                throw std::invalid_argument(GetLastCErrorStr());
+            }
+
             int res = -1;
             errno = 0;
             DIR* dir = opendir(path.c_str());
@@ -373,7 +405,9 @@ namespace cppmicroservices
             }
 
             if (res)
+            {
                 throw std::invalid_argument(GetLastCErrorStr());
+            }
         }
 
     } // namespace util

@@ -341,6 +341,7 @@ namespace cppmicroservices
         for (auto& sr : serviceRegistrations)
         {
             auto regLock = sr.LockServiceRegistration();
+            US_UNUSED(regLock);
             if (auto bundle_ = sr.d->coreInfo->bundle_.lock())
             {
                 if (bundle_.get() == p)

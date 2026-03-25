@@ -56,6 +56,7 @@ namespace cppmicroservices
         services.clear();
         classServices.clear();
         serviceRegistrations.clear();
+        bundleServices.clear();
     }
 
     Properties
@@ -129,6 +130,7 @@ namespace cppmicroservices
             US_UNUSED(l);
             services.insert(std::make_pair(res, classes));
             serviceRegistrations.push_back(res);
+            bundleServices[bundle].push_back(res);
             for (auto& clazz : classes)
             {
                 auto& s = classServices[clazz];
@@ -318,6 +320,19 @@ namespace cppmicroservices
         services.erase(sr);
         serviceRegistrations.erase(std::remove(serviceRegistrations.begin(), serviceRegistrations.end(), sr),
                                    serviceRegistrations.end());
+        if (auto bundle = sr.d->coreInfo->bundle_.lock())
+        {
+            auto it = bundleServices.find(bundle.get());
+            if (it != bundleServices.end())
+            {
+                auto& regs = it->second;
+                regs.erase(std::remove(regs.begin(), regs.end(), sr), regs.end());
+                if (regs.empty())
+                {
+                    bundleServices.erase(it);
+                }
+            }
+        }
         for (auto& clazz : classes)
         {
             auto& s = classServices[clazz];
@@ -338,17 +353,10 @@ namespace cppmicroservices
         auto l = this->Lock();
         US_UNUSED(l);
 
-        for (auto& sr : serviceRegistrations)
+        auto it = bundleServices.find(p);
+        if (it != bundleServices.end())
         {
-            auto [regLock, bundle_] = sr.LockAndGetBundle();
-            US_UNUSED(regLock);
-            if (bundle_)
-            {
-                if (bundle_.get() == p)
-                {
-                    res.push_back(sr);
-                }
-            }
+            res = it->second;
         }
     }
 

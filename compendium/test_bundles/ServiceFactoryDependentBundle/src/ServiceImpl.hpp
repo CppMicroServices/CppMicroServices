@@ -29,7 +29,7 @@ class dependentImpl : public test::FactoryServiceDependent
     void UnbindcreatedSvc(std::shared_ptr<test::FactoryCreatedService> /**/) {};
 
     bool
-    didBind()
+    didBind() override
     {
         return _bound;
     }

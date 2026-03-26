@@ -28,14 +28,6 @@ endif()
 
 add_executable(${US_RCC_EXECUTABLE_TARGET} ${srcs})
 
-if(UNIX)
-  # Suppress this compilation warning for miniz. Required with removing our patches to miniz.
-  set_source_files_properties(
-    ../../third_party/miniz.c
-    PROPERTIES COMPILE_FLAGS -Wno-old-style-cast
-  )
-endif()
-
 set_property(TARGET ${US_RCC_EXECUTABLE_TARGET} PROPERTY OUTPUT_NAME ${US_RCC_EXECUTABLE_OUTPUT_NAME})
 if(WIN32)
     target_link_libraries(${US_RCC_EXECUTABLE_TARGET} Shlwapi)
@@ -44,9 +36,7 @@ endif()
 target_link_libraries(${US_RCC_EXECUTABLE_TARGET} nowide::nowide)
 target_include_directories(${US_RCC_EXECUTABLE_TARGET} PRIVATE ${CppMicroServices_SOURCE_DIR}/third_party/boost/nowide/include)
 
-target_compile_definitions(${US_RCC_EXECUTABLE_TARGET} PRIVATE
-                           MINIZ_NO_ARCHIVE_READING_API
-                           MINIZ_NO_ZLIB_COMPATIBLE_NAMES)
+target_compile_definitions(${US_RCC_EXECUTABLE_TARGET} PRIVATE -DMINIZ_NO_ARCHIVE_READING_API -DMINIZ_NO_ZLIB_COMPATIBLE_NAMES)
 
 if(NOT US_NO_INSTALL)
     install(TARGETS ${US_RCC_EXECUTABLE_TARGET}

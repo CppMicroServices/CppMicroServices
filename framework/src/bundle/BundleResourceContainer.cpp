@@ -100,11 +100,12 @@ namespace cppmicroservices
     BundleResourceContainer::GetStat(BundleResourceContainer::Stat& stat)
     {
         OpenAndInitializeContainer();
+        std::unique_lock<std::mutex> l(m_ZipFileStreamMutex);
         int fileIndex
             = mz_zip_reader_locate_file(const_cast<mz_zip_archive*>(&m_ZipArchive), stat.filePath.c_str(), nullptr, 0);
         if (fileIndex >= 0)
         {
-            return GetStat(fileIndex, stat);
+            return GetStatLocked(fileIndex, stat);
         }
         return false;
     }
@@ -113,6 +114,13 @@ namespace cppmicroservices
     BundleResourceContainer::GetStat(int index, BundleResourceContainer::Stat& stat)
     {
         OpenAndInitializeContainer();
+        std::unique_lock<std::mutex> l(m_ZipFileStreamMutex);
+        return GetStatLocked(index, stat);
+    }
+
+    bool
+    BundleResourceContainer::GetStatLocked(int index, BundleResourceContainer::Stat& stat)
+    {
         if (index >= 0)
         {
             mz_zip_archive_file_stat zipStat;

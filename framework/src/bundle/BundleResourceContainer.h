@@ -100,6 +100,8 @@ namespace cppmicroservices
             }
         };
 
+        bool GetStatLocked(int index, Stat& stat);
+
         void InitSortedEntries() const;
 
         bool Matches(std::string const& name, std::string const& filePattern) const;

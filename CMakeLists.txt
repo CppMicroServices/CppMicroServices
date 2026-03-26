@@ -584,12 +584,6 @@ else()
     usFunctionCheckCompilerFlags(-Wno-mismatched-tags US_CXX_FLAGS)
   endif()
 
-  # Suppress this compilation warning on unix OSes. Required with removing our patches
-  # to miniz.
-  if(UNIX OR MINGW)
-    usFunctionCheckCompilerFlags(-Wno-old-style-cast US_CXX_FLAGS)
-  endif()
-
   # Issue #56: Workaround a clang compiler issue (https://llvm.org/bugs/show_bug.cgi?id=26749).
   # The typeinfo symbols do not have reliable symbol visibility. Instead of exporting only
   # symbols and associated typeinfo symbols which have explicit "default" visibility,
@@ -656,12 +650,6 @@ else()
   if(NOT US_CXX_COVERAGE_FLAGS AND US_ENABLE_COVERAGE)
     message(WARNING "Code coverage requested, but compiler does not recognize it")
   endif()
-endif()
-
-# Allow forcing of bundle builds to be deterministic
-if (US_USE_DETERMINISTIC_BUNDLE_BUILDS)
-  set(US_CXX_FLAGS "${US_CXX_FLAGS} -DMINIZ_DETERMINISTIC_ZIP_FILES")
-  set(US_C_FLAGS "${US_C_FLAGS} -DMINIZ_DETERMINISTIC_ZIP_FILES")
 endif()
 
 if(MINGW)

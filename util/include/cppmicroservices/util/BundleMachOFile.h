@@ -95,7 +95,7 @@ namespace cppmicroservices
             fs.read(reinterpret_cast<char*>(&mhdr), sizeof mhdr);
             if (mhdr.filetype != MH_DYLIB && mhdr.filetype != MH_BUNDLE && mhdr.filetype != MH_EXECUTE)
             {
-                throw InvalidMachOException("Not a Mach-O dynamic shared library or bundle file.");
+                throw InvalidMachOException("Not a Mach-O dynamic shared library, bundle file, or executable.");
             }
 
             fs.seekg(fileOffset + sizeof(mach_header_64));

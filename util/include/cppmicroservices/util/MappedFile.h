@@ -53,6 +53,7 @@ namespace cppmicroservices
                 {
                     mappedAddress = nullptr;
                     mapSize = 0;
+                    dataOffset = 0;
                 }
             }
         }
@@ -80,7 +81,9 @@ namespace cppmicroservices
         }
         std::size_t
         GetSize() const override
-        { return mapSize - dataOffset; }
+        {
+            return mapSize - dataOffset;
+        }
 
       private:
         int fileDesc;

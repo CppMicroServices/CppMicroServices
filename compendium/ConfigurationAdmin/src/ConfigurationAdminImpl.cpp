@@ -143,49 +143,60 @@ namespace
         }
     }
 
+    std::string
+    tryGetStringFromProperty(cppmicroservices::Any const& prop, std::string const& subKey = {})
+    {
+        if (prop.Empty())
+        {
+            return {};
+        }
+        if (subKey.empty())
+        {
+            auto const* s = cppmicroservices::any_cast<std::string>(&prop);
+            return s ? *s : std::string {};
+        }
+        auto const* map = cppmicroservices::any_cast<cppmicroservices::AnyMap>(&prop);
+        if (!map)
+        {
+            return {};
+        }
+        auto val = map->AtCompoundKey(subKey, cppmicroservices::Any());
+        auto const* s = cppmicroservices::any_cast<std::string>(&val);
+        return s ? *s : std::string {};
+    }
+
     template <typename T>
     std::string
     getPidFromServiceReference(T const& reference)
     {
         using namespace cppmicroservices::cmimpl::CMConstants;
-        try
+
+        std::string pid;
+
+        pid = tryGetStringFromProperty(reference.GetProperty(CM_SERVICE_KEY), CM_SERVICE_SUBKEY);
+        if (!pid.empty())
         {
-            auto const serviceProp = reference.GetProperty(CM_SERVICE_KEY);
-            auto const& serviceMap = cppmicroservices::ref_any_cast<cppmicroservices::AnyMap>(serviceProp);
-            return cppmicroservices::any_cast<std::string>(serviceMap.AtCompoundKey(CM_SERVICE_SUBKEY));
+            return pid;
         }
-        catch (...)
+
+        pid = tryGetStringFromProperty(reference.GetProperty(CM_COMPONENT_KEY), CM_COMPONENT_SUBKEY);
+        if (!pid.empty())
         {
-            // Service does not have a "service" property with a "pid" string subproperty.
+            return pid;
         }
-        try
+
+        pid = tryGetStringFromProperty(reference.GetProperty(CM_SERVICE_KEY + "." + CM_SERVICE_SUBKEY));
+        if (!pid.empty())
         {
-            auto const componentProp = reference.GetProperty(CM_COMPONENT_KEY);
-            auto const& componentMap = cppmicroservices::ref_any_cast<cppmicroservices::AnyMap>(componentProp);
-            return cppmicroservices::any_cast<std::string>(componentMap.AtCompoundKey(CM_COMPONENT_SUBKEY));
+            return pid;
         }
-        catch (...)
+
+        pid = tryGetStringFromProperty(reference.GetProperty(CM_COMPONENT_KEY + "." + CM_COMPONENT_SUBKEY));
+        if (!pid.empty())
         {
-            // Service does not have a "component" property with a "name" string property.
+            return pid;
         }
-        try
-        {
-            return cppmicroservices::any_cast<std::string>(
-                reference.GetProperty(CM_SERVICE_KEY + std::string(".") + CM_SERVICE_SUBKEY));
-        }
-        catch (...)
-        {
-            // Service does not have a "service.pid" string property.
-        }
-        try
-        {
-            return cppmicroservices::any_cast<std::string>(
-                reference.GetProperty(CM_COMPONENT_KEY + std::string(".") + CM_COMPONENT_SUBKEY));
-        }
-        catch (...)
-        {
-            // Service does not have a "component.name" string property.
-        }
+
         return {};
     }
 } // namespace

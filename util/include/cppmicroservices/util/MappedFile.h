@@ -56,6 +56,12 @@ namespace cppmicroservices
                     dataOffset = 0;
                 }
             }
+            else
+            {
+                mappedAddress = nullptr;
+                mapSize = 0;
+                dataOffset = 0;
+            }
         }
 
         ~MappedFile()

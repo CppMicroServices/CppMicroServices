@@ -31,9 +31,7 @@ namespace test
         ~basicDS5() override = default;
         std::string
         Description() override
-        {
-            return "basicDS5";
-        };
+        { return "basicDS5"; };
     };
 
     // Test fixture for integration tests
@@ -49,6 +47,7 @@ namespace test
             auto context = framework.GetBundleContext();
 
             ::test::InstallAndStartDS(context);
+            ::test::InstallAndStartConfigAdmin(context);
 
             auto sRef
                 = context.GetServiceReference<cppmicroservices::service::component::runtime::ServiceComponentRuntime>();
@@ -70,6 +69,55 @@ namespace test
     };
 
     /**
+     * Verify that ServiceReferenceFromService works for services provided by a
+     * ServiceFactory. A ServiceFactory-created service is bound to a dependent
+     * DS component via a bind method; the bind method calls
+     * ServiceReferenceFromService on the injected shared_ptr and expects it to
+     * succeed. The test also verifies that two external GetService calls for the
+     * same factory service return ServiceReferences that compare equal.
+     */
+    TEST_F(IntegrationTestFixture, testServiceReferenceFromServiceFactory)
+    {
+        auto const& param = std::make_shared<AsyncWorkServiceThreadPool>(10);
+        auto context = framework.GetBundleContext();
+
+        // ASYNCWORKSERVICE
+        auto reg = context.RegisterService<cppmicroservices::async::AsyncWorkService>(param);
+
+        // Start bundle
+        std::string componentName = "sample::ServiceComponentCA10";
+
+        ::test::InstallAndStartBundle(context, "ServiceFactoryBundle");
+        ::test::InstallAndStartBundle(context, "ServiceFactoryDependentBundle");
+
+        auto factoryRef = context.GetServiceReferences<cppmicroservices::ServiceFactory>("(mySvc=true)");
+        auto factorySvc = context.GetService<cppmicroservices::ServiceFactory>(factoryRef.front());
+
+        ASSERT_TRUE(factorySvc);
+
+        // register the factory
+        context.RegisterService<test::FactoryCreatedService>(
+            std::static_pointer_cast<cppmicroservices::ServiceFactory>(factorySvc));
+
+        // grab the dependent service, make sure it bound succesfully
+        auto dependentSvcRef = context.GetServiceReference<test::FactoryServiceDependent>();
+        auto dependentSvc = context.GetService<test::FactoryServiceDependent>(dependentSvcRef);
+        ASSERT_TRUE(dependentSvc && dependentSvc->didBind());
+
+        // verify that two calls to getServiceFromReference will return the same service, with the right interfaceid
+        ASSERT_NO_THROW(ASSERT_EQ(cppmicroservices::ServiceReferenceFromService(
+                                      context.GetService<test::FactoryCreatedService>(
+                                          context.GetServiceReference<test::FactoryCreatedService>()))
+                                      .GetInterfaceId(),
+                                  "test::FactoryCreatedService"));
+        ASSERT_NO_THROW(
+            ASSERT_EQ(cppmicroservices::ServiceReferenceFromService(context.GetService<test::FactoryCreatedService>(
+                          context.GetServiceReference<test::FactoryCreatedService>())),
+                      cppmicroservices::ServiceReferenceFromService(context.GetService<test::FactoryCreatedService>(
+                          context.GetServiceReference<test::FactoryCreatedService>()))));
+    }
+
+    /**
      * Verify that a service's configuration can be updated from within a 'Modified' callback without
      * deadlocking the framework trying to get the lock in configNotifier
      */
@@ -80,9 +128,6 @@ namespace test
 
         // ASYNCWORKSERVICE
         auto reg = context.RegisterService<cppmicroservices::async::AsyncWorkService>(param);
-
-        // CA
-        ::test::InstallAndStartConfigAdmin(context);
 
         // CA Service
         auto CARef = context.GetServiceReference<cppmicroservices::service::cm::ConfigurationAdmin>();

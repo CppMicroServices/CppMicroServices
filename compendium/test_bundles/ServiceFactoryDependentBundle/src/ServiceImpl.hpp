@@ -17,6 +17,7 @@ class dependentImpl : public test::FactoryServiceDependent
         try
         {
             auto srefFromService1 = cppmicroservices::ServiceReferenceFromService(factoryCreated);
+            US_UNUSED(srefFromService1);
             _bound = true;
         }
         catch (std::exception const& e)

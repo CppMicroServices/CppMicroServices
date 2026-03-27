@@ -42,7 +42,6 @@ namespace test
             framework.WaitForStop(std::chrono::milliseconds::zero());
         }
 
-        std::shared_ptr<cppmicroservices::service::component::runtime::ServiceComponentRuntime> dsRuntimeService;
         cppmicroservices::Framework framework;
     };
 
@@ -74,7 +73,8 @@ namespace test
         ASSERT_TRUE(factorySvc);
 
         // register the factory
-        context.RegisterService<test::FactoryCreatedService>(std::static_pointer_cast<cppmicroservices::ServiceFactory>(factorySvc));
+        context.RegisterService<test::FactoryCreatedService>(
+            std::static_pointer_cast<cppmicroservices::ServiceFactory>(factorySvc));
 
         // grab the dependent service, make sure it bound succesfully
         auto dependentSvcRef = context.GetServiceReference<test::FactoryServiceDependent>();
@@ -82,14 +82,15 @@ namespace test
         ASSERT_TRUE(dependentSvc && dependentSvc->didBind());
 
         // verify that two calls to getServiceFromReference will return the same service, with the right interfaceid
-        ASSERT_EQ(cppmicroservices::ServiceReferenceFromService(
-                      context.GetService<test::FactoryCreatedService>(
-                          context.GetServiceReference<test::FactoryCreatedService>()))
-                      .GetInterfaceId(),
-                  "test::FactoryCreatedService");
-        ASSERT_EQ(cppmicroservices::ServiceReferenceFromService(context.GetService<test::FactoryCreatedService>(
-                      context.GetServiceReference<test::FactoryCreatedService>())),
-                  cppmicroservices::ServiceReferenceFromService(context.GetService<test::FactoryCreatedService>(
-                      context.GetServiceReference<test::FactoryCreatedService>())));
+        ASSERT_NO_THROW(ASSERT_EQ(cppmicroservices::ServiceReferenceFromService(
+                                      context.GetService<test::FactoryCreatedService>(
+                                          context.GetServiceReference<test::FactoryCreatedService>()))
+                                      .GetInterfaceId(),
+                                  "test::FactoryCreatedService"));
+        ASSERT_NO_THROW(
+            ASSERT_EQ(cppmicroservices::ServiceReferenceFromService(context.GetService<test::FactoryCreatedService>(
+                          context.GetServiceReference<test::FactoryCreatedService>())),
+                      cppmicroservices::ServiceReferenceFromService(context.GetService<test::FactoryCreatedService>(
+                          context.GetServiceReference<test::FactoryCreatedService>()))));
     }
 } // namespace test

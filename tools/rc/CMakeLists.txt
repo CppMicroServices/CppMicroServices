@@ -36,7 +36,7 @@ endif()
 target_link_libraries(${US_RCC_EXECUTABLE_TARGET} nowide::nowide)
 target_include_directories(${US_RCC_EXECUTABLE_TARGET} PRIVATE ${CppMicroServices_SOURCE_DIR}/third_party/boost/nowide/include)
 
-target_compile_definitions(${US_RCC_EXECUTABLE_TARGET} PRIVATE -DMINIZ_NO_ARCHIVE_READING_API -DMINIZ_NO_ZLIB_COMPATIBLE_NAMES)
+target_compile_definitions(${US_RCC_EXECUTABLE_TARGET} PRIVATE -DMINIZ_NO_ZLIB_COMPATIBLE_NAMES)
 
 if(NOT US_NO_INSTALL)
     install(TARGETS ${US_RCC_EXECUTABLE_TARGET}

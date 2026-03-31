@@ -353,6 +353,7 @@ namespace cppmicroservices
     ServiceRegistrationBase::SafelyGetBundle() const
     {
         auto regLock = LockServiceRegistration();
+        US_UNUSED(regLock);
         auto bundle = d->coreInfo->bundle_.lock();
         return bundle;
     }

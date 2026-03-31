@@ -65,11 +65,11 @@ namespace cppmicroservices
         ServiceRegistrationLocks LockServiceRegistration() const;
 
         /**
-         * Lock the service registration and return the locked bundle along with the held lock.
+         * Lock the service registration and return the locked bundle.
          *
-         * @return A pair of the RAII lock object and the locked bundle shared_ptr.
+         * @return bundle shared_ptr.
          */
-        std::pair<ServiceRegistrationLocks, std::shared_ptr<BundlePrivate>> LockAndGetBundle() const;
+        std::shared_ptr<BundlePrivate> SafelyGetBundle() const;
 
         /**
          * Get the service object.

@@ -102,10 +102,11 @@ namespace cppmicroservices
             return Bundle();
         }
 
-        auto [l, bundle] = refP->LockAndGetBundle();
+        auto l = refP->LockServiceRegistration();
         US_UNUSED(l);
-        if (!bundle)
-        {
+        auto bundle = refP->coreInfo->bundle_.lock();
+        if (bundle == nullptr)
+            {
             return Bundle();
         }
         return MakeBundle(bundle->shared_from_this());

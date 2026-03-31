@@ -204,7 +204,7 @@ namespace cppmicroservices
 
         ServiceRegistrationLocks LockServiceRegistration() const;
 
-        std::pair<ServiceRegistrationLocks, std::shared_ptr<BundlePrivate>> LockAndGetBundle() const;
+        std::shared_ptr<BundlePrivate> SafelyGetBundle() const;
 
         std::shared_ptr<ServiceRegistrationBasePrivate> d;
     };

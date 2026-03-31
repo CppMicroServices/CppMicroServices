@@ -131,12 +131,7 @@ namespace cppmicroservices
 
         // This calls into service event listener hooks. We must not hold any locks here
         {
-            std::shared_ptr<BundlePrivate> bundle;
-            {
-                auto [l, b] = LockAndGetBundle();
-                US_UNUSED(l);
-                bundle = std::move(b);
-            }
+            std::shared_ptr<BundlePrivate> bundle = SafelyGetBundle();
             if (bundle)
             {
                 bundle->coreCtx->listeners.GetMatchingServiceListeners(modifiedEndMatchEvent, before);
@@ -191,12 +186,7 @@ namespace cppmicroservices
         if (old_rank != new_rank)
         {
             auto const& classes = ref_any_cast<std::vector<std::string>>(objectClasses);
-            std::shared_ptr<BundlePrivate> bundle;
-            {
-                auto [l, b] = LockAndGetBundle();
-                US_UNUSED(l);
-                bundle = std::move(b);
-            }
+            std::shared_ptr<BundlePrivate> bundle = SafelyGetBundle();
             if (bundle)
             {
                 bundle->coreCtx->services.UpdateServiceRegistrationOrder(classes);
@@ -206,12 +196,7 @@ namespace cppmicroservices
         // Notify listeners, we must not hold any locks here
         ServiceListeners::ServiceListenerEntries matchingListeners;
         {
-            std::shared_ptr<BundlePrivate> bundle;
-            {
-                auto [l, b] = LockAndGetBundle();
-                US_UNUSED(l);
-                bundle = std::move(b);
-            }
+            std::shared_ptr<BundlePrivate> bundle = SafelyGetBundle();
             if (bundle)
             {
                 bundle->coreCtx->listeners.GetMatchingServiceListeners(modifiedEvent, matchingListeners);
@@ -364,12 +349,12 @@ namespace cppmicroservices
         return ServiceRegistrationLocks(d, d->coreInfo);
     }
 
-    std::pair<ServiceRegistrationLocks, std::shared_ptr<BundlePrivate>>
-    ServiceRegistrationBase::LockAndGetBundle() const
+    std::shared_ptr<BundlePrivate>
+    ServiceRegistrationBase::SafelyGetBundle() const
     {
         auto regLock = LockServiceRegistration();
         auto bundle = d->coreInfo->bundle_.lock();
-        return { std::move(regLock), std::move(bundle) };
+        return bundle;
     }
 
     bool

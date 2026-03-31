@@ -60,12 +60,12 @@ namespace cppmicroservices
         return ServiceRegistrationLocks(registration.lock(), coreInfo);
     }
 
-    std::pair<ServiceRegistrationLocks, std::shared_ptr<BundlePrivate>>
-    ServiceReferenceBasePrivate::LockAndGetBundle() const
+    std::shared_ptr<BundlePrivate>
+    ServiceReferenceBasePrivate::SafelyGetBundle() const
     {
         auto regLock = LockServiceRegistration();
         auto bundle = coreInfo->bundle_.lock();
-        return { std::move(regLock), std::move(bundle) };
+        return bundle;
     }
 
     InterfaceMapConstPtr
@@ -79,12 +79,7 @@ namespace cppmicroservices
                                                             ServiceRegistrationBase(registration.lock()));
             if (!smap || smap->empty())
             {
-                std::shared_ptr<BundlePrivate> bundle_;
-                {
-                    auto [l, b] = LockAndGetBundle();
-                    US_UNUSED(l);
-                    bundle_ = std::move(b);
-                }
+                std::shared_ptr<BundlePrivate> bundle_ = SafelyGetBundle();
                 if (bundle_)
                 {
                     std::string message = "ServiceFactory returned an empty or nullptr interface map.";
@@ -97,12 +92,8 @@ namespace cppmicroservices
                 return smap;
             }
             {
-                std::shared_ptr<BundlePrivate> bundleSnapshot;
-                {
-                    auto [l, bundleSnapshot_] = LockAndGetBundle();
-                    US_UNUSED(l);
-                    bundleSnapshot = std::move(bundleSnapshot_);
-                }
+                std::shared_ptr<BundlePrivate> bundleSnapshot = SafelyGetBundle();
+
                 auto l = coreInfo->properties.Lock();
                 US_UNUSED(l);
                 for (auto const& clazz : ref_any_cast<std::vector<std::string>>(
@@ -127,12 +118,7 @@ namespace cppmicroservices
         }
         catch (cppmicroservices::SharedLibraryException const& ex)
         {
-            std::shared_ptr<BundlePrivate> regBundle;
-            {
-                auto [l, b] = LockAndGetBundle();
-                US_UNUSED(l);
-                regBundle = std::move(b);
-            }
+            std::shared_ptr<BundlePrivate> regBundle = SafelyGetBundle();
             if (regBundle)
             {
                 regBundle->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
@@ -157,12 +143,7 @@ namespace cppmicroservices
         catch (std::exception const& ex)
         {
             std::string message = "ServiceFactory threw an unknown exception.";
-            std::shared_ptr<BundlePrivate> bundle_;
-            {
-                auto [l, b] = LockAndGetBundle();
-                US_UNUSED(l);
-                bundle_ = std::move(b);
-            }
+            std::shared_ptr<BundlePrivate> bundle_ = SafelyGetBundle();
             if (bundle_)
             {
                 bundle_->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(
@@ -372,12 +353,7 @@ namespace cppmicroservices
                 }
                 catch (std::exception const& ex)
                 {
-                    std::shared_ptr<BundlePrivate> bundle_;
-                    {
-                        auto [l, b] = LockAndGetBundle();
-                        US_UNUSED(l);
-                        bundle_ = std::move(b);
-                    }
+                    std::shared_ptr<BundlePrivate> bundle_ = SafelyGetBundle();
                     if (bundle_)
                     {
                         std::string message("ServiceFactory threw an exception");
@@ -483,12 +459,7 @@ namespace cppmicroservices
             }
             catch (std::exception const& ex)
             {
-                std::shared_ptr<BundlePrivate> bundle_;
-                {
-                    auto [l, b] = LockAndGetBundle();
-                    US_UNUSED(l);
-                    bundle_ = std::move(b);
-                }
+                std::shared_ptr<BundlePrivate> bundle_ = SafelyGetBundle();
                 if (bundle_)
                 {
                     std::string message("ServiceFactory threw an exception");

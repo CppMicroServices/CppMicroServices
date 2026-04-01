@@ -652,12 +652,6 @@ else()
   endif()
 endif()
 
-# Allow forcing of bundle builds to be deterministic
-if (US_USE_DETERMINISTIC_BUNDLE_BUILDS)
-  set(US_CXX_FLAGS "${US_CXX_FLAGS} -DMINIZ_DETERMINISTIC_ZIP_FILES")
-  set(US_C_FLAGS "${US_C_FLAGS} -DMINIZ_DETERMINISTIC_ZIP_FILES")
-endif()
-
 if(MINGW)
   # suppress warnings about auto imported symbols
   set(US_CXX_FLAGS "-Wl,--enable-auto-import ${US_CXX_FLAGS}")

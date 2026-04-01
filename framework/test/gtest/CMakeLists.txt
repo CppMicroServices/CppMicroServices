@@ -134,6 +134,8 @@ if (US_COMPILER_MSVC AND BUILD_SHARED_LIBS)
   target_compile_options(${us_gtest_test_exe_name} PRIVATE -DGTEST_LINKED_AS_SHARED_LIBRARY)
 endif()
 
+target_compile_definitions(${us_gtest_test_exe_name} PRIVATE -DMINIZ_NO_ZLIB_COMPATIBLE_NAMES)
+
 # Needed for ResourceCompilerTest
 add_dependencies(${us_gtest_test_exe_name} ${US_RCC_EXECUTABLE_TARGET})
 set_property(TARGET ${us_gtest_test_exe_name} APPEND PROPERTY COMPILE_DEFINITIONS US_BUNDLE_NAME=main)

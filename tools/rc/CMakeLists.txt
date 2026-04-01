@@ -27,6 +27,7 @@ if(NOT APPLE AND US_COMPILER_GNU_ARM AND CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64
 endif()
 
 add_executable(${US_RCC_EXECUTABLE_TARGET} ${srcs})
+
 set_property(TARGET ${US_RCC_EXECUTABLE_TARGET} PROPERTY OUTPUT_NAME ${US_RCC_EXECUTABLE_OUTPUT_NAME})
 if(WIN32)
     target_link_libraries(${US_RCC_EXECUTABLE_TARGET} Shlwapi)
@@ -35,8 +36,7 @@ endif()
 target_link_libraries(${US_RCC_EXECUTABLE_TARGET} nowide::nowide)
 target_include_directories(${US_RCC_EXECUTABLE_TARGET} PRIVATE ${CppMicroServices_SOURCE_DIR}/third_party/boost/nowide/include)
 
-set_property(TARGET ${US_RCC_EXECUTABLE_TARGET} APPEND PROPERTY
-             COMPILE_DEFINITIONS "MINIZ_NO_ARCHIVE_READING_API;MINIZ_NO_ZLIB_COMPATIBLE_NAMES")
+target_compile_definitions(${US_RCC_EXECUTABLE_TARGET} PRIVATE -DMINIZ_NO_ZLIB_COMPATIBLE_NAMES)
 
 if(NOT US_NO_INSTALL)
     install(TARGETS ${US_RCC_EXECUTABLE_TARGET}
@@ -61,8 +61,17 @@ endif()
 # Re-enable enable exports for executables after building usResourceCompiler
 set(CMAKE_ENABLE_EXPORTS ON)
 
-# Test case to make sure that if deterministic builds are switched on
+# When deterministic bundle builds are enabled, compile miniz without time support so that
+# all zip entry timestamps are zeroed (giving deterministic output regardless of file mtimes).
+# MINIZ_NO_TIME disables mz_zip_time_t_to_dos_time / mz_zip_dos_to_time_t in miniz, leaving
+# dos_time and dos_date at their zero-initialized values for every entry written.
+# US_USE_DETERMINISTIC_BUNDLE_BUILDS activates the locale-setting and sorting logic in
+# ResourceCompiler.cpp that is also required for deterministic output.
 if (US_USE_DETERMINISTIC_BUNDLE_BUILDS)
+  target_compile_definitions(${US_RCC_EXECUTABLE_TARGET} PRIVATE
+                             MINIZ_NO_TIME
+                             US_USE_DETERMINISTIC_BUNDLE_BUILDS)
+
   add_test(NAME Deterministic_Zip_Files_Test
          WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
          COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/test/basic_deterministic_zip_test.$<IF:$<BOOL:${MSVC}>,bat,sh> ${CMAKE_BINARY_DIR}/bin/${US_RCC_EXECUTABLE_OUTPUT_NAME}

@@ -33,10 +33,10 @@ MIT License (GitHub) or Public Domain
 
 https://github.com/richgel999/miniz
 (formerly https://code.google.com/p/miniz/)
-v3.0.2
+v3.1.1
 
-Note: miniz.c and miniz.h created by downloading the source code
-      and running amalgamate.sh.
+Note: miniz.c and miniz.h obtained by unzipping the release binary
+      provided by the miniz maintainers.
 
 Patches
 

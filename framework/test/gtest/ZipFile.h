@@ -20,7 +20,16 @@ limitations under the License.
 
 =============================================================================*/
 
+#if defined(__clang__) || defined(__GNUC__)
+#    pragma GCC diagnostic push
+#    pragma GCC diagnostic ignored "-Wold-style-cast"
+#endif
+
 #include "miniz.h"
+
+#if defined(__clang__) || defined(__GNUC__)
+#    pragma GCC diagnostic pop
+#endif
 
 #include <string>
 #include <vector>

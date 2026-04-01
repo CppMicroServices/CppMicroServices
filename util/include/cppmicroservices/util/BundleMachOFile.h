@@ -93,9 +93,9 @@ namespace cppmicroservices
             fs.seekg(fileOffset);
             Mhdr mhdr;
             fs.read(reinterpret_cast<char*>(&mhdr), sizeof mhdr);
-            if (mhdr.filetype != MH_DYLIB && mhdr.filetype != MH_BUNDLE)
+            if (mhdr.filetype != MH_DYLIB && mhdr.filetype != MH_BUNDLE && mhdr.filetype != MH_EXECUTE)
             {
-                throw InvalidMachOException("Not a Mach-O dynamic shared library or bundle file.");
+                throw InvalidMachOException("Not a Mach-O dynamic shared library, bundle file, or executable.");
             }
 
             fs.seekg(fileOffset + sizeof(mach_header_64));
@@ -148,9 +148,10 @@ namespace cppmicroservices
                         if (section.size >= zipFileSizeThreshold)
                         {
                             off_t pa_offset = (fileOffset + section.offset) & ~(sysconf(_SC_PAGESIZE) - 1);
-                            size_t mappedLength = section.size + (fileOffset + section.offset) - pa_offset;
+                            size_t dataOffset = (fileOffset + section.offset) - static_cast<size_t>(pa_offset);
+                            size_t mappedLength = section.size + dataOffset;
                             return std::make_shared<RawBundleResources>(
-                                std::make_unique<MappedFile>(filePath, mappedLength, pa_offset));
+                                std::make_unique<MappedFile>(filePath, mappedLength, pa_offset, dataOffset));
                         }
                         else
                         {

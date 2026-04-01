@@ -1,0 +1,23 @@
+{
+    "bundle.symbolic_name" : "ServiceFactoryDependentBundle",
+    "bundle.name" : "ServiceFactoryDependentBundle",
+    "scr" : {
+        "version" : 1,
+        "components" : [{
+            "implementation-class": "dependentImpl",
+            "service" : {
+                "interfaces" : ["test::FactoryServiceDependent"]
+            },
+            "references" : [
+                {
+                    "name" : "createdSvc",
+                    "interface" : "test::FactoryCreatedService",
+                    "policy": "dynamic"
+                }
+            ],
+            "properties" : {
+                "myDependentSvc" : true
+            }
+        }]
+    }
+}

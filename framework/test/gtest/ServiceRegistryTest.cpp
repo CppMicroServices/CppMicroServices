@@ -28,7 +28,11 @@
 #include "TestUtils.h"
 #include "gtest/gtest.h"
 
+#include <atomic>
+#include <future>
+#include <thread>
 #include <unordered_set>
+#include <vector>
 
 using namespace cppmicroservices;
 
@@ -229,3 +233,62 @@ TEST_F(ServiceRegistryTest, TestServicePropertiesUpdate)
     reg2.Unregister();
     ASSERT_TRUE(context.GetServiceReferences<ITestServiceA>().empty());
 }
+
+
+
+#if defined(US_ENABLE_THREADING_SUPPORT)
+
+#include "ConcurrencyTestUtil.hpp"
+
+// This test exercises a data race between concurrent bundle_.lock() reads
+// (in SetProperties) and bundle_.reset() writes (in Unregister) on the
+// shared coreInfo->bundle_ weak_ptr.
+//
+// Without the fix (LockServiceRegistration around bundle_.lock() reads),
+// this crashes or triggers TSAN reports.
+TEST_F(ServiceRegistryTest, NoDataRaceOnConcurrentUnregisterAndSetProperties)
+{
+    constexpr int kIterations = 500;
+
+    for (int i = 0; i < kIterations; ++i)
+    {
+        auto reg = context.RegisterService<ITestServiceA>(std::make_shared<TestServiceA>());
+
+        cppmicroservices::detail::test::Barrier barrier(2);
+
+        auto f1 = std::async(
+            std::launch::async,
+            [&]()
+            {
+                barrier.Wait();
+                try
+                {
+                    ServiceProperties props;
+                    props["key"] = std::string("value");
+                    reg.SetProperties(std::move(props));
+                }
+                catch (...)
+                {
+                }
+            });
+
+        auto f2 = std::async(
+            std::launch::async,
+            [&]()
+            {
+                barrier.Wait();
+                try
+                {
+                    reg.Unregister();
+                }
+                catch (...)
+                {
+                }
+            });
+
+        f1.get();
+        f2.get();
+    }
+}
+
+#endif

@@ -26,6 +26,14 @@
 #include "cppmicroservices/ServiceInterface.h"
 #include "cppmicroservices/ServiceReferenceBase.h"
 
+#ifndef __cpp_vsersion
+#    if defined(_MSC_VER)
+#        define __cpp_vsersion _MSVC_LANG
+#    else
+#        define __cpp_vsersion __cplusplus
+#    endif
+#endif // !__cpp_vsersion
+
 namespace cppmicroservices
 {
 
@@ -102,7 +110,9 @@ namespace cppmicroservices
 
         using ServiceReferenceBase::operator=; // for the nullptr overload
 
-        ServiceReference& operator=(ServiceReferenceBase const& reference) {
+        ServiceReference&
+        operator=(ServiceReferenceBase const& reference)
+        {
             ServiceReferenceBase::operator=(reference);
             std::string const interfaceId(us_service_interface_iid<S>());
             if (GetInterfaceId() != interfaceId)
@@ -119,10 +129,12 @@ namespace cppmicroservices
             return *this;
         }
 
-#if __cplusplus >= 202002L
-	bool operator==(ServiceReference const& reference) const {
-		return ServiceReferenceBase::operator==(reference);
-	}
+#if __cpp_vsersion >= 202002L
+        bool
+        operator==(ServiceReference const& reference) const
+        {
+            return ServiceReferenceBase::operator==(reference);
+        }
 #else
         using ServiceReferenceBase::operator==;
 #endif
@@ -156,10 +168,12 @@ namespace cppmicroservices
 
         using ServiceReferenceBase::operator=;
 
-#if __cplusplus >= 202002L
-	bool operator==(ServiceReference const& reference) const {
-		return ServiceReferenceBase::operator==(reference);
-	}
+#if __cpp_vsersion >= 202002L
+        bool
+        operator==(ServiceReference const& reference) const
+        {
+            return ServiceReferenceBase::operator==(reference);
+        }
 #else
         using ServiceReferenceBase::operator==;
 #endif
@@ -184,9 +198,9 @@ namespace cppmicroservices
      * \ingroup gr_servicereference
      *
      * A method to retrieve a <code>ServiceObject</code>'s original <code>ServiceReference<void></code>
-     * 
+     *
      * \throws std::runtime_error if the service object is not a CppMicroServices managed object
-     * 
+     *
      *
      */
     US_Framework_EXPORT ServiceReferenceU ServiceReferenceFromService(std::shared_ptr<void> const& s);

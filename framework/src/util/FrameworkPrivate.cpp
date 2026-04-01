@@ -286,7 +286,7 @@ namespace cppmicroservices
     }
 
     void
-    FrameworkPrivate::Uninstall()
+    FrameworkPrivate::Uninstall(bool freeSharedLibrary)
     {
         throw std::runtime_error("Cannot uninstall a system bundle.");
     }

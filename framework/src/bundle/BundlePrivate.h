@@ -145,7 +145,7 @@ namespace cppmicroservices
         // Performs the actual activation.
         void FinalizeActivation();
 
-        virtual void Uninstall();
+        virtual void Uninstall(bool freeSharedLibrary = false);
 
         virtual std::string GetLocation() const;
 

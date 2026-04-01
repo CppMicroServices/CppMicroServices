@@ -145,14 +145,14 @@ namespace cppmicroservices
     }
 
     void
-    Bundle::Uninstall()
+    Bundle::Uninstall(bool freeSharedLibrary)
     {
         if (!d)
         {
             throw std::invalid_argument("invalid bundle");
         }
 
-        d->Uninstall();
+        d->Uninstall(freeSharedLibrary);
     }
 
     BundleContext

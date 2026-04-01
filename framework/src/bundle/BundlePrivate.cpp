@@ -295,7 +295,7 @@ namespace cppmicroservices
     }
 
     void
-    BundlePrivate::Uninstall()
+    BundlePrivate::Uninstall(bool freeSharedLibrary)
     {
         {
             auto l = this->Lock();
@@ -398,7 +398,10 @@ namespace cppmicroservices
                         }
                         bundleDir.clear();
                     }
-                    lib.Unload();
+                    if (freeSharedLibrary)
+                    {
+                        lib.Unload();
+                    }
                     // id, location and headers survives after uninstall.
 
                     // There might be bundle threads that are running start or stop

@@ -831,7 +831,7 @@ namespace cppmicroservices
          *
          * @see #Stop()
          */
-        void Uninstall();
+        void Uninstall(bool freeSharedLibrary = false);
 
       protected:
         Bundle(std::shared_ptr<BundlePrivate> const& d);

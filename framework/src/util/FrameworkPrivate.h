@@ -61,7 +61,7 @@ namespace cppmicroservices
         void Start(uint32_t) override;
         void Stop(uint32_t) override;
 
-        void Uninstall() override;
+        void Uninstall(bool freeSharedLibrary = false) override;
         std::string GetLocation() const override;
 
         AnyMap const& GetHeaders() const override;

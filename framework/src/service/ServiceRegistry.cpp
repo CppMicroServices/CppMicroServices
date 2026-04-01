@@ -28,6 +28,7 @@
 #include "BundlePrivate.h"
 #include "CoreBundleContext.h"
 #include "ServiceRegistrationBasePrivate.h"
+#include "ServiceRegistrationLocks.h"
 
 #include <cassert>
 #include <iterator>
@@ -55,6 +56,7 @@ namespace cppmicroservices
         services.clear();
         classServices.clear();
         serviceRegistrations.clear();
+        bundleServices.clear();
     }
 
     Properties
@@ -107,7 +109,7 @@ namespace cppmicroservices
         bool isPrototypeFactory = (isFactory ? static_cast<bool>(std::dynamic_pointer_cast<PrototypeServiceFactory>(
                                                    std::static_pointer_cast<ServiceFactory>(
                                                        service->find("org.cppmicroservices.factory")->second)))
-                                             : false);
+                         : false);
 
         std::vector<std::string> classes;
         // Check if service implements claimed classes and that they exist.
@@ -128,6 +130,7 @@ namespace cppmicroservices
             US_UNUSED(l);
             services.insert(std::make_pair(res, classes));
             serviceRegistrations.push_back(res);
+            bundleServices[bundle].push_back(res);
             for (auto& clazz : classes)
             {
                 auto& s = classServices[clazz];
@@ -317,6 +320,19 @@ namespace cppmicroservices
         services.erase(sr);
         serviceRegistrations.erase(std::remove(serviceRegistrations.begin(), serviceRegistrations.end(), sr),
                                    serviceRegistrations.end());
+        if (auto bundle = sr.d->coreInfo->bundle_.lock())
+        {
+            auto it = bundleServices.find(bundle.get());
+            if (it != bundleServices.end())
+            {
+                auto& regs = it->second;
+                regs.erase(std::remove(regs.begin(), regs.end(), sr), regs.end());
+                if (regs.empty())
+                {
+                    bundleServices.erase(it);
+                }
+            }
+        }
         for (auto& clazz : classes)
         {
             auto& s = classServices[clazz];
@@ -337,15 +353,10 @@ namespace cppmicroservices
         auto l = this->Lock();
         US_UNUSED(l);
 
-        for (auto& sr : serviceRegistrations)
+        auto it = bundleServices.find(p);
+        if (it != bundleServices.end())
         {
-            if (auto bundle_ = sr.d->coreInfo->bundle_.lock())
-            {
-                if (bundle_.get() == p)
-                {
-                    res.push_back(sr);
-                }
-            }
+            res = it->second;
         }
     }
 

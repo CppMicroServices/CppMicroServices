@@ -104,22 +104,22 @@ namespace cppmicroservices
                 if (!val.empty() && val[0] == '%')
                     val = val.substr(1);
 
-                return Any(val);
+                return {val};
             }
             else if (jsonValue.IsBool())
             {
-                return Any(jsonValue.GetBool());
+                return {jsonValue.GetBool()};
             }
             else if (jsonValue.IsInt())
             {
-                return Any(jsonValue.GetInt());
+                return {jsonValue.GetInt()};
             }
             else if (jsonValue.IsDouble())
             {
-                return Any(jsonValue.GetDouble());
+                return {jsonValue.GetDouble()};
             }
 
-            return Any();
+            return {};
         }
 
         void
@@ -165,7 +165,7 @@ namespace cppmicroservices
 
     BundleManifest::BundleManifest() : m_Headers(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {}
 
-    BundleManifest::BundleManifest(AnyMap const& m) : m_Headers(m) {}
+    BundleManifest::BundleManifest(AnyMap m) : m_Headers(std::move(m)) {}
 
     void
     BundleManifest::Parse(std::istream& is)
@@ -205,7 +205,7 @@ namespace cppmicroservices
         {
             return iter->second;
         }
-        return Any();
+        return {};
     }
 
     void

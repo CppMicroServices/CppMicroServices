@@ -71,10 +71,7 @@ dlsym(void* handle, char const* symbol)
 
 #endif
 
-namespace cppmicroservices
-{
-
-    namespace BundleUtils
+namespace cppmicroservices::BundleUtils
     {
 
         void*
@@ -96,7 +93,4 @@ namespace cppmicroservices
             }
             return addr;
         }
-
-    } // namespace BundleUtils
-
-} // namespace cppmicroservices
+} // namespace cppmicroservices::BundleUtils

@@ -60,7 +60,7 @@ namespace cppmicroservices
     Bundle
     MakeBundle(std::shared_ptr<BundlePrivate> const& d)
     {
-        return Bundle(d);
+        return {d};
     }
 
     void
@@ -438,7 +438,7 @@ namespace cppmicroservices
 
         if ((options & Bundle::START_TRANSIENT) == 0)
         {
-            SetAutostartSetting(options);
+            SetAutostartSetting(static_cast<int32_t>(options));
         }
 
         FinalizeActivation();
@@ -826,23 +826,24 @@ namespace cppmicroservices
             {
                 sr.Unregister();
             }
-            catch (std::logic_error const& /*ignore*/)
+            catch (std::logic_error const& ex/*ignore*/)
             {
                 // Someone has unregistered the service after stop completed.
                 // This should not occur, but we don't want get stuck in
                 // an illegal state so we catch it.
+                (void)ex;
             }
         }
 
         srs.clear();
         coreCtx->services.GetUsedByBundle(this, srs);
-        for (std::vector<ServiceRegistrationBase>::const_iterator i = srs.begin(); i != srs.end(); ++i)
+        for (const auto& i : srs)
         {
             // wrap in try-catch to catch failures if service is already unregistered
             // if service is unregistered, all work in UngetService is already done by Unregister() previously
             try
             {
-                auto ref = i->GetReference(std::string());
+                auto ref = i.GetReference(std::string());
                 ref.d.Load()->UngetService(this->shared_from_this(), false);
             }
             catch (...)

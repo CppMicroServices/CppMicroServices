@@ -163,7 +163,7 @@ namespace
     {
         Json::CharReaderBuilder rbuilder;
         rbuilder["rejectDupKeys"] = true;
-        rbuilder["allowComments"] = false;
+        rbuilder["allowComments"] = true;
         std::string errs;
 
         if (!Json::parseFromStream(rbuilder, jsonContent, &root, &errs))

@@ -131,14 +131,18 @@ namespace cppmicroservices
         {
             return nullptr;
         }
-        auto sh = new ServiceHolder<void> { bundle_, d->m_reference, nullptr, interfaceMap };
+        // Deep-copy so that the entries in the copy share ownership of the
+        // underlying service objects independently of the original map.
+        auto deepCopy = std::make_shared<InterfaceMap const>(*interfaceMap);
+
+        auto sh = new ServiceHolder<void> { bundle_, d->m_reference, nullptr, deepCopy };
         std::shared_ptr<ServiceHolder<void>> h(sh, CustomServiceDeleter { sh });
 
         // Build a consumer-facing copy where each entry aliases through the
         // ServiceHolder, carrying the CustomServiceDeleter. This ensures
         // ServiceReferenceFromService works on any pointer extracted from the map.
         auto wrappedMap = std::make_shared<InterfaceMap>();
-        for (auto const& entry : *interfaceMap)
+        for (auto const& entry : *deepCopy)
         {
             wrappedMap->emplace(entry.first, std::shared_ptr<void>(h, entry.second.get()));
         }

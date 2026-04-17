@@ -433,10 +433,20 @@ namespace cppmicroservices
                     else
                     {
                         // The pid wasn't a match but the properties might be. Check those.
-                        auto props = it.second->GetProperties();
-                        if (ldap.Match(props))
+                        // GetProperties() can throw if the configuration is concurrently
+                        // removed (removed flag set under propertiesMutex before the map
+                        // erase under configurationsMutex). Skip such entries.
+                        try
                         {
-                            result.emplace_back(it.second);
+                            auto props = it.second->GetProperties();
+                            if (ldap.Match(props))
+                            {
+                                result.emplace_back(it.second);
+                            }
+                        }
+                        catch (std::runtime_error const&)
+                        {
+                            // Configuration is being removed concurrently; skip it.
                         }
                     }
                 } // end for

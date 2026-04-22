@@ -419,9 +419,7 @@ namespace cppmicroservices
                     }
                     /* Build a single map containing both the pid and the configuration
                      * properties so that the LDAP filter is evaluated against the full
-                     * set of attributes.  Matching pid and properties separately caused
-                     * negative filters (e.g. (!(color=blue))) to incorrectly match the
-                     * pid-only map where the negated key was absent.
+                     * set of attributes.
                      */
                     auto props = it.second->GetProperties();
                     props["pid"] = it.first;

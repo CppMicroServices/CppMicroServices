@@ -326,6 +326,36 @@ namespace cppmicroservices
             EXPECT_EQ(allConfigs.size(), 3ul);
         }
 
+        TEST_F(TestConfigurationAdminImpl, VerifyListConfigurationsWithNegativeFilter)
+        {
+            auto bundleContext = GetFramework().GetBundleContext();
+            auto fakeLogger = std::make_shared<FakeLogger>();
+            std::shared_ptr<cppmicroservices::cmimpl::CMAsyncWorkService> asyncWorkService
+                = std::make_shared<cppmicroservices::cmimpl::CMAsyncWorkService>(bundleContext, fakeLogger);
+            ConfigurationAdminImpl configAdmin(bundleContext, fakeLogger, asyncWorkService);
+
+            // Create two configurations with the same property key but different values.
+            auto const conf1 = configAdmin.GetConfiguration("test.neg.pid1");
+            auto props1 = conf1->GetProperties();
+            props1["color"] = std::string { "blue" };
+            EXPECT_NO_THROW(conf1->Update(props1).get());
+
+            auto const conf2 = configAdmin.GetConfiguration("test.neg.pid2");
+            auto props2 = conf2->GetProperties();
+            props2["color"] = std::string { "red" };
+            EXPECT_NO_THROW(conf2->Update(props2).get());
+
+            // Positive filter: only the config whose color is "blue" should be returned.
+            auto const positiveResult = configAdmin.ListConfigurations("(color=blue)");
+            EXPECT_EQ(positiveResult.size(), 1ul);
+            EXPECT_EQ(positiveResult[0]->GetPid(), "test.neg.pid1");
+
+            // Negative filter: only the config whose color is NOT "blue" should be returned.
+            auto const negativeResult = configAdmin.ListConfigurations("(!(color=blue))");
+            EXPECT_EQ(negativeResult.size(), 1ul);
+            EXPECT_EQ(negativeResult[0]->GetPid(), "test.neg.pid2");
+        }
+
         TEST_F(TestConfigurationAdminImpl, VerifyAddConfigurations)
         {
             auto bundleContext = GetFramework().GetBundleContext();

@@ -289,10 +289,7 @@ namespace cppmicroservices
                                                   configWasSatisfied,
                                                   configNowSatisfied,
                                                   changeCountDifferent);
-            std::ostringstream configValue;
-            any_value_to_json(configValue, *(notification.newProperties));
-            logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
-                        "CONFIG change heard with pid " + notification.pid + " and props " + configValue.str());
+
             if (configWasSatisfied && configNowSatisfied && changeCountDifferent
                 && (metadata->configurationPolicy != CONFIG_POLICY_IGNORE))
             {

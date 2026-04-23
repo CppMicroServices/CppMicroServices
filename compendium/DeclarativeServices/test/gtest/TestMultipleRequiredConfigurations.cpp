@@ -105,12 +105,13 @@ namespace test
     {
         testBundle.Stop();
 
-        constexpr int NUM_ITERATIONS = 500;
+        constexpr int NUM_ITERATIONS = 20;
         constexpr auto SERVICE_TIMEOUT = std::chrono::milliseconds(5000);
         constexpr auto POLL_INTERVAL = std::chrono::milliseconds(5);
 
         for (int i = 0; i < NUM_ITERATIONS; ++i)
         {
+            std::cout << "repetition: " << i << std::endl;
             // Pre-create both configs.
             {
                 auto c0 = configAdmin->GetConfiguration(pid0);

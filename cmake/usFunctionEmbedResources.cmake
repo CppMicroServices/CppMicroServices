@@ -124,7 +124,16 @@ function(usFunctionEmbedResources)
   if(CMAKE_CROSSCOMPILING)
     # Cross-compiled builds need to use the imported host version of usResourceCompiler
     include(${IMPORT_EXECUTABLES})
-    set(resource_compiler native-${US_RCC_EXECUTABLE_TARGET})
+    set(_rc_target native-${US_RCC_EXECUTABLE_TARGET})
+    set(resource_compiler $<TARGET_FILE:${_rc_target}>)
+    set(resource_compiler_dep ${_rc_target})
+
+    # The host resource compiler may need a specific LD_LIBRARY_PATH to find
+    # the correct libstdc++.
+    set(_rc_env_cmd)
+    if(US_HOST_LD_LIBRARY_PATH)
+      set(_rc_env_cmd ${CMAKE_COMMAND} -E env "LD_LIBRARY_PATH=${US_HOST_LD_LIBRARY_PATH}")
+    endif()
   else()
     set(resource_compiler ${US_RCC_EXECUTABLE})
     if(TARGET ${US_RCC_EXECUTABLE_TARGET})
@@ -132,6 +141,7 @@ function(usFunctionEmbedResources)
     elseif(NOT resource_compiler)
       message(FATAL_ERROR "The CppMicroServices resource compiler was not found. Check the US_RCC_EXECUTABLE CMake variable.")
     endif()
+    set(resource_compiler_dep ${resource_compiler})
   endif()
 
   set(_zip_archive )
@@ -149,8 +159,8 @@ function(usFunctionEmbedResources)
     endif()
     add_custom_command(
       OUTPUT ${_zip_archive}
-      COMMAND ${resource_compiler} -o ${_zip_archive} ${_zip_args}
-      DEPENDS ${_res_zips} ${resource_compiler}
+      COMMAND ${_rc_env_cmd} ${resource_compiler} -o ${_zip_archive} ${_zip_args}
+      DEPENDS ${_res_zips} ${resource_compiler_dep}
       COMMENT "Creating resources zip file for ${US_RESOURCE_TARGET}"
       VERBATIM
      )
@@ -236,7 +246,7 @@ function(usFunctionEmbedResources)
       add_custom_command(
         TARGET ${US_RESOURCE_TARGET}
         POST_BUILD
-        COMMAND ${resource_compiler} -b $<TARGET_FILE:${US_RESOURCE_TARGET}> -z ${_zip_archive}
+        COMMAND ${_rc_env_cmd} ${resource_compiler} -b $<TARGET_FILE:${US_RESOURCE_TARGET}> -z ${_zip_archive}
         WORKING_DIRECTORY ${US_RESOURCE_WORKING_DIRECTORY}
         COMMENT "Appending zip file ${_zip_archive} to ${US_RESOURCE_TARGET}"
         VERBATIM

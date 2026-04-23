@@ -89,10 +89,19 @@ function(usFunctionAddResources)
     set(cmd_line_args -c ${US_RESOURCE_COMPRESSION_LEVEL})
   endif()
 
+  set(_rc_env_cmd)
   if(CMAKE_CROSSCOMPILING)
     # Cross-compiled builds need to use the imported host version of usResourceCompiler
     include(${IMPORT_EXECUTABLES})
-    set(resource_compiler native-${US_RCC_EXECUTABLE_TARGET})
+    set(_rc_target native-${US_RCC_EXECUTABLE_TARGET})
+    set(resource_compiler $<TARGET_FILE:${_rc_target}>)
+    set(resource_compiler_dep ${_rc_target})
+
+    # The host resource compiler may need a specific LD_LIBRARY_PATH to find
+    # the correct libstdc++.
+    if(US_HOST_LD_LIBRARY_PATH)
+      set(_rc_env_cmd ${CMAKE_COMMAND} -E env "LD_LIBRARY_PATH=${US_HOST_LD_LIBRARY_PATH}")
+    endif()
   else()
     set(resource_compiler ${US_RCC_EXECUTABLE})
     if(TARGET ${US_RCC_EXECUTABLE_TARGET})
@@ -100,6 +109,7 @@ function(usFunctionAddResources)
     elseif(NOT resource_compiler)
       message(FATAL_ERROR "The CppMicroServices resource compiler was not found. Check the US_RCC_EXECUTABLE CMake variable.")
     endif()
+    set(resource_compiler_dep ${resource_compiler})
   endif()
 
   set(_cmd_deps )
@@ -167,9 +177,9 @@ function(usFunctionAddResources)
   add_custom_command(
     OUTPUT ${_res_zip}
     COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_CURRENT_BINARY_DIR}/${US_RESOURCE_TARGET}"
-    COMMAND ${resource_compiler} ${cmd_line_args} -o ${_res_zip} ${_bundle_args} ${_file_args} ${_us_zip_args}
+    COMMAND ${_rc_env_cmd} ${resource_compiler} ${cmd_line_args} -o ${_res_zip} ${_bundle_args} ${_file_args} ${_us_zip_args}
     WORKING_DIRECTORY ${US_RESOURCE_WORKING_DIRECTORY}
-    DEPENDS ${_cmd_deps} ${resource_compiler}
+    DEPENDS ${_cmd_deps} ${resource_compiler_dep}
     COMMENT "Checking resource dependencies for ${US_RESOURCE_TARGET}"
     VERBATIM
   )

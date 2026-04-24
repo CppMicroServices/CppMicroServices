@@ -391,7 +391,9 @@ endif()
 
 if(US_USE_SYSTEM_BOOST)
     find_package(Boost 1.74.0 REQUIRED COMPONENTS nowide)
-    add_library(nowide::nowide ALIAS Boost::nowide)
+    add_library(nowide::nowide INTERFACE IMPORTED GLOBAL)
+    target_link_libraries(nowide::nowide INTERFACE Boost::nowide)
+    target_include_directories(nowide::nowide INTERFACE ${Boost_INCLUDE_DIRS})
 endif()
 
 if(US_USE_SYSTEM_SPDLOG)

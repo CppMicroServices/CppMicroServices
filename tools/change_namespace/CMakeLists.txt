@@ -3,12 +3,16 @@ project(change_namespace)
 
 enable_language(CXX)
 
-include_directories(../../third_party)
-
 set(srcs main.cpp "AddPaths.cpp" "CopyPaths.cpp" "ChangeNamespace.cpp")
 
 add_executable(change_namespace ${srcs})
 set_property(TARGET change_namespace PROPERTY OUTPUT_NAME change_namespace)
+
+if(US_USE_SYSTEM_CLI11)
+    target_link_libraries(change_namespace PRIVATE CLI11::CLI11)
+else()
+    target_include_directories(change_namespace PRIVATE ../../third_party)
+endif()
 
 if(NOT US_NO_INSTALL)
     install(TARGETS change_namespace

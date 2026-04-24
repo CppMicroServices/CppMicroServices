@@ -1,6 +1,3 @@
-
-enable_language(C)
-
 # Temporarily disable enable exports for executables
 set(CMAKE_ENABLE_EXPORTS OFF)
 

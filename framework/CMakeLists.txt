@@ -35,13 +35,16 @@ usMacroCreateBundle(Framework
   SYMBOLIC_NAME system_bundle
   SKIP_INIT # we do it manually
   EMBED_RESOURCE_METHOD LINK
-  PRIVATE_INCLUDE_DIRS src/util src/service src/bundle ../third_party
+  PRIVATE_INCLUDE_DIRS src/util src/service src/bundle
   LINK_LIBRARIES ${_link_libraries}
   SOURCES ${_framework_srcs}
   PUBLIC_HEADERS ${_framework_public_headers}
   PRIVATE_HEADERS ${_framework_private_headers}
   BINARY_RESOURCES manifest.json
 )
+
+# Private implementation deps — not propagated to framework consumers.
+target_link_libraries(${PROJECT_TARGET} PRIVATE miniz::miniz rapidjson::rapidjson)
 
 set_property(
   TARGET ${PROJECT_TARGET} APPEND PROPERTY

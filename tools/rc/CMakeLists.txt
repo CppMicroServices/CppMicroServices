@@ -4,30 +4,41 @@ enable_language(C)
 # Temporarily disable enable exports for executables
 set(CMAKE_ENABLE_EXPORTS OFF)
 
-include_directories(../../third_party
-                    ${CppMicroServices_SOURCE_DIR}/util/include)
-
 add_definitions(-DUS_RCC_EXECUTABLE_NAME=\"${US_RCC_EXECUTABLE_OUTPUT_NAME}\")
 
 if(US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG)
   add_compile_options(-Wno-error=unneeded-internal-declaration)
 endif()
 
-set(srcs ResourceCompiler.cpp ../../third_party/miniz.c)
-
 if(NOT APPLE AND US_COMPILER_GNU_ARM AND CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64|ARM64|arm64")
   add_compile_options(-Wno-error=maybe-uninitialized)
 endif()
 
-add_executable(${US_RCC_EXECUTABLE_TARGET} ${srcs})
+set(srcs ResourceCompiler.cpp)
 
-set_property(TARGET ${US_RCC_EXECUTABLE_TARGET} PROPERTY OUTPUT_NAME ${US_RCC_EXECUTABLE_OUTPUT_NAME})
-if(WIN32)
-    target_link_libraries(${US_RCC_EXECUTABLE_TARGET} Shlwapi)
+if(NOT US_USE_SYSTEM_MINIZ)
+  list(APPEND srcs ../../third_party/miniz.c)
 endif()
 
-target_link_libraries(${US_RCC_EXECUTABLE_TARGET} nowide::nowide)
-target_include_directories(${US_RCC_EXECUTABLE_TARGET} PRIVATE ${CppMicroServices_SOURCE_DIR}/third_party/boost/nowide/include)
+add_executable(${US_RCC_EXECUTABLE_TARGET} ${srcs})
+
+target_include_directories(${US_RCC_EXECUTABLE_TARGET} PRIVATE ../../third_party)
+
+if(NOT US_USE_SYSTEM_RAPIDJSON)
+  target_include_directories(${US_RCC_EXECUTABLE_TARGET) PRIVATE ${CppMicroServices_SOURCE_DIR}/util/include)
+endif()
+
+set_property(TARGET ${US_RCC_EXECUTABLE_TARGET} PROPERTY OUTPUT_NAME ${US_RCC_EXECUTABLE_OUTPUT_NAME})
+
+target_link_libraries(${US_RCC_EXECUTABLE_TARGET} PRIVATE
+    nowide::nowide
+    CLI11::CLI11
+    rapidjson::rapidjson
+    miniz::miniz)
+
+if(WIN32)
+    target_link_libraries(${US_RCC_EXECUTABLE_TARGET} PRIVATE Shlwapi)
+endif()
 
 target_compile_definitions(${US_RCC_EXECUTABLE_TARGET} PRIVATE -DMINIZ_NO_ZLIB_COMPATIBLE_NAMES)
 
@@ -61,6 +72,10 @@ set(CMAKE_ENABLE_EXPORTS ON)
 # US_USE_DETERMINISTIC_BUNDLE_BUILDS activates the locale-setting and sorting logic in
 # ResourceCompiler.cpp that is also required for deterministic output.
 if (US_USE_DETERMINISTIC_BUNDLE_BUILDS)
+  if(US_USE_SYSTEM_MINIZ)
+    message(WARNING "US_USE_DETERMINISTIC_BUNDLE_BUILDS requires bundled miniz (MINIZ_NO_TIME). "
+                    "Set US_USE_SYSTEM_MINIZ=OFF or disable deterministic builds.")
+  endif()
   target_compile_definitions(${US_RCC_EXECUTABLE_TARGET} PRIVATE
                              MINIZ_NO_TIME
                              US_USE_DETERMINISTIC_BUNDLE_BUILDS)

@@ -12,15 +12,10 @@ CppMicroServices library, it is marked as such.
 dirent_win32
 ------------
 
-See file for license information.
+MIT License (GitHub)
 
-http://softagalleria.net/dirent.php
-1.20.1
-
-Patches
-
- * Set errno to ENAMETOOLONG if opendir() is called with a path argument
-   longer than MAX_PATH.
+https://github.com/tronkko/dirent/
+1.26
 
 jsoncpp
 -------
@@ -30,10 +25,6 @@ MIT License or Public Domain
 https://github.com/open-source-parsers/jsoncpp
 (formerly http://jsoncpp.sourceforge.net)
 1.9.5
-
-Patches
-
-* Fixed some compiler warnings
 
 miniz
 -----
@@ -51,33 +42,6 @@ Patches
 
  * Support for zip files with prepended binary blobs.
  * Write to C file streams.
-
-tinyscheme
-----------
-
-BSD-style license
-
-http://tinyscheme.sourceforge.net/home.html
-1.42
-
-Patches
-
- * Added header for missing off_t declaration.
- * Disable Windows warnings C4244 and C4267.
- * Do not use dllexport/dllimport specs on Windows
-
-The Lean Mean C++ Option Parser
--------------------------------
-
-MIT License
-
-http://sourceforge.net/projects/optionparser
-1.7
-
-Patches
-
- * Added virtual destructors
- * Converted old-style casts to C++ casts
 
 Google Test and Google Mock
 ----------------------------

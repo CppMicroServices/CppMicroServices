@@ -133,7 +133,15 @@ namespace cppmicroservices::scrimpl
         std::vector<ComponentDescriptionDTO> componentDTOs;
         for (auto holder : compMgrs)
         {
-            componentDTOs.push_back(CreateDTO(holder));
+            try
+            {
+                componentDTOs.push_back(CreateDTO(holder));
+            }
+            catch (std::exception const& e)
+            {
+                logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
+                           "Failed to create ComponentDescriptionDTO: " + std::string(e.what()));
+            }
         }
         return componentDTOs;
     }

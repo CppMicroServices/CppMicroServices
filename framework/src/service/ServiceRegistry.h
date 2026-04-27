@@ -60,6 +60,7 @@ namespace cppmicroservices
 
         using MapServiceClasses = std::unordered_map<ServiceRegistrationBase, std::vector<std::string>>;
         using MapClassServices = std::unordered_map<std::string, std::vector<ServiceRegistrationBase>>;
+        using MapBundleServices = std::unordered_map<BundlePrivate*, std::vector<ServiceRegistrationBase>>;
 
         /**
          * All registered services in the current framework.
@@ -76,6 +77,11 @@ namespace cppmicroservices
          * ranked service first.
          */
         MapClassServices classServices;
+
+        /**
+         * Mapping of bundle to its registered services.
+         */
+        MapBundleServices bundleServices;
 
         CoreBundleContext* core;
 

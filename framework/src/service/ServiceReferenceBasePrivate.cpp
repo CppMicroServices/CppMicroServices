@@ -60,6 +60,15 @@ namespace cppmicroservices
         return ServiceRegistrationLocks(registration.lock(), coreInfo);
     }
 
+    std::shared_ptr<BundlePrivate>
+    ServiceReferenceBasePrivate::SafelyGetBundle() const
+    {
+        auto regLock = LockServiceRegistration();
+        US_UNUSED(regLock);
+        auto bundle = coreInfo->bundle_.lock();
+        return bundle;
+    }
+
     InterfaceMapConstPtr
     ServiceReferenceBasePrivate::GetServiceFromFactory(BundlePrivate* bundle,
                                                        std::shared_ptr<ServiceFactory> const& factory)
@@ -71,7 +80,8 @@ namespace cppmicroservices
                                                             ServiceRegistrationBase(registration.lock()));
             if (!smap || smap->empty())
             {
-                if (auto bundle_ = coreInfo->bundle_.lock())
+                std::shared_ptr<BundlePrivate> bundle_ = SafelyGetBundle();
+                if (bundle_)
                 {
                     std::string message = "ServiceFactory returned an empty or nullptr interface map.";
                     bundle_->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(
@@ -83,6 +93,8 @@ namespace cppmicroservices
                 return smap;
             }
             {
+                std::shared_ptr<BundlePrivate> bundleSnapshot = SafelyGetBundle();
+
                 auto l = coreInfo->properties.Lock();
                 US_UNUSED(l);
                 for (auto const& clazz : ref_any_cast<std::vector<std::string>>(
@@ -90,10 +102,10 @@ namespace cppmicroservices
                 {
                     if (smap->find(clazz) == smap->end() && clazz != "org.cppmicroservices.factory")
                     {
-                        if (auto bundle_ = coreInfo->bundle_.lock())
+                        if (bundleSnapshot)
                         {
                             std::string message("ServiceFactory produced an object that did not implement: " + clazz);
-                            bundle_->coreCtx->listeners.SendFrameworkEvent(
+                            bundleSnapshot->coreCtx->listeners.SendFrameworkEvent(
                                 FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING,
                                                MakeBundle(bundle->shared_from_this()),
                                                message,
@@ -107,12 +119,13 @@ namespace cppmicroservices
         }
         catch (cppmicroservices::SharedLibraryException const& ex)
         {
-            if (auto bundle = coreInfo->bundle_.lock())
+            std::shared_ptr<BundlePrivate> regBundle = SafelyGetBundle();
+            if (regBundle)
             {
-                bundle->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
-                                                                             ex.GetBundle(),
-                                                                             "Failed to load shared library",
-                                                                             std::current_exception()));
+                regBundle->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
+                                                                              ex.GetBundle(),
+                                                                              "Failed to load shared library",
+                                                                              std::current_exception()));
             }
             throw;
         }
@@ -131,7 +144,8 @@ namespace cppmicroservices
         catch (std::exception const& ex)
         {
             std::string message = "ServiceFactory threw an unknown exception.";
-            if (auto bundle_ = coreInfo->bundle_.lock())
+            std::shared_ptr<BundlePrivate> bundle_ = SafelyGetBundle();
+            if (bundle_)
             {
                 bundle_->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(
                     FrameworkEvent::Type::FRAMEWORK_ERROR,
@@ -340,7 +354,8 @@ namespace cppmicroservices
                 }
                 catch (std::exception const& ex)
                 {
-                    if (auto bundle_ = coreInfo->bundle_.lock())
+                    std::shared_ptr<BundlePrivate> bundle_ = SafelyGetBundle();
+                    if (bundle_)
                     {
                         std::string message("ServiceFactory threw an exception");
                         bundle_->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(
@@ -445,7 +460,8 @@ namespace cppmicroservices
             }
             catch (std::exception const& ex)
             {
-                if (auto bundle_ = coreInfo->bundle_.lock())
+                std::shared_ptr<BundlePrivate> bundle_ = SafelyGetBundle();
+                if (bundle_)
                 {
                     std::string message("ServiceFactory threw an exception");
                     bundle_->coreCtx->listeners.SendFrameworkEvent(

@@ -126,16 +126,23 @@ namespace cppmicroservices
         {
             return result;
         }
-        result = std::make_shared<InterfaceMap const>(*(interfaceMap.get()));
-
         auto bundle_ = d->m_context->bundle.lock();
         if (!bundle_)
         {
             return nullptr;
         }
-        auto sh = new ServiceHolder<void> { bundle_, d->m_reference, nullptr, result };
+        auto sh = new ServiceHolder<void> { bundle_, d->m_reference, nullptr, interfaceMap };
         std::shared_ptr<ServiceHolder<void>> h(sh, CustomServiceDeleter { sh });
-        return InterfaceMapConstPtr(h, h->interfaceMap.get());
+
+        // Build a consumer-facing copy where each entry aliases through the
+        // ServiceHolder, carrying the CustomServiceDeleter. This ensures
+        // ServiceReferenceFromService works on any pointer extracted from the map.
+        auto wrappedMap = std::make_shared<InterfaceMap>();
+        for (auto const& entry : *interfaceMap)
+        {
+            wrappedMap->emplace(entry.first, std::shared_ptr<void>(h, entry.second.get()));
+        }
+        return std::const_pointer_cast<InterfaceMap const>(wrappedMap);
     }
 
     ServiceReferenceBase

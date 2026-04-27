@@ -433,11 +433,11 @@ namespace cppmicroservices
                         {
                             result.emplace_back(it.second);
                         }
-                      }
-                      catch (std::runtime_error const&)
-                      {
-                          // Configuration is being removed concurrently; skip it.
-                      }
+                    }
+                    catch (std::runtime_error const&)
+                    {
+                        // Configuration is being removed concurrently; skip it.
+                    }
                 } // end for
             }
             return result;

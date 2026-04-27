@@ -118,6 +118,44 @@ namespace test
     }
 
     /**
+     * Verify that a DS-injected factory service remains usable on a background
+     * thread after the framework has shut down.  The dependent bundle's bind
+     * method spawns a thread that sleeps 200ms then invokes a virtual method on
+     * the injected service.  The framework is stopped while that thread is
+     * sleeping.  Without proper independent ownership of the service object
+     * (the deep-copy in GetServiceInterfaceMap), the service would be destroyed
+     * during shutdown and the deferred virtual call would crash
+     * (pure-virtual / use-after-free).
+     */
+    TEST_F(IntegrationTestFixture, testInjectedServiceOwnershipAfterShutdown)
+    {
+        auto context = framework.GetBundleContext();
+
+        ::test::InstallAndStartBundle(context, "ServiceFactoryBundle");
+        ::test::InstallAndStartBundle(context, "ServiceFactoryDependentBundle");
+
+        auto factoryRef = context.GetServiceReferences<cppmicroservices::ServiceFactory>("(mySvc=true)");
+        auto factorySvc = context.GetService<cppmicroservices::ServiceFactory>(factoryRef.front());
+        ASSERT_TRUE(factorySvc);
+
+        context.RegisterService<test::FactoryCreatedService>(
+            std::static_pointer_cast<cppmicroservices::ServiceFactory>(factorySvc));
+
+        auto dependentSvcRef = context.GetServiceReference<test::FactoryServiceDependent>();
+        auto dependentSvc = context.GetService<test::FactoryServiceDependent>(dependentSvcRef);
+        ASSERT_TRUE(dependentSvc && dependentSvc->didBind());
+
+        // The bind method spawned a thread with a 200ms delay.
+        // Stop the framework now — the thread's work will run after shutdown.
+        framework.Stop();
+        framework.WaitForStop(std::chrono::milliseconds::zero());
+
+        // The background thread should complete successfully: the injected
+        // service's virtual method must still be callable after framework shutdown.
+        EXPECT_EQ(dependentSvc->getAsyncSayHiResult(), "HELLO");
+    }
+
+    /**
      * Verify that a service's configuration can be updated from within a 'Modified' callback without
      * deadlocking the framework trying to get the lock in configNotifier
      */

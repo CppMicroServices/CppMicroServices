@@ -408,7 +408,6 @@ namespace cppmicroservices
 
                 // filter is not empty so look for pid and property matches
                 LDAPFilter ldap { filter };
-                cppmicroservices::AnyMap pidMap { cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS };
 
                 for (auto const& it : configurations)
                 {
@@ -418,37 +417,27 @@ namespace cppmicroservices
                     {
                         continue;
                     }
-                    /* Create an AnyMap containing the pid or factoryPid so that the ldap filter
-                     * functionality can be used to match the pid to the
-                     * input parameter. Easy way to do the comparison since input parameter could
-                     * contain a regular expression
-                     */
-                    pidMap["pid"] = it.first;
+                    /* Build a single map containing both the pid and the configuration
+                     * properties so that the LDAP filter is evaluated against the full
+                     * set of attributes.
+                     * NOTE: GetProperties() can throw if the configuration is concurrently
+                     * removed (removed flag set under propertiesMutex before the map
+                     * erase under configurationsMutex). Skip such entries.
+                     **/
+                    try
+                    {
+                        auto props = it.second->GetProperties();
+                        props["pid"] = it.first;
 
-                    if (ldap.Match(pidMap))
-                    {
-                        // This configuration object has a matching pid.
-                        result.emplace_back(it.second);
-                    }
-                    else
-                    {
-                        // The pid wasn't a match but the properties might be. Check those.
-                        // GetProperties() can throw if the configuration is concurrently
-                        // removed (removed flag set under propertiesMutex before the map
-                        // erase under configurationsMutex). Skip such entries.
-                        try
+                        if (ldap.Match(props))
                         {
-                            auto props = it.second->GetProperties();
-                            if (ldap.Match(props))
-                            {
-                                result.emplace_back(it.second);
-                            }
+                            result.emplace_back(it.second);
                         }
-                        catch (std::runtime_error const&)
-                        {
-                            // Configuration is being removed concurrently; skip it.
-                        }
-                    }
+                      }
+                      catch (std::runtime_error const&)
+                      {
+                          // Configuration is being removed concurrently; skip it.
+                      }
                 } // end for
             }
             return result;

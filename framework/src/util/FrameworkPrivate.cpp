@@ -38,7 +38,7 @@ namespace cppmicroservices
         : BundlePrivate(fwCtx)
         , headers(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
     {
-        headers[Constants::BUNDLE_SYMBOLICNAME] = symbolicName;
+        headers[Constants::BUNDLE_SYMBOLICNAME] = sharedState->symbolicName;
         headers[Constants::BUNDLE_NAME] = location;
         headers[Constants::BUNDLE_VERSION] = version.ToString();
         headers[Constants::BUNDLE_MANIFESTVERSION] = std::string("2");
@@ -373,7 +373,7 @@ namespace cppmicroservices
         // Set state to BUNDLE_INSTALLED
         for (auto b : allBundles)
         {
-            if (b->id != 0)
+            if (b->sharedState->id != 0)
             {
                 auto l = coreCtx->resolver.Lock();
                 US_UNUSED(l);

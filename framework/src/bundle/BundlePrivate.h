@@ -40,11 +40,29 @@
 
 namespace cppmicroservices
 {
-
     class CoreBundleContext;
     class Bundle;
     class BundleContextPrivate;
     struct BundleActivator;
+
+    class PersistentStorage
+    {
+      public:
+        PersistentStorage(long idIn, std::string nameIn) : id(idIn), symbolicName(nameIn)
+        {
+        }
+        ~PersistentStorage() = default;
+        /**
+         * Framework context.
+         */        /**
+         * bundle id
+         */
+        long id;
+        /**
+         * name of bundle
+         */
+        std::string symbolicName;
+    };
 
     /**
      * \ingroup MicroServices
@@ -167,14 +185,14 @@ namespace cppmicroservices
         CoreBundleContext* coreCtx;
 
         /**
-         * Bundle identifier.
+         * Bundle identifiers.
          */
-        long const id;
+        std::shared_ptr<PersistentStorage> sharedState;
 
         /**
          * Bundle location identifier.
          */
-        const std::string location;
+        std::string const location;
 
         /**
          * State of the bundle
@@ -240,11 +258,6 @@ namespace cppmicroservices
         // GCC 4.6 atomics do not support custom trivially copyable types
         // like enums yet, so we use the underlying primitive type here.
         std::atomic<uint8_t> aborted;
-
-        /**
-         * Bundle symbolic name.
-         */
-        const std::string symbolicName;
 
         /**
          * Bundle version

@@ -90,7 +90,10 @@ namespace cppmicroservices
         return Properties(AnyMap(std::move(props)));
     }
 
-    ServiceRegistry::ServiceRegistry(CoreBundleContext* coreCtx) : core(coreCtx) {}
+    ServiceRegistry::ServiceRegistry(CoreBundleContext* coreCtx)
+        : core(coreCtx)
+    {
+    }
 
     ServiceRegistrationBase
     ServiceRegistry::RegisterService(BundlePrivate* bundle,
@@ -181,8 +184,8 @@ namespace cppmicroservices
         {
             std::vector<ServiceReferenceBase> srs;
             Get_unlocked(removeLeadingNamespacing(clazz), "", bundle, srs);
-            DIAG_LOG(*core->sink) << "get service ref " << clazz << " for bundle " << bundle->symbolicName << " = "
-                                  << srs.size() << " refs";
+            DIAG_LOG(*core->sink) << "get service ref " << clazz << " for bundle " << bundle->sharedState->symbolicName
+                                  << " = " << srs.size() << " refs";
 
             if (!srs.empty())
             {

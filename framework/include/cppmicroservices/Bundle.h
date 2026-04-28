@@ -38,10 +38,11 @@ namespace cppmicroservices
 {
 
     class Any;
-    class CoreBundleContext;
     class BundleContext;
     class BundleResource;
     class BundlePrivate;
+    class CoreBundleContext;
+    struct PersistentStorage;
 
     template <class S>
     class ServiceReference;
@@ -838,6 +839,7 @@ namespace cppmicroservices
 
         std::shared_ptr<BundlePrivate> d;
         std::shared_ptr<CoreBundleContext> c;
+        std::shared_ptr<PersistentStorage> sharedState;
 
         friend class BundleRegistry;
         friend Bundle MakeBundle(std::shared_ptr<BundlePrivate> const&);

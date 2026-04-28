@@ -128,7 +128,9 @@ namespace cppmicroservices
             : public ::testing::TestWithParam<std::shared_ptr<metadata::ComponentMetadata>>
         {
           protected:
-            ComponentManagerImplParameterizedTest() : framework(cppmicroservices::FrameworkFactory().NewFramework()) {}
+            ComponentManagerImplParameterizedTest() : framework(cppmicroservices::FrameworkFactory().NewFramework())
+            {
+            }
 
             virtual ~ComponentManagerImplParameterizedTest() = default;
 
@@ -423,6 +425,54 @@ namespace cppmicroservices
             compDesc->enabled = defaultEnabled;
             compDesc->immediate = false;
             return compDesc;
+        }
+
+        // Verify that GetBundleId() and GetBundle() remain accessible after the
+        // bundle is stopped (and its BundleContext is invalidated). This is the
+        // scenario described in GitHub issue #1218: when bundles are stopped,
+        // ComponentRegistry cleanup must still be able to call GetBundleId()
+        // without throwing.
+        TEST(ComponentManagerImplTest, GetBundleIdPersistsAfterBundleStop)
+        {
+            auto framework = cppmicroservices::FrameworkFactory().NewFramework();
+            framework.Start();
+            auto bc = framework.GetBundleContext();
+            auto fakeLogger = std::make_shared<FakeLogger>();
+            auto mockRegistry = std::make_shared<MockComponentRegistry>();
+            auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
+            mockMetadata->name = mockMetadata->implClassName = "TestComponent";
+            auto logger = std::make_shared<SCRLogger>(bc);
+            auto asyncWorkService = std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(bc, logger);
+            auto extRegistry = std::make_shared<SCRExtensionRegistry>(logger);
+            auto notifier = std::make_shared<ConfigurationNotifier>(bc, fakeLogger, asyncWorkService, extRegistry);
+
+            // Create a ComponentManagerImpl using the framework's bundle context
+            auto compMgr = std::make_shared<ComponentManagerImpl>(mockMetadata,
+                                                                  mockRegistry,
+                                                                  bc,
+                                                                  fakeLogger,
+                                                                  asyncWorkService,
+                                                                  notifier);
+
+            // Capture the bundle id while the bundle is still active
+            auto expectedId = compMgr->GetBundleId();
+
+            // Stop the framework, which invalidates all bundle contexts
+            framework.Stop();
+            framework.WaitForStop(std::chrono::seconds::zero());
+
+            // GetBundleId() must still work after the bundle context is invalidated
+            EXPECT_NO_THROW({
+                auto id = compMgr->GetBundleId();
+                EXPECT_EQ(id, expectedId);
+            });
+
+            // GetBundle() must still return a valid bundle with persistent identity
+            EXPECT_NO_THROW({
+                auto bundle = compMgr->GetBundle();
+                EXPECT_TRUE(bundle);
+                EXPECT_EQ(bundle.GetBundleId(), static_cast<long>(expectedId));
+            });
         }
 
         INSTANTIATE_TEST_SUITE_P(ComponentManagerParameterized,

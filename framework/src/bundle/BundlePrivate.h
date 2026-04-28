@@ -48,7 +48,9 @@ namespace cppmicroservices
     class PersistentStorage
     {
       public:
-        PersistentStorage(long idIn, std::string nameIn) : id(idIn), symbolicName(nameIn)
+        PersistentStorage(long idIn, std::string nameIn)
+            : id(std::move(idIn))
+            , symbolicName(std::move(nameIn))
         {
         }
         ~PersistentStorage() = default;

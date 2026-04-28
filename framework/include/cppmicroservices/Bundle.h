@@ -42,7 +42,7 @@ namespace cppmicroservices
     class BundleResource;
     class BundlePrivate;
     class CoreBundleContext;
-    struct PersistentStorage;
+    class PersistentStorage;
 
     template <class S>
     class ServiceReference;

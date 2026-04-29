@@ -56,8 +56,6 @@
 
 #include "CLI/CLI11.hpp"
 
-#include "json/json.h"
-
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>
 #include <rapidjson/istreamwrapper.h>

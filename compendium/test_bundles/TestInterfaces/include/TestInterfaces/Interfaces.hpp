@@ -240,7 +240,7 @@ namespace test
         FactoryServiceDependent() = default;
         virtual ~FactoryServiceDependent() = default;
         virtual bool didBind() = 0;
-
+        virtual std::string getAsyncSayHiResult() = 0;
     };
 
 } // namespace test

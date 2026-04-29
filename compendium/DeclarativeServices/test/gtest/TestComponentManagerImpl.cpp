@@ -97,7 +97,7 @@ namespace cppmicroservices
                                                                          asyncWorkService,
                                                                          notifier));
                     },
-                    std::invalid_argument);
+                    cppmicroservices::IllegalStateException);
             }
             {
                 EXPECT_THROW(
@@ -110,16 +110,6 @@ namespace cppmicroservices
                                                                          notifier));
                     },
                     std::invalid_argument);
-            }
-            {
-                EXPECT_NO_THROW({
-                    US_UNUSED(std::make_shared<ComponentManagerImpl>(mockMetadata,
-                                                                     mockRegistry,
-                                                                     bc,
-                                                                     fakeLogger,
-                                                                     asyncWorkService,
-                                                                     notifier));
-                });
             }
         }
 

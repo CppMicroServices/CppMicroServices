@@ -55,7 +55,14 @@
 #include <nowide/fstream.hpp>
 
 #include "CLI/CLI11.hpp"
+
 #include "json/json.h"
+
+#include <rapidjson/document.h>
+#include <rapidjson/error/en.h>
+#include <rapidjson/istreamwrapper.h>
+#include <rapidjson/prettywriter.h>
+#include <rapidjson/stringbuffer.h>
 
 // ---------------------------------------------------------------------------------
 // --------------------------    PLATFORM SPECIFIC CODE    -------------------------
@@ -67,6 +74,13 @@
 #    endif
 #    define VC_EXTRALEAN
 #    include <windows.h>
+
+    // windows.h defines GetObject as a macro (GetObjectA/GetObjectW),
+    // which conflicts with rapidjson::Value::GetObject().
+#    ifdef GetObject
+#        undef GetObject
+#    endif
+
 #    define PATH_SEPARATOR "\\"
 static std::string
 get_error_str()
@@ -151,25 +165,71 @@ namespace
     };
 
     /*
+     * @brief recursively checks for duplicate keys in a parsed JSON value.
+     * @param value The rapidjson value to check.
+     * @throw InvalidManifest if duplicate keys are found at any level.
+     */
+    void
+    checkDuplicateKeys(rapidjson::Value const& value)
+    {
+        if (value.IsObject())
+        {
+            std::set<std::string> seen;
+            for (auto const& m : value.GetObject())
+            {
+                if (!seen.insert(m.name.GetString()).second)
+                {
+                    throw InvalidManifest(std::string("Duplicate key: '") + m.name.GetString() + "'");
+                }
+                checkDuplicateKeys(m.value);
+            }
+        }
+        else if (value.IsArray())
+        {
+            for (auto const& elem : value.GetArray())
+            {
+                checkDuplicateKeys(elem);
+            }
+        }
+    }
+
+    /*
+     * @brief serializes a rapidjson value to a pretty-printed JSON string.
+     * @param value The rapidjson value to serialize.
+     * @return pretty-printed JSON string with trailing newline.
+     */
+    std::string
+    toStyledString(rapidjson::Value const& value)
+    {
+        rapidjson::StringBuffer buffer;
+        rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+        value.Accept(writer);
+        std::string out(buffer.GetString(), buffer.GetSize());
+        out += '\n';
+        return out;
+    }
+
+    /*
      * @brief parses json content and returns the parsed json or throws.
-     * @tparam jsonContent json content to parse. The type must be convertible to std::istream.
+     * @param jsonContent json content to parse as a std::istream.
      * @param root The parsed Json root object.
      * @throw InvalidManifest if the json is invalid. Parse error information is in the exception.
      * If an exception is thrown, the root param is invalid.
      */
-    template <class T>
     void
-    parseAndValidateJson(T& jsonContent, Json::Value& root)
+    parseAndValidateJson(std::istream& jsonContent, rapidjson::Document& root)
     {
-        Json::CharReaderBuilder rbuilder;
-        rbuilder["rejectDupKeys"] = true;
-        rbuilder["allowComments"] = false;
-        std::string errs;
+        rapidjson::IStreamWrapper stream(jsonContent);
+        root.ParseStream(stream);
 
-        if (!Json::parseFromStream(rbuilder, jsonContent, &root, &errs))
+        if (root.HasParseError())
         {
+            std::string errs = std::string("Offset ") + std::to_string(root.GetErrorOffset()) + ": "
+                               + rapidjson::GetParseError_En(root.GetParseError());
             throw InvalidManifest(errs);
         }
+
+        checkDuplicateKeys(root);
     }
 
     /*
@@ -180,7 +240,7 @@ namespace
      * If an exception is thrown, the root param is invalid.
      */
     void
-    parseAndValidateJsonFromFile(std::string const& jsonFile, Json::Value& root)
+    parseAndValidateJsonFromFile(std::string const& jsonFile, rapidjson::Document& root)
     {
         try
         {
@@ -222,7 +282,7 @@ namespace
 
         try
         {
-            Json::Value root;
+            rapidjson::Document root;
             std::istringstream json(std::string(reinterpret_cast<char const*>(manifestFileContents.get()), length));
             parseAndValidateJson(json, root);
         }
@@ -284,47 +344,51 @@ namespace
      * @brief concatenates all manifests checking for invalid syntax and
      * duplicate JSON key names.
      * @param manifests a map containing manifest file paths and their content.
-     * @pre-condition each manifest in manifests has already been validated by jsoncpp.
-     * @throw InvalidManifest if the manifest has inavlid syntax or duplicate key names
+     * @pre-condition each manifest in manifests has already been validated.
+     * @throw InvalidManifest if the manifest has invalid syntax or duplicate key names
      * @return valid JSON content
      */
-    Json::Value
-    AggregateManifestsAndValidate(std::unordered_map<std::string, Json::Value>& manifests)
+    rapidjson::Document
+    AggregateManifestsAndValidate(std::unordered_map<std::string, rapidjson::Document>& manifests)
     {
-        Json::Value root;
+        // Initialize as empty object so HasMember/AddMember work immediately.
+        // A default-constructed Document is Null, which does not support object operations.
+        rapidjson::Document root(rapidjson::kObjectType);
+        auto& allocator = root.GetAllocator();
 
         for (auto& manifest : manifests)
         {
-            Json::Value jsonRoot(manifest.second);
-            Json::Value::iterator iter = jsonRoot.begin();
-            for (; iter != jsonRoot.end(); ++iter)
+            for (auto& m : manifest.second.GetObject())
             {
                 // concatenating all the root objects together means that
                 // duplicate key names only have to be checked for children of
                 // each root object. Any other duplicate keys would have been
                 // detected when validating each individual JSON file.
-                if (Json::Value {} == root[iter.name()])
+                if (!root.HasMember(m.name))
                 {
-                    root[iter.name()] = (*iter);
+                    // Deep copy key and value into root's allocator. 
+                    rapidjson::Value key(m.name, allocator);
+                    rapidjson::Value val(m.value, allocator);
+                    root.AddMember(key, val, allocator);
                 }
                 else
                 {
                     throw InvalidManifest(
-                        std::string("Duplicate key: '" + iter.name() + "' found in " + manifest.first));
+                        std::string("Duplicate key: '") + m.name.GetString() + "' found in " + manifest.first);
                 }
             }
         }
 
-        std::clog << "concatenated (pre-validated) json:\n" << root.toStyledString() << std::endl;
+        std::clog << "concatenated (pre-validated) json:\n" << toStyledString(root) << std::endl;
 
         // Any duplicate keys would have been flagged earlier while concatenating all the manifest files.
         // This is a final JSON validation which should only find JSON syntax errors caused by an error in
         // concatenation.
-        Json::Value manifestJson;
-        std::istringstream json(root.toStyledString());
+        rapidjson::Document manifestJson;
+        std::istringstream json(toStyledString(root));
         parseAndValidateJson(json, manifestJson);
 
-        std::clog << "final (validated) manifest.json:\n" << manifestJson.toStyledString() << std::endl;
+        std::clog << "final (validated) manifest.json:\n" <<  toStyledString(manifestJson) << std::endl;
         return manifestJson;
     }
 } // namespace
@@ -343,7 +407,7 @@ class ZipArchive
      * @throw std::runtime exception if failed to add manifest.json
      * @throw InvalidManifest if manifest.json is invalid
      */
-    void AddManifestFile(Json::Value const& manifest);
+    void AddManifestFile(rapidjson::Document const& manifest);
 
     /*
      * @brief Add a file to this zip archive
@@ -425,27 +489,31 @@ ZipArchive::CheckAndAddToArchivedNames(std::string const& archiveEntry)
 }
 
 void
-ZipArchive::AddManifestFile(Json::Value const& manifest)
+ZipArchive::AddManifestFile(rapidjson::Document const& manifest)
 {
     // Check to make sure that the bundleName passed on the command line and the
     // bundle.symbolic_name in the manifest file match. If the bundleName is not passed in on the
     // command line, use the name specified in the manifest. If there's a mismatch or if no
     // bundleName is supplied in either location, it's an error.
-    auto bname = manifest.get("bundle.symbolic_name", "");
-    if (bname.isString())
+    // RapidJSON has no .get(key, default) — check HasMember first, then access.
+    if (manifest.HasMember("bundle.symbolic_name"))
     {
-        auto bnameStr = bname.asString();
-        if (!bundleName.empty())
+        auto const& bname = manifest["bundle.symbolic_name"];
+        if (bname.IsString())
         {
-            if (bnameStr != bundleName)
+            std::string bnameStr = bname.GetString();
+            if (!bundleName.empty())
             {
-                throw std::runtime_error("Bundle name in manifest " + bnameStr
-                                         + " does not match value supplied on command line " + bundleName);
+                if (bnameStr != bundleName)
+                {
+                    throw std::runtime_error("Bundle name in manifest " + bnameStr
+                                             + " does not match value supplied on command line " + bundleName);
+                }
             }
-        }
-        else
-        {
-            bundleName = bnameStr;
+            else
+            {
+                bundleName = bnameStr;
+            }
         }
     }
     if (bundleName.empty())
@@ -453,7 +521,7 @@ ZipArchive::AddManifestFile(Json::Value const& manifest)
         throw std::runtime_error(
             "Bundle name is required. Make sure that \"bundle.symbolic_name\" is set in the manifest.json file.");
     }
-    std::string styledManifestJson(manifest.toStyledString());
+    std::string styledManifestJson(toStyledString(manifest));
     std::string archiveEntry(bundleName + "/manifest.json");
 
     // Issue 161.1: Check for file exists first and throw a more desriptive runtime error
@@ -494,7 +562,7 @@ ZipArchive::AddResourceFile(std::string const& resFileName, bool isManifest)
     // through the --res-add option.
     if (isManifest || resFileName == std::string("manifest.json"))
     {
-        Json::Value root;
+        rapidjson::Document root;
         parseAndValidateJsonFromFile(resFileName, root);
     }
 
@@ -801,18 +869,19 @@ main(int argc, char** argv)
 
             std::unique_ptr<ZipArchive> zipArchive(new ZipArchive(zipFile, compressionLevel, bundleName));
 
-            // map of manifest file to its JSON data
-            std::unordered_map<std::string, Json::Value> manifests;
+            // map of manifest file to its JSON data.
+            // rapidjson::Document is move-only, so we use emplace + std::move below.
+            std::unordered_map<std::string, rapidjson::Document> manifests;
 
             // Add the manifest file to zip archive
             if (!manifestAdd.empty())
             {
                 for (auto const& mfile : manifestAdd)
                 {
-                    Json::Value manifest;
+                    rapidjson::Document manifest;
                     parseAndValidateJsonFromFile(mfile, manifest);
                     bool result;
-                    std::tie(std::ignore, result) = manifests.insert(std::make_pair(mfile, manifest));
+                    std::tie(std::ignore, result) = manifests.emplace(mfile, std::move(manifest));
                     if (!result)
                     {
                         std::clog << "Skipping duplicate manifest file " << mfile << std::endl;

@@ -45,7 +45,12 @@ namespace cppmicroservices
 
     Bundle::Bundle(Bundle const&) = default;
 
-    Bundle::Bundle(Bundle&& b) noexcept : d(std::move(b.d)), c(std::move(b.c)) {}
+    Bundle::Bundle(Bundle&& b) noexcept
+        : d(std::move(b.d))
+        , c(std::move(b.c))
+        , sharedState(std::move(b.sharedState))
+    {
+    }
 
     Bundle& Bundle::operator=(Bundle const&) = default;
 
@@ -54,6 +59,7 @@ namespace cppmicroservices
     {
         this->d = std::move(b.d);
         this->c = std::move(b.c);
+        this->sharedState = std::move(b.sharedState);
         return *this;
     }
 
@@ -62,7 +68,18 @@ namespace cppmicroservices
     bool
     Bundle::operator==(Bundle const& rhs) const
     {
-        return *this ? (rhs ? d->coreCtx->id == rhs.d->coreCtx->id && d->id == rhs.d->id : false) : !rhs;
+        if (sharedState && rhs.sharedState)
+        {
+            // if both have their persistant state, compare state
+            return c->id == rhs.c->id && sharedState->id == rhs.sharedState->id;
+        }
+        else if (sharedState || rhs.sharedState)
+        {
+            // if one has state return false
+            return false;
+        }
+        // if neither have state return true
+        return true;
     }
 
     bool
@@ -74,23 +91,40 @@ namespace cppmicroservices
     bool
     Bundle::operator<(Bundle const& rhs) const
     {
-        return *this ? (rhs ? (d->coreCtx->id == rhs.d->coreCtx->id ? d->id < rhs.d->id
-                                                                    : d->coreCtx->id < rhs.d->coreCtx->id)
-                            : true)
-                     : false;
+        if (sharedState && rhs.sharedState)
+        {
+            return c->id == rhs.c->id ? sharedState->id < rhs.sharedState->id : c->id < rhs.c->id;
+        }
+        else if (rhs.sharedState || sharedState)
+        {
+            // if only one has sharedState, return true if us, false if them
+            return sharedState ? true : false;
+        }
+        // if neither have sharedState, return false
+        return false;
     }
 
-    Bundle::operator bool() const { return d != nullptr; }
+    Bundle::
+    operator bool() const
+    {
+        return d != nullptr;
+    }
 
     Bundle&
     Bundle::operator=(std::nullptr_t)
     {
         d = nullptr;
         c = nullptr;
+        sharedState = nullptr;
         return *this;
     }
 
-    Bundle::Bundle(std::shared_ptr<BundlePrivate> const& d) : d(d), c(d ? d->coreCtx->shared_from_this() : nullptr) {}
+    Bundle::Bundle(std::shared_ptr<BundlePrivate> const& d)
+        : d(d)
+        , c(d ? d->coreCtx->shared_from_this() : nullptr)
+        , sharedState(d ? d->sharedState : nullptr)
+    {
+    }
 
     Bundle::~Bundle() = default;
 
@@ -169,12 +203,12 @@ namespace cppmicroservices
     long
     Bundle::GetBundleId() const
     {
-        if (!d)
+        if (!sharedState)
         {
             throw std::invalid_argument("invalid bundle");
         }
 
-        return d->id;
+        return sharedState->id;
     }
 
     std::string
@@ -191,12 +225,12 @@ namespace cppmicroservices
     std::string
     Bundle::GetSymbolicName() const
     {
-        if (!d)
+        if (!sharedState)
         {
             throw std::invalid_argument("invalid bundle");
         }
 
-        return d->symbolicName;
+        return sharedState->symbolicName;
     }
 
     BundleVersion
@@ -250,8 +284,8 @@ namespace cppmicroservices
         // "org.cppmicroservices.*" properties.
         if (property.Empty())
         {
-            auto props = d->coreCtx->frameworkProperties.find(key);
-            if (props != d->coreCtx->frameworkProperties.end())
+            auto props = c->frameworkProperties.find(key);
+            if (props != c->frameworkProperties.end())
             {
                 property = (*props).second;
             }
@@ -281,7 +315,7 @@ namespace cppmicroservices
         d->CheckUninstalled();
         std::vector<ServiceRegistrationBase> sr;
         std::vector<ServiceReferenceU> res;
-        d->coreCtx->services.GetRegisteredByBundle(d.get(), sr);
+        c->services.GetRegisteredByBundle(d.get(), sr);
         for (std::vector<ServiceRegistrationBase>::const_iterator i = sr.begin(); i != sr.end(); ++i)
         {
             res.emplace_back(i->GetReference());
@@ -300,7 +334,7 @@ namespace cppmicroservices
         d->CheckUninstalled();
         std::vector<ServiceRegistrationBase> sr;
         std::vector<ServiceReferenceU> res;
-        d->coreCtx->services.GetUsedByBundle(d.get(), sr);
+        c->services.GetUsedByBundle(d.get(), sr);
         for (std::vector<ServiceRegistrationBase>::const_iterator i = sr.begin(); i != sr.end(); ++i)
         {
             res.emplace_back(i->GetReference());
@@ -361,7 +395,7 @@ namespace cppmicroservices
         void* symbol = BundleUtils::GetSymbol(handle, symname.c_str(), errmsg);
         if (!symbol)
         {
-            d->coreCtx->logger->Log(logservice::SeverityLevel::LOG_WARNING, errmsg);
+            c->logger->Log(logservice::SeverityLevel::LOG_WARNING, errmsg);
         }
         return symbol;
     }

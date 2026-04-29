@@ -27,7 +27,10 @@
 #include "ZipFile.h"
 
 #include "gtest/gtest.h"
-#include "json/json.h"
+
+#include <rapidjson/document.h>
+#include <rapidjson/prettywriter.h>
+#include <rapidjson/stringbuffer.h>
 
 #include <array>
 #include <cstdlib>
@@ -949,12 +952,10 @@ TEST_F(ResourceCompilerTest, testUnicodeManifestAdd)
     ChangeDirectory(origdir);
 }
 
-// In jsoncpp 0.10.6 not allowing comments does NOT result in a parse failure for a JSON file with comments.
-// Instead, assuming the JSON is valid, parsing returns JSON stripped of the comments.
-// This test will only makes sure that JSON with comments can be added successfully.
-// It shouldn't be necessary to check that JSON comments are actually stripped from the output json as
-// that should be the responsibility of jsoncpp's tests and we will rely on that.
-// There is an issue logged for this behavior in jsoncpp (https://github.com/open-source-parsers/jsoncpp/issues/690)
+// Comments are not valid JSON (RFC 8259). The resource compiler correctly rejects them.
+// Previously, jsoncpp silently stripped comments even with allowComments=false,
+// which was a known bug (https://github.com/open-source-parsers/jsoncpp/issues/690).
+// With rapidjson, comments are properly rejected as parse errors.
 TEST_F(ResourceCompilerTest, testManifestAddWithJSONComments)
 {
     std::string jsonCommentSyntax(R"(
@@ -965,7 +966,7 @@ TEST_F(ResourceCompilerTest, testManifestAddWithJSONComments)
 		 "bundle.description" : "This bundle shouldn't have comments!",
 		 "authors" : ["John Doe", "Douglas Reynolds", "Daniel Cannady"],
 		 "rating" : 5 // no comments allowed
-		} 
+		}
     )");
 
     createManifestFile(tempdir, jsonCommentSyntax, "manifest4.json");
@@ -975,8 +976,8 @@ TEST_F(ResourceCompilerTest, testManifestAddWithJSONComments)
     cmd << " --bundle-name mybundle";
     cmd << " --out-file \"" << tempdir << "json_comment_syntax.zip\"";
     cmd << " --manifest-add \"" << tempdir << "manifest4.json\"";
-    // Test embedding a manifest containing JSON comments.
-    ASSERT_EQ(EXIT_SUCCESS, runExecutable(cmd.str()));
+    // Test that a manifest containing JSON comments is rejected.
+    ASSERT_EQ(BUNDLE_MANIFEST_VALIDATION_ERROR_CODE, runExecutable(cmd.str()));
 }
 
 TEST_F(ResourceCompilerTest, testManifestAddWithDuplicateKeys)
@@ -1312,19 +1313,23 @@ TEST_F(ResourceCompilerTest, testMultipleManifestConcatenation)
     // Test the successful concatenation of multiple manifest.json files into one.
     ASSERT_EQ(EXIT_SUCCESS, runExecutable(cmd.str()));
 
-    Json::Reader reader;
-    Json::Value root;
+    rapidjson::Document root;
+    root.Parse(manifest_json.c_str());
 
     // Test that the expected JSON content was parsed correctly.
-    ASSERT_TRUE(reader.parse(manifest_json, root, false));
+    ASSERT_FALSE(root.HasParseError());
 
-    std::string expectedJSON(root.toStyledString());
+    rapidjson::StringBuffer buffer;
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+    root.Accept(writer);
+    std::string expectedJSON(buffer.GetString(), buffer.GetSize());
+    expectedJSON += '\n';
+
     // retrieve the JSON which was concatenated by usResourceCompiler
     std::string concatenatedJSON;
     concatenatedJSON = getManifestContent(tempdir + "merged_zip.zip", "main");
 
-    // line feed and new line characters may be lurking in the strings. I don't know how to use miniz and jsoncpp to
-    // embed these characters in a consistent manner, so I'm opting to remove them afterwards.
+    // line feed and new line characters may be lurking in the strings.
     removeLineEndings(concatenatedJSON);
     removeLineEndings(expectedJSON);
 
@@ -1359,17 +1364,20 @@ TEST_F(ResourceCompilerTest, testManifestWithNullTerminator)
     // Test the successful embedding of a manifest containing an embedded null terminator.
     ASSERT_EQ(EXIT_SUCCESS, runExecutable(cmd.str()));
 
-    Json::Reader reader;
-    Json::Value root;
+    rapidjson::Document root;
+    root.Parse(manifest_json.c_str());
     // Test that the expected JSON content was parsed correctly.
-    ASSERT_TRUE(reader.parse(manifest_json, root, false));
+    ASSERT_FALSE(root.HasParseError());
 
-    std::string expectedJSON(root.toStyledString());
+    rapidjson::StringBuffer buffer;
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+    root.Accept(writer);
+    std::string expectedJSON(buffer.GetString(), buffer.GetSize());
+    expectedJSON += '\n';
 
     std::string nullTerminatorJSON = getManifestContent(tempdir + "embedded_null_terminator.zip", "main");
 
-    // line feed and new line characters may be lurking in the strings. I don't know how to use miniz and jsoncpp to
-    // embed these characters in a consistent manner, so I'm opting to remove them afterwards.
+    // line feed and new line characters may be lurking in the strings.
     removeLineEndings(nullTerminatorJSON);
     removeLineEndings(expectedJSON);
 
@@ -1387,8 +1395,7 @@ TEST_F(ResourceCompilerTest, testManifestWithNullTerminator)
 
     nullTerminatorJSON = getManifestContent(tempdir + mergedZipFile, "main");
 
-    // line feed and new line characters may be lurking in the strings. I don't know how to use miniz and jsoncpp to
-    // embed these characters in a consistent manner, so I'm opting to remove them afterwards.
+    // line feed and new line characters may be lurking in the strings.
     removeLineEndings(nullTerminatorJSON);
 
     // Test that the JSON content matches the expected JSON content.

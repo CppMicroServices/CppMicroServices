@@ -38,6 +38,7 @@
 #include <fstream>
 #include <iostream>
 #include <list>
+#include <map>
 #include <set>
 #include <stdexcept>
 #include <string>
@@ -347,7 +348,7 @@ namespace
      * @return valid JSON content
      */
     rapidjson::Document
-    AggregateManifestsAndValidate(std::unordered_map<std::string, rapidjson::Document>& manifests)
+    AggregateManifestsAndValidate(std::map<std::string, rapidjson::Document>& manifests)
     {
         // Initialize as empty object so HasMember/AddMember work immediately.
         // A default-constructed Document is Null, which does not support object operations.
@@ -868,8 +869,10 @@ main(int argc, char** argv)
             std::unique_ptr<ZipArchive> zipArchive(new ZipArchive(zipFile, compressionLevel, bundleName));
 
             // map of manifest file to its JSON data.
+            // std::map ensures manifests are processed in sorted filename order,
+            // giving deterministic key ordering in the merged output.
             // rapidjson::Document is move-only, so we use emplace + std::move below.
-            std::unordered_map<std::string, rapidjson::Document> manifests;
+            std::map<std::string, rapidjson::Document> manifests;
 
             // Add the manifest file to zip archive
             if (!manifestAdd.empty())

@@ -1307,8 +1307,8 @@ TEST_F(ResourceCompilerTest, testMultipleManifestConcatenation)
     cmd << " --bundle-name "
         << "main";
     cmd << " --out-file \"" << tempdir << "merged_zip.zip\"";
-    cmd << " --manifest-add \"" << tempdir << "manifest_part1.json\"";
     cmd << " --manifest-add \"" << tempdir << "manifest_part2.json\"";
+    cmd << " --manifest-add \"" << tempdir << "manifest_part1.json\"";
     cmd << " --manifest-add \"" << tempdir << "manifest_part3.json\"";
     // Test the successful concatenation of multiple manifest.json files into one.
     ASSERT_EQ(EXIT_SUCCESS, runExecutable(cmd.str()));

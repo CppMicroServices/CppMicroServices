@@ -2,16 +2,7 @@ set(_srcs
     ComponentInfo.cpp
     Main.cpp
     ManifestParserImpl.cpp
-    Util.cpp
-    ../../../third_party/jsoncpp.cpp)
-
-if(MINGW)
-  # Suppress warnings for specific files
-  set_source_files_properties(
-    ../../../third_party/jsoncpp.cpp
-    PROPERTIES COMPILE_FLAGS -Wno-maybe-uninitialized
-  )
-endif()
+    Util.cpp)
 
 if(NOT APPLE AND US_COMPILER_GNU_ARM AND  CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64|ARM64|arm64")
   add_compile_options(-Wno-error=maybe-uninitialized)

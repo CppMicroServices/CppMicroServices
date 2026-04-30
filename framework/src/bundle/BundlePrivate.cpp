@@ -214,10 +214,13 @@ namespace cppmicroservices
     void
     BundlePrivate::Start(uint32_t options)
     {
+        // Hold the framework shutdown blocker through activation to prevent
+        // the framework from stopping while this bundle is starting.
+        std::unique_ptr<FrameworkShutdownBlocker> frameworkBlock = nullptr;
         {
             auto l = this->Lock();
             US_UNUSED(l);
-            auto frameworkBlock = coreCtx->GetFrameworkStateAndBlock();
+            frameworkBlock = coreCtx->GetFrameworkStateAndBlock();
             if (frameworkBlock->frameworkHasStopped)
             {
                 throw std::runtime_error("Bundle " + symbolicName + " (location=" + location
@@ -226,7 +229,7 @@ namespace cppmicroservices
 
             if ((options & Bundle::START_TRANSIENT) == 0)
             {
-                SetAutostartSetting(options);
+                SetAutostartSetting(static_cast<int32_t>(options));
             }
         }
 

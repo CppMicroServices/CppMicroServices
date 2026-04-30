@@ -33,7 +33,6 @@ namespace cppmicroservices
       public:
         BundleActiveState();
         explicit BundleActiveState(std::shared_future<void> blockUntil);
-        ~BundleActiveState() override = default;
 
         void Start(BundlePrivate& bundle, uint32_t options) override;
         std::exception_ptr Stop(BundlePrivate& bundle, uint32_t options) override;

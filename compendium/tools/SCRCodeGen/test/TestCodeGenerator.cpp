@@ -704,6 +704,21 @@ namespace codegen
             }
   }
   )manifest";
+
+    const std::string manifest_with_comment = R"manifest(
+  {
+    "scr" : { "version" : 1, // this is a comment - should not be allowed
+              "components": [{
+                       "implementation-class": "Foo",
+                       "service": {
+                       "scope": "SINGLETON", 
+                       "interfaces": ["Foo::Interface"]
+                       }
+                       }]
+            }
+  }
+  )manifest";
+
     rapidjson::Document
     GetManifestSCRData(std::string const& content)
     {
@@ -930,7 +945,10 @@ namespace codegen
                                         true),
             CodegenInvalidManifestState(manifest_too_many_configuration_pids,
                                         "Error: For factory components, the configuration-pid array may "
-                                        "only contain one entry")));
+                                        "only contain one entry"),
+            CodegenInvalidManifestState(manifest_with_comment,
+                                        "Missing a name for object member",
+                                        /*isPartial=*/true)));
  
     
 } // namespace codegen

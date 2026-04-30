@@ -29,32 +29,34 @@ using codegen::datamodel::ReferenceInfo;
 using codegen::util::JsonValueValidator;
 
 std::vector<ComponentInfo>
-ManifestParserImplV1::ParseAndGetComponentInfos(Json::Value const& scr) const
+ManifestParserImplV1::ParseAndGetComponentInfos(rapidjson::Value const& scr) const
 {
     std::vector<ComponentInfo> componentInfos;
-    auto const jsonComponents = JsonValueValidator(scr, "components", Json::ValueType::arrayValue)();
-    for (auto const& jsonComponent : jsonComponents)
+    auto const& jsonComponents = JsonValueValidator(scr, "components", rapidjson::kArrayType)();
+    for (auto const& jsonComponent : jsonComponents.GetArray())
     {
         ComponentInfo componentInfo;
         componentInfo.implClassName
-            = JsonValueValidator(jsonComponent, "implementation-class", Json::ValueType::stringValue).GetString();
+            = JsonValueValidator(jsonComponent, "implementation-class", rapidjson::kStringType).GetString();
 
         // The component name is optional and may not exist in the component info metadata.
         try
         {
-            componentInfo.name = JsonValueValidator(jsonComponent, "name", Json::ValueType::stringValue).GetString();
+            componentInfo.name = JsonValueValidator(jsonComponent, "name", rapidjson::kStringType).GetString();
         }
         catch (std::exception const&)
         {
         }
 
         // inject-references
-        if (jsonComponent.isMember("inject-references"))
+        if (jsonComponent.HasMember("inject-references"))
         {
             bool isBool = false;
             try {
-                auto const injectReferences = JsonValueValidator(jsonComponent, "inject-references", Json::ValueType::booleanValue)();
-                componentInfo.setInjectReferences(injectReferences.asBool());
+                // kTrueType is used to mean "any boolean" — Validate() checks IsBool()
+                // which accepts both true and false.
+                auto const& injectReferences = JsonValueValidator(jsonComponent, "inject-references", rapidjson::kTrueType)();
+                componentInfo.setInjectReferences(injectReferences.GetBool());
                 isBool = true;
             } catch(...){
                 // do nothing
@@ -64,10 +66,10 @@ ManifestParserImplV1::ParseAndGetComponentInfos(Json::Value const& scr) const
             if (!isBool){
                 try {
                     // conversion of value to bool failed, must be array of strings
-                    auto const injectReferences = JsonValueValidator(jsonComponent, "inject-references", Json::ValueType::arrayValue)();
+                    auto const& injectReferences = JsonValueValidator(jsonComponent, "inject-references", rapidjson::kArrayType)();
                     std::unordered_set<std::string> injectedRefNames;
-                    for (auto const& refName : injectReferences){
-                        injectedRefNames.insert(refName.asString());
+                    for (auto const& refName : injectReferences.GetArray()){
+                        injectedRefNames.insert(refName.GetString());
                     }
                     componentInfo.setInjectReferences(false, injectedRefNames);
                 } catch (...){
@@ -80,7 +82,7 @@ ManifestParserImplV1::ParseAndGetComponentInfos(Json::Value const& scr) const
         bool configPolicy = false;
         bool configPid = false;
         componentInfo.configurationPolicy = codegen::datamodel::ComponentInfo::CONFIG_POLICY_IGNORE;
-        if (jsonComponent.isMember("configuration-policy"))
+        if (jsonComponent.HasMember("configuration-policy"))
         {
             configPolicy = true;
             JsonValueValidator::ValidChoices<3> policyChoices = {
@@ -90,23 +92,23 @@ ManifestParserImplV1::ParseAndGetComponentInfos(Json::Value const& scr) const
                 = JsonValueValidator(jsonComponent, "configuration-policy", policyChoices).GetString();
         }
         std::unordered_map<std::string, std::string> duplicatePids;
-        if (jsonComponent.isMember("configuration-pid"))
+        if (jsonComponent.HasMember("configuration-pid"))
         {
             configPid = true;
             // make sure there are no duplicates in the configuration-pid array.
-            auto const configurationPids
-                = JsonValueValidator(jsonComponent, "configuration-pid", Json::ValueType::arrayValue)();
+            auto const& configurationPids
+                = JsonValueValidator(jsonComponent, "configuration-pid", rapidjson::kArrayType)();
 
-            for (auto const& pid : configurationPids)
+            for (auto const& pid : configurationPids.GetArray())
             {
-                if (duplicatePids.find(pid.asString()) != duplicatePids.end())
+                if (duplicatePids.find(pid.GetString()) != duplicatePids.end())
                 {
                     std::string msg = "configuration-pid error in the manifest. "
                                       "Duplicate pid detected.";
-                    msg.append(pid.asString());
+                    msg.append(pid.GetString());
                     throw std::runtime_error(msg);
                 }
-                duplicatePids.emplace(pid.asString(), pid.asString());
+                duplicatePids.emplace(pid.GetString(), pid.GetString());
             }
         }
         // Both configuration-policy and configuration-pid must be present in the manifest.json
@@ -119,10 +121,10 @@ ManifestParserImplV1::ParseAndGetComponentInfos(Json::Value const& scr) const
                                      "Admin.");
         }
         // factory
-        if (jsonComponent.isMember("factory"))
+        if (jsonComponent.HasMember("factory"))
         {
             auto factoryComponentID
-                = JsonValueValidator(jsonComponent, "factory", Json::ValueType::stringValue).GetString();
+                = JsonValueValidator(jsonComponent, "factory", rapidjson::kStringType).GetString();
             if (!factoryComponentID.empty() && (duplicatePids.size() != 1))
             {
                 throw std::runtime_error("Error: For factory components, the configuration-pid array "
@@ -131,45 +133,45 @@ ManifestParserImplV1::ParseAndGetComponentInfos(Json::Value const& scr) const
         }
 
         // service
-        if (jsonComponent.isMember("service"))
+        if (jsonComponent.HasMember("service"))
         {
-            auto const jsonServiceInfo = JsonValueValidator(jsonComponent, "service", Json::ValueType::objectValue)();
+            auto const& jsonServiceInfo = JsonValueValidator(jsonComponent, "service", rapidjson::kObjectType)();
             JsonValueValidator::ValidChoices<3> scopeChoices = {
                 {"singleton", "bundle", "prototype"}
             };
             componentInfo.service.scope = JsonValueValidator(jsonServiceInfo, "scope", scopeChoices).GetString();
 
             // interfaces
-            auto const jsonServiceInterfaces
-                = JsonValueValidator(jsonServiceInfo, "interfaces", Json::ValueType::arrayValue)();
-            for (auto const& jsonServiceInterface : jsonServiceInterfaces)
+            auto const& jsonServiceInterfaces
+                = JsonValueValidator(jsonServiceInfo, "interfaces", rapidjson::kArrayType)();
+            for (auto const& jsonServiceInterface : jsonServiceInterfaces.GetArray())
             {
-                if (!jsonServiceInterface.isString() || jsonServiceInterface.asString() == "")
+                if (!jsonServiceInterface.IsString() || std::string(jsonServiceInterface.GetString()).empty())
                 {
                     std::string msg = "Invalid array value for the name 'interfaces'. ";
                     msg += "Expected non-empty string";
                     throw std::runtime_error(msg);
                 }
-                componentInfo.service.interfaces.push_back(jsonServiceInterface.asString());
+                componentInfo.service.interfaces.push_back(jsonServiceInterface.GetString());
             }
         }
 
         // references
-        if (jsonComponent.isMember("references"))
+        if (jsonComponent.HasMember("references"))
         {
-            auto const jsonRefInfos = JsonValueValidator(jsonComponent, "references", Json::ValueType::arrayValue)();
+            auto const& jsonRefInfos = JsonValueValidator(jsonComponent, "references", rapidjson::kArrayType)();
 
             std::unordered_map<std::string, std::size_t> duplicateRefs;
-            duplicateRefs.reserve(jsonRefInfos.size());
-            for (auto const& jsonRefInfo : jsonRefInfos)
+            duplicateRefs.reserve(jsonRefInfos.Size());
+            for (auto const& jsonRefInfo : jsonRefInfos.GetArray())
             {
                 ReferenceInfo refInfo;
-                refInfo.name = JsonValueValidator(jsonRefInfo, "name", Json::ValueType::stringValue).GetString();
+                refInfo.name = JsonValueValidator(jsonRefInfo, "name", rapidjson::kStringType).GetString();
                 // reference names for a service component must be unique.
                 // track all duplicates and produce an error message afterwards.
                 duplicateRefs[refInfo.name]++;
 
-                refInfo.interface = JsonValueValidator(jsonRefInfo, "interface", Json::ValueType::stringValue)
+                refInfo.interface = JsonValueValidator(jsonRefInfo, "interface", rapidjson::kStringType)
                                         .GetString();
                 JsonValueValidator::ValidChoices<4> cardinalityChoices = {
                     {"1..1", "0..1", "1..n", "0..n"}
@@ -183,10 +185,10 @@ ManifestParserImplV1::ParseAndGetComponentInfos(Json::Value const& scr) const
                     {"reluctant", "greedy"}
                 };
                 refInfo.policy_option = JsonValueValidator(jsonRefInfo, "policy-option", optionChoices).GetString();
-                if (jsonRefInfo.isMember("target"))
+                if (jsonRefInfo.HasMember("target"))
                 {
                     refInfo.target
-                        = JsonValueValidator(jsonRefInfo, "target", Json::ValueType::stringValue).GetString();
+                        = JsonValueValidator(jsonRefInfo, "target", rapidjson::kStringType).GetString();
                 }
                 componentInfo.references.push_back(refInfo);
             }

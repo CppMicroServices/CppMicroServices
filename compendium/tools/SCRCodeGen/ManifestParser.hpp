@@ -26,7 +26,7 @@
 #include <vector>
 
 #include "ComponentInfo.hpp"
-#include "json/json.h"
+#include <rapidjson/document.h>
 
 using codegen::datamodel::ComponentInfo;
 
@@ -44,7 +44,7 @@ class ManifestParser
 {
   public:
     virtual ~ManifestParser() = default;
-    virtual std::vector<ComponentInfo> ParseAndGetComponentInfos(Json::Value const& scr) const = 0;
+    virtual std::vector<ComponentInfo> ParseAndGetComponentInfos(rapidjson::Value const& scr) const = 0;
 };
 
 #endif // MANIFESTPARSER_HPP

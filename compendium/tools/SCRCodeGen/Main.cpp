@@ -33,7 +33,7 @@
 #include "ComponentInfo.hpp"
 #include "ManifestParser.hpp"
 #include "ManifestParserFactory.hpp"
-#include "json/json.h"
+#include <rapidjson/document.h>
 #if defined(USING_GTEST)
 #    include "gtest/gtest_prod.h"
 #else
@@ -106,9 +106,9 @@ main(int argc, char const** argv, char**)
         std::ifstream manifestFile(manifestFilePath, std::ifstream::binary | std::ifstream::in);
         checkFileOpenOrThrow(manifestFile);
         auto const root = ParseManifestOrThrow(manifestFile);
-        auto const scr = JsonValueValidator(root, "scr", Json::ValueType::objectValue)();
-        auto const version = JsonValueValidator(scr, "version", Json::ValueType::intValue)();
-        auto const manifestParser = ManifestParserFactory::Create(version.asInt());
+        auto const& scr = JsonValueValidator(root, "scr", rapidjson::kObjectType)();
+        auto const& version = JsonValueValidator(scr, "version", rapidjson::kNumberType)();
+        auto const manifestParser = ManifestParserFactory::Create(version.GetInt());
         auto const componentInfos = manifestParser->ParseAndGetComponentInfos(scr);
         ComponentCallbackGenerator compGen(includeHeaderPaths, componentInfos);
         WriteToFile(outFilePath, compGen.GetString());

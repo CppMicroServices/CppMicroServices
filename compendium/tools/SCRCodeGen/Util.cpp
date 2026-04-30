@@ -43,7 +43,7 @@ namespace codegen
                     std::string key = it->name.GetString();
                     if (!seen.insert(key).second)
                     {
-                        throw std::runtime_error("Duplicate key '" + key + "' found in manifest");
+                        throw std::runtime_error("Duplicate key: '" + key + "' found in manifest");
                     }
                     checkDuplicateKeys(it->value);
                 }

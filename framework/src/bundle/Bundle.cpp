@@ -102,7 +102,7 @@ namespace cppmicroservices
             throw std::invalid_argument("invalid bundle");
         }
 
-        return static_cast<State>(d->state.load());
+        return d->GetBundleStateEnum();
     }
 
     void

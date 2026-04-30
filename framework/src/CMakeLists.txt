@@ -50,6 +50,12 @@ set(_srcs
   bundle/BundleHooks.cpp
   bundle/BundleManifest.cpp
   bundle/BundlePrivate.cpp
+  bundle/states/BundleInstalledState.cpp
+  bundle/states/BundleResolvedState.cpp
+  bundle/states/BundleStartingState.cpp
+  bundle/states/BundleActiveState.cpp
+  bundle/states/BundleStoppingState.cpp
+  bundle/states/BundleUninstalledState.cpp
   bundle/BundleRegistry.cpp
   bundle/BundleResource.cpp
   bundle/BundleResourceBuffer.cpp
@@ -88,6 +94,13 @@ set(_private_headers
   bundle/BundleHooks.h
   bundle/BundleManifest.h
   bundle/BundlePrivate.h
+  bundle/states/BundleLifecycleState.hpp
+  bundle/states/BundleInstalledState.hpp
+  bundle/states/BundleResolvedState.hpp
+  bundle/states/BundleStartingState.hpp
+  bundle/states/BundleActiveState.hpp
+  bundle/states/BundleStoppingState.hpp
+  bundle/states/BundleUninstalledState.hpp
   bundle/BundleRegistry.h
   bundle/BundleResourceContainer.h
   bundle/BundleStorage.h

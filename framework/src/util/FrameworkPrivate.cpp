@@ -29,6 +29,12 @@ limitations under the License.
 #include "BundleContextPrivate.h"
 #include "BundleStorage.h"
 
+#include "../bundle/states/BundleActiveState.hpp"
+#include "../bundle/states/BundleInstalledState.hpp"
+#include "../bundle/states/BundleResolvedState.hpp"
+#include "../bundle/states/BundleStartingState.hpp"
+#include "../bundle/states/BundleStoppingState.hpp"
+
 #include <chrono>
 
 namespace cppmicroservices
@@ -62,7 +68,7 @@ namespace cppmicroservices
     void
     FrameworkPrivate::DoInit()
     {
-        state = Bundle::STATE_STARTING;
+        SetLifecycleState(std::make_shared<BundleStartingState>());
         coreCtx->Init();
     }
 
@@ -72,7 +78,8 @@ namespace cppmicroservices
         auto l = Lock();
         US_UNUSED(l);
 
-        switch (static_cast<Bundle::State>(state.load()))
+        auto s = GetBundleStateEnum();
+        switch (s)
         {
             case Bundle::STATE_INSTALLED:
             case Bundle::STATE_RESOLVED:
@@ -82,7 +89,7 @@ namespace cppmicroservices
                 return;
             default:
                 std::stringstream ss;
-                ss << state;
+                ss << s;
                 throw std::logic_error("INTERNAL ERROR, Illegal state, " + ss.str());
         }
         this->DoInit();
@@ -129,7 +136,8 @@ namespace cppmicroservices
 
         auto l = Lock();
         // Already stopped?
-        if (((Bundle::STATE_INSTALLED | Bundle::STATE_RESOLVED) & state) == 0)
+        auto ws = GetBundleStateEnum();
+        if (ws != Bundle::STATE_INSTALLED && ws != Bundle::STATE_RESOLVED)
         {
             stopEvent = FrameworkEventInternal { false,
                                                  FrameworkEvent::Type::FRAMEWORK_ERROR,
@@ -179,7 +187,8 @@ namespace cppmicroservices
         auto l = Lock();
         US_UNUSED(l);
         bool wasActive = false;
-        switch (static_cast<Bundle::State>(state.load()))
+        auto shutdownState = GetBundleStateEnum();
+        switch (shutdownState)
         {
             case Bundle::STATE_INSTALLED:
             case Bundle::STATE_RESOLVED:
@@ -217,22 +226,23 @@ namespace cppmicroservices
             US_UNUSED(l);
             coreCtx->SetFrameworkStoppedState(false);
 
-            switch (state.load())
             {
-                case Bundle::STATE_INSTALLED:
-                case Bundle::STATE_RESOLVED:
-                    DoInit();
-                    [[fallthrough]];
-                case Bundle::STATE_STARTING:
-                    operation = BundlePrivate::OP_ACTIVATING;
-                    break;
-                case Bundle::STATE_ACTIVE:
-                    return;
-                default:
-                    std::stringstream ss;
-                    ss << state;
-
-                    throw std::runtime_error("INTERNAL ERROR, Illegal state, " + ss.str());
+                auto fwState = GetBundleStateEnum();
+                switch (fwState)
+                {
+                    case Bundle::STATE_INSTALLED:
+                    case Bundle::STATE_RESOLVED:
+                        DoInit();
+                        [[fallthrough]];
+                    case Bundle::STATE_STARTING:
+                        break;
+                    case Bundle::STATE_ACTIVE:
+                        return;
+                    default:
+                        std::stringstream ss;
+                        ss << fwState;
+                        throw std::runtime_error("INTERNAL ERROR, Illegal state, " + ss.str());
+                }
             }
             bundlesToStart = coreCtx->storage->GetStartOnLaunchBundles();
         }
@@ -266,13 +276,12 @@ namespace cppmicroservices
             auto l = Lock();
             US_UNUSED(l);
 
-            if (state == Bundle::STATE_ACTIVE)
+            if (GetBundleStateEnum() == Bundle::STATE_ACTIVE)
             {
                 return;
             }
 
-            state = Bundle::STATE_ACTIVE;
-            operation = BundlePrivate::OP_IDLE;
+            SetLifecycleState(std::make_shared<BundleActiveState>());
         }
 
         coreCtx->listeners.SendFrameworkEvent(
@@ -313,8 +322,7 @@ namespace cppmicroservices
             {
                 auto l = Lock();
                 US_UNUSED(l);
-                operation = OP_DEACTIVATING;
-                state = Bundle::STATE_STOPPING;
+                SetLifecycleState(std::make_shared<BundleStoppingState>());
             }
             coreCtx->listeners.BundleChanged(
                 BundleEvent(BundleEvent::BUNDLE_STOPPING, MakeBundle(this->shared_from_this())));
@@ -373,7 +381,8 @@ namespace cppmicroservices
             auto b = *iter;
             try
             {
-                if (((Bundle::STATE_ACTIVE | Bundle::STATE_STARTING) & b->state) != 0)
+                auto bs = b->GetBundleStateEnum();
+                if (bs == Bundle::STATE_ACTIVE || bs == Bundle::STATE_STARTING)
                 {
                     // Stop bundle without changing its autostart setting.
                     b->Stop(Bundle::StopOptions::STOP_TRANSIENT);
@@ -406,10 +415,9 @@ namespace cppmicroservices
     void
     FrameworkPrivate::SystemShuttingdownDone_unlocked(FrameworkEventInternal const& fe)
     {
-        if (state != Bundle::STATE_INSTALLED)
+        if (GetBundleStateEnum() != Bundle::STATE_INSTALLED)
         {
-            state = Bundle::STATE_RESOLVED;
-            operation = OP_IDLE;
+            SetLifecycleState(std::make_shared<BundleResolvedState>());
             NotifyAll();
         }
         stopEvent = fe;

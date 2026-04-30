@@ -23,6 +23,14 @@
 #include "BundlePrivate.h"
 #include "BundleStorage.h"
 
+#include "states/BundleActiveState.hpp"
+#include "states/BundleInstalledState.hpp"
+#include "states/BundleLifecycleState.hpp"
+#include "states/BundleResolvedState.hpp"
+#include "states/BundleStartingState.hpp"
+#include "states/BundleStoppingState.hpp"
+#include "states/BundleUninstalledState.hpp"
+
 #include "cppmicroservices/AnyMap.h"
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/BundleActivator.h"
@@ -66,35 +74,18 @@ namespace cppmicroservices
     void
     BundlePrivate::Stop(uint32_t options)
     {
-        std::exception_ptr savedException;
-
         {
             auto l = this->Lock();
             US_UNUSED(l);
-
-            if (state == Bundle::STATE_UNINSTALLED)
-            {
-                throw std::logic_error("Bundle " + symbolicName + " (location=" + location + ") is uninstalled");
-            }
 
             if ((options & Bundle::STOP_TRANSIENT) == 0)
             {
                 SetAutostartSetting(-1);
             }
-            switch (static_cast<Bundle::State>(state.load()))
-            {
-                case Bundle::STATE_INSTALLED:
-                case Bundle::STATE_RESOLVED:
-                case Bundle::STATE_STOPPING:
-                case Bundle::STATE_UNINSTALLED:
-                    return;
-
-                case Bundle::STATE_ACTIVE:
-                case Bundle::STATE_STARTING: // Lazy start...
-                    savedException = Stop0();
-                    break;
-            }
         }
+
+        // Delegate to the current state object
+        auto savedException = GetLifecycleState()->Stop(*this, options);
 
         if (savedException)
         {
@@ -103,24 +94,7 @@ namespace cppmicroservices
     }
 
     std::exception_ptr
-    BundlePrivate::Stop0()
-    {
-        wasStarted = state == Bundle::STATE_ACTIVE;
-        state = Bundle::STATE_STOPPING;
-        operation = OP_DEACTIVATING;
-
-        std::exception_ptr savedException = Stop1();
-        if (state != Bundle::STATE_UNINSTALLED)
-        {
-            state = Bundle::STATE_RESOLVED;
-            coreCtx->listeners.BundleChanged({ BundleEvent::BUNDLE_STOPPED, MakeBundle(shared_from_this()) });
-            operation = OP_IDLE;
-        }
-        return savedException;
-    }
-
-    std::exception_ptr
-    BundlePrivate::Stop1()
+    BundlePrivate::DeactivateBundle()
     {
         std::exception_ptr res;
 
@@ -140,13 +114,12 @@ namespace cppmicroservices
                                        + "), BundleActivator::Stop() failed: " + util::GetLastExceptionStr()));
             }
 
-            // if stop was aborted (uninstall or timeout), make sure
-            // FinalizeActivation() has finished before checking aborted/state
+            // if stop was aborted (uninstall or timeout), check aborted/state
             {
                 std::string cause;
                 if (aborted == static_cast<uint8_t>(Aborted::YES))
                 {
-                    if (Bundle::STATE_UNINSTALLED == state)
+                    if (Bundle::STATE_UNINSTALLED == GetBundleStateEnum())
                     {
                         cause = "Bundle uninstalled during Stop()";
                     }
@@ -158,7 +131,7 @@ namespace cppmicroservices
                 else
                 {
                     aborted = static_cast<uint8_t>(Aborted::NO);
-                    if (Bundle::STATE_STOPPING != state)
+                    if (Bundle::STATE_STOPPING != GetBundleStateEnum())
                     {
                         cause = "Bundle changed state because of refresh during Stop()";
                     }
@@ -172,16 +145,13 @@ namespace cppmicroservices
             bactivator = nullptr;
         }
 
-        if (operation == OP_DEACTIVATING)
-        {
-            Stop2();
-        }
+        InvalidateBundleContext();
 
         return res;
     }
 
     void
-    BundlePrivate::Stop2()
+    BundlePrivate::InvalidateBundleContext()
     {
         // Call hooks after we've called BundleActivator::Stop(), but before we've
         // cleared all resources
@@ -198,29 +168,7 @@ namespace cppmicroservices
     Bundle::State
     BundlePrivate::GetUpdatedState()
     {
-        if (state == Bundle::STATE_INSTALLED)
-        {
-            try
-            {
-                if (state == Bundle::STATE_INSTALLED)
-                {
-                    state = Bundle::STATE_RESOLVED;
-                    operation = OP_RESOLVING;
-                    coreCtx->listeners.BundleChanged(
-                        { BundleEvent::BUNDLE_RESOLVED, MakeBundle(this->shared_from_this()) });
-                    operation = OP_IDLE;
-                }
-            }
-            catch (...)
-            {
-                resolveFailException = std::current_exception();
-                coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
-                                                                     MakeBundle(this->shared_from_this()),
-                                                                     std::string(),
-                                                                     std::current_exception()));
-            }
-        }
-        return static_cast<Bundle::State>(state.load());
+        return GetLifecycleState()->GetUpdatedState(*this);
     }
 
     void
@@ -233,179 +181,27 @@ namespace cppmicroservices
             ctx->Invalidate();
         }
 
-        state = Bundle::STATE_INSTALLED;
+        SetLifecycleState(std::make_shared<BundleInstalledState>());
         if (sendEvent)
         {
-            operation = OP_UNRESOLVING;
             coreCtx->listeners.BundleChanged({ BundleEvent::BUNDLE_RESOLVED, MakeBundle(this->shared_from_this()) });
         }
-        operation = OP_IDLE;
     }
 
     void
-    BundlePrivate::FinalizeActivation()
+    BundlePrivate::ResolveAndActivate()
     {
-        switch (GetUpdatedState())
-        {
-            case Bundle::STATE_INSTALLED:
-            {
-                if (resolveFailException)
-                {
-                    std::rethrow_exception(resolveFailException);
-                }
-                break;
-            }
-            case Bundle::STATE_STARTING:
-            {
-                if (operation == OP_ACTIVATING)
-                {
-                    // finalization already in progress.
-                    return;
-                }
-            }
-                [[fallthrough]];
-            case Bundle::STATE_RESOLVED:
-            {
-                state = Bundle::STATE_STARTING;
-                operation = OP_ACTIVATING;
-
-                std::shared_ptr<BundleContextPrivate> null_expected;
-                std::shared_ptr<BundleContextPrivate> ctx(new BundleContextPrivate(this));
-                bundleContext.CompareExchange(null_expected, ctx);
-                auto e = Start0();
-                operation = OP_IDLE;
-                if (e)
-                {
-                    std::rethrow_exception(e);
-                }
-                break;
-            }
-            case Bundle::STATE_ACTIVE:
-                break;
-            case Bundle::STATE_STOPPING:
-                // This happens if call start from inside the BundleActivator.stop
-                // method.
-                // Don't allow it.
-                throw std::runtime_error("Bundle " + symbolicName + " (location=" + location
-                                         + "), start called from BundleActivator::Stop");
-            case Bundle::STATE_UNINSTALLED:
-                throw std::logic_error("Bundle " + symbolicName + " (location=" + location
-                                       + ") is in UNINSTALLED state");
-        }
+        // Auto-resolve if needed (INSTALLED -> RESOLVED), then delegate to current state
+        GetUpdatedState();
+        GetLifecycleState()->Start(*this, 0);
     }
 
     void
     BundlePrivate::Uninstall()
     {
-        {
-            auto l = this->Lock();
-            US_UNUSED(l);
+        // Delegate to current state object
+        GetLifecycleState()->Uninstall(*this);
 
-            switch (static_cast<Bundle::State>(state.load()))
-            {
-                case Bundle::STATE_UNINSTALLED:
-                    throw std::logic_error("Bundle " + symbolicName + " (location=" + location
-                                           + ") is in BUNDLE_UNINSTALLED state");
-                case Bundle::STATE_STARTING: // Lazy start
-                case Bundle::STATE_ACTIVE:
-                case Bundle::STATE_STOPPING:
-                {
-                    std::exception_ptr exception;
-                    try
-                    {
-                        exception = (state & (Bundle::STATE_ACTIVE | Bundle::STATE_STARTING)) != 0 ? Stop0() : nullptr;
-                    }
-                    catch (...)
-                    {
-                        // Force to install
-                        SetStateInstalled(false);
-                        exception = std::current_exception();
-                    }
-                    operation = BundlePrivate::OP_UNINSTALLING;
-                    if (exception != nullptr)
-                    {
-                        try
-                        {
-                            std::rethrow_exception(exception);
-                        }
-                        catch (...)
-                        {
-                            coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
-                                                                                 MakeBundle(shared_from_this()),
-                                                                                 std::string(),
-                                                                                 std::current_exception()));
-                        }
-                    }
-                }
-                    [[fallthrough]];
-                case Bundle::STATE_RESOLVED:
-                case Bundle::STATE_INSTALLED:
-                {
-                    coreCtx->bundleRegistry.Remove(location, id);
-                    if (operation != BundlePrivate::OP_UNINSTALLING)
-                    {
-                        try
-                        {
-                            operation = BundlePrivate::OP_UNINSTALLING;
-                        }
-                        catch (...)
-                        {
-                            // Make sure that bundleContext is invalid
-                            std::shared_ptr<BundleContextPrivate> ctx;
-                            if ((ctx = bundleContext.Exchange(ctx)))
-                            {
-                                ctx->Invalidate();
-                            }
-                            operation = BundlePrivate::OP_UNINSTALLING;
-                            coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
-                                                                                 MakeBundle(shared_from_this()),
-                                                                                 std::string(),
-                                                                                 std::current_exception()));
-                        }
-                    }
-                    if (state == Bundle::STATE_UNINSTALLED)
-                    {
-                        operation = BundlePrivate::OP_IDLE;
-                        throw std::logic_error("Bundle " + symbolicName + " (location=" + location
-                                               + ") is in BUNDLE_UNINSTALLED state");
-                    }
-
-                    state = Bundle::STATE_INSTALLED;
-                    coreCtx->listeners.BundleChanged(
-                        { BundleEvent::BUNDLE_UNRESOLVED, MakeBundle(shared_from_this()) });
-                    bactivator = nullptr;
-                    state = Bundle::STATE_UNINSTALLED;
-
-                    Purge();
-                    barchive->SetLastModified(std::chrono::steady_clock::now());
-                    operation = BundlePrivate::OP_IDLE;
-                    if (!bundleDir.empty())
-                    {
-                        try
-                        {
-                            if (util::Exists(bundleDir))
-                            {
-                                util::RemoveDirectoryRecursive(bundleDir);
-                            }
-                        }
-                        catch (...)
-                        {
-                            coreCtx->listeners.SendFrameworkEvent(
-                                FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING,
-                                               MakeBundle(shared_from_this()),
-                                               std::string(),
-                                               std::current_exception()));
-                        }
-                        bundleDir.clear();
-                    }
-                    // id, location and headers survives after uninstall.
-
-                    // There might be bundle threads that are running start or stop
-                    // operation. This will wake them and give them an chance to terminate.
-                    break;
-                }
-            }
-        }
         coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::BUNDLE_UNINSTALLED, MakeBundle(shared_from_this())));
     }
 
@@ -418,31 +214,23 @@ namespace cppmicroservices
     void
     BundlePrivate::Start(uint32_t options)
     {
-        auto l = this->Lock();
-        US_UNUSED(l);
-        auto frameworkBlock = coreCtx->GetFrameworkStateAndBlock();
-        if (frameworkBlock->frameworkHasStopped)
         {
-            throw std::runtime_error("Bundle " + symbolicName + " (location=" + location
-                                     + ") belongs to a stopped framework");
-        }
-        if (state == Bundle::STATE_UNINSTALLED)
-        {
-            throw std::logic_error("Bundle " + symbolicName + " (location=" + location + ") is uninstalled");
+            auto l = this->Lock();
+            US_UNUSED(l);
+            auto frameworkBlock = coreCtx->GetFrameworkStateAndBlock();
+            if (frameworkBlock->frameworkHasStopped)
+            {
+                throw std::runtime_error("Bundle " + symbolicName + " (location=" + location
+                                         + ") belongs to a stopped framework");
+            }
+
+            if ((options & Bundle::START_TRANSIENT) == 0)
+            {
+                SetAutostartSetting(options);
+            }
         }
 
-        if (state == Bundle::STATE_ACTIVE)
-        {
-            return;
-        }
-
-        if ((options & Bundle::START_TRANSIENT) == 0)
-        {
-            SetAutostartSetting(options);
-        }
-
-        FinalizeActivation();
-        return;
+        ResolveAndActivate();
     }
 
     AnyMap const&
@@ -452,7 +240,7 @@ namespace cppmicroservices
     }
 
     std::exception_ptr
-    BundlePrivate::Start0()
+    BundlePrivate::ActivateBundle()
     {
         // res is used to signal that start did not complete in a normal way
         std::exception_ptr res;
@@ -496,7 +284,7 @@ namespace cppmicroservices
                 if (coreCtx->validationFunc && (lib.GetFilePath() != util::GetExecutablePath())
                     && !coreCtx->validationFunc(thisBundle))
                 {
-                    StartFailed();
+                    CleanupAfterActivationFailure();
                     return std::make_exception_ptr(SecurityException {
                         "Bundle " + symbolicName + " (location=" + location + ") failed bundle validation.",
                         thisBundle });
@@ -509,7 +297,7 @@ namespace cppmicroservices
                                    thisBundle,
                                    "The bundle validation function threw an exception",
                                    std::current_exception()));
-                StartFailed();
+                CleanupAfterActivationFailure();
                 throw SecurityException { util::GetLastExceptionStr(), thisBundle };
             }
 
@@ -605,12 +393,12 @@ namespace cppmicroservices
         // - start time-out -> res = new exception (not used?)
 
         // if start was aborted (uninstall or timeout), make sure
-        // finalizeActivation() has finished before checking aborted/state
+        // check aborted/state
         {
             std::string cause;
             if (static_cast<Aborted>(aborted.load()) == Aborted::YES)
             {
-                if (Bundle::STATE_UNINSTALLED == state)
+                if (Bundle::STATE_UNINSTALLED == GetBundleStateEnum())
                 {
                     cause = "Bundle uninstalled during Start()";
                 }
@@ -622,7 +410,7 @@ namespace cppmicroservices
             else
             {
                 aborted = static_cast<uint8_t>(Aborted::NO);
-                if (Bundle::STATE_STARTING != state)
+                if (Bundle::STATE_STARTING != GetBundleStateEnum())
                 {
                     cause = "Bundle changed state because of refresh during Start()";
                 }
@@ -636,7 +424,7 @@ namespace cppmicroservices
 
         if (res == nullptr)
         {
-            state = Bundle::STATE_ACTIVE;
+            SetLifecycleState(std::make_shared<BundleActiveState>());
             try
             {
                 coreCtx->listeners.BundleChanged(
@@ -648,21 +436,21 @@ namespace cppmicroservices
             }
             catch (cppmicroservices::SecurityException const& ex)
             {
-                StartFailed();
+                CleanupAfterActivationFailure();
                 res = std::make_exception_ptr(ex);
             }
         }
-        else if (operation == OP_ACTIVATING)
+        else
         {
-            StartFailed();
+            CleanupAfterActivationFailure();
         }
         return res;
     }
 
     void
-    BundlePrivate::StartFailed()
+    BundlePrivate::CleanupAfterActivationFailure()
     {
-        state = Bundle::STATE_STOPPING;
+        SetLifecycleState(std::make_shared<BundleStoppingState>());
         coreCtx->listeners.BundleChanged(
             BundleEvent(BundleEvent::BUNDLE_STOPPING, MakeBundle(this->shared_from_this())));
         RemoveBundleResources();
@@ -671,7 +459,7 @@ namespace cppmicroservices
         {
             oldBundleContext->Invalidate();
         }
-        state = Bundle::STATE_RESOLVED;
+        SetLifecycleState(std::make_shared<BundleResolvedState>());
         coreCtx->listeners.BundleChanged(
             BundleEvent(BundleEvent::BUNDLE_STOPPED, MakeBundle(this->shared_from_this())));
     }
@@ -680,13 +468,12 @@ namespace cppmicroservices
         : coreCtx(coreCtx)
         , id(0)
         , location(Constants::SYSTEM_BUNDLE_LOCATION)
-        , state(Bundle::STATE_INSTALLED)
+        , lifecycleState(std::make_shared<BundleInstalledState>())
         , barchive()
         , bundleDir(this->coreCtx->GetDataStorage(id))
         , bundleContext()
         , destroyActivatorHook(nullptr)
         , bactivator(nullptr, nullptr)
-        , operation(static_cast<uint8_t>(OP_IDLE))
         , resolveFailException()
         , wasStarted(false)
         , aborted(static_cast<uint8_t>(Aborted::NONE))
@@ -703,13 +490,12 @@ namespace cppmicroservices
         : coreCtx(coreCtx)
         , id(ba->GetBundleId())
         , location(ba->GetBundleLocation())
-        , state(Bundle::STATE_INSTALLED)
+        , lifecycleState(std::make_shared<BundleInstalledState>())
         , barchive(ba)
         , bundleDir(coreCtx->GetDataStorage(id))
         , bundleContext()
         , destroyActivatorHook(nullptr)
         , bactivator(nullptr, nullptr)
-        , operation(OP_IDLE)
         , resolveFailException()
         , wasStarted(false)
         , aborted(static_cast<uint8_t>(Aborted::NONE))
@@ -807,7 +593,7 @@ namespace cppmicroservices
     void
     BundlePrivate::CheckUninstalled() const
     {
-        if (state == Bundle::STATE_UNINSTALLED)
+        if (GetBundleStateEnum() == Bundle::STATE_UNINSTALLED)
         {
             throw std::logic_error("Bundle " + symbolicName + " (location=" + location + ") is in UNINSTALLED state");
         }
@@ -883,6 +669,97 @@ namespace cppmicroservices
     BundlePrivate::GetAutostartSetting() const
     {
         return barchive->IsValid() ? barchive->GetAutostartSetting() : -1;
+    }
+
+    bool
+    BundlePrivate::CompareAndSetState(std::shared_ptr<BundleLifecycleState>* expected,
+                                      std::shared_ptr<BundleLifecycleState> desired)
+    {
+        return std::atomic_compare_exchange_strong(&lifecycleState, expected, desired);
+    }
+
+    std::shared_ptr<BundleLifecycleState>
+    BundlePrivate::GetLifecycleState() const
+    {
+        return std::atomic_load(&lifecycleState);
+    }
+
+    Bundle::State
+    BundlePrivate::GetBundleStateEnum() const
+    {
+        return std::atomic_load(&lifecycleState)->GetBundleState();
+    }
+
+    void
+    BundlePrivate::SetLifecycleState(std::shared_ptr<BundleLifecycleState> newState)
+    {
+        std::atomic_store(&lifecycleState, std::move(newState));
+    }
+
+    std::exception_ptr
+    BundlePrivate::DeactivateAndTransitionToResolved(std::shared_ptr<BundleLifecycleState> const& stoppingState)
+    {
+        std::exception_ptr savedException = DeactivateBundle();
+        auto resolvedState = std::make_shared<BundleResolvedState>();
+        auto expected = stoppingState;
+        CompareAndSetState(&expected, resolvedState);
+        coreCtx->listeners.BundleChanged({ BundleEvent::BUNDLE_STOPPED, MakeBundle(shared_from_this()) });
+        return savedException;
+    }
+
+    void
+    BundlePrivate::RemoveAndCleanupBundle()
+    {
+        coreCtx->bundleRegistry.Remove(location, id);
+
+        // Transition to INSTALLED (for UNRESOLVED event), then to UNINSTALLED
+        SetLifecycleState(std::make_shared<BundleInstalledState>());
+        coreCtx->listeners.BundleChanged({ BundleEvent::BUNDLE_UNRESOLVED, MakeBundle(shared_from_this()) });
+        bactivator = nullptr;
+
+        SetLifecycleState(std::make_shared<BundleUninstalledState>());
+
+        Purge();
+        barchive->SetLastModified(std::chrono::steady_clock::now());
+
+        if (!bundleDir.empty())
+        {
+            try
+            {
+                if (util::Exists(bundleDir))
+                {
+                    util::RemoveDirectoryRecursive(bundleDir);
+                }
+            }
+            catch (...)
+            {
+                coreCtx->listeners.SendFrameworkEvent(
+                    FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING,
+                                   MakeBundle(shared_from_this()),
+                                   std::string(),
+                                   std::current_exception()));
+            }
+            bundleDir.clear();
+        }
+    }
+
+    void
+    BundlePrivate::ReportFrameworkError(std::exception_ptr exception)
+    {
+        if (exception)
+        {
+            try
+            {
+                std::rethrow_exception(exception);
+            }
+            catch (...)
+            {
+                coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
+                                                                     MakeBundle(shared_from_this()),
+                                                                     std::string(),
+                                                                     std::current_exception()));
+            }
+        }
     }
 
     std::shared_ptr<BundlePrivate>

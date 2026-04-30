@@ -30,7 +30,9 @@
 #include <sstream>
 #include <string>
 
-#include "json/json.h"
+#include <rapidjson/document.h>
+#include <rapidjson/error/en.h>
+#include <rapidjson/istreamwrapper.h>
 
 namespace codegen
 {
@@ -43,21 +45,21 @@ namespace codegen
             template <size_t S>
             using ValidChoices = std::array<std::string, S>;
 
-            // Throw if the Json::Value
+            // Throw if:
             //  - data[name] doesn't exist
             //  - data[name] is empty
             //  - data[name] is not of the type specified by type.
-            JsonValueValidator(Json::Value const& data, std::string name, Json::ValueType type)
+            // Stores a non-owning pointer into the original document tree.
+            JsonValueValidator(rapidjson::Value const& data, std::string name, rapidjson::Type type)
                 : jsonName(std::move(name))
                 , msg("Invalid value for the name '" + jsonName + "'. Expected ")
             {
-                jsonVal = data[jsonName.c_str()];
-                if (Json::Value::nullRef == jsonVal)
+                if (!data.HasMember(jsonName.c_str()))
                 {
                     std::string msg = "Mandatory name '" + jsonName + "' missing from the manifest";
                     throw std::runtime_error(msg);
                 }
-
+                jsonVal = &data[jsonName.c_str()];
                 Validate(type);
             }
 
@@ -66,23 +68,25 @@ namespace codegen
             //  - present in the choices array.
             // Otherwise, throw.
             // If data[name] doesn't exist, the first item in the choices array (default value)
-            // will be returned by the operator() member function.
+            // will be returned by the GetString() member function via defaultStr.
             template <std::size_t S>
-            JsonValueValidator(Json::Value const& data, std::string name, ValidChoices<S> const& choices)
+            JsonValueValidator(rapidjson::Value const& data, std::string name, ValidChoices<S> const& choices)
                 : jsonName(std::move(name))
                 , msg("Invalid value for the name '" + jsonName + "'. Expected ")
             {
                 static_assert(S > 0, "Choices cannot be empty!");
 
-                jsonVal = data[jsonName.c_str()];
-                if (Json::Value::nullRef == jsonVal)
+                if (!data.HasMember(jsonName.c_str()))
                 {
-                    jsonVal = choices.front();
+                    // No member found — store the first choice as the default string.
+                    // jsonVal stays nullptr; GetString() will return defaultStr.
+                    defaultStr = choices.front();
                     return;
                 }
+                jsonVal = &data[jsonName.c_str()];
 
-                Validate(Json::ValueType::stringValue);
-                auto value = jsonVal.asString();
+                Validate(rapidjson::kStringType);
+                auto value = std::string(jsonVal->GetString());
 
                 // The cast is to help the compiler resolve the correct overload.
                 // Refer:
@@ -120,63 +124,70 @@ namespace codegen
                 }
             }
 
-            // Return the Json value data[name]
-            // (data and name are the Json data and name specified in the constructors)
-            Json::Value
+            // Return a const reference to the rapidjson::Value for data[name].
+            rapidjson::Value const&
             operator()() const
             {
-                return jsonVal;
+                return *jsonVal;
             }
 
-            // Return the string representation of the Json value data[name]
-            // Throw if data[name] is not of Json String type
-            // (data and name are the Json data and name specified in the constructors)
+            // Return the string value of data[name].
+            // If the member was not found (choices constructor default case),
+            // returns the stored default string.
+            // Throw if data[name] exists but is not of string type.
             std::string
             GetString() const
             {
-                if (!jsonVal.isString())
+                if (!jsonVal)
+                {
+                    return defaultStr;
+                }
+                if (!jsonVal->IsString())
                 {
                     throw std::runtime_error("The JSON value for the name '" + jsonName + "' must be of type string");
                 }
-                return jsonVal.asString();
+                return jsonVal->GetString();
             }
 
           private:
             void
-            Validate(Json::ValueType type)
+            Validate(rapidjson::Type type)
             {
                 switch (type)
                 {
-                    case Json::ValueType::stringValue:
-                        if (!jsonVal.isString() || jsonVal.asString() == "")
+                    case rapidjson::kStringType:
+                        if (!jsonVal->IsString() || std::string(jsonVal->GetString()).empty())
                         {
                             msg.append("non-empty string");
                             throw std::runtime_error(msg);
                         }
                         break;
-                    case Json::ValueType::arrayValue:
-                        if (!jsonVal.isArray() || !jsonVal.size())
+                    case rapidjson::kArrayType:
+                        if (!jsonVal->IsArray() || jsonVal->Empty())
                         {
                             msg.append("non-empty array");
                             throw std::runtime_error(msg);
                         }
                         break;
-                    case Json::ValueType::objectValue:
-                        if (!jsonVal.isObject() || !jsonVal.size())
+                    case rapidjson::kObjectType:
+                        if (!jsonVal->IsObject() || jsonVal->ObjectEmpty())
                         {
                             msg.append("non-empty JSON object i.e. collection of name/value pairs");
                             throw std::runtime_error(msg);
                         }
                         break;
-                    case Json::ValueType::intValue:
-                        if (!jsonVal.isInt())
+                    case rapidjson::kNumberType:
+                        if (!jsonVal->IsInt())
                         {
                             msg.append("int");
                             throw std::runtime_error(msg);
                         }
                         break;
-                    case Json::ValueType::booleanValue:
-                        if (!jsonVal.isBool())
+                    case rapidjson::kTrueType:
+                    case rapidjson::kFalseType:
+                        // rapidjson splits bool into kTrueType/kFalseType.
+                        // Both fall through to the same IsBool() check.
+                        if (!jsonVal->IsBool())
                         {
                             msg.append("boolean");
                             throw std::runtime_error(msg);
@@ -189,13 +200,16 @@ namespace codegen
 
             std::string jsonName;
             std::string msg;
-            Json::Value jsonVal;
+            rapidjson::Value const* jsonVal = nullptr;
+            // Stores the default string when the choices constructor
+            // doesn't find the member.
+            std::string defaultStr;
         };
 
         // Parse the manifest specified in the istream jsonStream.
         // Return the root JSON value.
         // Throw if the parsing isn't successful (such as presence of duplicate keys)
-        Json::Value ParseManifestOrThrow(std::istream& jsonStream);
+        rapidjson::Document ParseManifestOrThrow(std::istream& jsonStream);
 
         // Write content to a file specified by the path filePath.
         // Throw if the file can't be opened.

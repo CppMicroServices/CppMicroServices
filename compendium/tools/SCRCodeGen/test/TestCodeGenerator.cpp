@@ -724,9 +724,9 @@ namespace codegen
     {
         std::istringstream istrstream(content);
         auto root = util::ParseManifestOrThrow(istrstream);
-        util::JsonValueValidator(root, "scr", rapidjson::kObjectType);
+        auto const scrValidator = util::JsonValueValidator(root, "scr", rapidjson::kObjectType);
         rapidjson::Document scr;
-        scr.CopyFrom(root["scr"], scr.GetAllocator());
+        scr.CopyFrom(scrValidator(), scr.GetAllocator());
         return scr;
     };
 

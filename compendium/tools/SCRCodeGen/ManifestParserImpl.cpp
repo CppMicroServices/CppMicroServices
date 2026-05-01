@@ -32,7 +32,8 @@ std::vector<ComponentInfo>
 ManifestParserImplV1::ParseAndGetComponentInfos(rapidjson::Value const& scr) const
 {
     std::vector<ComponentInfo> componentInfos;
-    auto const& jsonComponents = JsonValueValidator(scr, "components", rapidjson::kArrayType)();
+    auto const componentsValidator = JsonValueValidator(scr, "components", rapidjson::kArrayType);
+    auto const& jsonComponents = componentsValidator();
     for (auto const& jsonComponent : jsonComponents.GetArray())
     {
         ComponentInfo componentInfo;
@@ -55,7 +56,8 @@ ManifestParserImplV1::ParseAndGetComponentInfos(rapidjson::Value const& scr) con
             try {
                 // kTrueType is used to mean "any boolean" — Validate() checks IsBool()
                 // which accepts both true and false.
-                auto const& injectReferences = JsonValueValidator(jsonComponent, "inject-references", rapidjson::kTrueType)();
+                auto const injectRefBoolValidator = JsonValueValidator(jsonComponent, "inject-references", rapidjson::kTrueType);
+                auto const& injectReferences = injectRefBoolValidator();
                 componentInfo.setInjectReferences(injectReferences.GetBool());
                 isBool = true;
             } catch(...){
@@ -66,7 +68,8 @@ ManifestParserImplV1::ParseAndGetComponentInfos(rapidjson::Value const& scr) con
             if (!isBool){
                 try {
                     // conversion of value to bool failed, must be array of strings
-                    auto const& injectReferences = JsonValueValidator(jsonComponent, "inject-references", rapidjson::kArrayType)();
+                    auto const injectRefArrayValidator = JsonValueValidator(jsonComponent, "inject-references", rapidjson::kArrayType);
+                    auto const& injectReferences = injectRefArrayValidator();
                     std::unordered_set<std::string> injectedRefNames;
                     for (auto const& refName : injectReferences.GetArray()){
                         injectedRefNames.insert(refName.GetString());
@@ -96,8 +99,8 @@ ManifestParserImplV1::ParseAndGetComponentInfos(rapidjson::Value const& scr) con
         {
             configPid = true;
             // make sure there are no duplicates in the configuration-pid array.
-            auto const& configurationPids
-                = JsonValueValidator(jsonComponent, "configuration-pid", rapidjson::kArrayType)();
+            auto const configPidsValidator = JsonValueValidator(jsonComponent, "configuration-pid", rapidjson::kArrayType);
+            auto const& configurationPids = configPidsValidator();
 
             for (auto const& pid : configurationPids.GetArray())
             {
@@ -135,15 +138,16 @@ ManifestParserImplV1::ParseAndGetComponentInfos(rapidjson::Value const& scr) con
         // service
         if (jsonComponent.HasMember("service"))
         {
-            auto const& jsonServiceInfo = JsonValueValidator(jsonComponent, "service", rapidjson::kObjectType)();
+            auto const serviceValidator = JsonValueValidator(jsonComponent, "service", rapidjson::kObjectType);
+            auto const& jsonServiceInfo = serviceValidator();
             JsonValueValidator::ValidChoices<3> scopeChoices = {
                 {"singleton", "bundle", "prototype"}
             };
             componentInfo.service.scope = JsonValueValidator(jsonServiceInfo, "scope", scopeChoices).GetString();
 
             // interfaces
-            auto const& jsonServiceInterfaces
-                = JsonValueValidator(jsonServiceInfo, "interfaces", rapidjson::kArrayType)();
+            auto const interfacesValidator = JsonValueValidator(jsonServiceInfo, "interfaces", rapidjson::kArrayType);
+            auto const& jsonServiceInterfaces = interfacesValidator();
             for (auto const& jsonServiceInterface : jsonServiceInterfaces.GetArray())
             {
                 if (!jsonServiceInterface.IsString() || std::string(jsonServiceInterface.GetString()).empty())
@@ -159,7 +163,8 @@ ManifestParserImplV1::ParseAndGetComponentInfos(rapidjson::Value const& scr) con
         // references
         if (jsonComponent.HasMember("references"))
         {
-            auto const& jsonRefInfos = JsonValueValidator(jsonComponent, "references", rapidjson::kArrayType)();
+            auto const refsValidator = JsonValueValidator(jsonComponent, "references", rapidjson::kArrayType);
+            auto const& jsonRefInfos = refsValidator();
 
             std::unordered_map<std::string, std::size_t> duplicateRefs;
             duplicateRefs.reserve(jsonRefInfos.Size());

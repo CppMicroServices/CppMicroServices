@@ -766,7 +766,8 @@ namespace codegen
     {
         CodegenValidManifestState vcs = GetParam();
         auto scr = GetManifestSCRData(vcs.manifest);
-        auto const& version = util::JsonValueValidator(scr, "version", rapidjson::kNumberType)();
+        auto const versionValidator = util::JsonValueValidator(scr, "version", rapidjson::kNumberType);
+        auto const& version = versionValidator();
 
         auto manifestParser = ManifestParserFactory::Create(version.GetInt());
         auto componentInfos = manifestParser->ParseAndGetComponentInfos(scr);
@@ -832,7 +833,8 @@ namespace codegen
         try
         {
             auto scr = GetManifestSCRData(ics.manifest);
-            auto const& version = util::JsonValueValidator(scr, "version", rapidjson::kNumberType)();
+            auto const versionValidator = util::JsonValueValidator(scr, "version", rapidjson::kNumberType);
+            auto const& version = versionValidator();
             auto manifestParser = ManifestParserFactory::Create(version.GetInt());
             [[maybe_unused]] auto _ = manifestParser->ParseAndGetComponentInfos(scr);
             FAIL() << "This failure suggests that parsing has succeeded. "

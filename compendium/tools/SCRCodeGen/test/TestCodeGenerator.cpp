@@ -834,7 +834,7 @@ namespace codegen
             auto scr = GetManifestSCRData(ics.manifest);
             auto const& version = util::JsonValueValidator(scr, "version", rapidjson::kNumberType)();
             auto manifestParser = ManifestParserFactory::Create(version.GetInt());
-            manifestParser->ParseAndGetComponentInfos(scr);
+            [[maybe_unused]] auto _ = manifestParser->ParseAndGetComponentInfos(scr);
             FAIL() << "This failure suggests that parsing has succeeded. "
                       "Shouldn't happen for failure mode tests";
         }

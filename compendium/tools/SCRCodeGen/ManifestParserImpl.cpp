@@ -152,7 +152,7 @@ ManifestParserImplV1::ParseAndGetComponentInfos(rapidjson::Value const& scr) con
                     msg += "Expected non-empty string";
                     throw std::runtime_error(msg);
                 }
-                componentInfo.service.interfaces.push_back(jsonServiceInterface.GetString());
+                componentInfo.service.interfaces.emplace_back(jsonServiceInterface.GetString());
             }
         }
 

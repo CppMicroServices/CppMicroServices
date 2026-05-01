@@ -78,13 +78,17 @@ namespace cppmicroservices
             auto l = this->Lock();
             US_UNUSED(l);
 
+            if (GetBundleStateEnum() == Bundle::STATE_UNINSTALLED)
+            {
+                throw std::logic_error("Bundle " + symbolicName + " (location=" + location + ") is uninstalled");
+            }
+
             if ((options & Bundle::STOP_TRANSIENT) == 0)
             {
                 SetAutostartSetting(-1);
             }
         }
 
-        // Delegate to the current state object
         auto savedException = GetLifecycleState()->Stop(*this, options);
 
         if (savedException)
@@ -225,6 +229,16 @@ namespace cppmicroservices
             {
                 throw std::runtime_error("Bundle " + symbolicName + " (location=" + location
                                          + ") belongs to a stopped framework");
+            }
+
+            auto state = GetBundleStateEnum();
+            if (state == Bundle::STATE_UNINSTALLED)
+            {
+                throw std::logic_error("Bundle " + symbolicName + " (location=" + location + ") is uninstalled");
+            }
+            if (state == Bundle::STATE_ACTIVE)
+            {
+                return;
             }
 
             if ((options & Bundle::START_TRANSIENT) == 0)

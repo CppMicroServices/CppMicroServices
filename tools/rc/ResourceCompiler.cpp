@@ -57,8 +57,15 @@
 #    endif
 #endif
 
-#include <boost/nowide/args.hpp>
-#include <boost/nowide/fstream.hpp>
+#ifdef US_HAVE_BOOST_NOWIDE
+#    include <boost/nowide/args.hpp>
+#    include <boost/nowide/fstream.hpp>
+namespace us_nowide = boost::nowide;
+#else
+#    include <nowide/args.hpp>
+#    include <nowide/fstream.hpp>
+namespace us_nowide = nowide;
+#endif
 
 #include "CLI/CLI.hpp"
 #include "cppmicroservices/util/RapidJsonUtils.h"
@@ -213,7 +220,7 @@ namespace
     {
         try
         {
-            boost::nowide::ifstream json(jsonFile);
+            us_nowide::ifstream json(jsonFile);
             if (!json.is_open())
             {
                 throw std::runtime_error("Could not open file " + jsonFile);
@@ -438,7 +445,7 @@ ZipArchive::ZipArchive(std::string const& archiveFileName, int compressionLevel,
 {
     std::clog << "Initializing zip archive " << fileName << " ..." << std::endl;
     // clear the contents of a outFile if it exists
-    boost::nowide::ofstream ofile(fileName, boost::nowide::ofstream::trunc);
+    us_nowide::ofstream ofile(fileName, us_nowide::ofstream::trunc);
     ofile.close();
     if (!mz_zip_writer_init_file(writeArchive.get(), fileName.c_str(), 0))
     {
@@ -676,7 +683,7 @@ main(int argc, char** argv)
     setlocale(LC_ALL, "C.UTF-8");
 #endif
 
-    boost::nowide::args _(argc, argv);
+    us_nowide::args _(argc, argv);
 
     int const BUNDLE_MANIFEST_VALIDATION_ERROR_CODE(2);
     constexpr int MIN_COMPRESSION_LEVEL = 0;
@@ -884,8 +891,8 @@ main(int argc, char** argv)
         {
             validateManifestsInArchive(zipFile);
             std::string bundleBinaryFile(bundleFile);
-            boost::nowide::ofstream outFileStream(bundleBinaryFile, std::ios::ate | std::ios::binary | std::ios::app);
-            boost::nowide::ifstream zipFileStream(zipFile, std::ios::in | std::ios::binary);
+            us_nowide::ofstream outFileStream(bundleBinaryFile, std::ios::ate | std::ios::binary | std::ios::app);
+            us_nowide::ifstream zipFileStream(zipFile, std::ios::in | std::ios::binary);
             if (outFileStream.is_open() && zipFileStream.is_open())
             {
                 std::clog << "Appending file " << bundleBinaryFile << " with contents of resources zip file at "
@@ -894,7 +901,7 @@ main(int argc, char** argv)
                 outFileStream << zipFileStream.rdbuf();
                 std::clog << "  Final file size : " << outFileStream.tellp() << std::endl;
                 outFileStream.close();
-                if (outFileStream.rdstate() & boost::nowide::ofstream::failbit)
+                if (outFileStream.rdstate() & us_nowide::ofstream::failbit)
                 {
                     std::cerr << "Failed to write file : " << bundleBinaryFile << std::endl;
                     return_code = EXIT_FAILURE;

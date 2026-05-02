@@ -395,6 +395,7 @@ if(US_USE_SYSTEM_BOOST)
     # Don't link Boost::nowide transitively - set everything directly
     target_include_directories(nowide::nowide INTERFACE ${Boost_INCLUDE_DIRS})
     target_link_libraries(nowide::nowide INTERFACE ${Boost_LIBRARIES})
+    target_compile_definitions(nowide::nowide INTERFACE US_HAVE_BOOST_NOWIDE)
 endif()
 
 if(US_USE_SYSTEM_SPDLOG)

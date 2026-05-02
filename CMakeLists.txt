@@ -393,7 +393,7 @@ if(US_USE_SYSTEM_BOOST)
     find_package(Boost 1.74.0 REQUIRED)
     add_library(nowide::nowide INTERFACE IMPORTED GLOBAL)
     target_include_directories(nowide::nowide INTERFACE ${Boost_INCLUDE_DIRS})
-    target_compile_definitions(nowide::nowide INTERFACE US_HAVE_BOOST_NOWIDE)
+    target_compile_definitions(nowide::nowide INTERFACE US_HAVE_BOOST_NOWIDE BOOST_ALL_NO_LIB)
 endif()
 
 if(US_USE_SYSTEM_SPDLOG)

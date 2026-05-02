@@ -390,11 +390,9 @@ endif()
 #-----------------------------------------------------------------------------
 
 if(US_USE_SYSTEM_BOOST)
-    find_package(Boost 1.74.0 REQUIRED COMPONENTS nowide)
+    find_package(Boost 1.74.0 REQUIRED)
     add_library(nowide::nowide INTERFACE IMPORTED GLOBAL)
-    # Don't link Boost::nowide transitively - set everything directly
     target_include_directories(nowide::nowide INTERFACE ${Boost_INCLUDE_DIRS})
-    target_link_libraries(nowide::nowide INTERFACE ${Boost_LIBRARIES})
     target_compile_definitions(nowide::nowide INTERFACE US_HAVE_BOOST_NOWIDE)
 endif()
 

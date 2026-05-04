@@ -1313,13 +1313,13 @@ TEST_F(ResourceCompilerTest, testMultipleManifestConcatenation)
     // Test the successful concatenation of multiple manifest.json files into one.
     ASSERT_EQ(EXIT_SUCCESS, runExecutable(cmd.str()));
 
-    rapidjson::Document root;
+    rapidjson::Document root; // NOLINT(cppcoreguidelines-init-variables)
     root.Parse(manifest_json.c_str());
 
     // Test that the expected JSON content was parsed correctly.
     ASSERT_FALSE(root.HasParseError());
 
-    rapidjson::StringBuffer buffer;
+    rapidjson::StringBuffer buffer; // NOLINT(cppcoreguidelines-init-variables)
     rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
     root.Accept(writer);
     std::string expectedJSON(buffer.GetString(), buffer.GetSize());
@@ -1364,12 +1364,12 @@ TEST_F(ResourceCompilerTest, testManifestWithNullTerminator)
     // Test the successful embedding of a manifest containing an embedded null terminator.
     ASSERT_EQ(EXIT_SUCCESS, runExecutable(cmd.str()));
 
-    rapidjson::Document root;
+    rapidjson::Document root; // NOLINT(cppcoreguidelines-init-variables)
     root.Parse(manifest_json.c_str());
     // Test that the expected JSON content was parsed correctly.
     ASSERT_FALSE(root.HasParseError());
 
-    rapidjson::StringBuffer buffer;
+    rapidjson::StringBuffer buffer; // NOLINT(cppcoreguidelines-init-variables)
     rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
     root.Accept(writer);
     std::string expectedJSON(buffer.GetString(), buffer.GetSize());

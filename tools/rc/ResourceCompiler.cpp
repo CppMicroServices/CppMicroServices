@@ -50,12 +50,6 @@
 #    include <filesystem>
 #else
 #    include <Shlwapi.h>
-    // Shlwapi.h pulls in windows.h which defines GetObject as a macro
-    // (GetObjectA/GetObjectW). Undef it before including rapidjson so that
-    // rapidjson::Value::GetObject() is not mangled by the preprocessor.
-#    ifdef GetObject
-#        undef GetObject
-#    endif
 #endif
 
 #include <nowide/args.hpp>

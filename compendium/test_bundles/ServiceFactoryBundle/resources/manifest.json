@@ -1,0 +1,23 @@
+{
+  "bundle.symbolic_name": "ServiceFactoryBundle",
+  "bundle.name": "ServiceFactoryBundle",
+  "bundle.activator": false,
+  "scr": {
+    "version": 1,
+    "components": [
+      {
+        "name": "testServiceFactory",
+        "implementation-class": "testServiceFactory",
+        "service": {
+          "interfaces": [
+             "cppmicroservices::ServiceFactory"
+          ]
+        },
+        "immediate": true,
+        "properties" : {
+          "mySvc" : true
+        }
+      }
+    ]
+  }
+}

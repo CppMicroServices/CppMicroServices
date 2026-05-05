@@ -184,6 +184,9 @@ namespace cppmicroservices
      * \ingroup gr_servicereference
      *
      * A method to retrieve a <code>ServiceObject</code>'s original <code>ServiceReference<void></code>
+     * 
+     * \throws std::runtime_error if the service object is not a CppMicroServices managed object
+     * 
      *
      */
     US_Framework_EXPORT ServiceReferenceU ServiceReferenceFromService(std::shared_ptr<void> const& s);

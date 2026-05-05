@@ -92,6 +92,7 @@ set(_declarativeservices_tests
   TestComponentLifecycle.cpp
   TestDictionary.cpp
   TestFixture.hpp
+  TestInteg.cpp
   TestServiceComponentRuntime.cpp
   TestServiceProvider.cpp
   TestServiceReferenceRetrieval.cpp

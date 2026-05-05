@@ -7,6 +7,37 @@ The format is based on `Keep a Changelog <http://keepachangelog.com/>`_
 and this project adheres to `Semantic Versioning <http://semver.org/>`_.
 
 
+`v3.8.11 <https://github.com/cppmicroservices/cppmicroservices/tree/3.8.11>`_ (2026-4-1)
+---------------------------------------------------------------------------------------------------------
+
+`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.8.10...3.8.11>`_
+
+Added
+-----
+
+
+Changed
+-------
+- `[Configuration Admin] Refactor ConfigurationAdmin for fewer throws. <https://github.com/CppMicroServices/CppMicroServices/pull/1242>`_
+
+Removed
+-------
+- `[Core Framework] Remove unnecessary 3rdparty libs, removed unnecessary patches. <https://github.com/CppMicroServices/CppMicroServices/pull/1233>`_
+
+Deprecated
+----------
+
+
+Fixed
+-----
+- `[Core Framework] Fix race for bundle starts and framework stop. <https://github.com/CppMicroServices/CppMicroServices/pull/1230>`_
+- `[Declarative Services] getcomponentDescriptionDTOs safety. <https://github.com/CppMicroServices/CppMicroServices/pull/1234>`_
+- `[Core Framework] Concurrent access to coreInfo bundle. <https://github.com/CppMicroServices/CppMicroServices/pull/1238>`_
+- `[Core Framework] Fix for failed serviceReferenceFromService. <https://github.com/CppMicroServices/CppMicroServices/pull/1240>`_
+- `[Core Framework] bug in change to serviceObjects <https://github.com/CppMicroServices/CppMicroServices/pull/1247>`_
+- `[Core Framework] Support cross compilation -- embed the LD_LIBRARY_PATH into the cmake options <https://github.com/CppMicroServices/CppMicroServices/pull/1250>`_
+
+
 `v3.8.10 <https://github.com/cppmicroservices/cppmicroservices/tree/3.8.10>`_ (2026-2-27)
 ---------------------------------------------------------------------------------------------------------
 

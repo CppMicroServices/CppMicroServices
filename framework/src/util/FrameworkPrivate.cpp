@@ -113,10 +113,12 @@ namespace cppmicroservices
             = coreCtx->frameworkProperties.find(cppmicroservices::Constants::FRAMEWORK_EXTRA_SHUTDOWN_FUNC);
         bool successful_wait = false;
         detail::ScopeGuard extraFunc(
-            [func = shutdownFuncIter == coreCtx->frameworkProperties.end() ? Any() : shutdownFuncIter->second, &successful_wait]()
+            [func = shutdownFuncIter == coreCtx->frameworkProperties.end() ? Any() : shutdownFuncIter->second,
+             &successful_wait]()
             {
                 // if we didn't finish the wait, don't invoke the callback
-                if(!successful_wait){
+                if (!successful_wait)
+                {
                     return;
                 }
                 if (!func.Empty())
@@ -213,7 +215,7 @@ namespace cppmicroservices
         {
             auto l = Lock();
             US_UNUSED(l);
-            auto writerLock = coreCtx->SetFrameworkStateAndBlockUntilComplete(false);
+            coreCtx->SetFrameworkStoppedState(false);
 
             switch (state.load())
             {
@@ -316,14 +318,15 @@ namespace cppmicroservices
             }
             coreCtx->listeners.BundleChanged(
                 BundleEvent(BundleEvent::BUNDLE_STOPPING, MakeBundle(this->shared_from_this())));
+
+            coreCtx->SetFrameworkStoppedState(true);
+
             if (wasActive)
             {
                 StopAllBundles();
             }
-            {
-                auto lock = coreCtx->SetFrameworkStateAndBlockUntilComplete(true);
-                coreCtx->Uninit0();
-            }
+            coreCtx->Uninit0();
+        
             {
                 auto l = Lock();
                 US_UNUSED(l);

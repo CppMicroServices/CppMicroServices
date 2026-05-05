@@ -179,10 +179,17 @@ function(usFunctionEmbedResources)
       # (pardon the elipsis for abbreviation)
       separate_arguments(_us_resource_cxx_flags UNIX_COMMAND ${CMAKE_CXX_FLAGS})
 
+      # Ensure the stub object matches the project's deployment target so the
+      # linker does not warn about version mismatches.
+      set(_us_resource_deploy_target_flag)
+      if(CMAKE_OSX_DEPLOYMENT_TARGET)
+        set(_us_resource_deploy_target_flag -mmacosx-version-min=${CMAKE_OSX_DEPLOYMENT_TARGET})
+      endif()
+
       # section name is "us_resources" because max length for section names in Mach-O format is 16 characters.
       add_custom_command(
         OUTPUT ${_source_output}
-        COMMAND ${CMAKE_CXX_COMPILER} --std=c++17 ${_us_resource_cxx_flags} -c ${US_CMAKE_RESOURCE_DEPENDENCIES_CPP} -o stub.o
+        COMMAND ${CMAKE_CXX_COMPILER} --std=c++17 ${_us_resource_cxx_flags} ${_us_resource_deploy_target_flag} -c ${US_CMAKE_RESOURCE_DEPENDENCIES_CPP} -o stub.o
         COMMAND ${CMAKE_LINKER} -r -sectcreate __TEXT us_resources ${_zip_archive_name} stub.o -o ${_source_output}
         DEPENDS ${_zip_archive}
         WORKING_DIRECTORY ${_zip_archive_path}

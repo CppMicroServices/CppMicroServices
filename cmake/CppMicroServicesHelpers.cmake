@@ -12,6 +12,10 @@ get_filename_component(_us_cmake_dir "${CMAKE_CURRENT_LIST_DIR}" ABSOLUTE)
 # cmake dir is <pkg>/share/cppmicroservices<M>/cmake/ — three levels up is <pkg>/
 get_filename_component(_us_pkg_root  "${_us_cmake_dir}/../../.." ABSOLUTE)
 
+# Extract major version suffix from our install path (share/cppmicroservices<M>/cmake/)
+string(REGEX MATCH "cppmicroservices([0-9]+)" _us_match "${_us_cmake_dir}")
+set(_us_version_suffix "${CMAKE_MATCH_1}")
+
 # Code-generation template paths
 set(US_BUNDLE_INIT_TEMPLATE            "${_us_cmake_dir}/BundleInit.cpp")
 set(US_CMAKE_RESOURCE_DEPENDENCIES_CPP "${_us_cmake_dir}/CMakeResourceDependencies.cpp")
@@ -25,7 +29,7 @@ endif()
 set(US_RCC_EXECUTABLE_TARGET usResourceCompiler)
 if(NOT TARGET usResourceCompiler)
     find_program(_us_rcc_exe
-        NAMES usResourceCompiler3
+        NAMES usResourceCompiler${_us_version_suffix}
         HINTS "${_us_pkg_root}/bin"
         NO_DEFAULT_PATH)
     if(_us_rcc_exe)
@@ -33,7 +37,7 @@ if(NOT TARGET usResourceCompiler)
         set_property(TARGET usResourceCompiler PROPERTY IMPORTED_LOCATION "${_us_rcc_exe}")
     else()
         message(WARNING
-            "CppMicroServices: usResourceCompiler3 not found in ${_us_pkg_root}/bin — "
+            "CppMicroServices: usResourceCompiler${_us_version_suffix} not found in ${_us_pkg_root}/bin — "
             "bundle resource embedding (usFunctionAddResources) will not work.")
     endif()
     unset(_us_rcc_exe CACHE)
@@ -51,14 +55,14 @@ if(TARGET CppMicroServices)
     unset(_existing)
 endif()
 
-# Helper functions
-include("${_us_cmake_dir}/usFunctionCheckCompilerFlags.cmake")
-include("${_us_cmake_dir}/usFunctionCheckResourceLinking.cmake")
-include("${_us_cmake_dir}/usFunctionGenerateBundleInit.cmake")
-include("${_us_cmake_dir}/usFunctionAddResources.cmake")
-include("${_us_cmake_dir}/usFunctionEmbedResources.cmake")
-include("${_us_cmake_dir}/usFunctionGetResourceSource.cmake")
-include("${_us_cmake_dir}/usFunctionBoostPath.cmake")
+# Helper functions — auto-include all usFunction/usMacro scripts installed alongside this file.
+# The install list is maintained in CMakeLists.txt (_install_cmake_scripts).
+file(GLOB _us_helper_scripts "${_us_cmake_dir}/usFunction*.cmake" "${_us_cmake_dir}/usMacro*.cmake")
+foreach(_us_script IN LISTS _us_helper_scripts)
+    include("${_us_script}")
+endforeach()
+unset(_us_helper_scripts)
+unset(_us_script)
 
 usFunctionCheckResourceLinking()
 
@@ -69,3 +73,4 @@ endif()
 
 unset(_us_cmake_dir)
 unset(_us_pkg_root)
+unset(_us_version_suffix)

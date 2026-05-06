@@ -30,52 +30,49 @@
 #include <rapidjson/prettywriter.h>
 #include <rapidjson/stringbuffer.h>
 
-namespace cppmicroservices
+namespace cppmicroservices::rapidjsonutils
 {
-    namespace rapidjsonutils
+
+    // Recursively checks for duplicate keys in JSON objects and arrays.
+    // RapidJSON's parser silently keeps duplicate keys, so we detect them
+    // manually after parsing.
+    inline void
+    checkDuplicateKeys(rapidjson::Value const& value)
     {
-
-        // Recursively checks for duplicate keys in JSON objects and arrays.
-        // RapidJSON's parser silently keeps duplicate keys, so we detect them
-        // manually after parsing.
-        inline void
-        checkDuplicateKeys(rapidjson::Value const& value)
+        if (value.IsObject())
         {
-            if (value.IsObject())
+            std::set<std::string> seen;
+            for (auto const& m : value.GetObject())
             {
-                std::set<std::string> seen;
-                for (auto const& m : value.GetObject())
+                if (!seen.insert(m.name.GetString()).second)
                 {
-                    if (!seen.insert(m.name.GetString()).second)
-                    {
-                        throw std::runtime_error(std::string("Duplicate key: '") + m.name.GetString() + "'");
-                    }
-                    checkDuplicateKeys(m.value);
+                    throw std::runtime_error(std::string("Duplicate key: '") + m.name.GetString() + "'");
                 }
-            }
-            else if (value.IsArray())
-            {
-                for (auto const& elem : value.GetArray())
-                {
-                    checkDuplicateKeys(elem);
-                }
+                checkDuplicateKeys(m.value);
             }
         }
-
-        // Serializes a rapidjson value to a pretty-printed JSON string with a
-        // trailing newline.
-        inline std::string
-        toStyledString(rapidjson::Value const& value)
+        else if (value.IsArray())
         {
-            rapidjson::StringBuffer buffer;
-            rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
-            value.Accept(writer);
-            std::string out(buffer.GetString(), buffer.GetSize());
-            out += '\n';
-            return out;
+            for (auto const& elem : value.GetArray())
+            {
+                checkDuplicateKeys(elem);
+            }
         }
+    }
 
-    } // namespace rapidjsonutils
-} // namespace cppmicroservices
+    // Serializes a rapidjson value to a pretty-printed JSON string with a
+    // trailing newline.
+    inline std::string
+    toStyledString(rapidjson::Value const& value)
+    {
+        rapidjson::StringBuffer buffer;
+        rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+        value.Accept(writer);
+        std::string out(buffer.GetString(), buffer.GetSize());
+        out += '\n';
+        return out;
+    }
+
+} // namespace cppmicroservices::rapidjsonutils
 
 #endif // CPPMICROSERVICES_RAPIDJSONUTILS_HPP

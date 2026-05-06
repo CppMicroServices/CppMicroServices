@@ -61,6 +61,7 @@
 #include <nowide/fstream.hpp>
 
 #include "CLI/CLI11.hpp"
+#include "cppmicroservices/util/RapidJsonUtils.h"
 
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>
@@ -168,50 +169,7 @@ namespace
         InvalidManifest(char const* msg) : std::runtime_error(msg) {}
     };
 
-    /*
-     * @brief recursively checks for duplicate keys in a parsed JSON value.
-     * @param value The rapidjson value to check.
-     * @throw InvalidManifest if duplicate keys are found at any level.
-     */
-    void
-    checkDuplicateKeys(rapidjson::Value const& value)
-    {
-        if (value.IsObject())
-        {
-            std::set<std::string> seen;
-            for (auto const& m : value.GetObject())
-            {
-                if (!seen.insert(m.name.GetString()).second)
-                {
-                    throw InvalidManifest(std::string("Duplicate key: '") + m.name.GetString() + "'");
-                }
-                checkDuplicateKeys(m.value);
-            }
-        }
-        else if (value.IsArray())
-        {
-            for (auto const& elem : value.GetArray())
-            {
-                checkDuplicateKeys(elem);
-            }
-        }
-    }
-
-    /*
-     * @brief serializes a rapidjson value to a pretty-printed JSON string.
-     * @param value The rapidjson value to serialize.
-     * @return pretty-printed JSON string with trailing newline.
-     */
-    std::string
-    toStyledString(rapidjson::Value const& value)
-    {
-        rapidjson::StringBuffer buffer;
-        rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
-        value.Accept(writer);
-        std::string out(buffer.GetString(), buffer.GetSize());
-        out += '\n';
-        return out;
-    }
+    using cppmicroservices::rapidjsonutils::toStyledString;
 
     /*
      * @brief parses json content and returns the parsed json or throws.
@@ -233,7 +191,14 @@ namespace
             throw InvalidManifest(errs);
         }
 
-        checkDuplicateKeys(root);
+        try
+        {
+            cppmicroservices::rapidjsonutils::checkDuplicateKeys(root);
+        }
+        catch (std::runtime_error const& e)
+        {
+            throw InvalidManifest(e.what());
+        }
     }
 
     /*

@@ -150,7 +150,7 @@ ManifestParserImplV1::ParseAndGetComponentInfos(rapidjson::Value const& scr) con
             auto const& jsonServiceInterfaces = interfacesValidator();
             for (auto const& jsonServiceInterface : jsonServiceInterfaces.GetArray())
             {
-                if (!jsonServiceInterface.IsString() || std::string(jsonServiceInterface.GetString()).empty())
+                if (!jsonServiceInterface.IsString() || jsonServiceInterface.GetStringLength() == 0)
                 {
                     std::string msg = "Invalid array value for the name 'interfaces'. ";
                     msg += "Expected non-empty string";

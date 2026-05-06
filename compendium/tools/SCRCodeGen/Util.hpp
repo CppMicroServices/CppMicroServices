@@ -125,9 +125,14 @@ namespace codegen
             }
 
             // Return a const reference to the rapidjson::Value for data[name].
+            // Throws if the member was not found (choices constructor default case).
             rapidjson::Value const&
             operator()() const
             {
+                if (!jsonVal)
+                {
+                    throw std::runtime_error("JSON value for '" + jsonName + "' is not available");
+                }
                 return *jsonVal;
             }
 

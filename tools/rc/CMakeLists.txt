@@ -4,7 +4,8 @@ enable_language(C)
 # Temporarily disable enable exports for executables
 set(CMAKE_ENABLE_EXPORTS OFF)
 
-include_directories(../../third_party)
+include_directories(../../third_party
+                    ${CppMicroServices_SOURCE_DIR}/util/include)
 
 add_definitions(-DUS_RCC_EXECUTABLE_NAME=\"${US_RCC_EXECUTABLE_OUTPUT_NAME}\")
 

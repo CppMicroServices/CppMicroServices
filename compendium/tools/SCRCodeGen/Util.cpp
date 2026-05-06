@@ -21,43 +21,13 @@
   =============================================================================*/
 #include "Util.hpp"
 
-#include <set>
+#include "cppmicroservices/util/RapidJsonUtils.h"
 
 namespace codegen
 {
     namespace util
     {
 
-        // Recursively checks for duplicate keys in JSON objects and arrays.
-        // Replaces jsoncpp's rbuilder["rejectDupKeys"] = true option, which
-        // rejected duplicate keys during parsing. RapidJSON's parser silently
-        // keeps duplicate keys, so we detect them manually after parsing.
-        void
-        checkDuplicateKeys(rapidjson::Value const& value)
-        {
-            if (value.IsObject())
-            {
-                std::set<std::string> seen;
-                for (auto it = value.MemberBegin(); it != value.MemberEnd(); ++it)
-                {
-                    std::string key = it->name.GetString();
-                    if (!seen.insert(key).second)
-                    {
-                        throw std::runtime_error("Duplicate key: '" + key + "' found in manifest");
-                    }
-                    checkDuplicateKeys(it->value);
-                }
-            }
-            else if (value.IsArray())
-            {
-                for (auto it = value.Begin(); it != value.End(); ++it)
-                {
-                    checkDuplicateKeys(*it);
-                }
-            }
-        }
-
-        
         rapidjson::Document
         ParseManifestOrThrow(std::istream& jsonStream)
         {
@@ -77,7 +47,7 @@ namespace codegen
                 throw std::runtime_error(errs);
             }
 
-            checkDuplicateKeys(root);
+            cppmicroservices::rapidjsonutils::checkDuplicateKeys(root);
 
             return root;
         }

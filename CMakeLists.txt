@@ -390,21 +390,11 @@ endif()
 #-----------------------------------------------------------------------------
 
 if(US_USE_SYSTEM_BOOST)
-    if(WIN32)
-        # On Windows, Boost.Nowide has compiled sources.  Create an INTERFACE
-        # wrapper that links the compiled lib and matches the bundled target name.
-        find_package(Boost 1.74.0 REQUIRED)
-        add_library(nowide::nowide INTERFACE IMPORTED GLOBAL)
-        target_include_directories(nowide::nowide INTERFACE ${Boost_INCLUDE_DIRS})
-        target_compile_definitions(nowide::nowide INTERFACE US_HAVE_BOOST_NOWIDE)
-        target_link_libraries(nowide::nowide INTERFACE boost::boost)
-    else()
-        # On Unix, Boost.Nowide is header-only — just need the include path.
-        find_package(Boost 1.74.0 REQUIRED)
-        add_library(nowide::nowide INTERFACE IMPORTED GLOBAL)
-        target_include_directories(nowide::nowide INTERFACE ${Boost_INCLUDE_DIRS})
-        target_compile_definitions(nowide::nowide INTERFACE US_HAVE_BOOST_NOWIDE)
-    endif()
+    find_package(Boost 1.74.0 REQUIRED)
+    add_library(nowide::nowide INTERFACE IMPORTED GLOBAL)
+    target_include_directories(nowide::nowide INTERFACE ${Boost_INCLUDE_DIRS})
+    target_compile_definitions(nowide::nowide INTERFACE US_HAVE_BOOST_NOWIDE)
+    target_link_libraries(nowide::nowide INTERFACE boost::boost)
 endif()
 
 if(US_USE_SYSTEM_SPDLOG)

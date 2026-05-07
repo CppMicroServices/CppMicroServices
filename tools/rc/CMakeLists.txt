@@ -19,11 +19,7 @@ endif()
 
 add_executable(${US_RCC_EXECUTABLE_TARGET} ${srcs})
 
-target_include_directories(${US_RCC_EXECUTABLE_TARGET} PRIVATE ../../third_party)
-
-if(NOT US_USE_SYSTEM_RAPIDJSON)
-  target_include_directories(${US_RCC_EXECUTABLE_TARGET} PRIVATE ${CppMicroServices_SOURCE_DIR}/util/include)
-endif()
+target_include_directories(${US_RCC_EXECUTABLE_TARGET} PRIVATE ../../third_party ${CppMicroServices_SOURCE_DIR}/util/include)
 
 set_property(TARGET ${US_RCC_EXECUTABLE_TARGET} PROPERTY OUTPUT_NAME ${US_RCC_EXECUTABLE_OUTPUT_NAME})
 

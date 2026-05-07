@@ -4,7 +4,8 @@ enable_language(C)
 # Temporarily disable enable exports for executables
 set(CMAKE_ENABLE_EXPORTS OFF)
 
-include_directories(../../third_party)
+include_directories(../../third_party
+                    ${CppMicroServices_SOURCE_DIR}/util/include)
 
 add_definitions(-DUS_RCC_EXECUTABLE_NAME=\"${US_RCC_EXECUTABLE_OUTPUT_NAME}\")
 
@@ -12,15 +13,7 @@ if(US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG)
   add_compile_options(-Wno-error=unneeded-internal-declaration)
 endif()
 
-set(srcs ResourceCompiler.cpp ../../third_party/miniz.c ../../third_party/jsoncpp.cpp)
-
-if(MINGW)
-  # Suppress warnings for specific files
-  set_source_files_properties(
-    ../../third_party/jsoncpp.cpp
-    PROPERTIES COMPILE_FLAGS -Wno-maybe-uninitialized
-  )
-endif()
+set(srcs ResourceCompiler.cpp ../../third_party/miniz.c)
 
 if(NOT APPLE AND US_COMPILER_GNU_ARM AND CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64|ARM64|arm64")
   add_compile_options(-Wno-error=maybe-uninitialized)

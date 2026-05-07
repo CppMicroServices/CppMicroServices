@@ -106,18 +106,9 @@ set(_additional_srcs
 # Build the main test driver executable
 #-----------------------------------------------------------------------------
 
-set(_third_party_srcs 
+set(_third_party_srcs
   ../../../third_party/miniz.c
-  ../../../third_party/jsoncpp.cpp
 )
-
-if(MINGW)
-  # Suppress warnings for specific files
-  set_source_files_properties(
-    ../../../third_party/jsoncpp.cpp
-    PROPERTIES COMPILE_FLAGS -Wno-maybe-uninitialized
-  )
-endif()
 
 if(NOT APPLE AND US_COMPILER_GNU_ARM AND  CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64|ARM64|arm64")
   add_compile_options(-Wno-error=maybe-uninitialized)

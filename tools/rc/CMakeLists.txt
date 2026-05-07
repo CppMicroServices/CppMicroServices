@@ -70,8 +70,8 @@ set(CMAKE_ENABLE_EXPORTS ON)
 # ResourceCompiler.cpp that is also required for deterministic output.
 if (US_USE_DETERMINISTIC_BUNDLE_BUILDS)
   if(US_USE_SYSTEM_MINIZ)
-    message(WARNING "US_USE_DETERMINISTIC_BUNDLE_BUILDS requires bundled miniz (MINIZ_NO_TIME). "
-                    "Set US_USE_SYSTEM_MINIZ=OFF or disable deterministic builds.")
+    message(FATAL_ERROR "US_USE_DETERMINISTIC_BUNDLE_BUILDS requires bundled miniz (MINIZ_NO_TIME). "
+                       "Set US_USE_SYSTEM_MINIZ=OFF or disable deterministic builds.")
   endif()
   target_compile_definitions(${US_RCC_EXECUTABLE_TARGET} PRIVATE
                              MINIZ_NO_TIME

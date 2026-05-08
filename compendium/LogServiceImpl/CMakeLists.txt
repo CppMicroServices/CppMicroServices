@@ -67,7 +67,7 @@ target_include_directories(LogService PRIVATE
   )
 
 target_link_libraries(LogService PRIVATE spdlog::spdlog)
-if(BUILD_SHARED_LIBS)
+if(BUILD_SHARED_LIBS AND US_USE_SYSTEM_SPDLOG)
   if(APPLE)
     target_link_options(LogService PRIVATE "-Wl,-hidden-lspdlog")
   elseif(UNIX)

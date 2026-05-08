@@ -45,7 +45,7 @@ usMacroCreateBundle(Framework
 
 # Private implementation deps — not propagated to framework consumers.
 target_link_libraries(${PROJECT_TARGET} PRIVATE miniz::miniz rapidjson::rapidjson)
-if(BUILD_SHARED_LIBS)
+if(BUILD_SHARED_LIBS AND US_USE_SYSTEM_MINIZ)
   if(APPLE)
     target_link_options(${PROJECT_TARGET} PRIVATE "-Wl,-hidden-lminiz")
   elseif(UNIX)

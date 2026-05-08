@@ -1,7 +1,7 @@
 # Extract the current version from the VERSION file
 file(STRINGS VERSION _version LIMIT_COUNT 1)
 
-set(US_CMAKE_MINIMUM_REQUIRED_VERSION 3.17)
+set(US_CMAKE_MINIMUM_REQUIRED_VERSION 3.24)
 
 cmake_minimum_required(VERSION ${US_CMAKE_MINIMUM_REQUIRED_VERSION})
 
@@ -819,6 +819,21 @@ if(US_ENABLE_COVERAGE AND US_CXX_COVERAGE_FLAGS)
 endif()
 
 usFunctionCheckResourceLinking()
+
+#-----------------------------------------------------------------------------
+# Static library symbol hiding
+#-----------------------------------------------------------------------------
+# When building shared libraries that privately link static dependencies,
+# prevent the static library symbols from leaking into our dynamic symbol table.
+# - Linux: --exclude-libs,ALL blanket-hides all symbols from all static archives.
+# - macOS: LOAD_HIDDEN link feature uses -load_hidden per static library.
+# - Windows: symbols are hidden by default unless __declspec(dllexport)'d.
+if(BUILD_SHARED_LIBS AND NOT MSVC)
+  if(APPLE)
+    set(CMAKE_LINK_LIBRARY_USING_LOAD_HIDDEN_SUPPORTED TRUE)
+    set(CMAKE_LINK_LIBRARY_USING_LOAD_HIDDEN "-Wl,-load_hidden,<LIBRARY>")
+  endif()
+endif()
 
 # For building with Xcode, "CMAKE_*_LINKER_FLAGS" need to include US_LINK_FLAGS
 # to include coverage flags "-fprofile-arcs" and "-ftest-coverage" if US_ENABLE_COVERAGE

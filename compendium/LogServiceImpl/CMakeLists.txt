@@ -66,7 +66,14 @@ target_include_directories(LogService PRIVATE
   ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googlemock/include
   )
 
-target_link_libraries(LogService PRIVATE spdlog::spdlog)
+if(BUILD_SHARED_LIBS AND APPLE)
+  target_link_libraries(LogService PRIVATE $<LINK_LIBRARY:LOAD_HIDDEN,spdlog::spdlog>)
+else()
+  target_link_libraries(LogService PRIVATE spdlog::spdlog)
+  if(BUILD_SHARED_LIBS AND UNIX)
+    target_link_options(LogService PRIVATE "LINKER:--exclude-libs,ALL")
+  endif()
+endif()
 
 if(APPLE)
   if(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "8.0.0")

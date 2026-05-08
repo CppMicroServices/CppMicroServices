@@ -66,15 +66,11 @@ target_include_directories(LogService PRIVATE
   ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googlemock/include
   )
 
-if(BUILD_SHARED_LIBS AND APPLE)
-  target_include_directories(LogService PRIVATE
-      $<TARGET_PROPERTY:spdlog::spdlog,INTERFACE_INCLUDE_DIRECTORIES>)
-  target_link_directories(LogService PRIVATE
-      $<TARGET_PROPERTY:spdlog::spdlog,INTERFACE_LINK_DIRECTORIES>)
-  target_link_options(LogService PRIVATE "-Wl,-hidden-lspdlog")
-else()
-  target_link_libraries(LogService PRIVATE spdlog::spdlog)
-  if(BUILD_SHARED_LIBS AND UNIX)
+target_link_libraries(LogService PRIVATE spdlog::spdlog)
+if(BUILD_SHARED_LIBS)
+  if(APPLE)
+    target_link_options(LogService PRIVATE "-Wl,-hidden-lspdlog")
+  elseif(UNIX)
     target_link_options(LogService PRIVATE "LINKER:--exclude-libs,ALL")
   endif()
 endif()

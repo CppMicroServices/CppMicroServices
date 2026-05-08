@@ -44,16 +44,11 @@ usMacroCreateBundle(Framework
 )
 
 # Private implementation deps — not propagated to framework consumers.
-if(BUILD_SHARED_LIBS AND APPLE)
-  target_include_directories(${PROJECT_TARGET} PRIVATE
-      $<TARGET_PROPERTY:miniz::miniz,INTERFACE_INCLUDE_DIRECTORIES>)
-  target_link_directories(${PROJECT_TARGET} PRIVATE
-      $<TARGET_PROPERTY:miniz::miniz,INTERFACE_LINK_DIRECTORIES>)
-  target_link_options(${PROJECT_TARGET} PRIVATE "-Wl,-hidden-lminiz")
-  target_link_libraries(${PROJECT_TARGET} PRIVATE rapidjson::rapidjson)
-else()
-  target_link_libraries(${PROJECT_TARGET} PRIVATE miniz::miniz rapidjson::rapidjson)
-  if(BUILD_SHARED_LIBS AND UNIX)
+target_link_libraries(${PROJECT_TARGET} PRIVATE miniz::miniz rapidjson::rapidjson)
+if(BUILD_SHARED_LIBS)
+  if(APPLE)
+    target_link_options(${PROJECT_TARGET} PRIVATE "-Wl,-hidden-lminiz")
+  elseif(UNIX)
     target_link_options(${PROJECT_TARGET} PRIVATE "LINKER:--exclude-libs,ALL")
   endif()
 endif()

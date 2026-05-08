@@ -820,6 +820,15 @@ endif()
 
 usFunctionCheckResourceLinking()
 
+#-----------------------------------------------------------------------------
+# Static library symbol hiding
+#-----------------------------------------------------------------------------
+# When building shared libraries that privately link static dependencies,
+# prevent the static library symbols from leaking into our dynamic symbol table.
+# - Linux: --exclude-libs,ALL blanket-hides all symbols from all static archives.
+# - macOS: -hidden-l<lib> links each static library with hidden visibility.
+# - Windows: symbols are hidden by default unless __declspec(dllexport)'d.
+
 # For building with Xcode, "CMAKE_*_LINKER_FLAGS" need to include US_LINK_FLAGS
 # to include coverage flags "-fprofile-arcs" and "-ftest-coverage" if US_ENABLE_COVERAGE
 # is set.

@@ -67,6 +67,13 @@ target_include_directories(LogService PRIVATE
   )
 
 target_link_libraries(LogService PRIVATE spdlog::spdlog)
+if(BUILD_SHARED_LIBS)
+  if(APPLE)
+    target_link_options(LogService PRIVATE "-Wl,-hidden-lspdlog")
+  elseif(UNIX)
+    target_link_options(LogService PRIVATE "LINKER:--exclude-libs,ALL")
+  endif()
+endif()
 
 if(APPLE)
   if(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "8.0.0")

@@ -27,6 +27,8 @@
 #include "cppmicroservices/ServiceRegistration.h"
 #include "cppmicroservices/detail/Threads.h"
 
+#include "../util/LDAPExpr.h"
+
 namespace cppmicroservices
 {
 
@@ -184,6 +186,11 @@ namespace cppmicroservices
                           std::string const& filter,
                           BundlePrivate* bundle,
                           std::vector<ServiceReferenceBase>& serviceRefs) const;
+
+        LDAPExpr const& GetCachedLDAPExpr(std::string const& filter) const;
+
+        static constexpr std::size_t FILTER_CACHE_MAX_SIZE = 128;
+        mutable std::unordered_map<std::string, LDAPExpr> filterCache;
     };
 } // namespace cppmicroservices
 

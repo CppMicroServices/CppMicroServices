@@ -22,7 +22,6 @@ endif()
 set(_scrcodegen_tests
   ../ComponentInfo.cpp
   ../ManifestParserImpl.cpp
-  ../../../../third_party/jsoncpp.cpp
   ../Util.cpp
   main.cpp
   TestCodeGenerator.cpp

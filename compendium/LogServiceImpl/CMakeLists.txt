@@ -62,10 +62,18 @@ target_include_directories(LogService PRIVATE
   ${CppMicroServices_BINARY_DIR}/framework/include
   ${CppMicroServices_SOURCE_DIR}/compendium/LogService/include
   ${CppMicroServices_BINARY_DIR}/compendium/LogService/include
-  ${CppMicroServices_SOURCE_DIR}/third_party/spdlog/include
   ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googletest/include
   ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googlemock/include
   )
+
+target_link_libraries(LogService PRIVATE spdlog::spdlog)
+if(BUILD_SHARED_LIBS AND US_USE_SYSTEM_SPDLOG)
+  if(APPLE)
+    target_link_options(LogService PRIVATE "-Wl,-hidden-lspdlog")
+  elseif(UNIX)
+    target_link_options(LogService PRIVATE "LINKER:--exclude-libs,ALL")
+  endif()
+endif()
 
 if(APPLE)
   if(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "8.0.0")

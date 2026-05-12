@@ -61,8 +61,11 @@ set(_srcs
   bundle/BundleVersion.cpp
   bundle/Constants.cpp
   bundle/CoreBundleContext.cpp
-  ../../third_party/miniz.c
 )
+
+if(NOT US_USE_SYSTEM_MINIZ)
+  list(APPEND _srcs ../../third_party/miniz.c)
+endif()
 
 set(_private_headers
   util/FrameworkPrivate.h

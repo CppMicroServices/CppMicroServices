@@ -29,7 +29,7 @@
 #include "Util.hpp"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "json/json.h"
+#include <rapidjson/document.h>
 
 namespace codegen
 {
@@ -68,7 +68,7 @@ namespace codegen
                        "deactivate" : "Deactivate",
                        "inject-references" : true,
                        "service": {
-                       "scope": "SINGLETON", //case-insensitive
+                       "scope": "SINGLETON",
                        "interfaces": ["SpellCheck::ISpellCheckService"]
                        },
                        "references": [{
@@ -90,7 +90,7 @@ namespace codegen
                        "deactivate" : "Deactivate",
                        "inject-references" : ["dictionary1"],
                        "service": {
-                       "scope": "SINGLETON", //case-insensitive
+                       "scope": "SINGLETON",
                        "interfaces": ["SpellCheck::ISpellCheckService"]
                        },
                        "references": [{
@@ -119,7 +119,7 @@ namespace codegen
                        "deactivate" : "Deactivate",
                        "inject-references" : ["dictionary1"],
                        "service": {
-                       "scope": "SINGLETON", //case-insensitive
+                       "scope": "SINGLETON",
                        "interfaces": ["SpellCheck::ISpellCheckService"]
                        },
                        "references": [{
@@ -146,7 +146,7 @@ namespace codegen
                        "deactivate" : "Deactivate",
                        "inject-references" : ["dictionary1", "dictionary0"],
                        "service": {
-                       "scope": "SINGLETON", //case-insensitive
+                       "scope": "SINGLETON",
                        "interfaces": ["SpellCheck::ISpellCheckService"]
                        },
                       "references": [
@@ -704,12 +704,30 @@ namespace codegen
             }
   }
   )manifest";
-    auto
+
+    const std::string manifest_with_comment = R"manifest(
+  {
+    "scr" : { "version" : 1, // this is a comment - should not be allowed
+              "components": [{
+                       "implementation-class": "Foo",
+                       "service": {
+                       "scope": "SINGLETON", 
+                       "interfaces": ["Foo::Interface"]
+                       }
+                       }]
+            }
+  }
+  )manifest";
+
+    rapidjson::Document
     GetManifestSCRData(std::string const& content)
     {
         std::istringstream istrstream(content);
         auto root = util::ParseManifestOrThrow(istrstream);
-        return util::JsonValueValidator(root, "scr", Json::ValueType::objectValue)();
+        auto const scrValidator = util::JsonValueValidator(root, "scr", rapidjson::kObjectType);
+        rapidjson::Document scr;
+        scr.CopyFrom(scrValidator(), scr.GetAllocator());
+        return scr;
     };
 
     // For the manifest specified in the member manifest and headers specified in headers,
@@ -748,9 +766,10 @@ namespace codegen
     {
         CodegenValidManifestState vcs = GetParam();
         auto scr = GetManifestSCRData(vcs.manifest);
-        auto version = util::JsonValueValidator(scr, "version", Json::ValueType::intValue)();
+        auto const versionValidator = util::JsonValueValidator(scr, "version", rapidjson::kNumberType);
+        auto const& version = versionValidator();
 
-        auto manifestParser = ManifestParserFactory::Create(version.asInt());
+        auto manifestParser = ManifestParserFactory::Create(version.GetInt());
         auto componentInfos = manifestParser->ParseAndGetComponentInfos(scr);
         ComponentCallbackGenerator compGen(vcs.headers, componentInfos);
         EXPECT_EQ(compGen.GetString(), vcs.referenceOutput);
@@ -814,9 +833,10 @@ namespace codegen
         try
         {
             auto scr = GetManifestSCRData(ics.manifest);
-            auto version = util::JsonValueValidator(scr, "version", Json::ValueType::intValue)();
-            auto manifestParser = ManifestParserFactory::Create(version.asInt());
-            manifestParser->ParseAndGetComponentInfos(scr);
+            auto const versionValidator = util::JsonValueValidator(scr, "version", rapidjson::kNumberType);
+            auto const& version = versionValidator();
+            auto manifestParser = ManifestParserFactory::Create(version.GetInt());
+            [[maybe_unused]] auto _ = manifestParser->ParseAndGetComponentInfos(scr);
             FAIL() << "This failure suggests that parsing has succeeded. "
                       "Shouldn't happen for failure mode tests";
         }
@@ -855,7 +875,7 @@ namespace codegen
             CodegenInvalidManifestState(manifest_illegal_ver2, "Invalid value for the name 'version'. Expected int"),
             CodegenInvalidManifestState(manifest_illegal_ver3, "Invalid value for the name 'version'. Expected int"),
             CodegenInvalidManifestState(manifest_illegal_ver4,
-                                        "Syntax error: value, object or array expected",
+                                        "Invalid value",
                                         /*isPartial=*/true),
             CodegenInvalidManifestState(manifest_missing_ver, "Mandatory name 'version' missing from the manifest"),
             CodegenInvalidManifestState(manifest_no_comp, "Mandatory name 'components' missing from the manifest"),
@@ -927,7 +947,10 @@ namespace codegen
                                         true),
             CodegenInvalidManifestState(manifest_too_many_configuration_pids,
                                         "Error: For factory components, the configuration-pid array may "
-                                        "only contain one entry")));
+                                        "only contain one entry"),
+            CodegenInvalidManifestState(manifest_with_comment,
+                                        "Missing a name for object member",
+                                        /*isPartial=*/true)));
  
     
 } // namespace codegen

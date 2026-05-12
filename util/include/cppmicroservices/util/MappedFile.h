@@ -38,11 +38,12 @@ namespace cppmicroservices
     class MappedFile final : public DataContainer
     {
       public:
-        MappedFile() : fileDesc(-1), mappedAddress(nullptr), mapSize(0) {}
-        MappedFile(std::string const& fileLocation, size_t mapLength, off_t offset)
+        MappedFile() : fileDesc(-1), mappedAddress(nullptr), mapSize(0), dataOffset(0) {}
+        MappedFile(std::string const& fileLocation, size_t mapLength, off_t offset, size_t dataOffset_ = 0)
             : fileDesc(-1)
             , mappedAddress(nullptr)
             , mapSize(mapLength)
+            , dataOffset(dataOffset_)
         {
             fileDesc = open(fileLocation.c_str(), O_RDONLY);
             if (fileDesc >= 0)
@@ -52,7 +53,14 @@ namespace cppmicroservices
                 {
                     mappedAddress = nullptr;
                     mapSize = 0;
+                    dataOffset = 0;
                 }
+            }
+            else
+            {
+                mappedAddress = nullptr;
+                mapSize = 0;
+                dataOffset = 0;
             }
         }
 
@@ -71,18 +79,23 @@ namespace cppmicroservices
         void*
         GetData() const override
         {
-            return mappedAddress;
+            if (!mappedAddress)
+            {
+                return nullptr;
+            }
+            return static_cast<char*>(mappedAddress) + dataOffset;
         }
         std::size_t
         GetSize() const override
         {
-            return mapSize;
+            return mapSize - dataOffset;
         }
 
       private:
         int fileDesc;
         void* mappedAddress;
         size_t mapSize;
+        size_t dataOffset;
     };
 
 } // namespace cppmicroservices

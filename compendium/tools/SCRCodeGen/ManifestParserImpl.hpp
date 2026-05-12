@@ -28,7 +28,7 @@ class ManifestParserImplV1 : public ManifestParser
 {
   public:
     ManifestParserImplV1() = default;
-    std::vector<ComponentInfo> ParseAndGetComponentInfos(Json::Value const& scr) const override;
+    [[nodiscard]] std::vector<ComponentInfo> ParseAndGetComponentInfos(rapidjson::Value const& scr) const override;
 };
 
 #endif //  MANIFESTPARSERIMPL_HPP

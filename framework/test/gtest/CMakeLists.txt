@@ -106,18 +106,9 @@ set(_additional_srcs
 # Build the main test driver executable
 #-----------------------------------------------------------------------------
 
-set(_third_party_srcs 
+set(_third_party_srcs
   ../../../third_party/miniz.c
-  ../../../third_party/jsoncpp.cpp
 )
-
-if(MINGW)
-  # Suppress warnings for specific files
-  set_source_files_properties(
-    ../../../third_party/jsoncpp.cpp
-    PROPERTIES COMPILE_FLAGS -Wno-maybe-uninitialized
-  )
-endif()
 
 if(NOT APPLE AND US_COMPILER_GNU_ARM AND  CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64|ARM64|arm64")
   add_compile_options(-Wno-error=maybe-uninitialized)
@@ -133,6 +124,8 @@ add_executable(${us_gtest_test_exe_name} ${_gtest_tests} ${_additional_srcs} ${_
 if (US_COMPILER_MSVC AND BUILD_SHARED_LIBS)
   target_compile_options(${us_gtest_test_exe_name} PRIVATE -DGTEST_LINKED_AS_SHARED_LIBRARY)
 endif()
+
+target_compile_definitions(${us_gtest_test_exe_name} PRIVATE -DMINIZ_NO_ZLIB_COMPATIBLE_NAMES)
 
 # Needed for ResourceCompilerTest
 add_dependencies(${us_gtest_test_exe_name} ${US_RCC_EXECUTABLE_TARGET})

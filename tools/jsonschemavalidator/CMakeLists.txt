@@ -1,12 +1,12 @@
 
 enable_language(CXX)
 
-include_directories(../../third_party)
-
 set(srcs main.cpp)
 
 add_executable(jsonschemavalidator ${srcs})
 set_property(TARGET jsonschemavalidator PROPERTY OUTPUT_NAME jsonschemavalidator)
+
+target_link_libraries(jsonschemavalidator PRIVATE CLI11::CLI11 rapidjson::rapidjson)
 
 if(NOT US_NO_INSTALL)
     install(TARGETS jsonschemavalidator

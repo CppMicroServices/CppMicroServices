@@ -2,16 +2,7 @@ set(_srcs
     ComponentInfo.cpp
     Main.cpp
     ManifestParserImpl.cpp
-    Util.cpp
-    ../../../third_party/jsoncpp.cpp)
-
-if(MINGW)
-  # Suppress warnings for specific files
-  set_source_files_properties(
-    ../../../third_party/jsoncpp.cpp
-    PROPERTIES COMPILE_FLAGS -Wno-maybe-uninitialized
-  )
-endif()
+    Util.cpp)
 
 if(NOT APPLE AND US_COMPILER_GNU_ARM AND  CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64|ARM64|arm64")
   add_compile_options(-Wno-error=maybe-uninitialized)
@@ -25,11 +16,10 @@ set(_private_headers
     ManifestParserImpl.hpp
     Util.hpp)
 
-include_directories(../../../third_party
-		    ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googletest/include
+include_directories(${CppMicroServices_SOURCE_DIR}/third_party/googletest/googletest/include
 		    ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googlemock/include
-        ${CppMicroServices_SOURCE_DIR}/framework/include
-        ${CppMicroServices_SOURCE_DIR}/util/include)
+                    ${CppMicroServices_SOURCE_DIR}/framework/include
+                    ${CppMicroServices_SOURCE_DIR}/util/include)
 
 set(US_SCRCODEGEN_EXECUTABLE_TARGET SCRCodeGen)
 set(US_SCRCODEGEN_EXECUTABLE_OUTPUT_NAME ${US_SCRCODEGEN_EXECUTABLE_TARGET}${US_GLOBAL_VERSION_SUFFIX})
@@ -42,6 +32,8 @@ add_executable(${US_SCRCODEGEN_EXECUTABLE_TARGET} ${_srcs} ${_private_headers})
 if (US_BUILD_TESTING)
   target_compile_definitions(${US_SCRCODEGEN_EXECUTABLE_TARGET} PRIVATE USING_GTEST)
 endif()
+
+target_link_libraries(${US_SCRCODEGEN_EXECUTABLE_TARGET} PRIVATE rapidjson::rapidjson)
 
 set_property(TARGET ${US_SCRCODEGEN_EXECUTABLE_TARGET} PROPERTY OUTPUT_NAME ${US_SCRCODEGEN_EXECUTABLE_OUTPUT_NAME})
 

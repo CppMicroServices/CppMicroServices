@@ -38,8 +38,8 @@ namespace cppmicroservices
 
         ~CoreBundleContextHolder()
         {
-            auto const state = ctx->systemBundle->state.load();
-            if (((Bundle::STATE_STARTING | Bundle::STATE_ACTIVE) & state) == 0)
+            auto const s = ctx->systemBundle->GetBundleStateEnum();
+            if (s != Bundle::STATE_STARTING && s != Bundle::STATE_ACTIVE)
             {
                 // Call WaitForStop in case someone did call Framework::Stop()
                 // but didn't wait for it. This joins with a potentially

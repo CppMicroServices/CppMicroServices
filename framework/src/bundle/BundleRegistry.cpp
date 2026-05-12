@@ -494,7 +494,7 @@ namespace cppmicroservices
         US_UNUSED(l);
         for (auto& b : bundles.v)
         {
-            auto s = b.second->state.load();
+            auto s = b.second->GetBundleStateEnum();
             if (s == Bundle::STATE_ACTIVE || s == Bundle::STATE_STARTING)
             {
                 result.push_back(b.second);

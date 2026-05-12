@@ -34,6 +34,7 @@
 #include "BundleManifest.h"
 
 #include <functional>
+#include <future>
 #include <memory>
 #include <ostream>
 #include <thread>
@@ -44,6 +45,7 @@ namespace cppmicroservices
     class CoreBundleContext;
     class Bundle;
     class BundleContextPrivate;
+    class BundleLifecycleState;
     struct BundleActivator;
 
     /**
@@ -92,15 +94,17 @@ namespace cppmicroservices
 
         virtual void Stop(uint32_t);
 
-        std::exception_ptr Stop0();
+        /**
+         * Fire BUNDLE_STOPPING event, call BundleActivator::Stop, check for
+         * abort, then clean up resources via InvalidateBundleContext.
+         */
+        std::exception_ptr DeactivateBundle();
 
         /**
-         * Stop code that is executed without holding the packages
-         * lock.
+         * Run stop hooks, remove bundle resources (services, listeners),
+         * and invalidate the BundleContext.
          */
-        std::exception_ptr Stop1();
-
-        void Stop2();
+        void InvalidateBundleContext();
 
         /**
          * Get updated bundle state. That means check if an installed bundle has been
@@ -142,8 +146,11 @@ namespace cppmicroservices
          */
         int32_t GetAutostartSetting() const;
 
-        // Performs the actual activation.
-        void FinalizeActivation();
+        /**
+         * Auto-resolve the bundle if INSTALLED, then delegate to the
+         * current lifecycle state to activate.
+         */
+        void ResolveAndActivate();
 
         virtual void Uninstall();
 
@@ -154,12 +161,17 @@ namespace cppmicroservices
         virtual AnyMap const& GetHeaders() const;
 
         /**
-         * Start code that is executed without holding the
-         * packages lock.
+         * Fire BUNDLE_STARTING event, load shared library, create and call
+         * BundleActivator::Start. On success, transition to ACTIVE.
+         * Returns an exception_ptr on failure.
          */
-        std::exception_ptr Start0();
+        std::exception_ptr ActivateBundle();
 
-        void StartFailed();
+        /**
+         * Clean up after a failed activation: transition through
+         * STOPPING -> RESOLVED, fire events, invalidate context.
+         */
+        void CleanupAfterActivationFailure();
 
         /**
          * Framework context.
@@ -177,11 +189,52 @@ namespace cppmicroservices
         const std::string location;
 
         /**
-         * State of the bundle
+         * Lifecycle state object (new state machine).
+         * Managed via std::atomic operations (compare_exchange_strong).
          */
-        // GCC 4.6 atomics do not support custom trivially copyable types
-        // like enums yet, so we use the underlying primitive type here.
-        std::atomic<uint32_t> state;
+        std::shared_ptr<BundleLifecycleState> lifecycleState;
+
+        /**
+         * Atomically compare and swap the lifecycle state.
+         * Returns true if the swap succeeded.
+         */
+        bool CompareAndSetState(std::shared_ptr<BundleLifecycleState>* expected,
+                                std::shared_ptr<BundleLifecycleState> desired);
+
+        /**
+         * Get the current lifecycle state object.
+         */
+        std::shared_ptr<BundleLifecycleState> GetLifecycleState() const;
+
+        /**
+         * Get the current bundle state enum value from the lifecycle state object.
+         */
+        Bundle::State GetBundleStateEnum() const;
+
+        /**
+         * Directly set the lifecycle state (for FrameworkPrivate which manages
+         * its own transitions). This is NOT a CAS -- use only when holding a lock.
+         */
+        void SetLifecycleState(std::shared_ptr<BundleLifecycleState> newState);
+
+        /**
+         * Deactivate the bundle and CAS from STOPPING to RESOLVED.
+         * Called by BundleActiveState::Stop and BundleStartingState::Stop
+         * after they CAS to STOPPING.
+         */
+        std::exception_ptr DeactivateAndTransitionToResolved(
+            std::shared_ptr<BundleLifecycleState> const& stoppingState);
+
+        /**
+         * Remove bundle from registry, fire UNRESOLVED event, purge storage,
+         * and transition to UNINSTALLED.
+         */
+        void RemoveAndCleanupBundle();
+
+        /**
+         * Helper: report an exception as a framework error event.
+         */
+        void ReportFrameworkError(std::exception_ptr exception);
 
         /**
          * Bundle archive containing persistent data.
@@ -203,25 +256,6 @@ namespace cppmicroservices
         DestroyActivatorHook destroyActivatorHook;
 
         std::unique_ptr<BundleActivator, DestroyActivatorHook> bactivator;
-
-        enum Operation : uint8_t
-        {
-            OP_IDLE = 0,
-            OP_ACTIVATING = 1,
-            OP_DEACTIVATING = 2,
-            OP_RESOLVING = 3,
-            OP_UNINSTALLING = 4,
-            OP_UNRESOLVING = 5,
-            OP_UPDATING = 6
-        };
-
-        /**
-         * Type of operation in progress. Blocks bundle calls during activator and
-         * listener calls
-         */
-        // GCC 4.6 atomics do not support custom trivially copyable types
-        // like enums yet, so we use the underlying primitive type here.
-        std::atomic<uint8_t> operation;
 
         /** Saved exception of resolve failure. */
         std::exception_ptr resolveFailException;

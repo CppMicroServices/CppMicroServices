@@ -257,8 +257,12 @@ us_cache_var(US_ENABLE_UBSAN OFF BOOL "Enable ubsan (undefined behavior sanitize
 us_cache_var(US_ENABLE_COVERAGE OFF BOOL "Enable code coverage" ADVANCED)
 us_cache_var(US_BUILD_TESTING OFF BOOL "Build tests")
 us_cache_var(US_BUILD_EXAMPLES OFF BOOL "Build example projects")
-us_cache_var(US_USE_SYSTEM_GTEST OFF BOOL "Build using an external GTest installation" ADVANCED)
-us_cache_var(US_USE_SYSTEM_BOOST OFF BOOL "Build using an external Boost installation" ADVANCED)
+us_cache_var(US_USE_SYSTEM_GTEST     OFF BOOL "Build using an external GTest installation" ADVANCED)
+us_cache_var(US_USE_SYSTEM_BOOST     OFF BOOL "Build using an external Boost installation (provides Boost.Nowide)" ADVANCED)
+us_cache_var(US_USE_SYSTEM_MINIZ     OFF BOOL "Build using an external miniz installation" ADVANCED)
+us_cache_var(US_USE_SYSTEM_SPDLOG    OFF BOOL "Build using an external spdlog installation" ADVANCED)
+us_cache_var(US_USE_SYSTEM_RAPIDJSON OFF BOOL "Build using an external RapidJSON installation" ADVANCED)
+us_cache_var(US_USE_SYSTEM_CLI11     OFF BOOL "Build using an external CLI11 installation" ADVANCED)
 us_cache_var(US_USE_DETERMINISTIC_BUNDLE_BUILDS OFF BOOL "Build bundles deterministically" ADVANCED)
 
 set(_us_build_shared ${BUILD_SHARED_LIBS})
@@ -386,6 +390,47 @@ endif()
 
 if(US_USE_SYSTEM_BOOST)
     find_package(Boost 1.74.0 REQUIRED)
+    add_library(nowide::nowide INTERFACE IMPORTED GLOBAL)
+    target_include_directories(nowide::nowide INTERFACE ${Boost_INCLUDE_DIRS})
+    target_compile_definitions(nowide::nowide INTERFACE US_HAVE_BOOST_NOWIDE)
+    target_link_libraries(nowide::nowide INTERFACE boost::boost)
+endif()
+
+if(US_USE_SYSTEM_SPDLOG)
+    find_package(spdlog REQUIRED)
+else()
+    add_library(spdlog::spdlog INTERFACE IMPORTED)
+    target_include_directories(spdlog::spdlog INTERFACE
+        ${CMAKE_CURRENT_SOURCE_DIR}/third_party/spdlog/include)
+endif()
+
+if(US_USE_SYSTEM_RAPIDJSON)
+    find_package(rapidjson REQUIRED)
+    if(NOT TARGET rapidjson::rapidjson)
+        add_library(rapidjson::rapidjson INTERFACE IMPORTED)
+        target_include_directories(rapidjson::rapidjson INTERFACE ${RAPIDJSON_INCLUDE_DIRS})
+    endif()
+else()
+    add_library(rapidjson::rapidjson INTERFACE IMPORTED)
+    target_include_directories(rapidjson::rapidjson INTERFACE
+        ${CMAKE_CURRENT_SOURCE_DIR}/third_party)
+endif()
+
+if(US_USE_SYSTEM_CLI11)
+    find_package(CLI11 REQUIRED)
+else()
+    add_library(CLI11::CLI11 INTERFACE IMPORTED)
+    target_include_directories(CLI11::CLI11 INTERFACE
+        ${CMAKE_CURRENT_SOURCE_DIR}/third_party)
+endif()
+
+
+if(US_USE_SYSTEM_MINIZ)
+    find_package(miniz REQUIRED)
+else()
+    add_library(miniz::miniz INTERFACE IMPORTED)
+    target_include_directories(miniz::miniz INTERFACE
+        ${CMAKE_CURRENT_SOURCE_DIR}/third_party)
 endif()
 
 #-----------------------------------------------------------------------------
@@ -694,9 +739,11 @@ endif()
 #-----------------------------------------------------------------------------
 # Compile libraries here if you do not want -Werror or /WX on
 #-----------------------------------------------------------------------------
-set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared libraries" FORCE)
-add_subdirectory(third_party/boost/nowide)
-set(BUILD_SHARED_LIBS ${_us_build_shared} CACHE BOOL "Build shared libraries" FORCE)
+if(NOT US_USE_SYSTEM_BOOST)
+    set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared libraries" FORCE)
+    add_subdirectory(third_party/boost/nowide)
+    set(BUILD_SHARED_LIBS ${_us_build_shared} CACHE BOOL "Build shared libraries" FORCE)
+endif()
 #-----------------------------------------------------------------------------
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${US_CXX_FLAGS}")
@@ -772,6 +819,15 @@ if(US_ENABLE_COVERAGE AND US_CXX_COVERAGE_FLAGS)
 endif()
 
 usFunctionCheckResourceLinking()
+
+#-----------------------------------------------------------------------------
+# Static library symbol hiding
+#-----------------------------------------------------------------------------
+# When building shared libraries that privately link static dependencies,
+# prevent the static library symbols from leaking into our dynamic symbol table.
+# - Linux: --exclude-libs,ALL blanket-hides all symbols from all static archives.
+# - macOS: -hidden-l<lib> links each static library with hidden visibility.
+# - Windows: symbols are hidden by default unless __declspec(dllexport)'d.
 
 # For building with Xcode, "CMAKE_*_LINKER_FLAGS" need to include US_LINK_FLAGS
 # to include coverage flags "-fprofile-arcs" and "-ftest-coverage" if US_ENABLE_COVERAGE
@@ -935,6 +991,7 @@ install(EXPORT ${PROJECT_NAME}Targets
     ${US_CMAKE_DIR}/usFunctionCheckResourceLinking.cmake
     ${US_CMAKE_DIR}/usFunctionCheckCompilerFlags.cmake
     ${US_CMAKE_DIR}/usFunctionBoostPath.cmake
+    ${US_CMAKE_DIR}/CppMicroServicesHelpers.cmake
     )
 
   install(FILES ${_install_cmake_scripts}

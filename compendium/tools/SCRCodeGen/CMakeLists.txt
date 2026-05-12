@@ -16,11 +16,10 @@ set(_private_headers
     ManifestParserImpl.hpp
     Util.hpp)
 
-include_directories(../../../third_party
-		    ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googletest/include
+include_directories(${CppMicroServices_SOURCE_DIR}/third_party/googletest/googletest/include
 		    ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googlemock/include
-        ${CppMicroServices_SOURCE_DIR}/framework/include
-        ${CppMicroServices_SOURCE_DIR}/util/include)
+                    ${CppMicroServices_SOURCE_DIR}/framework/include
+                    ${CppMicroServices_SOURCE_DIR}/util/include)
 
 set(US_SCRCODEGEN_EXECUTABLE_TARGET SCRCodeGen)
 set(US_SCRCODEGEN_EXECUTABLE_OUTPUT_NAME ${US_SCRCODEGEN_EXECUTABLE_TARGET}${US_GLOBAL_VERSION_SUFFIX})
@@ -33,6 +32,8 @@ add_executable(${US_SCRCODEGEN_EXECUTABLE_TARGET} ${_srcs} ${_private_headers})
 if (US_BUILD_TESTING)
   target_compile_definitions(${US_SCRCODEGEN_EXECUTABLE_TARGET} PRIVATE USING_GTEST)
 endif()
+
+target_link_libraries(${US_SCRCODEGEN_EXECUTABLE_TARGET} PRIVATE rapidjson::rapidjson)
 
 set_property(TARGET ${US_SCRCODEGEN_EXECUTABLE_TARGET} PROPERTY OUTPUT_NAME ${US_SCRCODEGEN_EXECUTABLE_OUTPUT_NAME})
 

@@ -82,6 +82,20 @@ if(US_ENABLE_THREADING_SUPPORT AND NOT CMAKE_THREAD_LIBS_INIT)
   find_package(Threads REQUIRED)
 endif()
 
+# When consuming a static CppMicroServices build from an install tree, CMake
+# promotes PRIVATE link dependencies (miniz, rapidjson) into the exported
+# INTERFACE_LINK_LIBRARIES.  The actual code is already compiled into the
+# static library, so consumers don't need to link anything extra -- but the
+# targets must exist for the LINK_ONLY generator expressions to resolve.
+# Create lightweight stubs when no real target has been provided (e.g. by a
+# Conan package manager integration that supplies its own targets).
+foreach(_us_dep miniz::miniz rapidjson::rapidjson)
+  if(NOT TARGET ${_us_dep})
+    add_library(${_us_dep} INTERFACE IMPORTED)
+  endif()
+endforeach()
+unset(_us_dep)
+
 # Clear variables
 set(US_LIBRARIES )
 set(US_RUNTIME_LIBRARY_DIRS )

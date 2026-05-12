@@ -1,6 +1,6 @@
-#include <CLI/CLI11.hpp>
-#include <iostream>
 #include "ChangeNamespace.hpp"
+#include <CLI/CLI.hpp>
+#include <iostream>
 
 int main(int argc, char* argv[])
 {
@@ -14,17 +14,19 @@ int main(int argc, char* argv[])
     std::string destination;
     
     // Custom validator to reject empty values and flag-like values
-    auto non_empty_non_flag = [](const std::string &value) -> std::string {
-        if (value.empty()) {
+    auto non_empty_non_flag = [](std::string const& value) -> std::string
+    {
+        if (value.empty())
+        {
             return "Value cannot be empty";
         }
-        if (value[0] == '-') {
+        if (value[0] == '-')
+        {
             return "Value cannot be a flag";
         }
         return "";
     };
-    
-    
+
     app.add_option("--cppms_src", cppms_src, "sets the location of the cppms tree to path. [REQUIRED]")
         ->required()
         ->type_name("PATH")

@@ -549,6 +549,7 @@ namespace cppmicroservices
             else if (pPtr->GetType() == AnyMap::UNORDERED_MAP)
             {
                 auto const& lookupName = matchCase ? d->m_attrName : d->m_attrNameLower;
+                // d is a shared_ptr — captured reference outlives the lambda (consumed within this call).
                 auto value_iter = find_attr_value_in_map<any_map::unordered_any_map>(
                     pPtr,
                     lookupName,
@@ -582,6 +583,7 @@ namespace cppmicroservices
             else if (pPtr->GetType() == AnyMap::ORDERED_MAP)
             {
                 auto const& lookupName = matchCase ? d->m_attrName : d->m_attrNameLower;
+                // d is a shared_ptr — captured reference outlives the lambda (consumed within this call).
                 auto value_iter = find_attr_value_in_map<any_map::ordered_any_map>(
                     pPtr,
                     lookupName,
@@ -878,12 +880,6 @@ namespace cppmicroservices
             }
         }
         return sb;
-    }
-
-    bool
-    LDAPExpr::PatSubstr(const std::string_view s, int si, const std::string_view pat, int pi)
-    {
-        return PatSubstr(s.substr(si), pat.substr(pi));
     }
 
     bool

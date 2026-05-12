@@ -165,9 +165,6 @@ namespace cppmicroservices
         //!
         static bool PatSubstr(const std::string_view s, const std::string_view pat);
 
-        //!
-        static bool PatSubstr(const std::string_view s, int si, const std::string_view pat, int pi);
-
         //! Shared pointer
         std::shared_ptr<LDAPExprData> d;
     };

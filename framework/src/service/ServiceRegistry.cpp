@@ -218,6 +218,8 @@ namespace cppmicroservices
         }
         if (filterCache.size() >= FILTER_CACHE_MAX_SIZE)
         {
+            // Eviction order is non-deterministic (unordered_map iteration order).
+            // This is acceptable — we only need to shed load, not preserve recency.
             filterCache.erase(filterCache.begin(), std::next(filterCache.begin(), FILTER_CACHE_MAX_SIZE / 2));
         }
         auto [pos, inserted] = filterCache.emplace(filter, LDAPExpr(filter));

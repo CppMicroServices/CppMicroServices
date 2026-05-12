@@ -187,9 +187,12 @@ namespace cppmicroservices
                           BundlePrivate* bundle,
                           std::vector<ServiceReferenceBase>& serviceRefs) const;
 
+        // Returns a reference valid only until the next cache mutation.
+        // Caller must hold the registry lock (MultiThreaded::Lock).
         LDAPExpr const& GetCachedLDAPExpr(std::string const& filter) const;
 
         static constexpr std::size_t FILTER_CACHE_MAX_SIZE = 128;
+        // Protected by the registry's MultiThreaded mutex (Lock()).
         mutable std::unordered_map<std::string, LDAPExpr> filterCache;
     };
 } // namespace cppmicroservices

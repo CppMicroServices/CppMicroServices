@@ -218,10 +218,10 @@ namespace cppmicroservices
         }
         if (filterCache.size() >= FILTER_CACHE_MAX_SIZE)
         {
-            filterCache.clear();
+            filterCache.erase(filterCache.begin(), std::next(filterCache.begin(), FILTER_CACHE_MAX_SIZE / 2));
         }
-        auto [inserted, success] = filterCache.emplace(filter, LDAPExpr(filter));
-        return inserted->second;
+        auto [pos, inserted] = filterCache.emplace(filter, LDAPExpr(filter));
+        return pos->second;
     }
 
     void

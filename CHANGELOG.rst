@@ -7,6 +7,32 @@ The format is based on `Keep a Changelog <http://keepachangelog.com/>`_
 and this project adheres to `Semantic Versioning <http://semver.org/>`_.
 
 
+`v3.8.12 <https://github.com/cppmicroservices/cppmicroservices/tree/3.8.12>`_ (2026-5-12)
+---------------------------------------------------------------------------------------------------------
+
+`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.8.11...3.8.12>`_
+
+Added
+-----
+- `[Core Framework] Add changes required for building with Conan recipe and using vendored dependencies instead of bundled ones. <https://github.com/CppMicroServices/CppMicroServices/pull/1256>`_
+
+Changed
+-------
+- `[Core Framework] Upgrade miniz to 3.1.1 and remove custom patches. <https://github.com/CppMicroServices/CppMicroServices/pull/1239>`_
+
+Removed
+-------
+- `[Core Framework] Remove jsoncpp usage. <https://github.com/CppMicroServices/CppMicroServices/pull/1253>`_
+
+Deprecated
+----------
+
+
+Fixed
+-----
+- `[Configuration Admin] listConfigurations didn't properly apply filters. <https://github.com/CppMicroServices/CppMicroServices/pull/1249>`_
+
+
 `v3.8.11 <https://github.com/cppmicroservices/cppmicroservices/tree/3.8.11>`_ (2026-4-1)
 ---------------------------------------------------------------------------------------------------------
 

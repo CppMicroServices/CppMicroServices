@@ -558,6 +558,7 @@ namespace cppmicroservices
                         auto value_iter = p->findUO_TypeChecked(key);
                         if (!matchCase && value_iter == p->endUO_TypeChecked())
                         {
+                            std::string lower = LDAPExpr::ToLower(key);
                             for (auto value_iter = p->beginUO_TypeChecked(); value_iter != p->endUO_TypeChecked();
                                  ++value_iter)
                             {
@@ -592,6 +593,7 @@ namespace cppmicroservices
                         auto value_iter = p->findOM_TypeChecked(key);
                         if (!matchCase && value_iter == p->endOM_TypeChecked())
                         {
+                            std::string lower = LDAPExpr::ToLower(key);
                             for (auto value_iter = p->beginOM_TypeChecked(); value_iter != p->endOM_TypeChecked();
                                  ++value_iter)
                             {

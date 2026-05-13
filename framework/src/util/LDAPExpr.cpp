@@ -481,10 +481,9 @@ namespace cppmicroservices
 
         if (d->m_operator == EQ)
         {
-            StringList::const_iterator index;
-            if ((index
-                 = std::find(keywords.begin(), keywords.end(), matchCase ? d->m_attrName : d->m_attrNameLower))
-                    != keywords.end()
+            auto const index
+                = std::find(keywords.begin(), keywords.end(), matchCase ? d->m_attrName : d->m_attrNameLower);
+            if (index != keywords.end()
                 && d->m_attrValue.find_first_of(LDAPExprConstants::WILDCARD()) == std::string::npos)
             {
                 cache[index - keywords.begin()] = StringList(1, d->m_attrValue);

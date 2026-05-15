@@ -420,13 +420,23 @@ namespace cppmicroservices
                     /* Build a single map containing both the pid and the configuration
                      * properties so that the LDAP filter is evaluated against the full
                      * set of attributes.
-                     */
-                    auto props = it.second->GetProperties();
-                    props["pid"] = it.first;
-
-                    if (ldap.Match(props))
+                     * NOTE: GetProperties() can throw if the configuration is concurrently
+                     * removed (removed flag set under propertiesMutex before the map
+                     * erase under configurationsMutex). Skip such entries.
+                     **/
+                    try
                     {
-                        result.emplace_back(it.second);
+                        auto props = it.second->GetProperties();
+                        props["pid"] = it.first;
+
+                        if (ldap.Match(props))
+                        {
+                            result.emplace_back(it.second);
+                        }
+                    }
+                    catch (std::runtime_error const&)
+                    {
+                        // Configuration is being removed concurrently; skip it.
                     }
                 } // end for
             }

@@ -208,6 +208,24 @@ namespace cppmicroservices
         this->Lock(), Get_unlocked(removeLeadingNamespacing(clazz), filter, bundle, res);
     }
 
+    LDAPExpr const&
+    ServiceRegistry::GetCachedLDAPExpr(std::string const& filter) const
+    {
+        auto it = filterCache.find(filter);
+        if (it != filterCache.end())
+        {
+            return it->second;
+        }
+        if (filterCache.size() >= FILTER_CACHE_MAX_SIZE)
+        {
+            // Eviction order is non-deterministic (unordered_map iteration order).
+            // This is acceptable — we only need to shed load, not preserve recency.
+            filterCache.erase(filterCache.begin(), std::next(filterCache.begin(), FILTER_CACHE_MAX_SIZE / 2));
+        }
+        auto [pos, inserted] = filterCache.emplace(filter, LDAPExpr(filter));
+        return pos->second;
+    }
+
     void
     ServiceRegistry::Get_unlocked(std::string const& clazz,
                                   std::string const& filter,
@@ -217,14 +235,14 @@ namespace cppmicroservices
         std::vector<ServiceRegistrationBase>::const_iterator s;
         std::vector<ServiceRegistrationBase>::const_iterator send;
         std::vector<ServiceRegistrationBase> v;
-        LDAPExpr ldap;
+        LDAPExpr const* ldap = nullptr;
         if (clazz.empty())
         {
             if (!filter.empty())
             {
-                ldap = LDAPExpr(filter);
+                ldap = &GetCachedLDAPExpr(filter);
                 LDAPExpr::ObjectClassSet matched;
-                if (ldap.GetMatchedObjectClasses(matched))
+                if (ldap->GetMatchedObjectClasses(matched))
                 {
                     v.clear();
                     for (auto& className : matched)
@@ -271,13 +289,13 @@ namespace cppmicroservices
             }
             if (!filter.empty())
             {
-                ldap = LDAPExpr(filter);
+                ldap = &GetCachedLDAPExpr(filter);
             }
         }
 
         for (; s != send; ++s)
         {
-            if (filter.empty() || ldap.Evaluate(PropertiesHandle((s->d->coreInfo->properties), true), false))
+            if (!ldap || ldap->Evaluate(PropertiesHandle((s->d->coreInfo->properties), true), false))
             {
                 res.emplace_back(s->GetReference(clazz));
             }

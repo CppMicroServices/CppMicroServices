@@ -12,7 +12,7 @@ include_directories(
 #-----------------------------------------------------------------------------
 # Add test source files
 #-----------------------------------------------------------------------------
-set(_bench_src 
+set(_bench_src
   ServiceRegistryTest.cpp
   ServiceTrackerTest.cpp
   AnyMapPerfTest.cpp
@@ -21,6 +21,7 @@ set(_bench_src
   ldappropexpr.cpp
   servicequery.cpp
   BundleTrackerTest.cpp
+  LDAPFilterPerfTest.cpp
 )
 
 set(_additional_srcs

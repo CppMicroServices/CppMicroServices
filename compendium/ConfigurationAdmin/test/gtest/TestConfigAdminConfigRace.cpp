@@ -70,13 +70,14 @@ namespace
  * call DoCreate -> GetProperties and get properties without the required
  * configuration.
  */
+ why th no sync
 TEST_F(tGenericDSAndCASuite, testGetServiceDuringConfigRemovalRace)
 {
     std::string const configPid { "sample::ServiceComponentCA29" };
 
     InstallAndStartBundle(context, "TestBundleDSCA29");
 
-    int const iterations = 25;
+    int const iterations = 100;
     int constructedWithoutConfig = 0;
 
     for (int i = 0; i < iterations; ++i)

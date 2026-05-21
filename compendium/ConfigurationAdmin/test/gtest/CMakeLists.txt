@@ -51,6 +51,7 @@ set(_configurationadmin_tests
   TestCMBundleExtension.cpp
   TestCMLogger.cpp
   TestConfigAdmin.cpp
+  TestConfigAdminConfigRace.cpp
   TestConfigurationAdminImpl.cpp
   TestConfigurationImpl.cpp
   TestMetadataParserFactory.cpp
@@ -124,6 +125,7 @@ set(_test_bundles
   ManagedServiceAndFactoryBundle
   TestBundleManagedServiceFactory
   TestBundleMultipleManagedServiceFactory
+  TestBundleDSCA29
   )
 
 target_link_libraries(${us_configurationadmin_test_exe_name}

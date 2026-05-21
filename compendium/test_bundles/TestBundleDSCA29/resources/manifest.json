@@ -1,0 +1,19 @@
+{
+  "bundle.symbolic_name": "TestBundleDSCA29",
+  "bundle.activator": false,
+  "scr": {
+    "version": 1,
+    "components": [
+      {
+        "enabled": true,
+        "immediate": false,
+        "implementation-class": "sample::ServiceComponentCA29",
+        "configuration-policy": "require",
+        "configuration-pid": [ "sample::ServiceComponentCA29" ],
+        "service": {
+          "interfaces": [ "test::CAInterface" ]
+        }
+      }
+    ]
+  }
+}

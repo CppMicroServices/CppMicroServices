@@ -147,6 +147,22 @@ namespace cppmicroservices
             configNowSatisfied = isConfigSatisfied();
         }
 
+        bool
+        ConfigurationManager::WouldDeletionUnsatisfy(std::string const& pid) const noexcept
+        {
+            std::lock_guard<std::mutex> lock(propertiesMutex);
+            if (metadata->configurationPolicy != CONFIG_POLICY_REQUIRE)
+            {
+                return false;
+            }
+            auto it = configProperties.find(pid);
+            if (it == configProperties.end())
+            {
+                return false;
+            }
+            return (configProperties.size() - 1) < metadata->configurationPids.size();
+        }
+
         /**
          * Returns \c true if the configuration dependencies are satisfied, \c false otherwise
          */

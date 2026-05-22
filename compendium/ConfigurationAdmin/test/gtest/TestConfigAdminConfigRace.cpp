@@ -23,7 +23,6 @@
 #include "gtest/gtest.h"
 
 #include <cppmicroservices/Bundle.h>
-#include <cppmicroservices/Bundle.h>
 #include <cppmicroservices/BundleContext.h>
 #include <cppmicroservices/Framework.h>
 #include <cppmicroservices/FrameworkFactory.h>
@@ -42,6 +41,10 @@
 
 namespace
 {
+    auto const SERVICE_TIMEOUT = std::chrono::seconds(5);
+    int const NUM_ITERATIONS = 100;
+    int const NUM_GETSERVICE_ATTEMPTS = 50;
+
     std::string
     InstallAndStartBundle(cppmicroservices::BundleContext& ctx, std::string const& bundleName)
     {
@@ -70,14 +73,13 @@ namespace
  * call DoCreate -> GetProperties and get properties without the required
  * configuration.
  */
- why th no sync
 TEST_F(tGenericDSAndCASuite, testGetServiceDuringConfigRemovalRace)
 {
     std::string const configPid { "sample::ServiceComponentCA29" };
 
     InstallAndStartBundle(context, "TestBundleDSCA29");
 
-    int const iterations = 100;
+    int const iterations = NUM_ITERATIONS;
     int constructedWithoutConfig = 0;
 
     for (int i = 0; i < iterations; ++i)
@@ -91,7 +93,7 @@ TEST_F(tGenericDSAndCASuite, testGetServiceDuringConfigRemovalRace)
 
         // Wait until the service is available (component is SATISFIED/ACTIVE)
         auto sr = context.GetServiceReference<test::CAInterface>();
-        auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(5);
+        auto deadline = std::chrono::steady_clock::now() + SERVICE_TIMEOUT;
         while (!sr && std::chrono::steady_clock::now() < deadline)
         {
             std::this_thread::yield();
@@ -117,7 +119,7 @@ TEST_F(tGenericDSAndCASuite, testGetServiceDuringConfigRemovalRace)
                                            [&ready, this]()
                                            {
                                                ready.wait();
-                                               for (int j = 0; j < 50; ++j)
+                                               for (int j = 0; j < NUM_GETSERVICE_ATTEMPTS; ++j)
                                                {
                                                    auto ref = context.GetServiceReference<test::CAInterface>();
                                                    if (ref)
@@ -146,7 +148,7 @@ TEST_F(tGenericDSAndCASuite, testGetServiceDuringConfigRemovalRace)
         }
 
         // Wait for the service to become unavailable (component deactivated)
-        deadline = std::chrono::steady_clock::now() + std::chrono::seconds(5);
+        deadline = std::chrono::steady_clock::now() + SERVICE_TIMEOUT;
         sr = context.GetServiceReference<test::CAInterface>();
         while (sr && std::chrono::steady_clock::now() < deadline)
         {

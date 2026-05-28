@@ -211,7 +211,7 @@ namespace cppmicroservices
     LDAPExpr const&
     ServiceRegistry::GetCachedLDAPExpr(std::string const& filter) const
     {
-        auto it = filterCache.find(filter);
+        auto const it = filterCache.find(filter);
         if (it != filterCache.end())
         {
             return it->second;

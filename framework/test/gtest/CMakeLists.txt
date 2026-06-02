@@ -45,6 +45,7 @@ set(_gtest_tests
   GlobalServiceTrackerTest.cpp
   LDAPExprTest.cpp
   LDAPFilterTest.cpp
+  LDAPFilterCoverageTest.cpp
   OpenFileHandleTest.cpp
   UtilsTest.cpp
   FrameworkTest.cpp

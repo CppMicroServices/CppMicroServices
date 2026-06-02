@@ -121,13 +121,12 @@ namespace cppmicroservices
          * @return a std::optional const_iterator pointing to the found value. If the correct value
          *         is not found, and empty std::optional is returned.
          */
-        template <typename MapT>
+        template <typename MapT, typename LookupFn, typename EndFn>
         std::optional<typename MapT::const_iterator>
-        find_attr_value_in_map(
-            AnyMap const* pPtr,
-            std::string const& attrName,
-            std::function<typename MapT::const_iterator(AnyMap const* p, std::string const& name)> get_value_from_map,
-            std::function<typename MapT::const_iterator(AnyMap const* p)> end_iter)
+        find_attr_value_in_map(AnyMap const* pPtr,
+                               std::string const& attrName,
+                               LookupFn&& get_value_from_map,
+                               EndFn&& end_iter)
         {
             // short ciruit check. See if the full attrName is defined at the top level and return
             // quickly if it is. We match this first to preserve existing behavior and only proceed
@@ -313,6 +312,7 @@ namespace cppmicroservices
             : m_operator(op)
             , m_args(std::move(args))
             , m_attrName()
+            , m_attrNameLower()
             , m_attrValue()
         {
         }
@@ -321,8 +321,10 @@ namespace cppmicroservices
             : m_operator(op)
             , m_args()
             , m_attrName(std::move(attrName))
+            , m_attrNameLower(m_attrName.size(), '\0')
             , m_attrValue(std::move(attrValue))
         {
+            std::transform(m_attrName.begin(), m_attrName.end(), m_attrNameLower.begin(), ::tolower);
         }
 
         LDAPExprData(LDAPExprData const& other)
@@ -332,6 +334,7 @@ namespace cppmicroservices
         int m_operator;
         std::vector<LDAPExpr> m_args;
         std::string m_attrName;
+        std::string m_attrNameLower;
         std::string m_attrValue;
     };
 
@@ -477,10 +480,9 @@ namespace cppmicroservices
 
         if (d->m_operator == EQ)
         {
-            StringList::const_iterator index;
-            if ((index
-                 = std::find(keywords.begin(), keywords.end(), matchCase ? d->m_attrName : ToLower(d->m_attrName)))
-                    != keywords.end()
+            auto const index
+                = std::find(keywords.begin(), keywords.end(), matchCase ? d->m_attrName : d->m_attrNameLower);
+            if (index != keywords.end()
                 && d->m_attrValue.find_first_of(LDAPExprConstants::WILDCARD()) == std::string::npos)
             {
                 cache[index - keywords.begin()] = StringList(1, d->m_attrValue);
@@ -544,10 +546,12 @@ namespace cppmicroservices
             }
             else if (pPtr->GetType() == AnyMap::UNORDERED_MAP)
             {
+                auto const& lookupName = matchCase ? d->m_attrName : d->m_attrNameLower;
+                // d is a shared_ptr — captured reference outlives the lambda (consumed within this call).
                 auto value_iter = find_attr_value_in_map<any_map::unordered_any_map>(
                     pPtr,
-                    d->m_attrName,
-                    [matchCase](AnyMap const* p, std::string const& key)
+                    lookupName,
+                    [matchCase, &attrNameLower = d->m_attrNameLower](AnyMap const* p, std::string const& key)
                     {
                         auto value_iter = p->findUO_TypeChecked(key);
                         if (!matchCase && value_iter == p->endUO_TypeChecked())
@@ -556,7 +560,7 @@ namespace cppmicroservices
                             for (auto value_iter = p->beginUO_TypeChecked(); value_iter != p->endUO_TypeChecked();
                                  ++value_iter)
                             {
-                                if (LDAPExpr::ToLower(value_iter->first) == lower)
+                                if (LDAPExpr::ToLower(value_iter->first) == attrNameLower)
                                 {
                                     return value_iter;
                                 }
@@ -577,10 +581,12 @@ namespace cppmicroservices
             }
             else if (pPtr->GetType() == AnyMap::ORDERED_MAP)
             {
+                auto const& lookupName = matchCase ? d->m_attrName : d->m_attrNameLower;
+                // d is a shared_ptr — captured reference outlives the lambda (consumed within this call).
                 auto value_iter = find_attr_value_in_map<any_map::ordered_any_map>(
                     pPtr,
-                    d->m_attrName,
-                    [matchCase](AnyMap const* p, std::string const& key)
+                    lookupName,
+                    [matchCase, &attrNameLower = d->m_attrNameLower](AnyMap const* p, std::string const& key)
                     {
                         auto value_iter = p->findOM_TypeChecked(key);
                         if (!matchCase && value_iter == p->endOM_TypeChecked())
@@ -589,7 +595,7 @@ namespace cppmicroservices
                             for (auto value_iter = p->beginOM_TypeChecked(); value_iter != p->endOM_TypeChecked();
                                  ++value_iter)
                             {
-                                if (LDAPExpr::ToLower(value_iter->first) == lower)
+                                if (LDAPExpr::ToLower(value_iter->first) == attrNameLower)
                                 {
                                     return value_iter;
                                 }
@@ -838,7 +844,7 @@ namespace cppmicroservices
     }
 
     bool
-    LDAPExpr::CompareString(const std::string_view s1, int op, const std::string_view s2)
+    LDAPExpr::CompareString(std::string_view const s1, int op, std::string_view const s2)
     {
         switch (op)
         {
@@ -856,7 +862,7 @@ namespace cppmicroservices
     }
 
     std::string
-    LDAPExpr::FixupString(const std::string_view s)
+    LDAPExpr::FixupString(std::string_view const s)
     {
         std::string sb;
         sb.reserve(s.size());
@@ -877,46 +883,39 @@ namespace cppmicroservices
     }
 
     bool
-    LDAPExpr::PatSubstr(const std::string_view s, int si, const std::string_view pat, int pi)
+    LDAPExpr::PatSubstr(std::string_view const s, std::string_view const pat)
     {
-        if (pat.size() - pi == 0)
-        {
-            return s.size() - si == 0;
-        }
-        if (pat[pi] == LDAPExprConstants::WILDCARD())
-        {
-            pi++;
-            for (;;)
-            {
-                if (PatSubstr(s, si, pat, pi))
-                {
-                    return true;
-                }
-                if (s.size() - si == 0)
-                {
-                    return false;
-                }
-                si++;
-            }
-        }
-        else
-        {
-            if (s.size() - si == 0)
-            {
-                return false;
-            }
-            if (s[si] != pat[pi])
-            {
-                return false;
-            }
-            return PatSubstr(s, ++si, pat, ++pi);
-        }
-    }
+        auto const wildcard = LDAPExprConstants::WILDCARD();
+        std::size_t si = 0;
+        std::size_t pi = 0;
 
-    bool
-    LDAPExpr::PatSubstr(const std::string_view s, const std::string_view pat)
-    {
-        return PatSubstr(s, 0, pat, 0);
+        std::size_t lastWildcardPi = std::string_view::npos;
+        std::size_t lastWildcardSi = 0;
+
+        while (si < s.size() || pi < pat.size())
+        {
+            if (pi < pat.size() && pat[pi] == wildcard)
+            {
+                lastWildcardPi = ++pi;
+                lastWildcardSi = si;
+            }
+            else if (pi < pat.size() && si < s.size() && s[si] == pat[pi])
+            {
+                ++si;
+                ++pi;
+            }
+            else if (lastWildcardPi != std::string_view::npos && lastWildcardSi < s.size())
+            {
+                pi = lastWildcardPi;
+                si = ++lastWildcardSi;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     LDAPExpr
@@ -1003,7 +1002,7 @@ namespace cppmicroservices
         return LDAPExpr(op, attrName, attrValue);
     }
 
-    const std::string
+    std::string const
     LDAPExpr::ToString() const
     {
         std::string res;

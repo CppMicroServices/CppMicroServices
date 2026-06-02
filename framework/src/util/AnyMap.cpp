@@ -181,21 +181,28 @@ namespace cppmicroservices
 
     AnyMap::const_iter::const_iter(AnyMap::iter const& it)
     {
-        switch (it.it_.index())
-        {
-            case 0:
-                it_ = std::monostate {};
-                break;
-            case 1:
-                it_.emplace<1>(std::get<1>(it.it_));
-                break;
-            case 2:
-                it_.emplace<2>(std::get<2>(it.it_));
-                break;
-            case 3:
-                it_.emplace<3>(std::get<3>(it.it_));
-                break;
-        }
+        std::visit(
+            [this](auto const& i)
+            {
+                using T = std::decay_t<decltype(i)>;
+                if constexpr (std::is_same_v<T, std::monostate>)
+                {
+                    it_ = std::monostate {};
+                }
+                else if constexpr (std::is_same_v<T, ordered_any_map::iterator>)
+                {
+                    it_ = ociter(i);
+                }
+                else if constexpr (std::is_same_v<T, unordered_any_map::iterator>)
+                {
+                    it_ = uociter(i);
+                }
+                else
+                {
+                    it_ = uocciiter(i);
+                }
+            },
+            it.it_);
     }
 
 
@@ -375,33 +382,14 @@ namespace cppmicroservices
     AnyMap::iterator
     AnyMap::begin()
     {
-        switch (map_.index())
-        {
-            case 0:
-                return iterator(iter::iter_variant(std::in_place_index<1>, std::get<0>(map_).begin()));
-            case 1:
-                return iterator(iter::iter_variant(std::in_place_index<2>, std::get<1>(map_).begin()));
-            case 2:
-                return iterator(iter::iter_variant(std::in_place_index<3>, std::get<2>(map_).begin()));
-            default:
-                throw std::logic_error("invalid map type");
-        }
+        return std::visit([](auto& m) -> iterator { return iterator(iter::iter_variant(m.begin())); }, map_);
     }
 
     AnyMap::const_iter
     AnyMap::begin() const
     {
-        switch (map_.index())
-        {
-            case 0:
-                return const_iterator(const_iter::iter_variant(std::in_place_index<1>, std::get<0>(map_).begin()));
-            case 1:
-                return const_iterator(const_iter::iter_variant(std::in_place_index<2>, std::get<1>(map_).begin()));
-            case 2:
-                return const_iterator(const_iter::iter_variant(std::in_place_index<3>, std::get<2>(map_).begin()));
-            default:
-                throw std::logic_error("invalid map type");
-        }
+        return std::visit(
+            [](auto const& m) -> const_iterator { return const_iterator(const_iter::iter_variant(m.begin())); }, map_);
     }
 
     AnyMap::const_iterator
@@ -413,33 +401,14 @@ namespace cppmicroservices
     AnyMap::iterator
     AnyMap::end()
     {
-        switch (map_.index())
-        {
-            case 0:
-                return iterator(iter::iter_variant(std::in_place_index<1>, std::get<0>(map_).end()));
-            case 1:
-                return iterator(iter::iter_variant(std::in_place_index<2>, std::get<1>(map_).end()));
-            case 2:
-                return iterator(iter::iter_variant(std::in_place_index<3>, std::get<2>(map_).end()));
-            default:
-                throw std::logic_error("invalid map type");
-        }
+        return std::visit([](auto& m) -> iterator { return iterator(iter::iter_variant(m.end())); }, map_);
     }
 
     AnyMap::const_iterator
     AnyMap::end() const
     {
-        switch (map_.index())
-        {
-            case 0:
-                return const_iterator(const_iter::iter_variant(std::in_place_index<1>, std::get<0>(map_).end()));
-            case 1:
-                return const_iterator(const_iter::iter_variant(std::in_place_index<2>, std::get<1>(map_).end()));
-            case 2:
-                return const_iterator(const_iter::iter_variant(std::in_place_index<3>, std::get<2>(map_).end()));
-            default:
-                throw std::logic_error("invalid map type");
-        }
+        return std::visit(
+            [](auto const& m) -> const_iterator { return const_iterator(const_iter::iter_variant(m.end())); }, map_);
     }
 
     AnyMap::const_iterator
@@ -499,42 +468,22 @@ namespace cppmicroservices
     std::pair<AnyMap::iterator, bool>
     AnyMap::insert(value_type const& value)
     {
-        switch (map_.index())
-        {
-            case 0:
+        return std::visit(
+            [&value](auto& m) -> std::pair<iterator, bool>
             {
-                auto p = std::get<0>(map_).insert(value);
-                return { iterator(iter::iter_variant(std::in_place_index<1>, std::move(p.first))), p.second };
-            }
-            case 1:
-            {
-                auto p = std::get<1>(map_).insert(value);
-                return { iterator(iter::iter_variant(std::in_place_index<2>, std::move(p.first))), p.second };
-            }
-            case 2:
-            {
-                auto p = std::get<2>(map_).insert(value);
-                return { iterator(iter::iter_variant(std::in_place_index<3>, std::move(p.first))), p.second };
-            }
-            default:
-                throw std::logic_error("invalid map type");
-        }
+                auto p = m.insert(value);
+                return { iterator(iter::iter_variant(std::move(p.first))), p.second };
+            },
+            map_);
     }
 
     AnyMap::const_iterator
     AnyMap::find(key_type const& key) const
     {
-        switch (map_.index())
-        {
-            case 0:
-                return const_iterator(const_iter::iter_variant(std::in_place_index<1>, std::get<0>(map_).find(key)));
-            case 1:
-                return const_iterator(const_iter::iter_variant(std::in_place_index<2>, std::get<1>(map_).find(key)));
-            case 2:
-                return const_iterator(const_iter::iter_variant(std::in_place_index<3>, std::get<2>(map_).find(key)));
-            default:
-                throw std::logic_error("invalid map type");
-        }
+        return std::visit(
+            [&key](auto const& m) -> const_iterator
+            { return const_iterator(const_iter::iter_variant(m.find(key))); },
+            map_);
     }
 
     AnyMap::size_type

@@ -48,6 +48,113 @@ namespace cppmicroservices
 
     } // namespace detail
 
+    class US_Framework_EXPORT ci_unordered_map
+    {
+        using map_type = std::unordered_map<std::string, Any, detail::any_map_cihash, detail::any_map_ciequal>;
+        map_type map_;
+
+      public:
+        using key_type = map_type::key_type;
+        using mapped_type = map_type::mapped_type;
+        using value_type = map_type::value_type;
+        using size_type = map_type::size_type;
+        using difference_type = map_type::difference_type;
+        using hasher = map_type::hasher;
+        using key_equal = map_type::key_equal;
+        using reference = map_type::reference;
+        using const_reference = map_type::const_reference;
+
+        class const_iterator
+        {
+            map_type::const_iterator it_;
+
+          public:
+            using value_type = ci_unordered_map::value_type;
+            using reference = ci_unordered_map::const_reference;
+            using pointer = value_type const*;
+            using difference_type = ci_unordered_map::difference_type;
+            using iterator_category = std::forward_iterator_tag;
+
+            const_iterator() = default;
+            const_iterator(map_type::const_iterator it) : it_(it) {}
+
+            reference operator*() const { return *it_; }
+            pointer operator->() const { return &(*it_); }
+            const_iterator& operator++() { ++it_; return *this; }
+            const_iterator operator++(int) { auto tmp = *this; ++it_; return tmp; }
+            bool operator==(const_iterator const& o) const { return it_ == o.it_; }
+            bool operator!=(const_iterator const& o) const { return it_ != o.it_; }
+        };
+
+        class iterator
+        {
+            map_type::iterator it_;
+
+          public:
+            using value_type = ci_unordered_map::value_type;
+            using reference = ci_unordered_map::reference;
+            using pointer = value_type*;
+            using difference_type = ci_unordered_map::difference_type;
+            using iterator_category = std::forward_iterator_tag;
+
+            iterator() = default;
+            iterator(map_type::iterator it) : it_(it) {}
+            operator const_iterator() const { return const_iterator(map_type::const_iterator(it_)); }
+
+            reference operator*() const { return *it_; }
+            pointer operator->() const { return &(*it_); }
+            iterator& operator++() { ++it_; return *this; }
+            iterator operator++(int) { auto tmp = *this; ++it_; return tmp; }
+            bool operator==(iterator const& o) const { return it_ == o.it_; }
+            bool operator!=(iterator const& o) const { return it_ != o.it_; }
+        };
+
+        ci_unordered_map() = default;
+        ci_unordered_map(std::initializer_list<value_type> il) : map_(il) {}
+        ci_unordered_map(ci_unordered_map const&) = default;
+        ci_unordered_map(ci_unordered_map&&) noexcept = default;
+        ci_unordered_map& operator=(ci_unordered_map const&) = default;
+        ci_unordered_map& operator=(ci_unordered_map&&) noexcept = default;
+        ~ci_unordered_map() = default;
+
+        iterator begin() noexcept { return iterator(map_.begin()); }
+        const_iterator begin() const noexcept { return const_iterator(map_.begin()); }
+        const_iterator cbegin() const noexcept { return const_iterator(map_.cbegin()); }
+        iterator end() noexcept { return iterator(map_.end()); }
+        const_iterator end() const noexcept { return const_iterator(map_.end()); }
+        const_iterator cend() const noexcept { return const_iterator(map_.cend()); }
+
+        bool empty() const noexcept { return map_.empty(); }
+        size_type size() const noexcept { return map_.size(); }
+        size_type count(key_type const& key) const { return map_.count(key); }
+        void clear() noexcept { map_.clear(); }
+
+        mapped_type& at(key_type const& key) { return map_.at(key); }
+        mapped_type const& at(key_type const& key) const { return map_.at(key); }
+        mapped_type& operator[](key_type const& key) { return map_[key]; }
+        mapped_type& operator[](key_type&& key) { return map_[std::move(key)]; }
+
+        std::pair<iterator, bool> insert(value_type const& value)
+        {
+            auto p = map_.insert(value);
+            return { iterator(p.first), p.second };
+        }
+
+        template <class... Args>
+        std::pair<iterator, bool> emplace(Args&&... args)
+        {
+            auto p = map_.emplace(std::forward<Args>(args)...);
+            return { iterator(p.first), p.second };
+        }
+
+        iterator find(key_type const& key) { return iterator(map_.find(key)); }
+        const_iterator find(key_type const& key) const { return const_iterator(map_.find(key)); }
+        size_type erase(key_type const& key) { return map_.erase(key); }
+
+        bool operator==(ci_unordered_map const& rhs) const { return map_ == rhs.map_; }
+        bool operator!=(ci_unordered_map const& rhs) const { return !(*this == rhs); }
+    };
+
     /**
      * \ingroup MicroServicesUtils
      *
@@ -76,8 +183,7 @@ namespace cppmicroservices
         using const_pointer = value_type const*;
         using ordered_any_map = std::map<std::string, Any>;
         using unordered_any_map = std::unordered_map<std::string, Any>;
-        using unordered_any_cimap
-            = std::unordered_map<std::string, Any, detail::any_map_cihash, detail::any_map_ciequal>;
+        using unordered_any_cimap = ci_unordered_map;
         using map_variant = std::variant<ordered_any_map, unordered_any_map, unordered_any_cimap>;
 
         enum map_type : uint8_t
@@ -207,26 +313,13 @@ namespace cppmicroservices
         std::pair<iterator, bool>
         emplace(Args&&... args)
         {
-            switch (map_.index())
-            {
-                case 0:
+            return std::visit(
+                [&](auto& m) -> std::pair<iterator, bool>
                 {
-                    auto p = std::get<0>(map_).emplace(std::forward<Args>(args)...);
-                    return { iterator(iter::iter_variant(std::in_place_index<1>, std::move(p.first))), p.second };
-                }
-                case 1:
-                {
-                    auto p = std::get<1>(map_).emplace(std::forward<Args>(args)...);
-                    return { iterator(iter::iter_variant(std::in_place_index<2>, std::move(p.first))), p.second };
-                }
-                case 2:
-                {
-                    auto p = std::get<2>(map_).emplace(std::forward<Args>(args)...);
-                    return { iterator(iter::iter_variant(std::in_place_index<3>, std::move(p.first))), p.second };
-                }
-                default:
-                    throw std::logic_error("invalid map type");
-            }
+                    auto p = m.emplace(std::forward<Args>(args)...);
+                    return { iterator(iter::iter_variant(std::move(p.first))), p.second };
+                },
+                map_);
         }
 
         const_iterator find(key_type const& key) const;

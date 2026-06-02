@@ -38,7 +38,6 @@ namespace cppmicroservices
     void
     Properties::PopulateCaseInsensitiveLookupMap() const
     {
-        // already populated?
         if (caseInsensitiveLookup.size() >= props.size())
         {
             return;
@@ -46,14 +45,16 @@ namespace cppmicroservices
 
         if (props.GetType() == AnyMap::ORDERED_MAP)
         {
-            for (auto itr = props.beginOM_TypeChecked(); itr != props.endOM_TypeChecked(); ++itr)
+            auto const& om = std::get<AnyMap::ordered_any_map>(props.map_);
+            for (auto itr = om.begin(); itr != om.end(); ++itr)
             {
                 caseInsensitiveLookup.insert(itr->first);
             }
         }
         else if (props.GetType() == AnyMap::UNORDERED_MAP)
         {
-            for (auto itr = props.beginUO_TypeChecked(); itr != props.endUO_TypeChecked(); ++itr)
+            auto const& uom = std::get<AnyMap::unordered_any_map>(props.map_);
+            for (auto itr = uom.begin(); itr != uom.end(); ++itr)
             {
                 caseInsensitiveLookup.insert(itr->first);
             }
@@ -102,7 +103,8 @@ namespace cppmicroservices
     {
         if (props.GetType() == AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
         {
-            if (auto itr = props.findUOCI_TypeChecked(key); itr != props.endUOCI_TypeChecked())
+            auto const& cimap = std::get<AnyMap::unordered_any_cimap>(props.map_);
+            if (auto itr = cimap.find(key); itr != cimap.end())
             {
                 if (!matchCase)
                 {
@@ -124,8 +126,9 @@ namespace cppmicroservices
         }
         else if (props.GetType() == AnyMap::UNORDERED_MAP)
         {
-            auto itr = props.findUO_TypeChecked(key);
-            if (itr != props.endUO_TypeChecked())
+            auto const& uom = std::get<AnyMap::unordered_any_map>(props.map_);
+            auto itr = uom.find(key);
+            if (itr != uom.end())
             {
                 return itr->second;
             }
@@ -137,7 +140,7 @@ namespace cppmicroservices
                 auto ciItr = caseInsensitiveLookup.find(key);
                 if (ciItr != caseInsensitiveLookup.end())
                 {
-                    return props.findUO_TypeChecked(*ciItr)->second;
+                    return uom.find(*ciItr)->second;
                 }
                 else
                 {
@@ -149,8 +152,9 @@ namespace cppmicroservices
         }
         else if (props.GetType() == AnyMap::ORDERED_MAP)
         {
-            auto itr = props.findOM_TypeChecked(key);
-            if (itr != props.endOM_TypeChecked())
+            auto const& om = std::get<AnyMap::ordered_any_map>(props.map_);
+            auto itr = om.find(key);
+            if (itr != om.end())
             {
                 return itr->second;
             }
@@ -162,7 +166,7 @@ namespace cppmicroservices
                 auto ciItr = caseInsensitiveLookup.find(key);
                 if (ciItr != caseInsensitiveLookup.end())
                 {
-                    return props.findOM_TypeChecked(*ciItr)->second;
+                    return om.find(*ciItr)->second;
                 }
                 else
                 {
@@ -178,19 +182,13 @@ namespace cppmicroservices
         }
     }
 
-    // This function has been modified to perform both the "find" and "lookup" operations rather than
-    // just the "lookup" as originally written.
-    //
-    // This code has been made more verbose as to extract the most performance out of it. If we know
-    // the map type for which we are operating on, then we can safely call the "*_TypeChecked()"
-    // version of certain functions on the map to bypass using the slow functions that return
-    // "any_map::iterator" or "any_map::const_iterator".
     std::pair<Any, bool>
     Properties::Value_unlocked(std::string const& key, bool matchCase) const
     {
         if (props.GetType() == AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
         {
-            if (auto itr = props.findUOCI_TypeChecked(key); itr != props.endUOCI_TypeChecked())
+            auto const& cimap = std::get<AnyMap::unordered_any_cimap>(props.map_);
+            if (auto itr = cimap.find(key); itr != cimap.end())
             {
                 if (!matchCase)
                 {
@@ -212,8 +210,9 @@ namespace cppmicroservices
         }
         else if (props.GetType() == AnyMap::UNORDERED_MAP)
         {
-            auto itr = props.findUO_TypeChecked(key);
-            if (itr != props.endUO_TypeChecked())
+            auto const& uom = std::get<AnyMap::unordered_any_map>(props.map_);
+            auto itr = uom.find(key);
+            if (itr != uom.end())
             {
                 return std::make_pair(itr->second, true);
             }
@@ -225,7 +224,7 @@ namespace cppmicroservices
                 auto ciItr = caseInsensitiveLookup.find(key);
                 if (ciItr != caseInsensitiveLookup.end())
                 {
-                    return std::make_pair(props.findUO_TypeChecked(*ciItr)->second, true);
+                    return std::make_pair(uom.find(*ciItr)->second, true);
                 }
                 else
                 {
@@ -237,8 +236,9 @@ namespace cppmicroservices
         }
         else if (props.GetType() == AnyMap::ORDERED_MAP)
         {
-            auto itr = props.findOM_TypeChecked(key);
-            if (itr != props.endOM_TypeChecked())
+            auto const& om = std::get<AnyMap::ordered_any_map>(props.map_);
+            auto itr = om.find(key);
+            if (itr != om.end())
             {
                 return std::make_pair(itr->second, true);
             }
@@ -250,7 +250,7 @@ namespace cppmicroservices
                 auto ciItr = caseInsensitiveLookup.find(key);
                 if (ciItr != caseInsensitiveLookup.end())
                 {
-                    return std::make_pair(props.findOM_TypeChecked(*ciItr)->second, true);
+                    return std::make_pair(om.find(*ciItr)->second, true);
                 }
                 else
                 {

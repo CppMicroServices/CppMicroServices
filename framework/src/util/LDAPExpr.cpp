@@ -525,11 +525,13 @@ namespace cppmicroservices
         {
             if (pPtr->GetType() == AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
             {
-                auto value_iter = find_attr_value_in_map<any_map::unordered_any_cimap>(
+                auto value_iter = find_attr_value_in_map<AnyMap::unordered_any_cimap>(
                     pPtr,
                     d->m_attrName,
-                    [](AnyMap const* p, std::string const& key) { return p->findUOCI_TypeChecked(key); },
-                    [](AnyMap const* p) { return p->endUOCI_TypeChecked(); });
+                    [](AnyMap const* p, std::string const& key)
+                    { return std::get<AnyMap::unordered_any_cimap>(p->map_).find(key); },
+                    [](AnyMap const* p)
+                    { return std::get<AnyMap::unordered_any_cimap>(p->map_).end(); });
 
                 if (!matchCase && value_iter)
                 {
@@ -548,29 +550,30 @@ namespace cppmicroservices
             {
                 auto const& lookupName = matchCase ? d->m_attrName : d->m_attrNameLower;
                 // d is a shared_ptr — captured reference outlives the lambda (consumed within this call).
-                auto value_iter = find_attr_value_in_map<any_map::unordered_any_map>(
+                auto value_iter = find_attr_value_in_map<AnyMap::unordered_any_map>(
                     pPtr,
                     lookupName,
                     [matchCase, &attrNameLower = d->m_attrNameLower](AnyMap const* p, std::string const& key)
                     {
-                        auto value_iter = p->findUO_TypeChecked(key);
-                        if (!matchCase && value_iter == p->endUO_TypeChecked())
+                        auto const& uom = std::get<AnyMap::unordered_any_map>(p->map_);
+                        auto value_iter = uom.find(key);
+                        if (!matchCase && value_iter == uom.end())
                         {
                             std::string lower = LDAPExpr::ToLower(key);
-                            for (auto value_iter = p->beginUO_TypeChecked(); value_iter != p->endUO_TypeChecked();
-                                 ++value_iter)
+                            for (auto value_iter = uom.begin(); value_iter != uom.end(); ++value_iter)
                             {
                                 if (LDAPExpr::ToLower(value_iter->first) == attrNameLower)
                                 {
                                     return value_iter;
                                 }
                             }
-                            return p->endUO_TypeChecked();
+                            return uom.end();
                         }
 
                         return value_iter;
                     },
-                    [](AnyMap const* p) { return p->endUO_TypeChecked(); });
+                    [](AnyMap const* p)
+                    { return std::get<AnyMap::unordered_any_map>(p->map_).end(); });
 
                 if (value_iter)
                 {
@@ -583,17 +586,17 @@ namespace cppmicroservices
             {
                 auto const& lookupName = matchCase ? d->m_attrName : d->m_attrNameLower;
                 // d is a shared_ptr — captured reference outlives the lambda (consumed within this call).
-                auto value_iter = find_attr_value_in_map<any_map::ordered_any_map>(
+                auto value_iter = find_attr_value_in_map<AnyMap::ordered_any_map>(
                     pPtr,
                     lookupName,
                     [matchCase, &attrNameLower = d->m_attrNameLower](AnyMap const* p, std::string const& key)
                     {
-                        auto value_iter = p->findOM_TypeChecked(key);
-                        if (!matchCase && value_iter == p->endOM_TypeChecked())
+                        auto const& om = std::get<AnyMap::ordered_any_map>(p->map_);
+                        auto value_iter = om.find(key);
+                        if (!matchCase && value_iter == om.end())
                         {
                             std::string lower = LDAPExpr::ToLower(key);
-                            for (auto value_iter = p->beginOM_TypeChecked(); value_iter != p->endOM_TypeChecked();
-                                 ++value_iter)
+                            for (auto value_iter = om.begin(); value_iter != om.end(); ++value_iter)
                             {
                                 if (LDAPExpr::ToLower(value_iter->first) == attrNameLower)
                                 {
@@ -601,12 +604,13 @@ namespace cppmicroservices
                                 }
                             }
 
-                            return p->endOM_TypeChecked();
+                            return om.end();
                         }
 
                         return value_iter;
                     },
-                    [](AnyMap const* p) { return p->endOM_TypeChecked(); });
+                    [](AnyMap const* p)
+                    { return std::get<AnyMap::ordered_any_map>(p->map_).end(); });
 
                 if (value_iter)
                 {

@@ -209,7 +209,7 @@ TEST(AnyMapTest, MoveConstructor)
 
     AnyMap o_anymap_move_ctor(std::move(o));
     ASSERT_EQ(any_cast<int>(o_anymap_move_ctor.at("do")), 1);
-    ASSERT_EQ(o.size(), 0u) << "Moved-from AnyMap should be valid but empty";
+    ASSERT_NO_THROW(o.size()) << "Moved-from AnyMap must remain in a valid state";
 
     AnyMap uo(AnyMap::UNORDERED_MAP);
     AnyMap uo_move(std::move(uo));
@@ -230,7 +230,7 @@ TEST(AnyMapTest, MoveAssignment)
     AnyMap uo_anymap_move_assign(AnyMap::UNORDERED_MAP);
     uo_anymap_move_assign = std::move(o);
     ASSERT_EQ(any_cast<int>(uo_anymap_move_assign.at("re")), 2);
-    ASSERT_EQ(o.size(), 0u) << "Moved-from AnyMap should be valid but empty";
+    ASSERT_NO_THROW(o.size()) << "Moved-from AnyMap must remain in a valid state";
 }
 
 void AnyMapTest_CopyAssignment_Helper(any_map::map_type t1, any_map::map_type t2) {

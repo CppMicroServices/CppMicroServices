@@ -375,8 +375,18 @@ namespace cppmicroservices
     AnyMap::map_type
     AnyMap::GetType() const
     {
-        static constexpr map_type types[] = { ORDERED_MAP, UNORDERED_MAP, UNORDERED_MAP_CASEINSENSITIVE_KEYS };
-        return types[map_.index()];
+        return std::visit(
+            [](auto const& m) -> map_type
+            {
+                using M = std::decay_t<decltype(m)>;
+                if constexpr (std::is_same_v<M, ordered_any_map>)
+                    return ORDERED_MAP;
+                else if constexpr (std::is_same_v<M, unordered_any_map>)
+                    return UNORDERED_MAP;
+                else
+                    return UNORDERED_MAP_CASEINSENSITIVE_KEYS;
+            },
+            map_);
     }
 
     AnyMap::iterator

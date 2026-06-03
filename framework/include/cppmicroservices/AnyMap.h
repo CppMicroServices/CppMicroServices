@@ -99,7 +99,7 @@ namespace cppmicroservices
 
             iterator() = default;
             iterator(map_type::iterator it) : it_(it) {}
-            operator const_iterator() const { return const_iterator(map_type::const_iterator(it_)); }
+            operator const_iterator() const { return {map_type::const_iterator(it_)}; }
 
             reference operator*() const { return *it_; }
             pointer operator->() const { return &(*it_); }

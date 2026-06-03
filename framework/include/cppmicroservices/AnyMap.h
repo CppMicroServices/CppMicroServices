@@ -120,7 +120,7 @@ namespace cppmicroservices
         iterator begin() noexcept { return {map_.begin()}; }
         const_iterator begin() const noexcept { return {map_.begin()}; }
         const_iterator cbegin() const noexcept { return {map_.cbegin()}; }
-        iterator end() noexcept { return iterator(map_.end()); }
+        iterator end() noexcept { return {map_.end()}; }
         const_iterator end() const noexcept { return const_iterator(map_.end()); }
         const_iterator cend() const noexcept { return const_iterator(map_.cend()); }
 

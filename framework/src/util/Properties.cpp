@@ -46,7 +46,7 @@ namespace cppmicroservices
         if (props.GetType() == AnyMap::ORDERED_MAP)
         {
             auto const& om = std::get<AnyMap::ordered_any_map>(props.map_);
-            for (auto itr = om.begin(); itr != om.end(); ++itr)
+            for (const auto & itr : om)
             {
                 caseInsensitiveLookup.insert(itr->first);
             }

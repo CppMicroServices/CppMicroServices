@@ -117,7 +117,7 @@ namespace cppmicroservices
         ci_unordered_map& operator=(ci_unordered_map&&) noexcept = default;
         ~ci_unordered_map() = default;
 
-        iterator begin() noexcept { return iterator(map_.begin()); }
+        iterator begin() noexcept { return {map_.begin()}; }
         const_iterator begin() const noexcept { return const_iterator(map_.begin()); }
         const_iterator cbegin() const noexcept { return const_iterator(map_.cbegin()); }
         iterator end() noexcept { return iterator(map_.end()); }

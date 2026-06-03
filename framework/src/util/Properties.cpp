@@ -46,17 +46,17 @@ namespace cppmicroservices
         if (props.GetType() == AnyMap::ORDERED_MAP)
         {
             auto const& om = std::get<AnyMap::ordered_any_map>(props.map_);
-            for (const auto & itr : om)
+            for (auto const& itr : om)
             {
-                caseInsensitiveLookup.insert(itr->first);
+                caseInsensitiveLookup.insert(itr.first);
             }
         }
         else if (props.GetType() == AnyMap::UNORDERED_MAP)
         {
             auto const& uom = std::get<AnyMap::unordered_any_map>(props.map_);
-            for (const auto & itr : uom)
+            for (auto const& itr : uom)
             {
-                caseInsensitiveLookup.insert(itr->first);
+                caseInsensitiveLookup.insert(itr.first);
             }
         }
         else

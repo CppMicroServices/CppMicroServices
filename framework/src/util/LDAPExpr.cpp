@@ -529,9 +529,9 @@ namespace cppmicroservices
                     pPtr,
                     d->m_attrName,
                     [](AnyMap const* p, std::string const& key)
-                    { return std::get<AnyMap::unordered_any_cimap>(p->map_).find(key); },
+                    { return p->get<AnyMap::unordered_any_cimap>().find(key); },
                     [](AnyMap const* p)
-                    { return std::get<AnyMap::unordered_any_cimap>(p->map_).end(); });
+                    { return p->get<AnyMap::unordered_any_cimap>().end(); });
 
                 if (!matchCase && value_iter)
                 {
@@ -555,7 +555,7 @@ namespace cppmicroservices
                     lookupName,
                     [matchCase, &attrNameLower = d->m_attrNameLower](AnyMap const* p, std::string const& key)
                     {
-                        auto const& uom = std::get<AnyMap::unordered_any_map>(p->map_);
+                        auto const& uom = p->get<AnyMap::unordered_any_map>();
                         auto value_iter = uom.find(key);
                         if (!matchCase && value_iter == uom.end())
                         {
@@ -573,7 +573,7 @@ namespace cppmicroservices
                         return value_iter;
                     },
                     [](AnyMap const* p)
-                    { return std::get<AnyMap::unordered_any_map>(p->map_).end(); });
+                    { return p->get<AnyMap::unordered_any_map>().end(); });
 
                 if (value_iter)
                 {
@@ -591,7 +591,7 @@ namespace cppmicroservices
                     lookupName,
                     [matchCase, &attrNameLower = d->m_attrNameLower](AnyMap const* p, std::string const& key)
                     {
-                        auto const& om = std::get<AnyMap::ordered_any_map>(p->map_);
+                        auto const& om = p->get<AnyMap::ordered_any_map>();
                         auto value_iter = om.find(key);
                         if (!matchCase && value_iter == om.end())
                         {
@@ -610,7 +610,7 @@ namespace cppmicroservices
                         return value_iter;
                     },
                     [](AnyMap const* p)
-                    { return std::get<AnyMap::ordered_any_map>(p->map_).end(); });
+                    { return p->get<AnyMap::ordered_any_map>().end(); });
 
                 if (value_iter)
                 {

@@ -45,7 +45,7 @@ namespace cppmicroservices
 
         if (props.GetType() == AnyMap::ORDERED_MAP)
         {
-            auto const& om = std::get<AnyMap::ordered_any_map>(props.map_);
+            auto const& om = props.get<AnyMap::ordered_any_map>();
             for (auto const& itr : om)
             {
                 caseInsensitiveLookup.insert(itr.first);
@@ -53,7 +53,7 @@ namespace cppmicroservices
         }
         else if (props.GetType() == AnyMap::UNORDERED_MAP)
         {
-            auto const& uom = std::get<AnyMap::unordered_any_map>(props.map_);
+            auto const& uom = props.get<AnyMap::unordered_any_map>();
             for (auto const& itr : uom)
             {
                 caseInsensitiveLookup.insert(itr.first);
@@ -103,7 +103,7 @@ namespace cppmicroservices
     {
         if (props.GetType() == AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
         {
-            auto const& cimap = std::get<AnyMap::unordered_any_cimap>(props.map_);
+            auto const& cimap = props.get<AnyMap::unordered_any_cimap>();
             if (auto itr = cimap.find(key); itr != cimap.end())
             {
                 if (!matchCase)
@@ -126,7 +126,7 @@ namespace cppmicroservices
         }
         else if (props.GetType() == AnyMap::UNORDERED_MAP)
         {
-            auto const& uom = std::get<AnyMap::unordered_any_map>(props.map_);
+            auto const& uom = props.get<AnyMap::unordered_any_map>();
             auto itr = uom.find(key);
             if (itr != uom.end())
             {
@@ -152,7 +152,7 @@ namespace cppmicroservices
         }
         else if (props.GetType() == AnyMap::ORDERED_MAP)
         {
-            auto const& om = std::get<AnyMap::ordered_any_map>(props.map_);
+            auto const& om = props.get<AnyMap::ordered_any_map>();
             auto itr = om.find(key);
             if (itr != om.end())
             {
@@ -187,7 +187,7 @@ namespace cppmicroservices
     {
         if (props.GetType() == AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
         {
-            auto const& cimap = std::get<AnyMap::unordered_any_cimap>(props.map_);
+            auto const& cimap = props.get<AnyMap::unordered_any_cimap>();
             if (auto itr = cimap.find(key); itr != cimap.end())
             {
                 if (!matchCase)
@@ -210,7 +210,7 @@ namespace cppmicroservices
         }
         else if (props.GetType() == AnyMap::UNORDERED_MAP)
         {
-            auto const& uom = std::get<AnyMap::unordered_any_map>(props.map_);
+            auto const& uom = props.get<AnyMap::unordered_any_map>();
             auto itr = uom.find(key);
             if (itr != uom.end())
             {
@@ -236,7 +236,7 @@ namespace cppmicroservices
         }
         else if (props.GetType() == AnyMap::ORDERED_MAP)
         {
-            auto const& om = std::get<AnyMap::ordered_any_map>(props.map_);
+            auto const& om = props.get<AnyMap::ordered_any_map>();
             auto itr = om.find(key);
             if (itr != om.end())
             {

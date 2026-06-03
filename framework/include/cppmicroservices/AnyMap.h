@@ -341,7 +341,21 @@ namespace cppmicroservices
 
         mapped_type AtCompoundKey(key_type const& key, mapped_type defaultValue) const noexcept;
 
-        // ----- Public variant storage -----
+        template <typename MapT>
+        MapT const&
+        get() const
+        {
+            return std::get<MapT>(map_);
+        }
+
+        template <typename MapT>
+        MapT&
+        get()
+        {
+            return std::get<MapT>(map_);
+        }
+
+      private:
         map_variant map_;
     };
 

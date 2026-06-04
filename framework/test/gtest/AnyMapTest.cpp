@@ -58,18 +58,15 @@ TEST(AnyMapTest, IteratorTest)
         {{ "1", 1 }, { "2", 2 }}
     };
     AnyMap::const_iter uociter(uo.begin());
-    AnyMap::const_iter uociter1(uo.cbegin());
-    (void)uociter1;
+    [[maybe_unused]] AnyMap::const_iter uociter1(uo.cbegin());
 
     AnyMap uoci {
         {{ "do", 1 }, { "re", 2 }}
     };
     AnyMap::const_iter uoccciiter(uoci.begin());
-    AnyMap::const_iter uoccciiter1(uoci.cbegin());
-    (void)uoccciiter1;
+    [[maybe_unused]] AnyMap::const_iter uoccciiter1(uoci.cbegin());
 
-    AnyMap::const_iter ociter_temp(AnyMap(AnyMap::ORDERED_MAP).cbegin());
-    (void)ociter_temp;
+    [[maybe_unused]] AnyMap::const_iter ociter_temp(AnyMap(AnyMap::ORDERED_MAP).cbegin());
 
     // Testing deref and increment operators
     ASSERT_EQ((*ociter1).second.ToString(), std::string("1"));

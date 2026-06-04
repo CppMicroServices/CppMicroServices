@@ -78,12 +78,39 @@ namespace cppmicroservices
             const_iterator() = default;
             const_iterator(map_type::const_iterator it) : it_(it) {}
 
-            reference operator*() const { return *it_; }
-            pointer operator->() const { return &(*it_); }
-            const_iterator& operator++() { ++it_; return *this; }
-            const_iterator operator++(int) { auto tmp = *this; ++it_; return tmp; }
-            bool operator==(const_iterator const& o) const { return it_ == o.it_; }
-            bool operator!=(const_iterator const& o) const { return it_ != o.it_; }
+            reference
+            operator*() const
+            {
+                return *it_;
+            }
+            pointer
+            operator->() const
+            {
+                return &(*it_);
+            }
+            const_iterator&
+            operator++()
+            {
+                ++it_;
+                return *this;
+            }
+            const_iterator
+            operator++(int)
+            {
+                auto tmp = *this;
+                ++it_;
+                return tmp;
+            }
+            bool
+            operator==(const_iterator const& o) const
+            {
+                return it_ == o.it_;
+            }
+            bool
+            operator!=(const_iterator const& o) const
+            {
+                return it_ != o.it_;
+            }
         };
 
         class iterator
@@ -99,14 +126,41 @@ namespace cppmicroservices
 
             iterator() = default;
             iterator(map_type::iterator it) : it_(it) {}
-            operator const_iterator() const { return {map_type::const_iterator(it_)}; }
+            operator const_iterator() const { return { map_type::const_iterator(it_) }; }
 
-            reference operator*() const { return *it_; }
-            pointer operator->() const { return &(*it_); }
-            iterator& operator++() { ++it_; return *this; }
-            iterator operator++(int) { auto tmp = *this; ++it_; return tmp; }
-            bool operator==(iterator const& o) const { return it_ == o.it_; }
-            bool operator!=(iterator const& o) const { return it_ != o.it_; }
+            reference
+            operator*() const
+            {
+                return *it_;
+            }
+            pointer
+            operator->() const
+            {
+                return &(*it_);
+            }
+            iterator&
+            operator++()
+            {
+                ++it_;
+                return *this;
+            }
+            iterator
+            operator++(int)
+            {
+                auto tmp = *this;
+                ++it_;
+                return tmp;
+            }
+            bool
+            operator==(iterator const& o) const
+            {
+                return it_ == o.it_;
+            }
+            bool
+            operator!=(iterator const& o) const
+            {
+                return it_ != o.it_;
+            }
         };
 
         ci_unordered_map() = default;
@@ -117,42 +171,120 @@ namespace cppmicroservices
         ci_unordered_map& operator=(ci_unordered_map&&) noexcept = default;
         ~ci_unordered_map() = default;
 
-        iterator begin() noexcept { return {map_.begin()}; }
-        const_iterator begin() const noexcept { return {map_.begin()}; }
-        const_iterator cbegin() const noexcept { return {map_.cbegin()}; }
-        iterator end() noexcept { return {map_.end()}; }
-        const_iterator end() const noexcept { return const_iterator(map_.end()); }
-        const_iterator cend() const noexcept { return const_iterator(map_.cend()); }
+        iterator
+        begin() noexcept
+        {
+            return { map_.begin() };
+        }
+        const_iterator
+        begin() const noexcept
+        {
+            return { map_.begin() };
+        }
+        const_iterator
+        cbegin() const noexcept
+        {
+            return { map_.cbegin() };
+        }
+        iterator
+        end() noexcept
+        {
+            return { map_.end() };
+        }
+        const_iterator
+        end() const noexcept
+        {
+            return { map_.end() };
+        }
+        const_iterator
+        cend() const noexcept
+        {
+            return { map_.cend() };
+        }
 
-        bool empty() const noexcept { return map_.empty(); }
-        size_type size() const noexcept { return map_.size(); }
-        size_type count(key_type const& key) const { return map_.count(key); }
-        void clear() noexcept { map_.clear(); }
+        bool
+        empty() const noexcept
+        {
+            return map_.empty();
+        }
+        size_type
+        size() const noexcept
+        {
+            return map_.size();
+        }
+        size_type
+        count(key_type const& key) const
+        {
+            return map_.count(key);
+        }
+        void
+        clear() noexcept
+        {
+            map_.clear();
+        }
 
-        mapped_type& at(key_type const& key) { return map_.at(key); }
-        mapped_type const& at(key_type const& key) const { return map_.at(key); }
-        mapped_type& operator[](key_type const& key) { return map_[key]; }
-        mapped_type& operator[](key_type&& key) { return map_[std::move(key)]; }
+        mapped_type&
+        at(key_type const& key)
+        {
+            return map_.at(key);
+        }
+        mapped_type const&
+        at(key_type const& key) const
+        {
+            return map_.at(key);
+        }
+        mapped_type&
+        operator[](key_type const& key)
+        {
+            return map_[key];
+        }
+        mapped_type&
+        operator[](key_type&& key)
+        {
+            return map_[std::move(key)];
+        }
 
-        std::pair<iterator, bool> insert(value_type const& value)
+        std::pair<iterator, bool>
+        insert(value_type const& value)
         {
             auto p = map_.insert(value);
             return { iterator(p.first), p.second };
         }
 
         template <class... Args>
-        std::pair<iterator, bool> emplace(Args&&... args)
+        std::pair<iterator, bool>
+        emplace(Args&&... args)
         {
             auto p = map_.emplace(std::forward<Args>(args)...);
             return { iterator(p.first), p.second };
         }
 
-        iterator find(key_type const& key) { return iterator(map_.find(key)); }
-        const_iterator find(key_type const& key) const { return const_iterator(map_.find(key)); }
-        size_type erase(key_type const& key) { return map_.erase(key); }
+        iterator
+        find(key_type const& key)
+        {
+            return { map_.find(key) };
+        }
+        const_iterator
+        find(key_type const& key) const
+        {
+            return { map_.find(key) };
+        }
+        size_type
+        erase(key_type const& key)
+        {
+            return map_.erase(key);
+        }
 
-        bool operator==(ci_unordered_map const& rhs) const { return map_ == rhs.map_; }
-        bool operator!=(ci_unordered_map const& rhs) const { return !(*this == rhs); }
+        bool
+        operator==(ci_unordered_map const& rhs) const
+        {
+            return map_ == rhs.map_;
+        }
+        bool
+        operator!=(ci_unordered_map const& rhs) const
+        {
+            return !(*this == rhs);
+        }
     };
 
     /**
@@ -214,7 +346,10 @@ namespace cppmicroservices
 
             const_iter() = default;
             const_iter(const_iter const&) = default;
+            const_iter(const_iter&&) noexcept = default;
             const_iter& operator=(const_iter const&) = default;
+            const_iter& operator=(const_iter&&) noexcept = default;
+            ~const_iter() = default;
             const_iter(iter const& it);
 
             explicit const_iter(iter_variant it) : it_(std::move(it)) {}
@@ -249,7 +384,10 @@ namespace cppmicroservices
 
             iter() = default;
             iter(iter const&) = default;
+            iter(iter&&) noexcept = default;
             iter& operator=(iter const&) = default;
+            iter& operator=(iter&&) noexcept = default;
+            ~iter() = default;
 
             explicit iter(iter_variant it) : it_(std::move(it)) {}
 

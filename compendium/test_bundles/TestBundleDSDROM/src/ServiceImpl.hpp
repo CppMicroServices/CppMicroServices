@@ -1,9 +1,11 @@
-#ifndef _SERVICE_IMPL_HPP_
-#define _SERVICE_IMPL_HPP_
+#ifndef SERVICE_IMPL_HPP_
+#define SERVICE_IMPL_HPP_
 
 #include <atomic>
 #include <mutex>
 #include <vector>
+#include <memory>
+#include <string>
 
 #include "TestInterfaces/Interfaces.hpp"
 #include "cppmicroservices/servicecomponent/ComponentContext.hpp"
@@ -42,4 +44,4 @@ namespace sample
 
 } // namespace sample
 
-#endif // _SERVICE_IMPL_HPP_
+#endif // SERVICE_IMPL_HPP_

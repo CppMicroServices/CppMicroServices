@@ -90,7 +90,7 @@ TEST_F(tGenericDSAndCASuite, testGetServiceDuringConfigRemovalRace)
                                        });
 
         auto getServiceFuture = std::async(std::launch::async,
-                                           [&barrier, getServiceAttempts, this]()
+                                           [&barrier, this]()
                                            {
                                                barrier.Wait();
                                                for (int j = 0; j < getServiceAttempts; ++j)

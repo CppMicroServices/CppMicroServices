@@ -16,7 +16,6 @@ else()
 endif()
 
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../TestingConfig.h.in" "${PROJECT_BINARY_DIR}/include/ConfigurationAdminTestingConfig.h")
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../TestingConfig.h.in" "${PROJECT_BINARY_DIR}/include/DSTestingConfig.h")
 
 include_directories(
   ${GTEST_INCLUDE_DIRS}
@@ -67,7 +66,7 @@ include_directories(${PROJECT_BINARY_DIR}/include
   )
 
 set(_additional_srcs
-  ../TestUtils.cpp
+  TestUtilsStub.cpp
   ../../src/CMActivator.cpp
   )
 

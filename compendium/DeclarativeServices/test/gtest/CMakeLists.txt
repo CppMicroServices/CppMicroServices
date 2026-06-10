@@ -99,6 +99,7 @@ set(_declarativeservices_tests
   TestSharedLibraryException.cpp
   TestUpdateConfiguration.cpp
   ImportTestBundles.cpp
+  TestDynamicReferenceBinding.cpp
   TestBindingPolicies.cpp
   TestDSConfigAdminOperationOrder.cpp
   main.cpp
@@ -178,6 +179,7 @@ set(_test_bundles
   TestBundleDSDGOU
   TestBundleDSDRMU
   TestBundleDSDRMU_userMethodStaticChecks
+  TestBundleDSDROM
   TestBundleDSDROU
   TestBundleDSSLE1
   TestBundleDSSLE2

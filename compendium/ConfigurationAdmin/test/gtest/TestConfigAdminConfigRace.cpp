@@ -32,8 +32,9 @@
 #include "TestInterfaces/Interfaces.hpp"
 
 #include "TestFixtures.hpp"
+#include "../TestUtils.hpp"
+#include "../../../DeclarativeServices/test/gtest/ConcurrencyTestUtil.hpp"
 
-#include <atomic>
 #include <chrono>
 #include <future>
 #include <string>
@@ -42,44 +43,21 @@
 namespace
 {
     auto const SERVICE_TIMEOUT = std::chrono::seconds(5);
-    int const NUM_ITERATIONS = 100;
-    int const NUM_GETSERVICE_ATTEMPTS = 50;
-
-    std::string
-    InstallAndStartBundle(cppmicroservices::BundleContext& ctx, std::string const& bundleName)
-    {
-        std::string path = cppmicroservices::testing::LIB_PATH + cppmicroservices::util::DIR_SEP + US_LIB_PREFIX
-                           + bundleName + US_LIB_POSTFIX + US_LIB_EXT;
-
-#if defined(US_BUILD_SHARED_LIBS)
-        auto bundles = ctx.InstallBundles(path);
-        for (auto& b : bundles)
-        {
-            b.Start();
-        }
-#endif
-        return path;
-    }
 } // namespace
 
 /**
- * Tests that a race condition between removing a required Configuration and
- * a concurrent GetService call does not result in a component being
- * constructed without its required configuration properties.
- *
- * The race window is in ComponentConfigurationImpl::ConfigChangedState where
- * UpdateMergedProperties removes the config properties BEFORE Deactivate()
- * unregisters the service. A concurrent GetService during this window will
- * call DoCreate -> GetProperties and get properties without the required
- * configuration.
+ * Verify that GetService concurrent with a removed required configuration
+ * never returns a component instance without the required configuration
+ * properties.
  */
 TEST_F(tGenericDSAndCASuite, testGetServiceDuringConfigRemovalRace)
 {
     std::string const configPid { "sample::ServiceComponentCA29" };
 
-    InstallAndStartBundle(context, "TestBundleDSCA29");
+    test::InstallAndStartBundle(context, "TestBundleDSCA29");
 
-    int const iterations = NUM_ITERATIONS;
+    int const iterations = 100;
+    int const getServiceAttempts = 50;
     int constructedWithoutConfig = 0;
 
     for (int i = 0; i < iterations; ++i)
@@ -102,24 +80,20 @@ TEST_F(tGenericDSAndCASuite, testGetServiceDuringConfigRemovalRace)
         ASSERT_TRUE(sr) << "Service never became available after config update, iteration " << i;
 
         // Race: remove the configuration while concurrently trying to GetService.
-        // The Remove() is asynchronous and will trigger ConfigChangedState.
-        // Meanwhile we hammer GetService to try to hit the window between
-        // UpdateMergedProperties and Deactivate.
-        std::promise<void> go;
-        std::shared_future<void> ready(go.get_future());
+        Barrier barrier(2);
 
         auto removeFuture = std::async(std::launch::async,
-                                       [&ready, &configuration]()
+                                       [&barrier, &configuration]()
                                        {
-                                           ready.wait();
+                                           barrier.Wait();
                                            configuration->Remove();
                                        });
 
         auto getServiceFuture = std::async(std::launch::async,
-                                           [&ready, this]()
+                                           [&barrier, getServiceAttempts, this]()
                                            {
-                                               ready.wait();
-                                               for (int j = 0; j < NUM_GETSERVICE_ATTEMPTS; ++j)
+                                               barrier.Wait();
+                                               for (int j = 0; j < getServiceAttempts; ++j)
                                                {
                                                    auto ref = context.GetServiceReference<test::CAInterface>();
                                                    if (ref)
@@ -139,7 +113,6 @@ TEST_F(tGenericDSAndCASuite, testGetServiceDuringConfigRemovalRace)
                                                return false;
                                            });
 
-        go.set_value();
         removeFuture.get();
         bool raceHit = getServiceFuture.get();
         if (raceHit)

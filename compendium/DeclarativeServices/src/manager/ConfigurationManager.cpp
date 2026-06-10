@@ -151,15 +151,18 @@ namespace cppmicroservices
         ConfigurationManager::WouldDeletionUnsatisfy(std::string const& pid) const noexcept
         {
             std::lock_guard<std::mutex> lock(propertiesMutex);
+            // If not required, deletion wouldn't unsatisfy
             if (metadata->configurationPolicy != CONFIG_POLICY_REQUIRE)
             {
                 return false;
             }
+            // If we don't currently track this config, deletion wouldn't unsatisfy
             auto it = configProperties.find(pid);
             if (it == configProperties.end())
             {
                 return false;
             }
+            // If we have more configs than needed, deletion wouldn't unsatisfy
             return (configProperties.size() - 1) < metadata->configurationPids.size();
         }
 

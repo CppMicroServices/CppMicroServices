@@ -279,13 +279,14 @@ namespace cppmicroservices
                 return;
             }
 
-            // For CM_DELETED: check if this deletion would unsatisfy config BEFORE mutating.
-            // If so, deactivate first (closes the latch, drains in-flight GetService calls),
-            // then update properties as bookkeeping.
-            if (notification.event == cppmicroservices::service::cm::ConfigurationEventType::CM_DELETED
-                && configManager->WouldDeletionUnsatisfy(notification.pid))
+            if (notification.event == cppmicroservices::service::cm::ConfigurationEventType::CM_DELETED)
             {
-                Deactivate();
+                if (configManager->WouldDeletionUnsatisfy(notification.pid))
+                {
+                    // Deactivate first (closes the latch, drains in-flight GetService calls),
+                    // then update properties as bookkeeping.
+                    Deactivate();
+                }
 
                 bool configWasSatisfied = false;
                 bool configNowSatisfied = false;
@@ -327,20 +328,9 @@ namespace cppmicroservices
                 }
             }
 
-            switch (notification.event)
+            if (!configWasSatisfied && configNowSatisfied && AreReferencesSatisfied())
             {
-                case cppmicroservices::service::cm::ConfigurationEventType::CM_UPDATED:
-                    if (!configWasSatisfied && configNowSatisfied && AreReferencesSatisfied())
-                    {
-                        Register();
-                    }
-                    break;
-                case cppmicroservices::service::cm::ConfigurationEventType::CM_DELETED:
-                    // Non-unsatisfying deletion (e.g., optional policy or redundant config).
-                    // Already handled by UpdateMergedProperties above.
-                    break;
-                default:
-                    break;
+                Register();
             }
         }
 

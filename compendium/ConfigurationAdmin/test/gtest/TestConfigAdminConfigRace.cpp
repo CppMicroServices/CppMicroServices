@@ -32,7 +32,6 @@
 #include "TestInterfaces/Interfaces.hpp"
 
 #include "TestFixtures.hpp"
-#include "../TestUtils.hpp"
 #include "../../../DeclarativeServices/test/gtest/ConcurrencyTestUtil.hpp"
 
 #include <chrono>
@@ -43,6 +42,22 @@
 namespace
 {
     auto const SERVICE_TIMEOUT = std::chrono::seconds(5);
+
+    std::string
+    InstallAndStartBundle(cppmicroservices::BundleContext& ctx, std::string const& bundleName)
+    {
+        std::string path = cppmicroservices::testing::LIB_PATH + cppmicroservices::util::DIR_SEP + US_LIB_PREFIX
+                           + bundleName + US_LIB_POSTFIX + US_LIB_EXT;
+
+#if defined(US_BUILD_SHARED_LIBS)
+        auto bundles = ctx.InstallBundles(path);
+        for (auto& b : bundles)
+        {
+            b.Start();
+        }
+#endif
+        return path;
+    }
 } // namespace
 
 /**
@@ -54,7 +69,7 @@ TEST_F(tGenericDSAndCASuite, testGetServiceDuringConfigRemovalRace)
 {
     std::string const configPid { "sample::ServiceComponentCA29" };
 
-    test::InstallAndStartBundle(context, "TestBundleDSCA29");
+    InstallAndStartBundle(context, "TestBundleDSCA29");
 
     int const iterations = 100;
     int const getServiceAttempts = 50;

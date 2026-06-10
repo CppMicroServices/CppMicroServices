@@ -71,8 +71,8 @@ TEST_F(tGenericDSAndCASuite, testGetServiceDuringConfigRemovalRace)
 
     InstallAndStartBundle(context, "TestBundleDSCA29");
 
-    int const iterations = 100;
-    int const getServiceAttempts = 50;
+    int iterations = 100;
+    int getServiceAttempts = 50;
     int constructedWithoutConfig = 0;
 
     for (int i = 0; i < iterations; ++i)
@@ -105,7 +105,7 @@ TEST_F(tGenericDSAndCASuite, testGetServiceDuringConfigRemovalRace)
                                        });
 
         auto getServiceFuture = std::async(std::launch::async,
-                                           [&barrier, this]()
+                                           [&barrier, this, getServiceAttempts]()
                                            {
                                                barrier.Wait();
                                                for (int j = 0; j < getServiceAttempts; ++j)

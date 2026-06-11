@@ -67,6 +67,7 @@ include_directories(${PROJECT_BINARY_DIR}/include
 
 set(_additional_srcs
   ../../src/CMActivator.cpp
+  ../TestUtils.cpp
   )
 
 #-----------------------------------------------------------------------------

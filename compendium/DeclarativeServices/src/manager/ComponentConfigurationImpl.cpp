@@ -328,7 +328,8 @@ namespace cppmicroservices
                 }
             }
 
-            if (!configWasSatisfied && configNowSatisfied && AreReferencesSatisfied())
+            if (!configWasSatisfied && configNowSatisfied && AreReferencesSatisfied()
+                && notification.event == cppmicroservices::service::cm::ConfigurationEventType::CM_UPDATED)
             {
                 Register();
             }

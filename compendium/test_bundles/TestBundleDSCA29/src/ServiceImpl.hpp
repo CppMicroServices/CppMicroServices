@@ -3,7 +3,6 @@
 
 #include "TestInterfaces/Interfaces.hpp"
 #include "cppmicroservices/servicecomponent/ComponentContext.hpp"
-#include <atomic>
 #include <mutex>
 
 using ComponentContext = cppmicroservices::service::component::ComponentContext;
@@ -16,9 +15,6 @@ namespace sample
         ServiceComponentCA29(std::shared_ptr<cppmicroservices::AnyMap> const& props);
         cppmicroservices::AnyMap GetProperties();
         ~ServiceComponentCA29() = default;
-
-        static std::atomic<int> constructionCount;
-        static std::atomic<int> missingPropertyCount;
 
       private:
         std::mutex propertiesLock;

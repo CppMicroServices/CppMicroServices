@@ -288,6 +288,8 @@ namespace cppmicroservices
                     Deactivate();
                 }
 
+                // These out-params are unused in this branch but are required by the
+                // UpdateMergedProperties interface which takes them as non-const bool references.
                 bool configWasSatisfied = false;
                 bool configNowSatisfied = false;
                 bool changeCountDifferent = false;

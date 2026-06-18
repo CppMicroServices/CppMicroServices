@@ -1,5 +1,5 @@
-#ifndef _SERVICE_IMPL_HPP_
-#define _SERVICE_IMPL_HPP_
+#ifndef SERVICE_IMPL_DSGRAPH07_HPP
+#define SERVICE_IMPL_DSGRAPH07_HPP
 
 #include "TestInterfaces/Interfaces.hpp"
 
@@ -14,4 +14,4 @@ namespace graph
     };
 } // namespace graph
 
-#endif // _SERVICE_IMPL_HPP_
+#endif // SERVICE_IMPL_DSGRAPH07_HPP

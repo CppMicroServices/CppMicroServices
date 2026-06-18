@@ -1,5 +1,5 @@
-#ifndef _SERVICE_IMPL_HPP_
-#define _SERVICE_IMPL_HPP_
+#ifndef SERVICE_IMPL_DSDEPENDENTNOINJECT_HPP
+#define SERVICE_IMPL_DSDEPENDENTNOINJECT_HPP
 
 #include "TestInterfaces/Interfaces.hpp"
 #include "cppmicroservices/servicecomponent/ComponentContext.hpp"
@@ -40,4 +40,4 @@ namespace dependent
     };
 } // namespace dependent
 
-#endif // _SERVICE_IMPL_HPP_
+#endif // SERVICE_IMPL_DSDEPENDENTNOINJECT_HPP

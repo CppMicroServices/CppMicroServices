@@ -21,23 +21,34 @@
   =============================================================================*/
 #include "Util.hpp"
 
+#include "cppmicroservices/util/RapidJsonUtils.h"
+
 namespace codegen
 {
     namespace util
     {
 
-        Json::Value
+        rapidjson::Document
         ParseManifestOrThrow(std::istream& jsonStream)
         {
-            Json::Value root;
-            Json::CharReaderBuilder rbuilder;
-            rbuilder["rejectDupKeys"] = true;
-            std::string errs;
+            rapidjson::IStreamWrapper stream(jsonStream);
 
-            if (!Json::parseFromStream(rbuilder, jsonStream, &root, &errs))
+            rapidjson::Document root;
+            // RapidJSON sets an error flag on the Document instead of returning bool.
+            root.ParseStream(stream);
+
+            if (root.HasParseError())
             {
+                // GetParseError_En converts rapidjson's error code to English text.
+                // GetErrorOffset gives the byte position where parsing failed.
+                std::string errs = "JSON parse error at offset "
+                                   + std::to_string(root.GetErrorOffset()) + ": "
+                                   + rapidjson::GetParseError_En(root.GetParseError());
                 throw std::runtime_error(errs);
             }
+
+            cppmicroservices::rapidjsonutils::checkDuplicateKeys(root);
+
             return root;
         }
 

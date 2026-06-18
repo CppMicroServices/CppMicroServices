@@ -27,7 +27,7 @@ limitations under the License.
 #include <stdexcept> // std::runtime_error
 #include <string>    // std::to_string
 
-#include "CLI/CLI11.hpp"
+#include "CLI/CLI.hpp"
 #include "rapidjson/error/en.h"
 #include "rapidjson/istreamwrapper.h" // depends on ifstream included above
 #include "rapidjson/prettywriter.h"
@@ -102,7 +102,7 @@ validate(std::string const& jsonfile, std::string const& schemafile) noexcept
 int
 main(int argc, char* argv[])
 {
-    CLI::App app{"jsonschemavalidator: Validate a JSON file against a JSON schema."};
+    CLI::App app { "jsonschemavalidator: Validate a JSON file against a JSON schema." };
 
     std::string schemafilepath;
     std::string jsonfilepath;
@@ -121,16 +121,18 @@ main(int argc, char* argv[])
 
     // Custom usage message
     app.footer("\nExample:\n  jsonschemavalidator -s myschema.json -j mydata.json\n");
-    
+
     int retVal = EXIT_SUCCESS;
-    
+
     // If no arguments provided, print usage and exit
-    if(argc == 1) {
+    if (argc == 1)
+    {
         std::cout << app.help() << std::endl;
         return retVal;
     }
 
-    try {
+    try
+    {
         app.parse(argc, argv);
         auto result = validate(jsonfilepath, schemafilepath);
         if (!result.first)
@@ -139,12 +141,14 @@ main(int argc, char* argv[])
             retVal = EXIT_FAILURE;
         }
     }
-    catch(const CLI::CallForHelp &e) {
+    catch (const CLI::CallForHelp& e)
+    {
         // When help is requested, print it and return success
         std::cout << app.help() << std::endl;
         return retVal;
     }
-    catch(const CLI::ParseError &e) {
+    catch (const CLI::ParseError& e)
+    {
         // CLI11 will print the error and usage
         return app.exit(e);
     }

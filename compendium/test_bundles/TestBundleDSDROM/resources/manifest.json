@@ -1,0 +1,31 @@
+{
+    "bundle.symbolic_name": "TestBundleDSDROM",
+    "scr": {
+        "version": 1,
+        "components": [
+            {
+                "immediate": true,
+                "implementation-class": "sample::ServiceComponentDynamicReluctantOptionalMultiple",
+                "service": {
+                    "interfaces": [
+                        "test::Interface2"
+                    ]
+                },
+                "inject-references": true,
+                "references": [
+                    {
+                        "name": "staticDep",
+                        "interface": "test::Interface1"
+                    },
+                    {
+                        "name": "optionalDeps",
+                        "interface": "test::Interface3",
+                        "cardinality": "0..n",
+                        "policy": "dynamic",
+                        "policy-option": "reluctant"
+                    }
+                ]
+            }
+        ]
+    }
+}

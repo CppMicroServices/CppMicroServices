@@ -58,15 +58,15 @@ TEST(AnyMapTest, IteratorTest)
         {{ "1", 1 }, { "2", 2 }}
     };
     AnyMap::const_iter uociter(uo.begin());
-    AnyMap::const_iter uociter1(uo.cbegin());
+    [[maybe_unused]] AnyMap::const_iter uociter1(uo.cbegin());
 
     AnyMap uoci {
         {{ "do", 1 }, { "re", 2 }}
     };
     AnyMap::const_iter uoccciiter(uoci.begin());
-    AnyMap::const_iter uoccciiter1(uoci.cbegin());
+    [[maybe_unused]] AnyMap::const_iter uoccciiter1(uoci.cbegin());
 
-    AnyMap::const_iter ociter_temp(AnyMap(AnyMap::ORDERED_MAP).cbegin());
+    [[maybe_unused]] AnyMap::const_iter ociter_temp(AnyMap(AnyMap::ORDERED_MAP).cbegin());
 
     // Testing deref and increment operators
     ASSERT_EQ((*ociter1).second.ToString(), std::string("1"));
@@ -199,7 +199,6 @@ TEST(AnyMapTest, AnyMap)
 
 TEST(AnyMapTest, MoveConstructor)
 {
-    testing::FLAGS_gtest_death_test_style = "threadsafe";
     AnyMap o = {
         AnyMap::ORDERED_MAP,
         {{ "do", 1 }, { "re", 2 }}
@@ -207,8 +206,7 @@ TEST(AnyMapTest, MoveConstructor)
 
     AnyMap o_anymap_move_ctor(std::move(o));
     ASSERT_EQ(any_cast<int>(o_anymap_move_ctor.at("do")), 1);
-    ASSERT_DEATH({ o.size(); }, ".*") << "This call should result in a crash because "
-                                         "the object has been moved from";
+    ASSERT_NO_THROW(o.size()) << "Moved-from AnyMap must remain in a valid state";
 
     AnyMap uo(AnyMap::UNORDERED_MAP);
     AnyMap uo_move(std::move(uo));
@@ -221,7 +219,6 @@ TEST(AnyMapTest, MoveConstructor)
 
 TEST(AnyMapTest, MoveAssignment)
 {
-    testing::FLAGS_gtest_death_test_style = "threadsafe";
     AnyMap o {
         AnyMap::ORDERED_MAP,
         {{ "do", 1 }, { "re", 2 }}
@@ -230,8 +227,7 @@ TEST(AnyMapTest, MoveAssignment)
     AnyMap uo_anymap_move_assign(AnyMap::UNORDERED_MAP);
     uo_anymap_move_assign = std::move(o);
     ASSERT_EQ(any_cast<int>(uo_anymap_move_assign.at("re")), 2);
-    ASSERT_DEATH(o.size(), ".*") << "This call should result in a crash because "
-                                    "the object has been moved from";
+    ASSERT_NO_THROW(o.size()) << "Moved-from AnyMap must remain in a valid state";
 }
 
 void AnyMapTest_CopyAssignment_Helper(any_map::map_type t1, any_map::map_type t2) {

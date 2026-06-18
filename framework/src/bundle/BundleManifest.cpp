@@ -232,10 +232,9 @@ namespace cppmicroservices
     {
         CopyDeprecatedProperties();
         std::vector<std::string> keys;
-        for (AnyMap::const_iterator iter = m_PropertiesDeprecated.cbegin(); iter != m_PropertiesDeprecated.cend();
-             ++iter)
+        for (auto const& iter : m_PropertiesDeprecated)
         {
-            keys.push_back(iter->first);
+            keys.push_back(iter.first);
         }
         return keys;
     }

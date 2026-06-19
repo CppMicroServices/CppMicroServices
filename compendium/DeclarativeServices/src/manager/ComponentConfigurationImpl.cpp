@@ -278,6 +278,31 @@ namespace cppmicroservices
             {
                 return;
             }
+
+            if (notification.event == cppmicroservices::service::cm::ConfigurationEventType::CM_DELETED)
+            {
+                if (configManager->WouldDeletionUnsatisfy(notification.pid))
+                {
+                    // Deactivate first (closes the latch, drains in-flight GetService calls),
+                    // then update properties as bookkeeping.
+                    Deactivate();
+                }
+
+                // These out-params are unused in this branch but are required by the
+                // UpdateMergedProperties interface which takes them as non-const bool references.
+                bool configWasSatisfied = false;
+                bool configNowSatisfied = false;
+                bool changeCountDifferent = false;
+                configManager->UpdateMergedProperties(notification.pid,
+                                                      notification.newProperties,
+                                                      notification.event,
+                                                      notification.newChangeCount,
+                                                      configWasSatisfied,
+                                                      configNowSatisfied,
+                                                      changeCountDifferent);
+                return;
+            }
+
             bool configWasSatisfied = false;
             bool configNowSatisfied = false;
             bool changeCountDifferent = false;
@@ -305,22 +330,10 @@ namespace cppmicroservices
                 }
             }
 
-            switch (notification.event)
+            if (!configWasSatisfied && configNowSatisfied && AreReferencesSatisfied()
+                && notification.event == cppmicroservices::service::cm::ConfigurationEventType::CM_UPDATED)
             {
-                case cppmicroservices::service::cm::ConfigurationEventType::CM_UPDATED:
-                    if (!configWasSatisfied && configNowSatisfied && AreReferencesSatisfied())
-                    {
-                        Register();
-                    }
-                    break;
-                case cppmicroservices::service::cm::ConfigurationEventType::CM_DELETED:
-                    if (configWasSatisfied && !configNowSatisfied)
-                    {
-                        Deactivate();
-                    }
-                    break;
-                default:
-                    break;
+                Register();
             }
         }
 

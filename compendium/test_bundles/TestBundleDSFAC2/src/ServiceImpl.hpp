@@ -34,4 +34,4 @@ namespace sample
     };
 } // namespace sample
 
-#endif // _SERVICE_IMPL_HPP_
+#endif // SERVICE_IMPL_DSFAC2_HPP

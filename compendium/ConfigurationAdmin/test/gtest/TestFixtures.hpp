@@ -9,6 +9,7 @@
 #include <cppmicroservices/Framework.h>
 #include <cppmicroservices/FrameworkEvent.h>
 #include <cppmicroservices/FrameworkFactory.h>
+#include <cppmicroservices/util/FileSystem.h>
 
 #include "boost/asio/async_result.hpp"
 #include "boost/asio/packaged_task.hpp"

@@ -1,5 +1,5 @@
-#ifndef _SERVICE_IMPL_HPP_
-#define _SERVICE_IMPL_HPP_
+#ifndef SERVICE_IMPL_SERVICEFACTORYDEPENDENTBUNDLE_HPP
+#define SERVICE_IMPL_SERVICEFACTORYDEPENDENTBUNDLE_HPP
 
 #include "TestInterfaces/Interfaces.hpp"
 #include "cppmicroservices/ServiceReference.h"
@@ -87,4 +87,4 @@ class dependentImpl : public test::FactoryServiceDependent
     std::thread _worker;
 };
 
-#endif // _SERVICE_IMPL_HPP_
+#endif // SERVICE_IMPL_SERVICEFACTORYDEPENDENTBUNDLE_HPP

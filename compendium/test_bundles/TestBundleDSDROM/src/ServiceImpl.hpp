@@ -1,5 +1,5 @@
-#ifndef SERVICE_IMPL_HPP_
-#define SERVICE_IMPL_HPP_
+#ifndef SERVICE_IMPL_DSDROM_HPP
+#define SERVICE_IMPL_DSDROM_HPP
 
 #include <atomic>
 #include <mutex>
@@ -44,4 +44,4 @@ namespace sample
 
 } // namespace sample
 
-#endif // SERVICE_IMPL_HPP_
+#endif // SERVICE_IMPL_DSDROM_HPP

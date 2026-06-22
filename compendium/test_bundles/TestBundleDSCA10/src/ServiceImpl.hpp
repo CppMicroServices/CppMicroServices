@@ -1,5 +1,5 @@
-#ifndef _SERVICE_IMPL_HPP_
-#define _SERVICE_IMPL_HPP_
+#ifndef SERVICE_IMPL_DSCA10_HPP
+#define SERVICE_IMPL_DSCA10_HPP
 
 #include "TestInterfaces/Interfaces.hpp"
 #include "cppmicroservices/cm/ConfigurationAdmin.hpp"
@@ -30,4 +30,4 @@ namespace sample
     };
 } // namespace sample
 
-#endif // _SERVICE_IMPL_HPP_
+#endif // SERVICE_IMPL_DSCA10_HPP

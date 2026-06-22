@@ -3,12 +3,9 @@
 namespace sample
 {
 
-    void
-    ServiceComponentCA29::Modified(std::shared_ptr<ComponentContext> const&,
-                                   std::shared_ptr<cppmicroservices::AnyMap> const& configuration)
+    ServiceComponentCA29::ServiceComponentCA29(std::shared_ptr<cppmicroservices::AnyMap> const& props)
+        : properties(props)
     {
-        std::lock_guard<std::mutex> lock(propertiesLock);
-        properties = configuration;
     }
 
     cppmicroservices::AnyMap

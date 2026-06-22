@@ -12,16 +12,8 @@ namespace sample
     class ServiceComponentCA29 : public test::CAInterface
     {
       public:
-        ServiceComponentCA29()
-            : properties(std::make_shared<cppmicroservices::AnyMap>(
-                cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS))
-        {
-        }
-
-        void Modified(std::shared_ptr<ComponentContext> const& context,
-                      std::shared_ptr<cppmicroservices::AnyMap> const& configuration);
+        ServiceComponentCA29(std::shared_ptr<cppmicroservices::AnyMap> const& props);
         cppmicroservices::AnyMap GetProperties();
-
         ~ServiceComponentCA29() = default;
 
       private:

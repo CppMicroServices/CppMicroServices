@@ -48,7 +48,7 @@ namespace test
             //         break;
             //     }
             // }
-            testBundle = ::test::InstallAndStartBundle(context, "TestBundleDSCA29");
+            testBundle = ::test::InstallAndStartBundle(context, "TestBundleDSCA30");
             ASSERT_TRUE(testBundle);
         }
 
@@ -80,9 +80,9 @@ namespace test
             tGenericDSAndCASuite::TearDown();
         }
 
-        std::string const componentName = "sample::ServiceComponentCA29";
-        std::string const pid0 = "sample::ServiceComponentCA29_pid0";
-        std::string const pid1 = "sample::ServiceComponentCA29_pid1";
+        std::string const componentName = "sample::ServiceComponentCA30";
+        std::string const pid0 = "sample::ServiceComponentCA30_pid0";
+        std::string const pid1 = "sample::ServiceComponentCA30_pid1";
         cppmicroservices::Bundle testBundle;
     };
 

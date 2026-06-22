@@ -222,6 +222,7 @@ set(_test_bundles
   TestBundleDSCA27
   TestBundleDSCA28
   TestBundleDSCA29
+  TestBundleDSCA30
   TestBundleDSFAC1
   EnglishDictionary
   )

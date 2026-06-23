@@ -37,17 +37,7 @@ namespace test
         SetUp() override
         {
             tGenericDSAndCASuite::SetUp();
-            // Install the LogService bundle so SCRLogger output goes to stdout via spdlog.
-            // InstallLib uses the library name; then we find and start by symbolic name.
-            // ::test::InstallLib(context, "LogService");
-            // for (auto& b : context.GetBundles())
-            // {
-            //     if (b.GetSymbolicName() == "log_service")
-            //     {
-            //         b.Start();
-            //         break;
-            //     }
-            // }
+
             testBundle = ::test::InstallAndStartBundle(context, "TestBundleDSCA30");
             ASSERT_TRUE(testBundle);
         }

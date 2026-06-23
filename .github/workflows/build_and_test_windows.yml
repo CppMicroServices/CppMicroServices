@@ -38,7 +38,7 @@ jobs:
         git config --global core.autocrlf true
         subst Z: ${{github.workspace}}
 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       with:
         submodules: true
 
@@ -70,7 +70,7 @@ jobs:
           git config --global core.autocrlf true
           subst Z: ${{github.workspace}}
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: true
           fetch-depth: 1
@@ -125,14 +125,14 @@ jobs:
         git config --global core.autocrlf true
         subst Z: ${{github.workspace}}
 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       with:
         submodules: true
 
     - name: Build And Test
       working-directory: Z:\
       run: ctest -VV -S cmake\usCTestScript_github.cmake
-      
+
   build_win_deterministic_bundles:
     name: Build and Test [windows-2022,Configuration=0,Deterministic]
     runs-on: windows-2022
@@ -151,7 +151,7 @@ jobs:
         subst Z: ${{github.workspace}}
         echo "C:\msys64" >> $PATH
 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       with:
         submodules: true
 

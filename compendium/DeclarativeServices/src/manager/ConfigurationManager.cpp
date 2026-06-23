@@ -70,28 +70,40 @@ namespace cppmicroservices
                 {
                     if (configProperties.find(pid) == configProperties.end())
                     {
-                        auto config = configAdmin->ListConfigurations("(pid=" + pid + ")");
-                        if (config.size() > 0)
+                        try
                         {
-                            changeCount[pid] = config.front()->GetChangeCount();
-                            auto properties = config.front()->GetProperties();
-                            configProperties.emplace(pid, properties);
-                            for (auto const& item : properties)
+                            auto config = configAdmin->ListConfigurations("(pid=" + pid + ")");
+                            if (config.size() > 0)
                             {
-                                mergedProperties[item.first] = item.second;
+                                changeCount[pid] = config.front()->GetChangeCount();
+                                auto properties = config.front()->GetProperties();
+                                configProperties.emplace(pid, properties);
+                                for (auto const& item : properties)
+                                {
+                                    mergedProperties[item.first] = item.second;
+                                }
                             }
+                        }
+                        catch (std::exception const& ex)
+                        {
+                            logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
+                                        "ConfigurationManager::Initialize: configuration with pid " + pid
+                                            + " threw: " + ex.what());
+                        }
+                        catch (...)
+                        {
+                            logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
+                                        "ConfigurationManager::Initialize: config with pid " + pid
+                                            + " threw unknown exception");
                         }
                     }
                 }
             }
             catch (...)
             {
-                // No ConfigAdmin available
                 logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-                            "Exception while initializing ConfigurationManager object",
+                            "ConfigurationAdmin service not available during ConfigurationManager::initialization",
                             std::current_exception());
-
-                return;
             }
         }
 

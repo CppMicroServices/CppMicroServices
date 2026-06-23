@@ -84,7 +84,7 @@ namespace
 
         TestServiceImpl1(std::shared_ptr<ServiceDependency2> const& b) : foo(nullptr), bar(b), activated(false) {}
 
-        virtual ~TestServiceImpl1() {}
+        ~TestServiceImpl1() {}
 
         void
         BindFoo(std::shared_ptr<ServiceDependency1> const& f)

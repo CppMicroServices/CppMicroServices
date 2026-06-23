@@ -393,7 +393,7 @@ if(US_USE_SYSTEM_BOOST)
     add_library(nowide::nowide INTERFACE IMPORTED GLOBAL)
     target_include_directories(nowide::nowide INTERFACE ${Boost_INCLUDE_DIRS})
     target_compile_definitions(nowide::nowide INTERFACE US_HAVE_BOOST_NOWIDE)
-    target_link_libraries(nowide::nowide INTERFACE boost::boost)
+    target_link_libraries(nowide::nowide INTERFACE Boost::boost)
 endif()
 
 if(US_USE_SYSTEM_SPDLOG)

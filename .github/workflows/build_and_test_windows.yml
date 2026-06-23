@@ -7,13 +7,154 @@ on:
     branches: [ development, c\+\+14-compliant ]
   workflow_dispatch:
 
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Release
+  BUILD_CONFIGURATION: 0
+  WITH_COVERAGE: 0
+
 jobs:
-  detect_vs:
-    name: Detect Visual Studio [windows-2025]
-    runs-on: windows-2025
+  build_win_msvc:
+    name: Build and Test [${{matrix.os}},Configuration=${{matrix.buildconfiguration}}]
+    runs-on: ${{matrix.os}}
+    env:
+      BUILD_DIR: Z:\build\config_${{matrix.buildconfiguration}}
+      BUILD_CONFIGURATION: ${{matrix.buildconfiguration}}
+      BUILD_OS: ${{matrix.os}}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2022, windows-2025, windows-11-arm]
+        # build configurations:
+        # 0 = threading ON / shared lib ON
+        # 1 = threading ON / shared lib OFF
+        # 2 = threading OFF / shared lib ON
+        # 3 = threading OFF/ shared lib OFF
+        buildconfiguration: [0,1,2,3]
 
     steps:
-    - name: Detect Visual Studio
+    - name: Initialization
       run: |
-        & "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -all -format json
-        cmake --version
+        git config --global core.autocrlf true
+        subst Z: ${{github.workspace}}
+
+    - uses: actions/checkout@v4
+      with:
+        submodules: true
+
+    - name: Build And Test
+      working-directory: Z:\
+      run: ctest -VV -S cmake\usCTestScript_github.cmake
+
+  build_win_msvc_coverage:
+    name: Build and Test with Code Coverage [${{matrix.os}},Configuration=${{matrix.buildconfiguration}}]
+    runs-on: ${{matrix.os}}
+    env:
+      BUILD_DIR: Z:/build/config_${{matrix.buildconfiguration}}
+      BUILD_CONFIGURATION: ${{matrix.buildconfiguration}}
+      BUILD_TYPE: Debug
+      BUILD_OS: ${{matrix.os}}
+      WITH_COVERAGE: 1
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2022, windows-2025]
+        # build configurations:
+        # 0 = threading ON / shared lib ON
+        # 1 = threading ON / shared lib OFF
+        buildconfiguration: [0,1,2,3]
+
+    steps:
+      - name: Initialization
+        run: |
+          git config --global core.autocrlf true
+          subst Z: ${{github.workspace}}
+
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+          fetch-depth: 1
+
+      # Install OpenCppCoverage for windows builds and add it to the path so CMake and CTest can find it and use
+      # it for generation of code coverage files
+      - name: Install OpenCppCoverage
+        run: ${{github.workspace}}\install_opencppcoverage.ps1
+
+      - name: Build And Test
+        working-directory: Z:\
+        run: ctest -VV -S cmake\usCTestScript_github.cmake
+
+      - name: Merge Code Coverage Reports
+        working-directory: ${{github.workspace}}\build\config_${{matrix.buildconfiguration}}
+        run: ${{github.workspace}}\opencppcoverage_mergereports.bat
+
+      - name: Fix Filepaths for Coverage Report
+        working-directory: ${{github.workspace}}
+        run: python ${{github.workspace}}\fixcoveragefilepaths.py -i build\config_${{matrix.buildconfiguration}}\coverage.xml -s Z:\ -o ${{github.workspace}}\coverage_pathsfixed.xml
+
+      - uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage_pathsfixed.xml
+          fail_ci_if_error: true
+          verbose: true
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  build_win_mingw:
+    name: Build and Test [mingw-w64,Configuration=${{matrix.buildconfiguration}}]
+    runs-on: windows-2025
+    env:
+      BUILD_DIR: Z:\build\config_${{matrix.buildconfiguration}}
+      BUILD_CONFIGURATION: ${{matrix.buildconfiguration}}
+      BUILD_OS: mingw-w64
+      CC: gcc
+      CXX: g++
+    strategy:
+      fail-fast: false
+      matrix:
+        # build configurations:
+        # 0 = threading ON / shared lib ON
+        # 1 = threading ON / shared lib OFF
+        # 2 = threading OFF / shared lib ON
+        # 3 = threading OFF/ shared lib OFF
+        buildconfiguration: [0,1,2,3]
+
+    steps:
+    - name: Initialization
+      run: |
+        git config --global core.autocrlf true
+        subst Z: ${{github.workspace}}
+
+    - uses: actions/checkout@v4
+      with:
+        submodules: true
+
+    - name: Build And Test
+      working-directory: Z:\
+      run: ctest -VV -S cmake\usCTestScript_github.cmake
+
+  build_win_deterministic_bundles:
+    name: Build and Test [windows-2022,Configuration=0,Deterministic]
+    runs-on: windows-2022
+    env:
+      BUILD_DIR: Z:\build\config_0
+      BUILD_CONFIGURATION: 0
+      BUILD_OS: windows-2022
+      BUILD_WITH_DETERMINISTIC: 1
+    strategy:
+      fail-fast: false
+
+    steps:
+    - name: Initialization
+      run: |
+        git config --global core.autocrlf true
+        subst Z: ${{github.workspace}}
+        echo "C:\msys64" >> $PATH
+
+    - uses: actions/checkout@v4
+      with:
+        submodules: true
+
+    - name: Build And Test
+      working-directory: Z:\
+      run: ctest -VV -S cmake\usCTestScript_github.cmake

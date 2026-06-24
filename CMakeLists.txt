@@ -389,11 +389,14 @@ endif()
 #-----------------------------------------------------------------------------
 
 if(US_USE_SYSTEM_BOOST)
-    find_package(Boost 1.74.0 REQUIRED)
+    if(WIN32)
+        set(Boost_USE_STATIC_LIBS ON)
+    endif()
+    find_package(Boost 1.74.0 REQUIRED COMPONENTS nowide)
     add_library(nowide::nowide INTERFACE IMPORTED GLOBAL)
     target_include_directories(nowide::nowide INTERFACE ${Boost_INCLUDE_DIRS})
-    target_compile_definitions(nowide::nowide INTERFACE US_HAVE_BOOST_NOWIDE)
-    target_link_libraries(nowide::nowide INTERFACE Boost::boost)
+    target_compile_definitions(nowide::nowide INTERFACE US_HAVE_BOOST_NOWIDE BOOST_NOWIDE_NO_LIB)
+    target_link_libraries(nowide::nowide INTERFACE Boost::nowide)
 endif()
 
 if(US_USE_SYSTEM_SPDLOG)

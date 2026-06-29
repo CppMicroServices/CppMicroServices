@@ -389,8 +389,12 @@ namespace cppmicroservices
 
             auto result = configAdmin.AddConfigurations(std::move(configs));
 
+            // test.pid was previously fetched via GetConfiguration but never updated,
+            // so its current state is null-properties (per OSGi Compendium R7 §104.7.4).
+            // AddConfigurations now supplies empty properties — which is different from
+            // null — so this is a first-update transition: changeCount goes 0 -> 1.
             decltype(result) expected {
-                {  "test.pid", 0ul,  reinterpret_cast<std::uintptr_t>(conf.get()) },
+                {  "test.pid", 1ul,  reinterpret_cast<std::uintptr_t>(conf.get()) },
                 { "test.pid2", 2ul, reinterpret_cast<std::uintptr_t>(conf2.get()) }
             };
 

@@ -169,6 +169,58 @@ namespace cppmicroservices
             EXPECT_EQ(conf.UpdateWithoutNotificationIfDifferent(props), std::make_pair(true, 2ul));
         }
 
+        // Per OSGi Compendium R7 §104.7.4, a never-updated Configuration has null
+        // properties — distinct from "updated to empty". The first call to
+        // UpdateIfDifferent on a freshly-created (no initial properties) Configuration
+        // must therefore behave like Update even when the new properties are empty:
+        // it must report `true` and fire the listener notification.
+        TEST(TestConfigurationImpl, VerifyUpdateIfDifferentNotifiesOnFirstEmptyUpdate)
+        {
+            auto mockConfigAdmin = std::make_shared<testing::NiceMock<MockConfigurationAdminPrivate>>();
+            AnyMap emptyProps { AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS };
+            std::string pid { "test~instance" };
+            std::string factoryPid { "test" };
+            ConfigurationImpl conf { mockConfigAdmin.get(),
+                                     pid,
+                                     factoryPid,
+                                     emptyProps,
+                                     std::make_shared<async::MockAsyncWorkService>(),
+                                     1 };
+            auto validFuture = std::make_shared<ThreadpoolSafeFuturePrivate>();
+
+            EXPECT_CALL(*mockConfigAdmin, NotifyConfigurationUpdated(pid, testing::_, testing::_))
+                .Times(1)
+                .WillOnce(testing::Return(validFuture));
+
+            auto result = conf.UpdateIfDifferent(emptyProps);
+            EXPECT_TRUE(result.first);
+
+            // A second call with the same (empty) properties must now be a no-op.
+            result = conf.UpdateIfDifferent(emptyProps);
+            EXPECT_FALSE(result.first);
+        }
+
+        // Same invariant at the without-notification layer: the first call on a
+        // never-updated Configuration must return {true, 1u} even when newProperties
+        // is empty, because "no properties" and "empty properties" are not the same.
+        TEST(TestConfigurationImpl, VerifyUpdateWithoutNotificationIfDifferentFirstEmptyUpdate)
+        {
+            auto mockConfigAdmin = std::make_shared<testing::NiceMock<MockConfigurationAdminPrivate>>();
+            AnyMap emptyProps { AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS };
+            std::string pid { "test~instance" };
+            std::string factoryPid { "test" };
+            ConfigurationImpl conf { mockConfigAdmin.get(),
+                                     pid,
+                                     factoryPid,
+                                     emptyProps,
+                                     std::make_shared<async::MockAsyncWorkService>(),
+                                     1 };
+            EXPECT_CALL(*mockConfigAdmin, NotifyConfigurationUpdated(testing::_, testing::_, testing::_)).Times(0);
+
+            EXPECT_EQ(conf.UpdateWithoutNotificationIfDifferent(emptyProps), std::make_pair(true, 1ul));
+            EXPECT_EQ(conf.UpdateWithoutNotificationIfDifferent(emptyProps), std::make_pair(false, 0ul));
+        }
+
         TEST(TestConfigurationImpl, VerifyRemoveWithoutNotificationIfChangeCountEquals)
         {
             auto mockConfigAdmin = std::make_shared<testing::NiceMock<MockConfigurationAdminPrivate>>();

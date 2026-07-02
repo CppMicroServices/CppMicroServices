@@ -117,7 +117,7 @@ namespace cppmicroservices
         {
             std::error_code err_code(GetLastError(), std::generic_category());
             std::string errMsg = "Loading ";
-            errMsg.append(libPath).append("failed with error: ").append(util::GetLastWin32ErrorStr());
+            errMsg.append(libPath).append(" failed with error: ").append(util::GetLastWin32ErrorStr());
 
             d->m_Handle = nullptr;
 

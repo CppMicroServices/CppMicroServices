@@ -224,7 +224,10 @@ namespace cppmicroservices
             {
                 throw std::runtime_error(REMOVED_EXCEPTION_MESSAGE);
             }
-            if (properties == newProperties)
+            // Per OSGi Compendium R7 §104.7.4, a never-updated Configuration has null
+            // properties — distinct from "updated to empty". The first update must always
+            // be treated as different, even if newProperties is empty, so listeners fire.
+            if (changeCount > 0 && properties == newProperties)
             {
                 return std::pair<bool, unsigned long> { false, 0u };
             }

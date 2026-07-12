@@ -168,7 +168,7 @@ namespace cppmicroservices
             return EmptyVersion();
         }
 
-        return BundleVersion(version2);
+        return {version2};
     }
 
     bool

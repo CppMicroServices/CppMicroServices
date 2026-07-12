@@ -223,7 +223,7 @@ namespace cppmicroservices
 
         std::vector<ServiceReferenceBase> refs;
         b->coreCtx->services.Get(clazz, filter, b.get(), refs);
-        return std::vector<ServiceReferenceU>(refs.begin(), refs.end());
+        return {refs.begin(), refs.end()};
     }
 
     ServiceReferenceU
@@ -258,7 +258,7 @@ namespace cppmicroservices
         auto b = GetAndCheckBundlePrivate(d);
         auto serviceHolder = new ServiceHolder<void>(b, reference, reference.d.Load()->GetService(b.get()), nullptr);
         std::shared_ptr<ServiceHolder<void>> h(serviceHolder, CustomServiceDeleter { serviceHolder });
-        return std::shared_ptr<void>(h, h->service.get());
+        return {h, h->service.get()};
     }
 
     InterfaceMapConstPtr
@@ -281,7 +281,7 @@ namespace cppmicroservices
         auto serviceInterfaceMap = reference.d.Load()->GetServiceInterfaceMap(b.get());
         std::shared_ptr<ServiceHolder<InterfaceMap const>> h(
             new ServiceHolder<InterfaceMap const>(b, reference, serviceInterfaceMap, nullptr));
-        return InterfaceMapConstPtr(h, h->service.get());
+        return {h, h->service.get()};
     }
 
     ListenerToken
@@ -458,7 +458,7 @@ namespace cppmicroservices
             }
             return dataRoot + util::DIR_SEP + filename;
         }
-        return std::string();
+        return {};
     }
 
     std::vector<Bundle>

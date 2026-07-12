@@ -114,12 +114,12 @@ namespace cppmicroservices
     {
         if (!resourceContainer)
         {
-            return BundleResource();
+            return {};
         }
         BundleResource result(path, this->shared_from_this());
         if (result)
             return result;
-        return BundleResource();
+        return {};
     }
 
     std::vector<BundleResource>

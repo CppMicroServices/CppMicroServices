@@ -22,10 +22,7 @@
 
 #include "cppmicroservices/Constants.h"
 
-namespace cppmicroservices
-{
-
-    namespace Constants
+namespace cppmicroservices::Constants
     {
 
         const std::string SYSTEM_BUNDLE_LOCATION = "System Bundle";
@@ -71,5 +68,4 @@ namespace cppmicroservices
         const std::string SCOPE_PROTOTYPE = "prototype";
         const std::string LIBRARY_LOAD_OPTIONS = "org.cppmicroservices.library.load.options";
 
-    } // namespace Constants
-} // namespace cppmicroservices
+} // namespace cppmicroservices::Constants

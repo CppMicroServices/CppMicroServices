@@ -48,6 +48,13 @@
 #include "CoreBundleContext.h"
 #include "ServiceReferenceBasePrivate.h"
 
+#include "states/BPStartingState.h"
+#include "states/BPStoppingState.h"
+#include "states/BPResolvedState.h"
+#include "states/BPInstalledState.h"
+#include "states/BPActiveState.h"
+#include "states/BPUninstalledState.h"
+
 #include <algorithm>
 #include <cassert>
 #include <chrono>
@@ -66,161 +73,51 @@ namespace cppmicroservices
     void
     BundlePrivate::Stop(uint32_t options)
     {
-        std::exception_ptr savedException;
-
-        {
-            auto l = this->Lock();
-            US_UNUSED(l);
-
-            if (state == Bundle::STATE_UNINSTALLED)
-            {
-                throw std::logic_error("Bundle " + symbolicName + " (location=" + location + ") is uninstalled");
-            }
-
-            if ((options & Bundle::STOP_TRANSIENT) == 0)
-            {
-                SetAutostartSetting(-1);
-            }
-            switch (static_cast<Bundle::State>(state.load()))
-            {
-                case Bundle::STATE_INSTALLED:
-                case Bundle::STATE_RESOLVED:
-                case Bundle::STATE_STOPPING:
-                case Bundle::STATE_UNINSTALLED:
-                    return;
-
-                case Bundle::STATE_ACTIVE:
-                case Bundle::STATE_STARTING: // Lazy start...
-                    savedException = Stop0();
-                    break;
-            }
-        }
-
-        if (savedException)
-        {
-            std::rethrow_exception(savedException);
-        }
-    }
-
-    std::exception_ptr
-    BundlePrivate::Stop0()
-    {
-        wasStarted = state == Bundle::STATE_ACTIVE;
-        state = Bundle::STATE_STOPPING;
-        operation = OP_DEACTIVATING;
-
-        std::exception_ptr savedException = Stop1();
-        if (state != Bundle::STATE_UNINSTALLED)
-        {
-            state = Bundle::STATE_RESOLVED;
-            coreCtx->listeners.BundleChanged({ BundleEvent::BUNDLE_STOPPED, MakeBundle(shared_from_this()) });
-            operation = OP_IDLE;
-        }
-        return savedException;
-    }
-
-    std::exception_ptr
-    BundlePrivate::Stop1()
-    {
-        std::exception_ptr res;
-
-        coreCtx->listeners.BundleChanged(
-            BundleEvent(BundleEvent::BUNDLE_STOPPING, MakeBundle(this->shared_from_this())));
-
-        if (wasStarted && bactivator != nullptr)
-        {
-            try
-            {
-                bactivator->Stop(MakeBundleContext(bundleContext.Load()));
-            }
-            catch (...)
-            {
-                res = std::make_exception_ptr(
-                    std::runtime_error("Bundle " + symbolicName + " (location=" + location
-                                       + "), BundleActivator::Stop() failed: " + util::GetLastExceptionStr()));
-            }
-
-            // if stop was aborted (uninstall or timeout), make sure
-            // FinalizeActivation() has finished before checking aborted/state
-            {
-                std::string cause;
-                if (aborted == static_cast<uint8_t>(Aborted::YES))
-                {
-                    if (Bundle::STATE_UNINSTALLED == state)
-                    {
-                        cause = "Bundle uninstalled during Stop()";
-                    }
-                    else
-                    {
-                        cause = "Bundle activator Stop() time-out";
-                    }
-                }
-                else
-                {
-                    aborted = static_cast<uint8_t>(Aborted::NO);
-                    if (Bundle::STATE_STOPPING != state)
-                    {
-                        cause = "Bundle changed state because of refresh during Stop()";
-                    }
-                }
-                if (!cause.empty())
-                {
-                    res = std::make_exception_ptr(std::runtime_error("Bundle " + symbolicName + " (location=" + location
-                                                                     + ") stop failed: " + cause));
-                }
-            }
-            bactivator = nullptr;
-        }
-
-        if (operation == OP_DEACTIVATING)
-        {
-            Stop2();
-        }
-
-        return res;
+        GetStateObj()->Stop(*this, options);
     }
 
     void
-    BundlePrivate::Stop2()
+    BundlePrivate::Start(uint32_t options)
     {
-        // Call hooks after we've called BundleActivator::Stop(), but before we've
-        // cleared all resources
-        std::shared_ptr<BundleContextPrivate> ctx = bundleContext.Load();
-        if (ctx)
-        {
-            coreCtx->listeners.HooksBundleStopped(ctx);
-            RemoveBundleResources();
-            ctx->Invalidate();
-            bundleContext.Store(std::shared_ptr<BundleContextPrivate>());
-        }
+        GetStateObj()->Start(*this, options);
     }
 
-    Bundle::State
-    BundlePrivate::GetUpdatedState()
+
+    void
+    BundlePrivate::Uninstall()
     {
-        if (state == Bundle::STATE_INSTALLED)
-        {
-            try
-            {
-                if (state == Bundle::STATE_INSTALLED)
-                {
-                    state = Bundle::STATE_RESOLVED;
-                    operation = OP_RESOLVING;
-                    coreCtx->listeners.BundleChanged(
-                        { BundleEvent::BUNDLE_RESOLVED, MakeBundle(this->shared_from_this()) });
-                    operation = OP_IDLE;
-                }
-            }
-            catch (...)
-            {
-                resolveFailException = std::current_exception();
-                coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
-                                                                     MakeBundle(this->shared_from_this()),
-                                                                     std::string(),
-                                                                     std::current_exception()));
-            }
-        }
-        return static_cast<Bundle::State>(state.load());
+        GetStateObj()->Uninstall(*this);
+    }
+
+    bool
+    BundlePrivate::CompareAndSetState(std::shared_ptr<BundlePrivateState>* expectedState,
+                                                    std::shared_ptr<BundlePrivateState> desiredState)
+    {
+        return std::atomic_compare_exchange_strong(&state, expectedState, desiredState);
+    }
+
+    AnyMap const&
+    BundlePrivate::GetHeaders() const
+    {
+        return bundleManifest.GetHeaders();
+    }
+
+    std::shared_ptr<BundlePrivateState>
+    BundlePrivate::GetStateObj() const
+    {
+        return std::atomic_load(&state);
+    }
+
+    uint32_t BundlePrivate::GetState() const
+    {
+        return GetStateObj()->GetState();
+    }
+
+
+    std::string
+    BundlePrivate::GetLocation() const
+    {
+        return location;
     }
 
     void
@@ -233,454 +130,24 @@ namespace cppmicroservices
             ctx->Invalidate();
         }
 
-        state = Bundle::STATE_INSTALLED;
+        auto installedState = std::make_shared<BPInstalledState>();
+        auto currState = GetStateObj();
+        CompareAndSetState(&currState, installedState);
+        // state = Bundle::STATE_INSTALLED;
+
         if (sendEvent)
         {
             operation = OP_UNRESOLVING;
             coreCtx->listeners.BundleChanged({ BundleEvent::BUNDLE_RESOLVED, MakeBundle(this->shared_from_this()) });
         }
         operation = OP_IDLE;
-    }
-
-    void
-    BundlePrivate::FinalizeActivation()
-    {
-        switch (GetUpdatedState())
-        {
-            case Bundle::STATE_INSTALLED:
-            {
-                if (resolveFailException)
-                {
-                    std::rethrow_exception(resolveFailException);
-                }
-                break;
-            }
-            case Bundle::STATE_STARTING:
-            {
-                if (operation == OP_ACTIVATING)
-                {
-                    // finalization already in progress.
-                    return;
-                }
-            }
-                [[fallthrough]];
-            case Bundle::STATE_RESOLVED:
-            {
-                state = Bundle::STATE_STARTING;
-                operation = OP_ACTIVATING;
-
-                std::shared_ptr<BundleContextPrivate> null_expected;
-                std::shared_ptr<BundleContextPrivate> ctx(new BundleContextPrivate(this));
-                bundleContext.CompareExchange(null_expected, ctx);
-                auto e = Start0();
-                operation = OP_IDLE;
-                if (e)
-                {
-                    std::rethrow_exception(e);
-                }
-                break;
-            }
-            case Bundle::STATE_ACTIVE:
-                break;
-            case Bundle::STATE_STOPPING:
-                // This happens if call start from inside the BundleActivator.stop
-                // method.
-                // Don't allow it.
-                throw std::runtime_error("Bundle " + symbolicName + " (location=" + location
-                                         + "), start called from BundleActivator::Stop");
-            case Bundle::STATE_UNINSTALLED:
-                throw std::logic_error("Bundle " + symbolicName + " (location=" + location
-                                       + ") is in UNINSTALLED state");
-        }
-    }
-
-    void
-    BundlePrivate::Uninstall()
-    {
-        {
-            auto l = this->Lock();
-            US_UNUSED(l);
-
-            switch (static_cast<Bundle::State>(state.load()))
-            {
-                case Bundle::STATE_UNINSTALLED:
-                    throw std::logic_error("Bundle " + symbolicName + " (location=" + location
-                                           + ") is in BUNDLE_UNINSTALLED state");
-                case Bundle::STATE_STARTING: // Lazy start
-                case Bundle::STATE_ACTIVE:
-                case Bundle::STATE_STOPPING:
-                {
-                    std::exception_ptr exception;
-                    try
-                    {
-                        exception = (state & (Bundle::STATE_ACTIVE | Bundle::STATE_STARTING)) != 0 ? Stop0() : nullptr;
-                    }
-                    catch (...)
-                    {
-                        // Force to install
-                        SetStateInstalled(false);
-                        exception = std::current_exception();
-                    }
-                    operation = BundlePrivate::OP_UNINSTALLING;
-                    if (exception != nullptr)
-                    {
-                        try
-                        {
-                            std::rethrow_exception(exception);
-                        }
-                        catch (...)
-                        {
-                            coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
-                                                                                 MakeBundle(shared_from_this()),
-                                                                                 std::string(),
-                                                                                 std::current_exception()));
-                        }
-                    }
-                }
-                    [[fallthrough]];
-                case Bundle::STATE_RESOLVED:
-                case Bundle::STATE_INSTALLED:
-                {
-                    coreCtx->bundleRegistry.Remove(location, id);
-                    if (operation != BundlePrivate::OP_UNINSTALLING)
-                    {
-                        try
-                        {
-                            operation = BundlePrivate::OP_UNINSTALLING;
-                        }
-                        catch (...)
-                        {
-                            // Make sure that bundleContext is invalid
-                            std::shared_ptr<BundleContextPrivate> ctx;
-                            if ((ctx = bundleContext.Exchange(ctx)))
-                            {
-                                ctx->Invalidate();
-                            }
-                            operation = BundlePrivate::OP_UNINSTALLING;
-                            coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
-                                                                                 MakeBundle(shared_from_this()),
-                                                                                 std::string(),
-                                                                                 std::current_exception()));
-                        }
-                    }
-                    if (state == Bundle::STATE_UNINSTALLED)
-                    {
-                        operation = BundlePrivate::OP_IDLE;
-                        throw std::logic_error("Bundle " + symbolicName + " (location=" + location
-                                               + ") is in BUNDLE_UNINSTALLED state");
-                    }
-
-                    state = Bundle::STATE_INSTALLED;
-                    coreCtx->listeners.BundleChanged(
-                        { BundleEvent::BUNDLE_UNRESOLVED, MakeBundle(shared_from_this()) });
-                    bactivator = nullptr;
-                    state = Bundle::STATE_UNINSTALLED;
-
-                    Purge();
-                    barchive->SetLastModified(std::chrono::steady_clock::now());
-                    operation = BundlePrivate::OP_IDLE;
-                    if (!bundleDir.empty())
-                    {
-                        try
-                        {
-                            if (util::Exists(bundleDir))
-                            {
-                                util::RemoveDirectoryRecursive(bundleDir);
-                            }
-                        }
-                        catch (...)
-                        {
-                            coreCtx->listeners.SendFrameworkEvent(
-                                FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING,
-                                               MakeBundle(shared_from_this()),
-                                               std::string(),
-                                               std::current_exception()));
-                        }
-                        bundleDir.clear();
-                    }
-                    // id, location and headers survives after uninstall.
-
-                    // There might be bundle threads that are running start or stop
-                    // operation. This will wake them and give them an chance to terminate.
-                    break;
-                }
-            }
-        }
-        coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::BUNDLE_UNINSTALLED, MakeBundle(shared_from_this())));
-    }
-
-    std::string
-    BundlePrivate::GetLocation() const
-    {
-        return location;
-    }
-
-    void
-    BundlePrivate::Start(uint32_t options)
-    {
-        auto l = this->Lock();
-        US_UNUSED(l);
-        auto frameworkBlock = coreCtx->GetFrameworkStateAndBlock();
-        if (frameworkBlock->frameworkHasStopped)
-        {
-            throw std::runtime_error("Bundle " + symbolicName + " (location=" + location
-                                     + ") belongs to a stopped framework");
-        }
-        if (state == Bundle::STATE_UNINSTALLED)
-        {
-            throw std::logic_error("Bundle " + symbolicName + " (location=" + location + ") is uninstalled");
-        }
-
-        if (state == Bundle::STATE_ACTIVE)
-        {
-            return;
-        }
-
-        if ((options & Bundle::START_TRANSIENT) == 0)
-        {
-            SetAutostartSetting(options);
-        }
-
-        FinalizeActivation();
         return;
-    }
-
-    AnyMap const&
-    BundlePrivate::GetHeaders() const
-    {
-        return bundleManifest.GetHeaders();
-    }
-
-    std::exception_ptr
-    BundlePrivate::Start0()
-    {
-        // res is used to signal that start did not complete in a normal way
-        std::exception_ptr res;
-        auto const thisBundle = MakeBundle(this->shared_from_this());
-        coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::BUNDLE_STARTING, thisBundle));
-
-        auto const& headers = thisBundle.GetHeaders();
-        Any bundleActivatorVal;
-        if (headers.count(Constants::BUNDLE_ACTIVATOR) > 0)
-        {
-            bundleActivatorVal = headers.find(Constants::BUNDLE_ACTIVATOR)->second;
-        }
-
-        bool useActivator = false;
-        if (!bundleActivatorVal.Empty())
-        {
-            try
-            {
-                useActivator = any_cast<bool>(bundleActivatorVal);
-            }
-            catch (BadAnyCastException const& ex)
-            {
-                std::string message("Failed to read 'bundle.activator' property. Expected type : ");
-                message += typeid(useActivator).name();
-                message += ", Found type : ";
-                message += bundleActivatorVal.Type().name();
-                coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING,
-                                                                     thisBundle,
-                                                                     message,
-                                                                     std::make_exception_ptr(ex)));
-            }
-        }
-
-        // Activator in the bundle is not called if 'bundle.activator' property
-        // either does not exist or is set to false. If the property is set to true,
-        // the actiavtor inside the bundle is called.
-        if (useActivator)
-        {
-            try
-            {
-                if (coreCtx->validationFunc && (lib.GetFilePath() != util::GetExecutablePath())
-                    && !coreCtx->validationFunc(thisBundle))
-                {
-                    StartFailed();
-                    return std::make_exception_ptr(SecurityException {
-                        "Bundle " + symbolicName + " (location=" + location + ") failed bundle validation.",
-                        thisBundle });
-                }
-            }
-            catch (...)
-            {
-                coreCtx->listeners.SendFrameworkEvent(
-                    FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING,
-                                   thisBundle,
-                                   "The bundle validation function threw an exception",
-                                   std::current_exception()));
-                StartFailed();
-                throw SecurityException { util::GetLastExceptionStr(), thisBundle };
-            }
-
-            try
-            {
-                void* libHandle = nullptr;
-                if ((lib.GetFilePath() == util::GetExecutablePath()))
-                {
-                    libHandle = BundleUtils::GetExecutableHandle();
-                }
-                else
-                {
-                    if (!lib.IsLoaded())
-                    {
-                        coreCtx->logger->Log(logservice::SeverityLevel::LOG_INFO,
-                                             "Loading shared library for Bundle " + symbolicName
-                                                 + " (location=" + location + ")");
-                        lib.Load(coreCtx->libraryLoadOptions);
-                        coreCtx->logger->Log(logservice::SeverityLevel::LOG_INFO,
-                                             "Finished loading shared library for Bundle " + symbolicName
-                                                 + " (location=" + location + ")");
-                    }
-                    libHandle = lib.GetHandle();
-                }
-
-                auto ctx = bundleContext.Load();
-
-                // save this bundle's context so that it can be accessible anywhere
-                // from within this bundle's code.
-                std::string set_bundle_context_func = US_STR(US_SET_CTX_PREFIX) + symbolicName;
-                std::string set_bundle_context_err;
-                BundleUtils::GetSymbol(SetBundleContext, libHandle, set_bundle_context_func, set_bundle_context_err);
-
-                if (SetBundleContext)
-                {
-                    SetBundleContext(ctx.get());
-                }
-                else
-                {
-                    coreCtx->logger->Log(logservice::SeverityLevel::LOG_WARNING, set_bundle_context_err);
-                }
-
-                // get the create/destroy activator callbacks
-                std::string create_activator_func = US_STR(US_CREATE_ACTIVATOR_PREFIX) + symbolicName;
-                std::function<BundleActivator*(void)> createActivatorHook;
-                std::string create_activator_err;
-                BundleUtils::GetSymbol(createActivatorHook, libHandle, create_activator_func, create_activator_err);
-
-                std::string destroy_activator_func = US_STR(US_DESTROY_ACTIVATOR_PREFIX) + symbolicName;
-                std::string destroy_activator_err;
-                BundleUtils::GetSymbol(destroyActivatorHook, libHandle, destroy_activator_func, destroy_activator_err);
-
-                if (!createActivatorHook)
-                {
-                    coreCtx->logger->Log(logservice::SeverityLevel::LOG_ERROR, create_activator_err);
-                    throw std::runtime_error("Bundle " + symbolicName + " (location=" + location
-                                             + ") activator constructor not found");
-                }
-                if (!destroyActivatorHook)
-                {
-                    coreCtx->logger->Log(logservice::SeverityLevel::LOG_ERROR, destroy_activator_err);
-                    throw std::runtime_error("Bundle " + symbolicName + " (location=" + location
-                                             + ") activator destructor not found");
-                }
-
-                // get a BundleActivator instance
-                bactivator = std::unique_ptr<BundleActivator, DestroyActivatorHook>(createActivatorHook(),
-                                                                                    destroyActivatorHook);
-                bactivator->Start(MakeBundleContext(ctx));
-            }
-            catch (std::system_error const& ex)
-            {
-                // SharedLibrary::Load(int flags) will throw a std::system_error when a shared library
-                // fails to load. Creating a SharedLibraryException here to throw.
-                res = std::make_exception_ptr(
-                    cppmicroservices::SharedLibraryException(ex.code(), ex.what(), thisBundle));
-            }
-            catch (...)
-            {
-                coreCtx->logger->Log(logservice::SeverityLevel::LOG_INFO,
-                                     "Failed to start Bundle " + symbolicName + " (location=" + location + ")",
-                                     std::current_exception());
-                res = std::make_exception_ptr(std::runtime_error("Bundle " + symbolicName + " (location= " + location
-                                                                 + ") start failed: " + util::GetLastExceptionStr()));
-            }
-        }
-
-        // activator.start() done
-        // - normal -> state = active, started event
-        // - exception from start() -> res = ex, start-failed clean-up
-        // - unexpected state change (uninstall, refresh?):
-        //   -> res = new exception
-        // - start time-out -> res = new exception (not used?)
-
-        // if start was aborted (uninstall or timeout), make sure
-        // finalizeActivation() has finished before checking aborted/state
-        {
-            std::string cause;
-            if (static_cast<Aborted>(aborted.load()) == Aborted::YES)
-            {
-                if (Bundle::STATE_UNINSTALLED == state)
-                {
-                    cause = "Bundle uninstalled during Start()";
-                }
-                else
-                {
-                    cause = "Bundle activator Start() time-out";
-                }
-            }
-            else
-            {
-                aborted = static_cast<uint8_t>(Aborted::NO);
-                if (Bundle::STATE_STARTING != state)
-                {
-                    cause = "Bundle changed state because of refresh during Start()";
-                }
-            }
-            if (!cause.empty())
-            {
-                res = std::make_exception_ptr(std::runtime_error("Bundle " + symbolicName + " (location= " + location
-                                                                 + ") start failed: " + cause));
-            }
-        }
-
-        if (res == nullptr)
-        {
-            state = Bundle::STATE_ACTIVE;
-            try
-            {
-                coreCtx->listeners.BundleChanged(
-                    BundleEvent(BundleEvent::BUNDLE_STARTED, MakeBundle(this->shared_from_this())));
-            }
-            catch (cppmicroservices::SharedLibraryException const& ex)
-            {
-                res = std::make_exception_ptr(ex);
-            }
-            catch (cppmicroservices::SecurityException const& ex)
-            {
-                StartFailed();
-                res = std::make_exception_ptr(ex);
-            }
-        }
-        else if (operation == OP_ACTIVATING)
-        {
-            StartFailed();
-        }
-        return res;
-    }
-
-    void
-    BundlePrivate::StartFailed()
-    {
-        state = Bundle::STATE_STOPPING;
-        coreCtx->listeners.BundleChanged(
-            BundleEvent(BundleEvent::BUNDLE_STOPPING, MakeBundle(this->shared_from_this())));
-        RemoveBundleResources();
-        auto oldBundleContext = bundleContext.Exchange(std::shared_ptr<BundleContextPrivate>());
-        if (oldBundleContext)
-        {
-            oldBundleContext->Invalidate();
-        }
-        state = Bundle::STATE_RESOLVED;
-        coreCtx->listeners.BundleChanged(
-            BundleEvent(BundleEvent::BUNDLE_STOPPED, MakeBundle(this->shared_from_this())));
     }
 
     BundlePrivate::BundlePrivate(CoreBundleContext* coreCtx)
         : coreCtx(coreCtx)
         , id(0)
         , location(Constants::SYSTEM_BUNDLE_LOCATION)
-        , state(Bundle::STATE_INSTALLED)
         , barchive()
         , bundleDir(this->coreCtx->GetDataStorage(id))
         , bundleContext()
@@ -696,6 +163,7 @@ namespace cppmicroservices
         , bundleManifest()
         , lib()
         , SetBundleContext(nullptr)
+        , state(std::make_shared<BPInstalledState>())
     {
     }
 
@@ -703,7 +171,6 @@ namespace cppmicroservices
         : coreCtx(coreCtx)
         , id(ba->GetBundleId())
         , location(ba->GetBundleLocation())
-        , state(Bundle::STATE_INSTALLED)
         , barchive(ba)
         , bundleDir(coreCtx->GetDataStorage(id))
         , bundleContext()
@@ -719,6 +186,7 @@ namespace cppmicroservices
         , bundleManifest(ba->GetInjectedManifest())
         , lib(location)
         , SetBundleContext(nullptr)
+        , state(std::make_shared<BPInstalledState>())
     {
         // Only take the time to read the manifest out of the BundleArchive file if we don't already have
         // a manifest.
@@ -807,7 +275,7 @@ namespace cppmicroservices
     void
     BundlePrivate::CheckUninstalled() const
     {
-        if (state == Bundle::STATE_UNINSTALLED)
+        if (GetState() == Bundle::STATE_UNINSTALLED)
         {
             throw std::logic_error("Bundle " + symbolicName + " (location=" + location + ") is in UNINSTALLED state");
         }

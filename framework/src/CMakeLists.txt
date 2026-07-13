@@ -61,6 +61,14 @@ set(_srcs
   bundle/BundleVersion.cpp
   bundle/Constants.cpp
   bundle/CoreBundleContext.cpp
+  bundle/states/BundlePrivateState.cpp
+  bundle/states/BPUninstalledState.cpp
+  bundle/states/BPInstalledState.cpp
+  bundle/states/BPResolvedState.cpp
+  bundle/states/BPIdleState.cpp
+  bundle/states/BPStartingState.cpp
+  bundle/states/BPStoppingState.cpp
+  bundle/states/BPRunningState.cpp
 )
 
 if(NOT US_USE_SYSTEM_MINIZ)

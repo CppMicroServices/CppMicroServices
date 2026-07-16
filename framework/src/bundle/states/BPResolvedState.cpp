@@ -215,7 +215,6 @@ namespace cppmicroservices
                 {
                     transitionAction.set_value();
                     startingState->Start(mgr, options);
-                    //mgr.Start(options);
 
                 }
 

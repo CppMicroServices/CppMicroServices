@@ -22,7 +22,7 @@ namespace cppmicroservices
                 mgr.coreCtx->listeners.BundleChanged(
                     { BundleEvent::BUNDLE_RESOLVED, MakeBundle(mgr.shared_from_this()) });
                 transitionAction.set_value();
-                mgr.Start(options); //call resolved->start now
+                resolvedState->Start(mgr, options); //call resolved->start now
                 break;
             }
         }

@@ -36,14 +36,14 @@ namespace cppmicroservices
         auto currState = shared_from_this(); 
         std::promise<void> transitionAction; 
         auto fut = transitionAction.get_future();
-        auto uninstalledState = std::make_shared<BPUninstalledState>(std::move(fut));
+        auto resolvedState = std::make_shared<BPResolvedState>(std::move(fut)); 
 
-        while(currState->GetState() != Bundle::STATE_UNINSTALLED){
-            if (mgr.CompareAndSetState(&currState, uninstalledState))
-            {
+        while(currState->GetState() == Bundle::STATE_STOPPING){
+            if (mgr.CompareAndSetState(&currState, resolvedState)){
                 currState->WaitForTransitionTask();
-                FinalizeUninstall(mgr);
+                mgr.coreCtx->listeners.BundleChanged({ BundleEvent::BUNDLE_STOPPED, MakeBundle(mgr.shared_from_this()) }); //listener stopp-ED event
                 transitionAction.set_value();
+                resolvedState->Uninstall(mgr);
                 break;
             }
         }

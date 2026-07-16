@@ -49,38 +49,31 @@ namespace cppmicroservices
         auto currState = shared_from_this(); 
         std::promise<void> transitionAction; 
         auto fut = transitionAction.get_future();
-        auto uninstalledState = std::make_shared<BPUninstalledState>(std::move(fut));
+        auto stoppingState = std::make_shared<BPStoppingState>(std::move(fut));
 
-        while(currState->GetState() != Bundle::STATE_UNINSTALLED){
-            if (mgr.CompareAndSetState(&currState, uninstalledState)){
+        while(currState->GetState() != Bundle::STATE_STOPPING){
+            if (mgr.CompareAndSetState(&currState, stoppingState)){
                 currState->WaitForTransitionTask();
-                
+
                 std::exception_ptr res;
-                try {
-                    res = StopHelper(mgr);
-                } 
-                catch (...){
-                    mgr.SetStateInstalled(false);
-                    res = std::current_exception();
-                }
-                mgr.coreCtx->listeners.BundleChanged({ BundleEvent::BUNDLE_STOPPED, MakeBundle(mgr.shared_from_this()) });
-                
+                res = StopHelper(mgr);
+                // try {
+                //     res = StopHelper(mgr);
+                // } 
+                // catch (...){
+                //     mgr.SetStateInstalled(false);
+                //     res = std::current_exception();
+                // }
+
                 if (res){
-                    try
-                    {
-                        std::rethrow_exception(res);
-                    }
-                    catch (...)
-                    {
-                        mgr.coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
+                    mgr.coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
                                                                                 MakeBundle(mgr.shared_from_this()),
                                                                                 std::string(),
-                                                                                std::current_exception()));
-                    }
+                                                                                res));
                 }
-
-                FinalizeUninstall(mgr);
+                
                 transitionAction.set_value();
+                stoppingState->Uninstall(mgr);
                 break;
 
             }

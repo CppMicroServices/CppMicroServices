@@ -24,7 +24,7 @@ jobs:
       WITH_COVERAGE: 0
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v5
       with:
         submodules: true
     
@@ -48,7 +48,7 @@ jobs:
       WITH_COVERAGE: 0
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v5
       with:
         submodules: true
     
@@ -69,7 +69,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, ubuntu-22.04-arm, macos-13, macos-14]
+        os: [ubuntu-22.04, ubuntu-22.04-arm, macos-14, macos-15]
         # build configurations:
         # 0 = threading ON / shared lib ON
         # 1 = threading ON / shared lib OFF
@@ -78,7 +78,7 @@ jobs:
         buildconfiguration: [0,1,2,3]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v5
       with:
          submodules: true
 
@@ -110,7 +110,7 @@ jobs:
         os: [ubuntu-22.04, macos-latest]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v5
       with:
         submodules: true
 

@@ -317,6 +317,20 @@ namespace cppmicroservices
         US_Framework_EXPORT extern const std::string
             FRAMEWORK_BUNDLE_VALIDATION_FUNC; // = "org.cppmicroservices.framework.bundle.validation.function"
 
+        /**
+         * Framework property specifying a shutdown callback invoked after
+         * waitForStop() completes.
+         *
+         * @return void
+         * @note The value must be a callable convertible to: std::function<void()>
+         * @note MUST NOT throw exceptions.
+         * @note MUST be idempotent -- callable repeatedly.
+         * @note The callback may create threads or async work, but **must wait for all such
+         * work to finish before returning**.
+         * 
+         */
+        US_Framework_EXPORT extern std::string const FRAMEWORK_EXTRA_SHUTDOWN_FUNC; // = "org.cppmicroservices.framework.shutdown.function"
+
         /*
          * Service properties.
          */

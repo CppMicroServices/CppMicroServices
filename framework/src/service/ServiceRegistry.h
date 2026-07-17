@@ -27,6 +27,8 @@
 #include "cppmicroservices/ServiceRegistration.h"
 #include "cppmicroservices/detail/Threads.h"
 
+#include "../util/LDAPExpr.h"
+
 namespace cppmicroservices
 {
 
@@ -60,6 +62,7 @@ namespace cppmicroservices
 
         using MapServiceClasses = std::unordered_map<ServiceRegistrationBase, std::vector<std::string>>;
         using MapClassServices = std::unordered_map<std::string, std::vector<ServiceRegistrationBase>>;
+        using MapBundleServices = std::unordered_map<BundlePrivate*, std::vector<ServiceRegistrationBase>>;
 
         /**
          * All registered services in the current framework.
@@ -76,6 +79,11 @@ namespace cppmicroservices
          * ranked service first.
          */
         MapClassServices classServices;
+
+        /**
+         * Mapping of bundle to its registered services.
+         */
+        MapBundleServices bundleServices;
 
         CoreBundleContext* core;
 
@@ -178,6 +186,19 @@ namespace cppmicroservices
                           std::string const& filter,
                           BundlePrivate* bundle,
                           std::vector<ServiceReferenceBase>& serviceRefs) const;
+
+        /**
+         * Returns a reference valid only until the next cache mutation.
+         * Caller must hold the registry lock (MultiThreaded::Lock).
+         * @param filter a std::string containing the filter
+         * @return a const reference to an LDAPExpr for filter
+         */
+        LDAPExpr const& GetCachedLDAPExpr(std::string const& filter) const;
+
+        static constexpr std::size_t FILTER_CACHE_MAX_SIZE = 128;
+
+        // Protected by the registry's MultiThreaded mutex (Lock()).
+        mutable std::unordered_map<std::string, LDAPExpr> filterCache;
     };
 } // namespace cppmicroservices
 

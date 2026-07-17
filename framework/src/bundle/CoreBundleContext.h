@@ -204,7 +204,7 @@ namespace cppmicroservices
          *     - other calls to start or stop the framework
          *     - calls to start bundles
          */
-        WriteLock SetFrameworkStateAndBlockUntilComplete(bool desiredState);
+        void SetFrameworkStoppedState(bool desiredState);
 
         /**
          * Called when bundle startup is occuring

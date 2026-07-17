@@ -1,5 +1,5 @@
-#ifndef SERVICEIMPL_HPP
-#define SERVICEIMPL_HPP
+#ifndef SERVICE_IMPL_DSTOI12_HPP
+#define SERVICE_IMPL_DSTOI12_HPP
 
 #include "TestInterfaces/Interfaces.hpp"
 
@@ -14,4 +14,4 @@ namespace sample
     };
 } // namespace sample
 
-#endif // _SERVICE_IMPL_HPP_
+#endif // SERVICE_IMPL_DSTOI12_HPP

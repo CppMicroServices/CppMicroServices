@@ -32,6 +32,8 @@
 
 #include "gtest/gtest.h"
 
+#include <fstream>
+
 namespace
 {
 #if defined(US_BUILD_SHARED_LIBS)
@@ -109,3 +111,46 @@ TEST(BundleObjFile, MappedFile)
 }
 #    endif // defined (US_PLATFORM_APPLE) || defined (US_PLATFORM_POSIX)
 #endif     // defined (US_BUILD_SHARED_LIBS)
+
+#if defined(US_PLATFORM_APPLE) || defined(US_PLATFORM_POSIX)
+/// @test Verify that GetData() applies dataOffset and GetSize() subtracts it.
+TEST(BundleObjFile, MappedFileWithDataOffset)
+{
+    // Write a temp file with known content so we can verify pointer arithmetic
+    cppmicroservices::testing::File tempFile
+        = cppmicroservices::testing::MakeUniqueTempFile(cppmicroservices::testing::GetTempDirectory());
+    {
+        std::ofstream out(tempFile.Path, std::ios::binary);
+        out.write("PADDINGhello", 12);
+    }
+
+    constexpr size_t dataOffset = 7; // skip "PADDING"
+    constexpr size_t mapLength = 12;
+    cppmicroservices::MappedFile mf(tempFile.Path, mapLength, 0, dataOffset);
+
+    ASSERT_NE(mf.GetData(), nullptr);
+    EXPECT_EQ(mf.GetSize(), mapLength - dataOffset);
+    EXPECT_EQ(strncmp(static_cast<char const*>(mf.GetData()), "hello", 5), 0);
+}
+
+/// @test Veriify that an open failure with a non-zero offset doesn't underflow GetSize()
+TEST(BundleObjFile, MappedFileOpenFailureWithNonZeroDataOffset)
+{
+    constexpr size_t dataOffset = 100;
+    cppmicroservices::MappedFile mf("/does/not/exist/bogus.bundle", 200, 0, dataOffset);
+
+    EXPECT_EQ(mf.GetData(), nullptr);
+    EXPECT_EQ(mf.GetSize(), 0u);
+}
+#endif
+
+/// @test Verify that on macOS, MH_EXECUTE type files are allowed to go through the machO code
+#if defined(US_PLATFORM_APPLE)
+TEST(BundleObjFile, MachOExecutableNotRejected)
+{
+    std::string const execPath
+        = cppmicroservices::testing::BIN_PATH + cppmicroservices::util::DIR_SEP + "usFrameworkTests" + US_EXE_EXT;
+    ASSERT_TRUE(cppmicroservices::util::Exists(execPath));
+    EXPECT_NO_THROW(cppmicroservices::BundleObjFactory().CreateBundleFileObj(execPath));
+}
+#endif

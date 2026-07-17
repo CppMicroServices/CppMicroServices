@@ -6,6 +6,98 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog <http://keepachangelog.com/>`_
 and this project adheres to `Semantic Versioning <http://semver.org/>`_.
 
+
+`v3.8.12 <https://github.com/cppmicroservices/cppmicroservices/tree/3.8.12>`_ (2026-5-12)
+---------------------------------------------------------------------------------------------------------
+
+`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.8.11...3.8.12>`_
+
+Added
+-----
+- `[Core Framework] Add changes required for building with Conan recipe and using vendored dependencies instead of bundled ones. <https://github.com/CppMicroServices/CppMicroServices/pull/1256>`_
+
+Changed
+-------
+- `[Core Framework] Upgrade miniz to 3.1.1 and remove custom patches. <https://github.com/CppMicroServices/CppMicroServices/pull/1239>`_
+
+Removed
+-------
+- `[Core Framework] Remove jsoncpp usage. <https://github.com/CppMicroServices/CppMicroServices/pull/1253>`_
+
+Deprecated
+----------
+
+
+Fixed
+-----
+- `[Configuration Admin] listConfigurations didn't properly apply filters. <https://github.com/CppMicroServices/CppMicroServices/pull/1249>`_
+
+
+`v3.8.11 <https://github.com/cppmicroservices/cppmicroservices/tree/3.8.11>`_ (2026-4-1)
+---------------------------------------------------------------------------------------------------------
+
+`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.8.10...3.8.11>`_
+
+Added
+-----
+
+
+Changed
+-------
+- `[Configuration Admin] Refactor ConfigurationAdmin for fewer throws. <https://github.com/CppMicroServices/CppMicroServices/pull/1242>`_
+
+Removed
+-------
+- `[Core Framework] Remove unnecessary 3rdparty libs, removed unnecessary patches. <https://github.com/CppMicroServices/CppMicroServices/pull/1233>`_
+
+Deprecated
+----------
+
+
+Fixed
+-----
+- `[Core Framework] Fix race for bundle starts and framework stop. <https://github.com/CppMicroServices/CppMicroServices/pull/1230>`_
+- `[Declarative Services] getcomponentDescriptionDTOs safety. <https://github.com/CppMicroServices/CppMicroServices/pull/1234>`_
+- `[Core Framework] Concurrent access to coreInfo bundle. <https://github.com/CppMicroServices/CppMicroServices/pull/1238>`_
+- `[Core Framework] Fix for failed serviceReferenceFromService. <https://github.com/CppMicroServices/CppMicroServices/pull/1240>`_
+- `[Core Framework] bug in change to serviceObjects <https://github.com/CppMicroServices/CppMicroServices/pull/1247>`_
+- `[Core Framework] Support cross compilation -- embed the LD_LIBRARY_PATH into the cmake options <https://github.com/CppMicroServices/CppMicroServices/pull/1250>`_
+
+
+`v3.8.10 <https://github.com/cppmicroservices/cppmicroservices/tree/3.8.10>`_ (2026-2-27)
+---------------------------------------------------------------------------------------------------------
+
+`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.8.9...3.8.10>`_
+
+Added
+-----
+- `[Core Framework] Add license and dependency information to third_party/README. <https://github.com/CppMicroServices/CppMicroServices/pull/1229>`_
+- `[Core Framework] Increase floating point precision for Any values. <https://github.com/CppMicroServices/CppMicroServices/pull/1221>`_
+- `[Core Framework] New lambda for shutdown work. <https://github.com/CppMicroServices/CppMicroServices/pull/1226>`_
+
+Changed
+-------
+- `[Core Framework] Upgrade benchmark dependency to version 1.9.4. <https://github.com/CppMicroServices/CppMicroServices/pull/1215>`_
+- `[Core Framework] Update macOS GitHub Actions runners. <https://github.com/CppMicroServices/CppMicroServices/pull/1222>`_
+- `[Declarative Services] Update serviceTracker code flow to eliminate extraneous throws. <https://github.com/CppMicroServices/CppMicroServices/pull/1223>`_
+- `[Core Framework] Migrate option parser usage to CLI11, update tests, and remove unrequired files. <https://github.com/CppMicroServices/CppMicroServices/pull/1225>`_
+- `[Declarative Services] Add mutual exclusion between addition and removal of referenced services. <https://github.com/CppMicroServices/CppMicroServices/pull/1229>`_
+
+Removed
+-------
+- `[Testing] Remove ResourceCompilerTest.cpp. <https://github.com/CppMicroServices/CppMicroServices/pull/1228>`_
+
+Deprecated
+----------
+
+
+Fixed
+-----
+- `[Declarative Services] Fix race between concurrent creation of configurations, factory instance creation, and bundle stop. <https://github.com/CppMicroServices/CppMicroServices/pull/1219>`_
+- `[Declarative Services] Fix concurrent reference removal and addition during component activate/deactivate. <https://github.com/CppMicroServices/CppMicroServices/pull/1227>`_
+- `[Core Framework] Fix ThreadSanitizer-reported data races and remove legacy GCC checks. <https://github.com/CppMicroServices/CppMicroServices/pull/1224>`_
+
+
 `v3.8.9 <https://github.com/cppmicroservices/cppmicroservices/tree/3.8.9>`_ (2025-10-31)
 ---------------------------------------------------------------------------------------------------------
 

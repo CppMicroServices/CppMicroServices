@@ -22,10 +22,12 @@ limitations under the License.
 
 #include <chrono>
 #include <fstream>
+#include <future>
 #include <mutex>
 #include <thread>
 #include <type_traits>
 
+#include "ConcurrencyTestUtil.hpp"
 #include "TestUtilBundleListener.h"
 #include "TestUtils.h"
 #include "cppmicroservices/Bundle.h"
@@ -51,18 +53,6 @@ using cppmicroservices::testing::File;
 using cppmicroservices::testing::GetTempDirectory;
 using cppmicroservices::testing::MakeUniqueTempDirectory;
 using cppmicroservices::testing::TempDir;
-
-#if !defined(__clang__) && defined(__GNUC__)
-#    define US_GCC_VER (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
-#endif
-
-// TODO: Remove all occurences of US_TYPE_OPERATIONS_AVAILABLE macro
-// once the minimum GCC compiler required is 4.7 or above
-#if defined(US_GCC_VER) && (US_GCC_VER < 40700)
-#    define US_TYPE_OPERATIONS_AVAILABLE 0
-#else
-#    define US_TYPE_OPERATIONS_AVAILABLE 1
-#endif
 
 US_MSVC_PUSH_DISABLE_WARNING(4996)
 
@@ -96,10 +86,9 @@ namespace
 
 TEST(FrameworkTest, Ctor)
 {
-#if US_TYPE_OPERATIONS_AVAILABLE
     ASSERT_FALSE(std::is_default_constructible<Framework>::value);
     ASSERT_TRUE((std::is_constructible<Framework, Bundle>::value));
-#endif
+
     // Bundle b;
     // ASSERT_THROW(Framework(Bundle(b)), std::logic_error); This causes a crash. TODO: Fix crash and uncomment this
     // line.
@@ -117,9 +106,8 @@ TEST(FrameworkTest, Ctor)
 
 TEST(FrameworkTest, MoveCtor)
 {
-#if US_TYPE_OPERATIONS_AVAILABLE
     ASSERT_TRUE(std::is_move_constructible<Framework>::value);
-#endif
+
     auto f = FrameworkFactory().NewFramework();
     ASSERT_TRUE(f);
     f.Start();
@@ -130,9 +118,8 @@ TEST(FrameworkTest, MoveCtor)
 
 TEST(FrameworkTest, MoveAssign)
 {
-#if US_TYPE_OPERATIONS_AVAILABLE
     ASSERT_TRUE(std::is_move_assignable<Framework>::value);
-#endif
+
     auto f = FrameworkFactory().NewFramework();
     ASSERT_TRUE(f);
     f.Start();
@@ -146,9 +133,8 @@ TEST(FrameworkTest, MoveAssign)
 
 TEST(FrameworkTest, CopyCtor)
 {
-#if US_TYPE_OPERATIONS_AVAILABLE
     ASSERT_TRUE(std::is_copy_constructible<Framework>::value);
-#endif
+
     auto f = FrameworkFactory().NewFramework();
     ASSERT_TRUE(f);
     f.Start();
@@ -163,9 +149,8 @@ TEST(FrameworkTest, CopyCtor)
 
 TEST(FrameworkTest, CopyAssign)
 {
-#if US_TYPE_OPERATIONS_AVAILABLE
     ASSERT_TRUE(std::is_copy_assignable<Framework>::value);
-#endif
+
     auto f = FrameworkFactory().NewFramework();
     ASSERT_TRUE(f);
     f.Start();
@@ -848,4 +833,115 @@ TEST(FrameworkTest, LoadLibraryLogsMessagesTest)
 }
 #endif
 
+TEST(FrameworkTest, ConfigurationWithExtraShutdownWork)
+{
+    std::atomic<int> capt { 0 };
+    std::function<void()> shutdownFun = [&capt]() { capt++; };
+
+    cppmicroservices::FrameworkConfiguration configuration {
+        { cppmicroservices::Constants::FRAMEWORK_EXTRA_SHUTDOWN_FUNC, shutdownFun }
+    };
+
+    auto f = FrameworkFactory().NewFramework(std::move(configuration));
+    ASSERT_NO_THROW(f.Start());
+
+    ASSERT_EQ(capt.load(), 0);
+    f.Stop();
+    f.WaitForStop(std::chrono::milliseconds::zero());
+    ASSERT_EQ(capt.load(), 1);
+
+    // ensure the callback is invoked on each invocation of waitforStop
+    f.WaitForStop(std::chrono::milliseconds::zero());
+    ASSERT_EQ(capt.load(), 2);
+}
+
+#ifdef US_ENABLE_THREADING_SUPPORT
+TEST(FrameworkTest, BundleStartAfterFrameworkStopKitchenSink)
+{
+    auto f = FrameworkFactory().NewFramework();
+
+    f.Start();
+
+    auto fmc = f.GetBundleContext();
+    bool hasSeenStop = false;
+    fmc.AddBundleListener(
+        [&hasSeenStop](cppmicroservices::BundleEvent const& event) mutable
+        {
+            static std::mutex m;
+            std::unique_lock lock(m);
+            auto type = event.GetType();
+            if (type == cppmicroservices::BundleEvent::BUNDLE_STOPPING && event.GetBundle().GetBundleId() != 0)
+            {
+                hasSeenStop = true;
+            }
+            else if (type == cppmicroservices::BundleEvent::BUNDLE_STARTING && hasSeenStop)
+            {
+                ASSERT_TRUE(false) << "bundle stop event followed by bundle start event -- not allowed";
+            }
+        });
+    cppmicroservices::detail::test::Barrier barrier(6);
+
+#ifdef US_BUILD_SHARED_LIBS
+    auto installAndStart = [&barrier, &fmc](std::string const& libName, bool wait = true)
+    {
+        if (wait)
+        {
+            barrier.Wait();
+        }
+        try
+        {
+            cppmicroservices::testing::InstallLib(fmc, libName).Start();
+        }
+        catch (...)
+        {
+        }
+    };
+
+#else
+    auto installAndStart = [&barrier, &fmc](std::string const& libName, bool wait = true)
+    {
+        if (wait)
+        {
+            barrier.Wait();
+        }
+        try
+        {
+            cppmicroservices::testing::GetBundle(libName, fmc).Start();
+        }
+        catch (...)
+        {
+        }
+    };
+#endif
+
+    installAndStart("TestBundleA", false);
+    installAndStart("TestBundleA2", false);
+    installAndStart("TestBundleB", false);
+    installAndStart("TestBundleH", false);
+    installAndStart("TestBundleLQ", false);
+    installAndStart("TestBundleM", false);
+    installAndStart("TestBundleR", false);
+    installAndStart("TestBundleRA", false);
+
+    std::vector<std::shared_future<void>> futures;
+    // Launch asynchronous tasks using std::async
+    futures.emplace_back(std::async(std::launch::async, installAndStart, "TestBundleRL"));
+    futures.emplace_back(std::async(std::launch::async, installAndStart, "TestBundleS"));
+    futures.emplace_back(std::async(std::launch::async, installAndStart, "TestBundleSL1"));
+    futures.emplace_back(std::async(std::launch::async, installAndStart, "TestBundleSL3"));
+    futures.emplace_back(std::async(std::launch::async, installAndStart, "TestBundleSL4"));
+    futures.emplace_back(std::async(std::launch::async,
+                                    [&f, &barrier]()
+                                    {
+                                        barrier.Wait();
+                                        f.Stop();
+                                        f.WaitForStop(std::chrono::milliseconds::zero());
+                                    }));
+
+    for (auto& fut : futures)
+    {
+        fut.get();
+    }
+}
+#endif
 US_MSVC_POP_WARNING

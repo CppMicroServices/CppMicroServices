@@ -35,7 +35,16 @@ limitations under the License.
 #include "cppmicroservices/util/FileSystem.h"
 #include "gtest/gtest.h"
 
+#if defined(__clang__) || defined(__GNUC__)
+#    pragma GCC diagnostic push
+#    pragma GCC diagnostic ignored "-Wold-style-cast"
+#endif
+
 #include "miniz.h"
+
+#if defined(__clang__) || defined(__GNUC__)
+#    pragma GCC diagnostic pop
+#endif
 
 #if defined(US_PLATFORM_WINDOWS)
 #    include "windows.h"

@@ -53,6 +53,8 @@ namespace cppmicroservices
                 // If the service was previously satisfied then either there is
                 // nothing to do or a rebind needs to happen if the cardinality
                 // is optional and there are no bound refs.
+
+                // no bound refs -> bind
                 if (0 == mgr.GetBoundReferences().size())
                 {
                     Log(mgr.configName_ + " has BIND for reference " + mgr.metadata_.name);
@@ -61,13 +63,12 @@ namespace cppmicroservices
 
                     notifications.emplace_back(mgr.metadata_.name, RefEvent::REBIND, reference);
                 }
+                else if (mgr.IsMultiple()) {
+                    // some bound refs, but multiple cardinality
 
-                // for multiple cardinality rebind to new reference if number of
-                // bound references is within limit of maxCardinality value
-                // otherwise log to the user that further bind is not possible
-                if (mgr.IsMultiple()) {
+                    // number bound < max -> rebind
                     if (mgr.GetBoundReferences().size() < mgr.metadata_.maxCardinality) {
-                        Log("Notify BIND for reference " + mgr.metadata_.name);
+                        Log(mgr.configName_ + " has BIND for reference " + mgr.metadata_.name);
 
                         ClearBoundRefs();
                         mgr.UpdateBoundRefs();
@@ -75,6 +76,7 @@ namespace cppmicroservices
                         notifications.emplace_back(mgr.metadata_.name, RefEvent::REBIND, reference);
                     }
                     else {
+                        // max already bound, log
                         Log("Number of multiple references has reached its maximum limit. New reference(s) will not be bound.", SeverityLevel::LOG_WARNING);
                     }
                 }

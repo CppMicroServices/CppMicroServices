@@ -34,19 +34,22 @@ DEALINGS IN THE SOFTWARE.
 #define CPPMICROSERVICES_ANY_H
 
 #include "cppmicroservices/FrameworkConfig.h"
+#include "detail/ScopeGuard.h"
 
 #include <algorithm>
 #include <array>
+#include <cstdint>
 #include <functional>
+#include <iomanip>
 #include <list>
 #include <map>
 #include <memory>
 #include <set>
 #include <sstream>
+#include <type_traits>
 #include <typeinfo>
 #include <utility>
 #include <vector>
-#include <cstdint>
 
 namespace cppmicroservices
 {
@@ -73,7 +76,7 @@ namespace cppmicroservices
                 op_eq_test(...)
                 {
                     return std::array<char, 2> {
-                        {0, 0}
+                        { 0, 0 }
                     };
                 }
 
@@ -101,7 +104,7 @@ namespace cppmicroservices
             }
 
         } // namespace detail
-    }     // namespace any
+    } // namespace any
 
     /**
 
@@ -129,23 +132,23 @@ namespace cppmicroservices
                                                        int32_t const);
     US_Framework_EXPORT std::ostream& any_value_to_cpp(std::ostream& os, bool val, uint8_t const, int32_t const);
 
-    template <typename T>
+    template <typename ReturnT, typename... Args>
     std::ostream&
-    any_value_to_string(std::ostream& os, std::function<bool(T const&)> const&)
+    any_value_to_string(std::ostream& os, std::function<ReturnT(Args...)> const&)
     {
         return os;
     }
 
-    template <typename T>
+    template <typename ReturnT, typename... Args>
     std::ostream&
-    any_value_to_json(std::ostream& os, std::function<bool(T const&)> const&, uint8_t const, int32_t const)
+    any_value_to_json(std::ostream& os, std::function<ReturnT(Args...)> const&, uint8_t const, int32_t const)
     {
         return os;
     }
 
-    template <typename T>
+    template <typename ReturnT, typename... Args>
     std::ostream&
-    any_value_to_cpp(std::ostream& os, std::function<bool(T const&)> const&, uint8_t const, int32_t const)
+    any_value_to_cpp(std::ostream& os, std::function<ReturnT(Args...)> const&, uint8_t const, int32_t const)
     {
         return os;
     }
@@ -156,8 +159,13 @@ namespace cppmicroservices
     template <typename ValueType>
     ValueType const& ref_any_cast(Any const& operand);
 
+    constexpr int DOUBLE_PRECISION = 12;
+
+    // --------------------
+    // Default templates (non-floating types)
+    // --------------------
     template <class T>
-    std::ostream&
+    std::enable_if_t<!std::is_floating_point_v<T>, std::ostream&>
     any_value_to_string(std::ostream& os, T const& val)
     {
         os << val;
@@ -165,19 +173,49 @@ namespace cppmicroservices
     }
 
     template <class T>
-    std::ostream&
+    std::enable_if_t<!std::is_floating_point_v<T>, std::ostream&>
     any_value_to_json(std::ostream& os, T const& val, uint8_t const = 0, int32_t const = 0)
     {
         return os << val;
     }
 
     template <class T>
-    std::ostream&
+    std::enable_if_t<!std::is_floating_point_v<T>, std::ostream&>
     any_value_to_cpp(std::ostream& os, T const& val, uint8_t const = 0, int32_t const = 0)
     {
         return os << val;
     }
 
+    // Helper for floating-point output with scope-based precision guard
+    template <class T>
+    std::ostream&
+    stream_floating_point(std::ostream& os, T const& val)
+    {
+        detail::ScopeGuard sg([&os, oldPrec = os.precision()]() { os.precision(oldPrec); });
+        os << std::setprecision(DOUBLE_PRECISION) << val;
+        return os;
+    }
+
+    template <class T>
+    std::enable_if_t<std::is_floating_point_v<T>, std::ostream&>
+    any_value_to_json(std::ostream& os, T const& val, uint8_t const, int32_t const)
+    {
+        return stream_floating_point(os, val);
+    }
+
+    template <class T>
+    std::enable_if_t<std::is_floating_point_v<T>, std::ostream&>
+    any_value_to_string(std::ostream& os, T const& val)
+    {
+        return stream_floating_point(os, val);
+    }
+
+    template <class T>
+    std::enable_if_t<std::is_floating_point_v<T>, std::ostream&>
+    any_value_to_cpp(std::ostream& os, T const& val, uint8_t const, int32_t const)
+    {
+        return stream_floating_point(os, val);
+    }
     /**
      * \internal
      */
@@ -392,13 +430,13 @@ namespace cppmicroservices
          * @tparam ValueType the type of the value to move into the Any
          * @param value a ValueType value to move into the Any
          */
-        template <typename ValueType
-                  , typename = std::enable_if_t<!std::is_same_v<Any, std::decay_t<ValueType>>
-                               && !std::is_reference_v<ValueType>>>
+        template <typename ValueType,
+                  typename
+                  = std::enable_if_t<!std::is_same_v<Any, std::decay_t<ValueType>> && !std::is_reference_v<ValueType>>>
         Any(ValueType&& value) : _content(new Holder<std::decay_t<ValueType>>(std::forward<ValueType>(value)))
         {
         }
-        
+
         /**
          * Copy constructor, works with empty Anys and initialized Any values.
          *
@@ -496,16 +534,16 @@ namespace cppmicroservices
             Any(rhs).Swap(*this);
             return *this;
         }
-        
+
         /**
          * Assignment operator which moves rhs into the internal storage of the Any
          *
          * @tparam ValueType the type of the value to move
          * @param value a ValueType value to move into the internal storage
          */
-        template <typename ValueType
-                  , typename = std::enable_if_t<!std::is_same_v<Any, std::decay_t<ValueType>>
-                               && !std::is_reference_v<ValueType>>>
+        template <typename ValueType,
+                  typename
+                  = std::enable_if_t<!std::is_same_v<Any, std::decay_t<ValueType>> && !std::is_reference_v<ValueType>>>
         Any&
         operator=(ValueType&& rhs)
         {

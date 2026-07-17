@@ -26,7 +26,16 @@
 #include "cppmicroservices/AnyMap.h"
 #include "cppmicroservices/util/BundleObjFile.h"
 
+#if defined(__clang__) || defined(__GNUC__)
+#    pragma GCC diagnostic push
+#    pragma GCC diagnostic ignored "-Wold-style-cast"
+#endif
+
 #include "miniz.h"
+
+#if defined(__clang__) || defined(__GNUC__)
+#    pragma GCC diagnostic pop
+#endif
 
 #include <cstdint>
 #include <memory>
@@ -113,7 +122,7 @@ namespace cppmicroservices
         /// Throws std::runtime_error if the underlying zip file cannot be opened.
         void OpenAndInitializeContainer() const;
 
-        const std::string m_Location;
+        std::string const m_Location;
         mutable mz_zip_archive m_ZipArchive;
         mutable std::unique_ptr<BundleObjFile> m_ObjFile;
 

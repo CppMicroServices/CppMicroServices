@@ -38,7 +38,7 @@ jobs:
         git config --global core.autocrlf true
         subst Z: ${{github.workspace}}
 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v5
       with:
         submodules: true
 
@@ -70,7 +70,7 @@ jobs:
           git config --global core.autocrlf true
           subst Z: ${{github.workspace}}
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v5
         with:
           submodules: true
           fetch-depth: 1
@@ -92,7 +92,7 @@ jobs:
         working-directory: ${{github.workspace}}
         run: python ${{github.workspace}}\fixcoveragefilepaths.py -i build\config_${{matrix.buildconfiguration}}\coverage.xml -s Z:\ -o ${{github.workspace}}\coverage_pathsfixed.xml
 
-      - uses: codecov/codecov-action@v4
+      - uses: codecov/codecov-action@v6
         with:
           files: ./coverage_pathsfixed.xml
           fail_ci_if_error: true
@@ -125,14 +125,14 @@ jobs:
         git config --global core.autocrlf true
         subst Z: ${{github.workspace}}
 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v5
       with:
         submodules: true
 
     - name: Build And Test
       working-directory: Z:\
       run: ctest -VV -S cmake\usCTestScript_github.cmake
-      
+
   build_win_deterministic_bundles:
     name: Build and Test [windows-2022,Configuration=0,Deterministic]
     runs-on: windows-2022
@@ -151,7 +151,7 @@ jobs:
         subst Z: ${{github.workspace}}
         echo "C:\msys64" >> $PATH
 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v5
       with:
         submodules: true
 

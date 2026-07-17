@@ -143,49 +143,60 @@ namespace
         }
     }
 
+    std::string
+    tryGetStringFromProperty(cppmicroservices::Any const& prop, std::string const& subKey = {})
+    {
+        if (prop.Empty())
+        {
+            return {};
+        }
+        if (subKey.empty())
+        {
+            auto const* s = cppmicroservices::any_cast<std::string>(&prop);
+            return s ? *s : std::string {};
+        }
+        auto const* map = cppmicroservices::any_cast<cppmicroservices::AnyMap>(&prop);
+        if (!map)
+        {
+            return {};
+        }
+        auto val = map->AtCompoundKey(subKey, cppmicroservices::Any());
+        auto const* s = cppmicroservices::any_cast<std::string>(&val);
+        return s ? *s : std::string {};
+    }
+
     template <typename T>
     std::string
     getPidFromServiceReference(T const& reference)
     {
         using namespace cppmicroservices::cmimpl::CMConstants;
-        try
+
+        std::string pid;
+
+        pid = tryGetStringFromProperty(reference.GetProperty(CM_SERVICE_KEY), CM_SERVICE_SUBKEY);
+        if (!pid.empty())
         {
-            auto const serviceProp = reference.GetProperty(CM_SERVICE_KEY);
-            auto const& serviceMap = cppmicroservices::ref_any_cast<cppmicroservices::AnyMap>(serviceProp);
-            return cppmicroservices::any_cast<std::string>(serviceMap.AtCompoundKey(CM_SERVICE_SUBKEY));
+            return pid;
         }
-        catch (...)
+
+        pid = tryGetStringFromProperty(reference.GetProperty(CM_COMPONENT_KEY), CM_COMPONENT_SUBKEY);
+        if (!pid.empty())
         {
-            // Service does not have a "service" property with a "pid" string subproperty.
+            return pid;
         }
-        try
+
+        pid = tryGetStringFromProperty(reference.GetProperty(CM_SERVICE_KEY + "." + CM_SERVICE_SUBKEY));
+        if (!pid.empty())
         {
-            auto const componentProp = reference.GetProperty(CM_COMPONENT_KEY);
-            auto const& componentMap = cppmicroservices::ref_any_cast<cppmicroservices::AnyMap>(componentProp);
-            return cppmicroservices::any_cast<std::string>(componentMap.AtCompoundKey(CM_COMPONENT_SUBKEY));
+            return pid;
         }
-        catch (...)
+
+        pid = tryGetStringFromProperty(reference.GetProperty(CM_COMPONENT_KEY + "." + CM_COMPONENT_SUBKEY));
+        if (!pid.empty())
         {
-            // Service does not have a "component" property with a "name" string property.
+            return pid;
         }
-        try
-        {
-            return cppmicroservices::any_cast<std::string>(
-                reference.GetProperty(CM_SERVICE_KEY + std::string(".") + CM_SERVICE_SUBKEY));
-        }
-        catch (...)
-        {
-            // Service does not have a "service.pid" string property.
-        }
-        try
-        {
-            return cppmicroservices::any_cast<std::string>(
-                reference.GetProperty(CM_COMPONENT_KEY + std::string(".") + CM_COMPONENT_SUBKEY));
-        }
-        catch (...)
-        {
-            // Service does not have a "component.name" string property.
-        }
+
         return {};
     }
 } // namespace
@@ -397,7 +408,6 @@ namespace cppmicroservices
 
                 // filter is not empty so look for pid and property matches
                 LDAPFilter ldap { filter };
-                cppmicroservices::AnyMap pidMap { cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS };
 
                 for (auto const& it : configurations)
                 {
@@ -407,26 +417,26 @@ namespace cppmicroservices
                     {
                         continue;
                     }
-                    /* Create an AnyMap containing the pid or factoryPid so that the ldap filter
-                     * functionality can be used to match the pid to the
-                     * input parameter. Easy way to do the comparison since input parameter could
-                     * contain a regular expression
-                     */
-                    pidMap["pid"] = it.first;
-
-                    if (ldap.Match(pidMap))
+                    /* Build a single map containing both the pid and the configuration
+                     * properties so that the LDAP filter is evaluated against the full
+                     * set of attributes.
+                     * NOTE: GetProperties() can throw if the configuration is concurrently
+                     * removed (removed flag set under propertiesMutex before the map
+                     * erase under configurationsMutex). Skip such entries.
+                     **/
+                    try
                     {
-                        // This configuration object has a matching pid.
-                        result.emplace_back(it.second);
-                    }
-                    else
-                    {
-                        // The pid wasn't a match but the properties might be. Check those.
                         auto props = it.second->GetProperties();
+                        props["pid"] = it.first;
+
                         if (ldap.Match(props))
                         {
                             result.emplace_back(it.second);
                         }
+                    }
+                    catch (std::runtime_error const&)
+                    {
+                        // Configuration is being removed concurrently; skip it.
                     }
                 } // end for
             }

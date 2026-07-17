@@ -28,6 +28,7 @@
 #include "BundlePrivate.h"
 #include "CoreBundleContext.h"
 #include "ServiceRegistrationBasePrivate.h"
+#include "ServiceRegistrationLocks.h"
 
 #include <cassert>
 #include <iterator>
@@ -55,6 +56,7 @@ namespace cppmicroservices
         services.clear();
         classServices.clear();
         serviceRegistrations.clear();
+        bundleServices.clear();
     }
 
     Properties
@@ -110,7 +112,7 @@ namespace cppmicroservices
         bool isPrototypeFactory = (isFactory ? static_cast<bool>(std::dynamic_pointer_cast<PrototypeServiceFactory>(
                                                    std::static_pointer_cast<ServiceFactory>(
                                                        service->find("org.cppmicroservices.factory")->second)))
-                                             : false);
+                         : false);
 
         std::vector<std::string> classes;
         // Check if service implements claimed classes and that they exist.
@@ -131,6 +133,7 @@ namespace cppmicroservices
             US_UNUSED(l);
             services.insert(std::make_pair(res, classes));
             serviceRegistrations.push_back(res);
+            bundleServices[bundle].push_back(res);
             for (auto& clazz : classes)
             {
                 auto& s = classServices[clazz];
@@ -208,6 +211,24 @@ namespace cppmicroservices
         this->Lock(), Get_unlocked(removeLeadingNamespacing(clazz), filter, bundle, res);
     }
 
+    LDAPExpr const&
+    ServiceRegistry::GetCachedLDAPExpr(std::string const& filter) const
+    {
+        auto const it = filterCache.find(filter);
+        if (it != filterCache.end())
+        {
+            return it->second;
+        }
+        if (filterCache.size() >= FILTER_CACHE_MAX_SIZE)
+        {
+            // Eviction order is non-deterministic (unordered_map iteration order).
+            // This is acceptable — we only need to shed load, not preserve recency.
+            filterCache.erase(filterCache.begin(), std::next(filterCache.begin(), FILTER_CACHE_MAX_SIZE / 2));
+        }
+        auto [pos, inserted] = filterCache.emplace(filter, LDAPExpr(filter));
+        return pos->second;
+    }
+
     void
     ServiceRegistry::Get_unlocked(std::string const& clazz,
                                   std::string const& filter,
@@ -217,14 +238,14 @@ namespace cppmicroservices
         std::vector<ServiceRegistrationBase>::const_iterator s;
         std::vector<ServiceRegistrationBase>::const_iterator send;
         std::vector<ServiceRegistrationBase> v;
-        LDAPExpr ldap;
+        LDAPExpr const* ldap = nullptr;
         if (clazz.empty())
         {
             if (!filter.empty())
             {
-                ldap = LDAPExpr(filter);
+                ldap = &GetCachedLDAPExpr(filter);
                 LDAPExpr::ObjectClassSet matched;
-                if (ldap.GetMatchedObjectClasses(matched))
+                if (ldap->GetMatchedObjectClasses(matched))
                 {
                     v.clear();
                     for (auto& className : matched)
@@ -271,13 +292,13 @@ namespace cppmicroservices
             }
             if (!filter.empty())
             {
-                ldap = LDAPExpr(filter);
+                ldap = &GetCachedLDAPExpr(filter);
             }
         }
 
         for (; s != send; ++s)
         {
-            if (filter.empty() || ldap.Evaluate(PropertiesHandle((s->d->coreInfo->properties), true), false))
+            if (!ldap || ldap->Evaluate(PropertiesHandle((s->d->coreInfo->properties), true), false))
             {
                 res.emplace_back(s->GetReference(clazz));
             }
@@ -320,6 +341,19 @@ namespace cppmicroservices
         services.erase(sr);
         serviceRegistrations.erase(std::remove(serviceRegistrations.begin(), serviceRegistrations.end(), sr),
                                    serviceRegistrations.end());
+        if (auto bundle = sr.d->coreInfo->bundle_.lock())
+        {
+            auto it = bundleServices.find(bundle.get());
+            if (it != bundleServices.end())
+            {
+                auto& regs = it->second;
+                regs.erase(std::remove(regs.begin(), regs.end(), sr), regs.end());
+                if (regs.empty())
+                {
+                    bundleServices.erase(it);
+                }
+            }
+        }
         for (auto& clazz : classes)
         {
             auto& s = classServices[clazz];
@@ -340,15 +374,10 @@ namespace cppmicroservices
         auto l = this->Lock();
         US_UNUSED(l);
 
-        for (auto& sr : serviceRegistrations)
+        auto it = bundleServices.find(p);
+        if (it != bundleServices.end())
         {
-            if (auto bundle_ = sr.d->coreInfo->bundle_.lock())
-            {
-                if (bundle_.get() == p)
-                {
-                    res.push_back(sr);
-                }
-            }
+            res = it->second;
         }
     }
 

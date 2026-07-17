@@ -225,6 +225,24 @@ namespace test
         virtual cppmicroservices::AnyMap GetProperties() = 0;
         virtual ~ServiceCInt();
     };
+
+    class US_TestInterfaces_EXPORT FactoryCreatedService
+    {
+      public:
+        FactoryCreatedService() = default;
+        virtual ~FactoryCreatedService() = default;
+        virtual std::string sayHi() = 0;
+    };
+
+    class US_TestInterfaces_EXPORT FactoryServiceDependent
+    {
+      public:
+        FactoryServiceDependent() = default;
+        virtual ~FactoryServiceDependent() = default;
+        virtual bool didBind() = 0;
+        virtual std::string getAsyncSayHiResult() = 0;
+    };
+
 } // namespace test
 
 #endif

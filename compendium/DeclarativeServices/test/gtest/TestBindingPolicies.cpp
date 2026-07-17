@@ -442,12 +442,10 @@ namespace cppmicroservices
             test::InstallAndStartDS(bc);
 
             // The expectation is that Log(...) with a log severity of LOG_ERROR will be called
-            // exactly 10 times - 1 bind and 1 unbind per service component of which there are three,
-            // plus an additional bind and unbind for each service component with optional cardinality
-            // of which there are two.
+            // exactly 6 times - 1 bind and 1 unbind per service component of which there are three.
             EXPECT_CALL(*mockLogger.get(),
                         Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, testing::_, testing::_))
-                .Times(10);
+                .Times(6);
 
             auto testBundle = test::InstallAndStartBundle(bc, "TestBindUnbindThrows");
             EXPECT_TRUE(bc.GetServiceReference<test::Interface2>())
@@ -1040,9 +1038,9 @@ namespace cppmicroservices
                                                    { 1, 2, 2 },
                                                    6 },
                 MultipleCardinalityDynamicPolicy { CreateFakeReferenceMetadata("dynamic", "reluctant", "0..n"),
-                                                   { 2, 3, 4 },
                                                    { 1, 2, 3 },
-                                                   7 }));
+                                                   { 1, 2, 3 },
+                                                   6 }));
 
         // test that:
         //  any new service causes a re-bind

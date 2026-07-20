@@ -195,27 +195,9 @@ namespace cppmicroservices
          * Type of operation in progress. Blocks bundle calls during activator and
          * listener calls
          */
-        // GCC 4.6 atomics do not support custom trivially copyable types
-        // like enums yet, so we use the underlying primitive type here.
-        std::atomic<uint8_t> operation;
 
         /** Saved exception of resolve failure. */
         std::exception_ptr resolveFailException;
-
-        /** Remember if bundle was started */
-        bool wasStarted;
-
-        enum class Aborted : uint8_t
-        {
-            NONE,
-            YES,
-            NO
-        };
-
-        /** start/stop time-out/uninstall flag */
-        // GCC 4.6 atomics do not support custom trivially copyable types
-        // like enums yet, so we use the underlying primitive type here.
-        std::atomic<uint8_t> aborted;
 
         /**
          * Bundle symbolic name.

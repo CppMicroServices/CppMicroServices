@@ -234,7 +234,6 @@ namespace cppmicroservices
                     DoInit();
                     [[fallthrough]];
                 case Bundle::STATE_STARTING:
-                    operation = BundlePrivate::OP_ACTIVATING;
                     break;
                 case Bundle::STATE_ACTIVE:
                     return;
@@ -284,8 +283,6 @@ namespace cppmicroservices
             auto activeState = std::make_shared<BPActiveState>();
             auto currState = GetStateObj();
             CompareAndSetState(&currState, activeState);
-            // state = Bundle::STATE_ACTIVE;
-            operation = BundlePrivate::OP_IDLE;
         }
 
         coreCtx->listeners.SendFrameworkEvent(
@@ -326,11 +323,9 @@ namespace cppmicroservices
             {
                 auto l = Lock();
                 US_UNUSED(l);
-                operation = OP_DEACTIVATING;
                 auto activeState = std::make_shared<BPStoppingState>();
                 auto currState = GetStateObj();
                 CompareAndSetState(&currState, activeState);
-                // state = Bundle::STATE_STOPPING;
             }
             coreCtx->listeners.BundleChanged(
                 BundleEvent(BundleEvent::BUNDLE_STOPPING, MakeBundle(this->shared_from_this())));
@@ -427,8 +422,6 @@ namespace cppmicroservices
             auto resolvedState = std::make_shared<BPResolvedState>();
             auto currState = GetStateObj();
             CompareAndSetState(&currState, resolvedState);
-            // state = Bundle::STATE_RESOLVED;
-            operation = OP_IDLE;
             NotifyAll();
         }
         stopEvent = fe;

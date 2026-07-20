@@ -137,10 +137,8 @@ namespace cppmicroservices
 
         if (sendEvent)
         {
-            operation = OP_UNRESOLVING;
             coreCtx->listeners.BundleChanged({ BundleEvent::BUNDLE_RESOLVED, MakeBundle(this->shared_from_this()) });
         }
-        operation = OP_IDLE;
         return;
     }
 
@@ -153,10 +151,7 @@ namespace cppmicroservices
         , bundleContext()
         , destroyActivatorHook(nullptr)
         , bactivator(nullptr, nullptr)
-        , operation(static_cast<uint8_t>(OP_IDLE))
         , resolveFailException()
-        , wasStarted(false)
-        , aborted(static_cast<uint8_t>(Aborted::NONE))
         , symbolicName(Constants::SYSTEM_BUNDLE_SYMBOLICNAME)
         , version(CppMicroServices_VERSION_MAJOR, CppMicroServices_VERSION_MINOR, CppMicroServices_VERSION_PATCH)
         , timeStamp(std::chrono::steady_clock::now())
@@ -176,10 +171,7 @@ namespace cppmicroservices
         , bundleContext()
         , destroyActivatorHook(nullptr)
         , bactivator(nullptr, nullptr)
-        , operation(OP_IDLE)
         , resolveFailException()
-        , wasStarted(false)
-        , aborted(static_cast<uint8_t>(Aborted::NONE))
         , symbolicName(ba->GetResourcePrefix())
         , version()
         , timeStamp(ba->GetLastModified())

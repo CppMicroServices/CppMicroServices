@@ -65,10 +65,9 @@ set(_srcs
   bundle/states/BPUninstalledState.cpp
   bundle/states/BPInstalledState.cpp
   bundle/states/BPResolvedState.cpp
-  bundle/states/BPIdleState.cpp
   bundle/states/BPStartingState.cpp
   bundle/states/BPStoppingState.cpp
-  bundle/states/BPRunningState.cpp
+  bundle/states/BPActiveState.cpp
 )
 
 if(NOT US_USE_SYSTEM_MINIZ)

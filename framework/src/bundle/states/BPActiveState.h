@@ -1,21 +1,19 @@
 #ifndef BPActiveState_h
 #define BPActiveState_h
 
-#include "BPRunningState.h"
+#include "BundlePrivateState.h"
 
 namespace cppmicroservices
 {
-    class BPActiveState final : public BPRunningState
+    class BPActiveState final : public BundlePrivateState
     { 
         public:
-        using BPRunningState::BPRunningState;
+        using BundlePrivateState::BundlePrivateState;
         virtual ~BPActiveState() = default;
 
-        void Start(BundlePrivate& mgr, uint32_t options) override{
-            CheckFrameworkHasStopped(mgr);
-            US_UNUSED(options);
-            return;
-        };
+        void Start(BundlePrivate& mgr, uint32_t options) override;
+        void Stop(BundlePrivate& mgr, uint32_t options) override;
+        void Uninstall(BundlePrivate& mgr) override;
 
         uint32_t GetState() override {
             return 0x00000020;

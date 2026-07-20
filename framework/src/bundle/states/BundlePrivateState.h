@@ -17,7 +17,6 @@ namespace cppmicroservices
         explicit BundlePrivateState(std::shared_future<void> blockUntil);
         virtual ~BundlePrivateState() = default;
 
-
         virtual void Start(BundlePrivate& mgr, uint32_t options)=0;
         virtual void Stop(BundlePrivate& mgr, uint32_t options)=0;
         virtual void Uninstall(BundlePrivate& mgr)=0;
@@ -26,7 +25,6 @@ namespace cppmicroservices
 
         void SetAutostart(BundlePrivate& mgr, uint32_t options);
         void CheckFrameworkHasStopped(BundlePrivate& mgr);
-        void StartFailed(BundlePrivate& mgr, std::shared_ptr<BundlePrivateState> expectedState);
 
         void WaitForTransitionTask();
 

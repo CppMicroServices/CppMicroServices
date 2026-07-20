@@ -45,24 +45,4 @@ namespace cppmicroservices {
         ready.get();
     }
 
-    void BundlePrivateState::StartFailed(BundlePrivate& mgr, std::shared_ptr<BundlePrivateState> expectedState)
-    {
-        // auto stoppingState = std::make_shared<BPStoppingState>();
-        // mgr.CompareAndSetState(&expectedState, stoppingState);
-        mgr.coreCtx->listeners.BundleChanged(
-            BundleEvent(BundleEvent::BUNDLE_STOPPING, MakeBundle(mgr.shared_from_this())));
-        mgr.RemoveBundleResources();
-        auto oldBundleContext = mgr.bundleContext.Exchange(std::shared_ptr<BundleContextPrivate>());
-        if (oldBundleContext)
-        {
-            oldBundleContext->Invalidate();
-        }
-
-        mgr.CompareAndSetState(&expectedState, std::make_shared<BPResolvedState>());
-
-        mgr.coreCtx->listeners.BundleChanged(
-            BundleEvent(BundleEvent::BUNDLE_STOPPED, MakeBundle(mgr.shared_from_this())));
-        
-
-    }
 }

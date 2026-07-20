@@ -30,15 +30,11 @@ namespace cppmicroservices
             if (mgr.CompareAndSetState(&currState, stoppingState)){
                 currState->WaitForTransitionTask();
                 std::exception_ptr res = StopHelper(mgr);
-                
-                if (res){
-                    auto state = std::dynamic_pointer_cast<BundlePrivateState>(stoppingState);
-                    mgr.CompareAndSetState(&state, std::make_shared<BPResolvedState>());
-                    transitionAction.set_value();
-                    std::rethrow_exception(res);
-                }
                 transitionAction.set_value();
                 stoppingState->Stop(mgr, options);
+                if (res){
+                    std::rethrow_exception(res);
+                }
                 break;
             }
         }
@@ -57,13 +53,6 @@ namespace cppmicroservices
 
                 std::exception_ptr res;
                 res = StopHelper(mgr);
-                // try {
-                //     res = StopHelper(mgr);
-                // } 
-                // catch (...){
-                //     mgr.SetStateInstalled(false);
-                //     res = std::current_exception();
-                // }
 
                 if (res){
                     mgr.coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
@@ -83,13 +72,13 @@ namespace cppmicroservices
     std::exception_ptr StopHelper(BundlePrivate& mgr){
         std::exception_ptr res;
         mgr.coreCtx->listeners.BundleChanged(
-            BundleEvent(BundleEvent::BUNDLE_STOPPING, MakeBundle(mgr.shared_from_this()))); //stop-ING listener event
+            BundleEvent(BundleEvent::BUNDLE_STOPPING, MakeBundle(mgr.shared_from_this())));
 
-        if (mgr.wasStarted && mgr.bactivator != nullptr) //if coming from active, and there is bactivator code
+        if (mgr.wasStarted && mgr.bactivator != nullptr)
         {
             try
             {
-                mgr.bactivator->Stop(MakeBundleContext(mgr.bundleContext.Load())); //run bactivator stop code
+                mgr.bactivator->Stop(MakeBundleContext(mgr.bundleContext.Load()));
             }
             catch (...)
             {
@@ -103,7 +92,7 @@ namespace cppmicroservices
         std::shared_ptr<BundleContextPrivate> ctx = mgr.bundleContext.Load();
         if (ctx)
         {
-            mgr.coreCtx->listeners.HooksBundleStopped(ctx); //listener event, looks different from the other ones though 
+            mgr.coreCtx->listeners.HooksBundleStopped(ctx);
             mgr.RemoveBundleResources();
             ctx->Invalidate();
             mgr.bundleContext.Store(std::shared_ptr<BundleContextPrivate>());

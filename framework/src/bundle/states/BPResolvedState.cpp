@@ -1,6 +1,7 @@
 #include "BPResolvedState.h"
 #include "BPStartingState.h"
 #include "BPStoppingState.h"
+#include "BPInstalledState.h"
 #include "BundlePrivate.h"
 #include "BundleContextPrivate.h"
 #include "CoreBundleContext.h"
@@ -79,10 +80,10 @@ namespace cppmicroservices
                             && !mgr.coreCtx->validationFunc(thisBundle))
                         {
                             //if validation fails, exit right away
-                            e = std::make_exception_ptr(SecurityException {
+                            std::__exception_ptr::exception_ptr securityExpection = std::make_exception_ptr(SecurityException {
                                 "Bundle " + mgr.symbolicName + " (location=" + mgr.location + ") failed bundle validation.",
                                 thisBundle });
-                            std::rethrow_exception(e);
+                            std::rethrow_exception(securityExpection);
                         }
                     }
                     catch (...)
@@ -182,53 +183,55 @@ namespace cppmicroservices
                                                                         + ") start failed: " + util::GetLastExceptionStr()));
                     }
                 }
-
-                // {
-                //     std::string cause;
-                //     if (static_cast<BundlePrivate::Aborted>(mgr.aborted.load()) == BundlePrivate::Aborted::YES)
-                //     {
-                //         if (Bundle::STATE_UNINSTALLED == mgr.state)
-                //         {
-                //             cause = "Bundle uninstalled during Start()";
-                //         }
-                //         else
-                //         {
-                //             cause = "Bundle activator Start() time-out";
-                //         }
-                //     }
-                //     else
-                //     {
-                //         mgr.aborted = static_cast<uint8_t>(BundlePrivate::Aborted::NO);
-                //         if (Bundle::STATE_STARTING != mgr.GetState())
-                //         {
-                //             cause = "Bundle changed state because of refresh during Start()";
-                //         }
-                //     }
-                //     if (!cause.empty())
-                //     {
-                //         e = std::make_exception_ptr(std::runtime_error("Bundle " + mgr.symbolicName + " (location= " + mgr.location
-                //                                                         + ") start failed: " + cause));
-                //     }
-                // }
                 
-                if (e == nullptr) //if no errors occured above 
+                if (e == nullptr)
                 {
                     transitionAction.set_value();
                     startingState->Start(mgr, options);
 
                 }
-
-                if (e)
+                else
                 {
                     StartFailed(mgr, startingState);
                     transitionAction.set_value();
                     std::rethrow_exception(e);
                 }
-
-                
-                break;
             }
         }
 
     }
+
+    void BPResolvedState::Uninstall(BundlePrivate& mgr){
+
+        // auto currState = shared_from_this(); 
+        // std::promise<void> transitionAction; 
+        // auto fut = transitionAction.get_future();
+        // auto installedState = std::make_shared<BPInstalledState>(std::move(fut));
+
+        // while(currState->GetState() != Bundle::STATE_INSTALLED){
+        //     if (mgr.CompareAndSetState(&currState, installedState))
+        //     {
+        //         currState->WaitForTransitionTask();
+        //         mgr.coreCtx->listeners.BundleChanged(
+        //                 { BundleEvent::BUNDLE_UNRESOLVED, MakeBundle(mgr.shared_from_this()) });
+        //         transitionAction.set_value();
+        //         installedState->Uninstall(mgr);
+        //         break;
+        //     }
+        // }
+
+        auto currState = shared_from_this(); 
+        auto installedState = std::make_shared<BPInstalledState>();
+
+        while(currState->GetState() != Bundle::STATE_INSTALLED){
+            if (mgr.CompareAndSetState(&currState, installedState))
+            {
+                installedState->Uninstall(mgr);
+                break;
+            }
+        }
+        
+    };
+
+    
 } 

@@ -45,37 +45,6 @@ namespace cppmicroservices {
         ready.get();
     }
 
-    void BundlePrivateState::FinalizeUninstall(BundlePrivate& mgr){
-        mgr.coreCtx->bundleRegistry.Remove(mgr.location, mgr.id);
-        mgr.coreCtx->listeners.BundleChanged(
-                { BundleEvent::BUNDLE_UNRESOLVED, MakeBundle(mgr.shared_from_this()) });
-        mgr.bactivator = nullptr;
-
-        mgr.Purge();
-        mgr.barchive->SetLastModified(std::chrono::steady_clock::now());
-        if (!mgr.bundleDir.empty()) //remove bundle dir
-        {
-            try
-            {
-                if (util::Exists(mgr.bundleDir))
-                {
-                    util::RemoveDirectoryRecursive(mgr.bundleDir);
-                }
-            }
-            catch (...)
-            {
-                mgr.coreCtx->listeners.SendFrameworkEvent(
-                    FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING,
-                                    MakeBundle(mgr.shared_from_this()),
-                                    std::string(),
-                                    std::current_exception()));
-            }
-            mgr.bundleDir.clear();
-        }
-        mgr.coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::BUNDLE_UNINSTALLED, MakeBundle(mgr.shared_from_this())));
-    
-    }
-
     void BundlePrivateState::StartFailed(BundlePrivate& mgr, std::shared_ptr<BundlePrivateState> expectedState)
     {
         // auto stoppingState = std::make_shared<BPStoppingState>();

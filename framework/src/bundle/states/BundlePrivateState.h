@@ -26,7 +26,6 @@ namespace cppmicroservices
 
         void SetAutostart(BundlePrivate& mgr, uint32_t options);
         void CheckFrameworkHasStopped(BundlePrivate& mgr);
-        void FinalizeUninstall(BundlePrivate &mgr);
         void StartFailed(BundlePrivate& mgr, std::shared_ptr<BundlePrivateState> expectedState);
 
         void WaitForTransitionTask();

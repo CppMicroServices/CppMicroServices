@@ -54,7 +54,7 @@ namespace cppmicroservices
             ConfigurationManager(ConfigurationManager&&) = delete;
             ConfigurationManager& operator=(ConfigurationManager const&) = delete;
             ConfigurationManager& operator=(ConfigurationManager&&) = delete;
-            virtual ~ConfigurationManager() = default;
+            ~ConfigurationManager() = default;
 
             /**
              * Method to initialize a newly constructed Configuration Manager.

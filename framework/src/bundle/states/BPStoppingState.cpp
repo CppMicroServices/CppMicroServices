@@ -3,6 +3,7 @@
 #include "BPUninstalledState.h"
 #include "BundlePrivate.h"
 #include "CoreBundleContext.h"
+#include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/BundleEvent.h"
 
 namespace cppmicroservices

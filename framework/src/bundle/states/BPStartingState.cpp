@@ -4,6 +4,7 @@
 #include "BundlePrivate.h"
 #include "CoreBundleContext.h"
 #include "BundleContextPrivate.h"
+#include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/BundleEvent.h"
 #include "cppmicroservices/SecurityException.h"
@@ -11,10 +12,9 @@
 #include "cppmicroservices/util/Error.h"
 #include "cppmicroservices/util/FileSystem.h"
 #include "cppmicroservices/util/String.h"
-#include "cppmicroservices/SharedLibraryException.h"
 #include "BundleUtils.h"
 #include "cppmicroservices/BundleActivator.h"
-#include "cppmicroservices/AnyMap.h"
+#include "cppmicroservices/Constants.h"
 
 namespace cppmicroservices
 {
@@ -27,9 +27,7 @@ namespace cppmicroservices
 
         while(currState->GetState() == Bundle::STATE_STARTING){
             if (mgr.CompareAndSetState(&currState, activeState)){
-                currState->WaitForTransitionTask(); 
-
-                // std::__exception_ptr::exception_ptr res;                   
+                currState->WaitForTransitionTask();              
 
                 auto const thisBundle = MakeBundle(mgr.shared_from_this());
                 auto const& headers = thisBundle.GetHeaders();
@@ -59,21 +57,14 @@ namespace cppmicroservices
                     }
                 }
 
-                // Activator in the bundle is not called if 'bundle.activator' property
-                // either does not exist or is set to false. If the property is set to true,
-                // the actiavtor inside the bundle is called.
                 if (useActivator)
                 {
-                    //validate bundle
                     bool valid = true;
                     try
                     {
                         if (mgr.coreCtx->validationFunc && (mgr.lib.GetFilePath() != util::GetExecutablePath())
                             && !mgr.coreCtx->validationFunc(thisBundle))
                         {
-                            // res = std::make_exception_ptr(SecurityException {
-                            //     "Bundle " + mgr.symbolicName + " (location=" + mgr.location + ") failed bundle validation.",
-                            //     thisBundle });
                             valid = false;
                         }
                     }
@@ -84,7 +75,6 @@ namespace cppmicroservices
                                         thisBundle,
                                         "The bundle validation function threw an exception",
                                         std::current_exception()));
-                        // res = std::make_exception_ptr(SecurityException { util::GetLastExceptionStr(), thisBundle });
                         transitionAction.set_value();
                         activeState->Stop(mgr, options);
                         throw (SecurityException { util::GetLastExceptionStr(), thisBundle });
@@ -122,8 +112,6 @@ namespace cppmicroservices
 
                         auto ctx = mgr.bundleContext.Load();
 
-                        // save this bundle's context so that it can be accessible anywhere
-                        // from within this bundle's code.
                         std::string set_bundle_context_func = US_STR(US_SET_CTX_PREFIX) + mgr.symbolicName;
                         std::string set_bundle_context_err;
                         BundleUtils::GetSymbol(mgr.SetBundleContext, libHandle, set_bundle_context_func, set_bundle_context_err);
@@ -137,8 +125,6 @@ namespace cppmicroservices
                             mgr.coreCtx->logger->Log(logservice::SeverityLevel::LOG_WARNING, set_bundle_context_err);
                         }
 
-                        // get the create/destroy activator callbacks
-                        // these are hooks that need to be setup and then they will automatically run?
                         std::string create_activator_func = US_STR(US_CREATE_ACTIVATOR_PREFIX) + mgr.symbolicName;
                         std::function<BundleActivator*(void)> createActivatorHook;
                         std::string create_activator_err;
@@ -161,18 +147,12 @@ namespace cppmicroservices
                                                     + ") activator destructor not found");
                         }
 
-                        // get a BundleActivator instance
                         mgr.bactivator = std::unique_ptr<BundleActivator, BundlePrivate::DestroyActivatorHook>(createActivatorHook(),
                                                                                             mgr.destroyActivatorHook);
-                        mgr.bactivator->Start(MakeBundleContext(ctx)); //run bactivator start code
+                        mgr.bactivator->Start(MakeBundleContext(ctx));
                     }
                     catch (std::system_error const& ex)
                     {
-                        // SharedLibrary::Load(int flags) will throw a std::system_error when a shared library
-                        // fails to load. Creating a SharedLibraryException here to throw.
-                        // res = std::make_exception_ptr(
-                        //     cppmicroservices::SharedLibraryException(ex.code(), ex.what(), thisBundle));
-                        
                         transitionAction.set_value();
                         activeState->Stop(mgr, options);
                         throw (cppmicroservices::SharedLibraryException(ex.code(), ex.what(), thisBundle));
@@ -182,23 +162,12 @@ namespace cppmicroservices
                         mgr.coreCtx->logger->Log(logservice::SeverityLevel::LOG_INFO,
                                             "Failed to start Bundle " + mgr.symbolicName + " (location=" + mgr.location + ")",
                                             std::current_exception());
-                        // res = std::make_exception_ptr(std::runtime_error("Bundle " + mgr.symbolicName + " (location= " + mgr.location
-                        //                                                 + ") start failed: " + util::GetLastExceptionStr()));
-                        
                         transitionAction.set_value();
                         activeState->Stop(mgr, options);
                         throw (std::runtime_error("Bundle " + mgr.symbolicName + " (location= " + mgr.location
                                                                         + ") start failed: " + util::GetLastExceptionStr()));
                     }
                 }
-                
-                // if(res)
-                // {
-                //     transitionAction.set_value();
-                //     activeState->Stop(mgr, options);
-                //     std::rethrow_exception(res);
-                //     break;
-                // }
 
                 try
                 {

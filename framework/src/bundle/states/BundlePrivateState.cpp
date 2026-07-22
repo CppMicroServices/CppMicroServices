@@ -1,14 +1,7 @@
 #include "BundlePrivateState.h"
 #include "BundlePrivate.h"
-#include "cppmicroservices/Bundle.h"
 #include "CoreBundleContext.h"
-#include "cppmicroservices/BundleEvent.h"
-#include "cppmicroservices/util/Error.h"
-#include "cppmicroservices/util/FileSystem.h"
-#include "cppmicroservices/util/String.h"
-#include "cppmicroservices/FrameworkEvent.h"
-#include "BundleContextPrivate.h"
-#include "BPResolvedState.h"
+#include "cppmicroservices/Bundle.h"
 
 namespace cppmicroservices {
 

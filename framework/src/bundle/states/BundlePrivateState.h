@@ -1,14 +1,14 @@
 #ifndef BundlePrivateState_h
 #define BundlePrivateState_h
 
-#include "cppmicroservices/Bundle.h"
-
-#include <memory>
+#include <cstdint>
 #include <future>
+#include <memory>
 
 namespace cppmicroservices
 {
-    // class BundlePrivate;
+    class BundlePrivate;
+
     class BundlePrivateState : public std::enable_shared_from_this<BundlePrivateState>
     { 
     

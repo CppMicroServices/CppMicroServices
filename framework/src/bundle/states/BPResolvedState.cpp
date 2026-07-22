@@ -1,20 +1,11 @@
 #include "BPResolvedState.h"
 #include "BPStartingState.h"
-#include "BPStoppingState.h"
 #include "BPInstalledState.h"
 #include "BundlePrivate.h"
 #include "BundleContextPrivate.h"
 #include "CoreBundleContext.h"
+#include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/BundleEvent.h"
-#include "cppmicroservices/FrameworkEvent.h"
-#include "cppmicroservices/SecurityException.h"
-#include "cppmicroservices/util/Error.h"
-#include "cppmicroservices/util/FileSystem.h"
-#include "cppmicroservices/util/String.h"
-#include "cppmicroservices/SharedLibraryException.h"
-#include "BundleUtils.h"
-#include "cppmicroservices/BundleActivator.h"
-#include "cppmicroservices/AnyMap.h"
 
 namespace cppmicroservices
 {
@@ -42,24 +33,6 @@ namespace cppmicroservices
     }
 
     void BPResolvedState::Uninstall(BundlePrivate& mgr){
-
-        // auto currState = shared_from_this(); 
-        // std::promise<void> transitionAction; 
-        // auto fut = transitionAction.get_future();
-        // auto installedState = std::make_shared<BPInstalledState>(std::move(fut));
-
-        // while(currState->GetState() != Bundle::STATE_INSTALLED){
-        //     if (mgr.CompareAndSetState(&currState, installedState))
-        //     {
-        //         currState->WaitForTransitionTask();
-        //         mgr.coreCtx->listeners.BundleChanged(
-        //                 { BundleEvent::BUNDLE_UNRESOLVED, MakeBundle(mgr.shared_from_this()) });
-        //         transitionAction.set_value();
-        //         installedState->Uninstall(mgr);
-        //         break;
-        //     }
-        // }
-
         auto currState = shared_from_this(); 
         auto installedState = std::make_shared<BPInstalledState>();
 
@@ -70,7 +43,6 @@ namespace cppmicroservices
                 break;
             }
         }
-        
     };
 
     

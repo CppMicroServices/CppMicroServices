@@ -3,10 +3,9 @@
 #include "BPResolvedState.h"
 #include "CoreBundleContext.h"
 #include "BundlePrivate.h"
+#include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/BundleEvent.h"
 #include "cppmicroservices/FrameworkEvent.h"
-
-#include "BundleContextPrivate.h"
 #include "cppmicroservices/util/FileSystem.h"
 #include <chrono>
 
@@ -28,7 +27,7 @@ namespace cppmicroservices
                 mgr.coreCtx->listeners.BundleChanged(
                     { BundleEvent::BUNDLE_RESOLVED, MakeBundle(mgr.shared_from_this()) });
                 transitionAction.set_value();
-                resolvedState->Start(mgr, options); //call resolved->start now
+                resolvedState->Start(mgr, options);
                 break;
             }
         }
@@ -51,7 +50,7 @@ namespace cppmicroservices
                 mgr.bactivator = nullptr;
                 mgr.Purge();
                 mgr.barchive->SetLastModified(std::chrono::steady_clock::now());
-                if (!mgr.bundleDir.empty()) //remove bundle dir
+                if (!mgr.bundleDir.empty())
                 {
                     try
                     {

@@ -114,13 +114,19 @@ function(usFunctionAddResources)
     # When usResourceCompiler is installed with shared third-party deps in
     # separate locations (e.g. a package-managed build), it loads them via
     # @rpath at consumer build time. On macOS, SIP strips DYLD_* from the
-    # environment whenever CMake runs a custom command through /bin/sh, so a
-    # DYLD_LIBRARY_PATH set by the surrounding build env never reaches the tool
-    # and it aborts with "no LC_RPATH's found". Re-supply it via `cmake -E env`,
-    # which sets the child environment directly and bypasses /bin/sh. Read at
-    # configure time; empty when unset (e.g. the vendored build that compiles
-    # the deps in statically), so this is a no-op there.
-    if(APPLE AND DEFINED ENV{DYLD_LIBRARY_PATH})
+    # environment whenever CMake runs a custom command through /bin/sh, so any
+    # DYLD_LIBRARY_PATH from the surrounding build env never reaches the tool and
+    # it aborts with "Library not loaded". Re-supply it via `cmake -E env`, which
+    # sets the child environment directly and bypasses /bin/sh.
+    #
+    # The dep dirs come from CMAKE_LIBRARY_PATH (populated by the package manager's
+    # toolchain with the link dirs of all deps, including the compiler's own
+    # build-context copies). This is the correct source: the ambient
+    # DYLD_LIBRARY_PATH does not carry the tool's transitive deps when the tool is
+    # consumed from the build context (host/build package instances differ).
+    # Empty when unset (e.g. the vendored build that compiles the deps in
+    # statically), so this is a no-op there.
+    if(APPLE AND CMAKE_LIBRARY_PATH)
       # CMake substitutes a bare executable target name for its built path only
       # when it is the first COMMAND token. Prepending `cmake -E env` demotes the
       # compiler to an argument, so reference it by file path explicitly
@@ -130,7 +136,9 @@ function(usFunctionAddResources)
       if(TARGET ${resource_compiler})
         set(resource_compiler $<TARGET_FILE:${resource_compiler}>)
       endif()
-      set(_rc_env_cmd ${CMAKE_COMMAND} -E env "DYLD_LIBRARY_PATH=$ENV{DYLD_LIBRARY_PATH}")
+      # CMAKE_LIBRARY_PATH is a CMake ;-list; DYLD_LIBRARY_PATH wants :-separated.
+      string(REPLACE ";" ":" _rc_dyld_path "${CMAKE_LIBRARY_PATH}")
+      set(_rc_env_cmd ${CMAKE_COMMAND} -E env "DYLD_LIBRARY_PATH=${_rc_dyld_path}")
     endif()
   endif()
 

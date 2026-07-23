@@ -144,21 +144,23 @@ function(usFunctionEmbedResources)
     set(resource_compiler_dep ${resource_compiler})
 
     # When usResourceCompiler is installed with shared third-party deps in
-    # separate locations (e.g. a package-managed build), it loads them via
-    # @rpath at consumer build time. On macOS, SIP strips DYLD_* from the
-    # environment whenever CMake runs a custom command through /bin/sh, so any
-    # DYLD_LIBRARY_PATH from the surrounding build env never reaches the tool and
-    # it aborts with "Library not loaded". Re-supply it via `cmake -E env`, which
-    # sets the child environment directly and bypasses /bin/sh.
+    # separate locations (e.g. a package-managed build), it loads them from the
+    # dynamic loader's search path at consumer build time. When the tool is
+    # consumed from the build context, the ambient loader path does not carry the
+    # tool's transitive deps (the host and build package instances differ), so
+    # the load fails ("libminiz.so.3: cannot open shared object file" on Linux,
+    # "Library not loaded: @rpath/..." on macOS). On macOS this is compounded by
+    # SIP, which strips DYLD_* from the environment whenever CMake runs a custom
+    # command through /bin/sh. Re-supply the loader path via `cmake -E env`, which
+    # sets the child environment directly (and, on macOS, bypasses the /bin/sh
+    # SIP stripping).
     #
     # The dep dirs come from CMAKE_LIBRARY_PATH (populated by the package manager's
     # toolchain with the link dirs of all deps, including the compiler's own
-    # build-context copies). This is the correct source: the ambient
-    # DYLD_LIBRARY_PATH does not carry the tool's transitive deps when the tool is
-    # consumed from the build context (host/build package instances differ).
-    # Empty when unset (e.g. the vendored build that compiles the deps in
+    # build-context copies) -- the correct source, since the ambient loader path
+    # lacks them. Empty when unset (e.g. the vendored build that links the deps in
     # statically), so this is a no-op there.
-    if(APPLE AND CMAKE_LIBRARY_PATH)
+    if(UNIX AND CMAKE_LIBRARY_PATH)
       # CMake substitutes a bare executable target name for its built path only
       # when it is the first COMMAND token. Prepending `cmake -E env` demotes the
       # compiler to an argument, so reference it by file path explicitly
@@ -168,9 +170,13 @@ function(usFunctionEmbedResources)
       if(TARGET ${resource_compiler})
         set(resource_compiler $<TARGET_FILE:${resource_compiler}>)
       endif()
-      # CMAKE_LIBRARY_PATH is a CMake ;-list; DYLD_LIBRARY_PATH wants :-separated.
-      string(REPLACE ";" ":" _rc_dyld_path "${CMAKE_LIBRARY_PATH}")
-      set(_rc_env_cmd ${CMAKE_COMMAND} -E env "DYLD_LIBRARY_PATH=${_rc_dyld_path}")
+      # CMAKE_LIBRARY_PATH is a CMake ;-list; the loader path env wants :-separated.
+      string(REPLACE ";" ":" _rc_loader_path "${CMAKE_LIBRARY_PATH}")
+      if(APPLE)
+        set(_rc_env_cmd ${CMAKE_COMMAND} -E env "DYLD_LIBRARY_PATH=${_rc_loader_path}")
+      else()
+        set(_rc_env_cmd ${CMAKE_COMMAND} -E env "LD_LIBRARY_PATH=${_rc_loader_path}")
+      endif()
     endif()
   endif()
 

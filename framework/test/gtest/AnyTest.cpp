@@ -346,6 +346,11 @@ TEST(AnyTest, AnyEquality)
 
 TEST(AnyTest, AnyMove)
 {
+    MyType::defaults = 0;
+    MyType::dtors = 0;
+    MyType::copies = 0;
+    MyType::moves = 0;
+
     cppmicroservices::AnyMap anyMap;
     anyMap.emplace("key1", MyType {});
 

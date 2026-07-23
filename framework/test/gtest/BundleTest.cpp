@@ -1008,4 +1008,35 @@ TEST_F(BundleTest, TestFrameworkAccessDuringFrameworkShutdown)
 }
 #endif
 
+TEST_F(BundleTest, TestGetServiceWithDefaultConstructedReferenceThrows)
+{
+    EXPECT_THROW(context.GetService(ServiceReferenceU()), std::invalid_argument);
+
+    ServiceReference<int> typedDefault;
+    EXPECT_THROW(context.GetService<int>(typedDefault), std::invalid_argument);
+}
+
+TEST_F(BundleTest, TestGetServiceWithUnregisteredReferenceReturnsNull)
+{
+    struct IService
+    {
+        virtual ~IService() = default;
+    };
+    struct ServiceImpl : IService
+    {
+    };
+
+    auto reg = context.RegisterService<IService>(std::make_shared<ServiceImpl>());
+    auto ref = context.GetServiceReference<IService>();
+    ASSERT_TRUE(ref);
+
+    reg.Unregister();
+
+    EXPECT_FALSE(ref) << "Reference should evaluate to false after unregistration";
+    EXPECT_NO_THROW({
+        auto svc = context.GetService<IService>(ref);
+        EXPECT_EQ(svc, nullptr) << "GetService on an unregistered reference should return null, not throw";
+    });
+}
+
 US_MSVC_POP_WARNING

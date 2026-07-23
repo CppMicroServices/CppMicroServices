@@ -146,7 +146,7 @@ TEST_F(BundleContextTest, BundleContextThrowWhenInvalid)
         << "GetServiceReference(string) on invalid BundleContext did not throw.";
     EXPECT_THROW({ (void)context2.GetServiceReference<bc_tests::TestService>(); }, std::runtime_error)
         << "GetServiceReference() on invalid BundleContext did not throw.";
-    EXPECT_THROW({ (void)context2.GetService<bc_tests::TestService>(sRef); }, std::invalid_argument)
+    EXPECT_THROW({ (void)context2.GetService<bc_tests::TestService>(sRef); }, std::runtime_error)
         << "GetService() on invalid BundleContext did not throw.";
     EXPECT_THROW({ (void)context2.GetServiceObjects<bc_tests::TestService>(sRef); }, std::runtime_error)
         << "GetServiceObjects() on invalid BundleContext did not throw.";

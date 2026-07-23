@@ -6,7 +6,6 @@ namespace cppmicroservices
 {
 
     void BPUninstalledState::Start(BundlePrivate& mgr, uint32_t options){
-
         US_UNUSED(options);
         CheckFrameworkHasStopped(mgr);
         throw std::logic_error("Bundle " + mgr.symbolicName + " (location=" + mgr.location + ") is uninstalled");

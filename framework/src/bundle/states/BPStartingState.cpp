@@ -20,6 +20,9 @@ namespace cppmicroservices
 {
 
     void BPStartingState::Start(BundlePrivate& mgr, uint32_t options){
+        CheckFrameworkHasStopped(mgr);
+        SetAutostart(mgr, options);
+
         auto currState = shared_from_this(); 
         std::promise<void> transitionAction; 
         auto fut = transitionAction.get_future();
@@ -194,6 +197,7 @@ namespace cppmicroservices
     }
 
     void BPStartingState::Stop(BundlePrivate& mgr, uint32_t options){
+        SetAutostart(mgr, options);
         auto currState = shared_from_this(); 
         std::promise<void> transitionAction; 
         auto fut = transitionAction.get_future();

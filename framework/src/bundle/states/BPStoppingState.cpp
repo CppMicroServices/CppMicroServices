@@ -17,7 +17,7 @@ namespace cppmicroservices
     }
 
     void BPStoppingState::Stop(BundlePrivate& mgr, uint32_t options){
-        US_UNUSED(options);
+        SetAutostart(mgr, options);
         auto currState = shared_from_this(); 
         std::promise<void> transitionAction; 
         auto fut = transitionAction.get_future();

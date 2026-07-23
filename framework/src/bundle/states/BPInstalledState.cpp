@@ -33,6 +33,11 @@ namespace cppmicroservices
         }
     }
 
+    void BPInstalledState::Stop(BundlePrivate& mgr, uint32_t options){
+        SetAutostart(mgr, options);
+        return;
+    };
+
     void BPInstalledState::Uninstall(BundlePrivate& mgr){
 
         auto currState = shared_from_this(); 

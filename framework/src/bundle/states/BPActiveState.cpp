@@ -19,6 +19,7 @@ namespace cppmicroservices
     };
 
     void BPActiveState::Stop(BundlePrivate& mgr, uint32_t options){
+        SetAutostart(mgr, options);
         auto currState = shared_from_this(); 
         std::promise<void> transitionAction; 
         auto fut = transitionAction.get_future();

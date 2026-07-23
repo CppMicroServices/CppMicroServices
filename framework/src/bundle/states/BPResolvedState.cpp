@@ -28,9 +28,15 @@ namespace cppmicroservices
                 mgr.coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::BUNDLE_STARTING, thisBundle));
                 transitionAction.set_value();
                 startingState->Start(mgr, options);
+                break;
             }
         }
     }
+
+    void BPResolvedState::Stop(BundlePrivate& mgr, uint32_t options){
+        SetAutostart(mgr, options);
+        return;
+    };
 
     void BPResolvedState::Uninstall(BundlePrivate& mgr){
         auto currState = shared_from_this(); 

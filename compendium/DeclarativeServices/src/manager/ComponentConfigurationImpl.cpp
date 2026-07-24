@@ -164,10 +164,9 @@ namespace cppmicroservices
             // situation can occur if the modified method is invoked on the active state which then activates other
             // dependING services which then calls getService on the original compConfig which then calls activate on
             // the original activeState and tries to set the properties recursively. See PR #1141
-            if (regManager && !currentlySettingProperties)
+            if (regManager && !currentlySettingProperties.exchange(true))
             {
-                currentlySettingProperties = true;
-                detail::ScopeGuard sg([this]() { currentlySettingProperties = false; });
+                detail::ScopeGuard sg([this]() { currentlySettingProperties.store(false); });
                 regManager->SetProperties(GetProperties());
             }
         }

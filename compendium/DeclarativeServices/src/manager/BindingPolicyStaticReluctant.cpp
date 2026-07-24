@@ -32,7 +32,7 @@ namespace cppmicroservices
 
         using namespace cppmicroservices::logservice;
 
-        std::vector<RefChangeNotification>
+        void
         ReferenceManagerBaseImpl::BindingPolicyStaticReluctant::ServiceAdded(ServiceReferenceBase const& reference)
         {
             std::vector<RefChangeNotification> notifications;
@@ -40,7 +40,7 @@ namespace cppmicroservices
             {
                 Log("BindingPolicyStaticReluctant::ServiceAdded called with an invalid "
                     "service reference");
-                return notifications;
+                return;
             }
             auto notifySatisfied = ShouldNotifySatisfied();
             if (notifySatisfied)
@@ -49,13 +49,13 @@ namespace cppmicroservices
                 notifications.emplace_back(mgr.metadata_.name, RefEvent::BECAME_SATISFIED, reference);
             }
 
-            return notifications;
+            mgr.BatchNotifyAllListeners(notifications);
         }
 
-        std::vector<RefChangeNotification>
+        void
         ReferenceManagerBaseImpl::BindingPolicyStaticReluctant::ServiceRemoved(ServiceReferenceBase const& reference)
         {
-            return StaticRemoveService(reference);
+            StaticRemoveService(reference);
         }
 
     } // namespace scrimpl

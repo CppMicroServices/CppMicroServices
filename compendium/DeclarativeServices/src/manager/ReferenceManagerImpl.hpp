@@ -189,8 +189,8 @@ namespace cppmicroservices
             class BindingPolicy
             {
               public:
-                virtual void ServiceAdded(ServiceReferenceBase const& reference) = 0;
-                virtual void ServiceRemoved(ServiceReferenceBase const& reference) = 0;
+                virtual std::vector<RefChangeNotification> ServiceAdded(ServiceReferenceBase const& reference) = 0;
+                virtual std::vector<RefChangeNotification> ServiceRemoved(ServiceReferenceBase const& reference) = 0;
 
                 virtual ~BindingPolicy() = default;
 
@@ -203,8 +203,8 @@ namespace cppmicroservices
                 bool ShouldClearBoundRefs(ServiceReferenceBase const& reference);
                 bool ShouldNotifySatisfied();
                 void ClearBoundRefs();
-                void StaticRemoveService(ServiceReferenceBase const& reference);
-                void DynamicRemoveService(ServiceReferenceBase const& reference);
+                std::vector<RefChangeNotification> StaticRemoveService(ServiceReferenceBase const& reference);
+                std::vector<RefChangeNotification> DynamicRemoveService(ServiceReferenceBase const& reference);
 
                 explicit BindingPolicy(ReferenceManagerBaseImpl& parent) : mgr(parent) {}
 
@@ -221,32 +221,32 @@ namespace cppmicroservices
             {
               public:
                 BindingPolicyDynamicGreedy(ReferenceManagerBaseImpl& parent) : BindingPolicy(parent) {}
-                void ServiceAdded(ServiceReferenceBase const& reference) override;
-                void ServiceRemoved(ServiceReferenceBase const& reference) override;
+                std::vector<RefChangeNotification> ServiceAdded(ServiceReferenceBase const& reference) override;
+                std::vector<RefChangeNotification> ServiceRemoved(ServiceReferenceBase const& reference) override;
             };
 
             class BindingPolicyDynamicReluctant : public BindingPolicy
             {
               public:
                 BindingPolicyDynamicReluctant(ReferenceManagerBaseImpl& parent) : BindingPolicy(parent) {}
-                void ServiceAdded(ServiceReferenceBase const& reference) override;
-                void ServiceRemoved(ServiceReferenceBase const& reference) override;
+                std::vector<RefChangeNotification> ServiceAdded(ServiceReferenceBase const& reference) override;
+                std::vector<RefChangeNotification> ServiceRemoved(ServiceReferenceBase const& reference) override;
             };
 
             class BindingPolicyStaticGreedy : public BindingPolicy
             {
               public:
                 BindingPolicyStaticGreedy(ReferenceManagerBaseImpl& parent) : BindingPolicy(parent) {}
-                void ServiceAdded(ServiceReferenceBase const& reference) override;
-                void ServiceRemoved(ServiceReferenceBase const& reference) override;
+                std::vector<RefChangeNotification> ServiceAdded(ServiceReferenceBase const& reference) override;
+                std::vector<RefChangeNotification> ServiceRemoved(ServiceReferenceBase const& reference) override;
             };
 
             class BindingPolicyStaticReluctant : public BindingPolicy
             {
               public:
                 BindingPolicyStaticReluctant(ReferenceManagerBaseImpl& parent) : BindingPolicy(parent) {}
-                void ServiceAdded(ServiceReferenceBase const& reference) override;
-                void ServiceRemoved(ServiceReferenceBase const& reference) override;
+                std::vector<RefChangeNotification> ServiceAdded(ServiceReferenceBase const& reference) override;
+                std::vector<RefChangeNotification> ServiceRemoved(ServiceReferenceBase const& reference) override;
             };
 
             static std::unique_ptr<BindingPolicy> CreateBindingPolicy(ReferenceManagerBaseImpl& mgr,

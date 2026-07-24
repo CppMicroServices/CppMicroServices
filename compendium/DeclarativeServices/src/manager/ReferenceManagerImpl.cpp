@@ -183,28 +183,29 @@ namespace cppmicroservices
         cppmicroservices::InterfaceMapConstPtr
         ReferenceManagerBaseImpl::AddingService(cppmicroservices::ServiceReference<void> const& reference)
         {
-            std::lock_guard l(stateChangeMutex);
-            // Each service registered by DS contains a service property representing the component configuration name
-            // to which it belongs. By checking the component configuration name of a service it can be determined
-            // whether this service will satisfy its own reference. If it would, it is not a matched reference as
-            // a service from the same component configuration can't satisfy its own reference.
-            //
-            // ASSUMPTION: If there is no component configuration name then its assumed this service was not registered
-            // by DS and could not satisfy itself since it is not managed by DS.
-            auto const compConfigName = reference.GetProperty(COMPONENT_NAME);
-            if ((true == compConfigName.Empty()) || (configName_ != compConfigName.ToStringNoExcept()))
+            std::vector<RefChangeNotification> notifications;
             {
-                // acquire lock on matchedRefs
-                auto matchedRefsHandle = matchedRefs.lock();
-                matchedRefsHandle->insert(reference);
-            } // release lock on matchedRefs
+                std::lock_guard l(stateChangeMutex);
+                // Each service registered by DS contains a service property representing the component configuration
+                // name to which it belongs. By checking the component configuration name of a service it can be
+                // determined whether this service will satisfy its own reference. If it would, it is not a matched
+                // reference as a service from the same component configuration can't satisfy its own reference.
+                //
+                // ASSUMPTION: If there is no component configuration name then its assumed this service was not
+                // registered by DS and could not satisfy itself since it is not managed by DS.
+                auto const compConfigName = reference.GetProperty(COMPONENT_NAME);
+                if ((true == compConfigName.Empty()) || (configName_ != compConfigName.ToStringNoExcept()))
+                {
+                    auto matchedRefsHandle = matchedRefs.lock();
+                    matchedRefsHandle->insert(reference);
+                }
 
-            // After updating the bound references on this thread, notifying listeners happens on the same thread.
-            // This behavior deviates from what is described in the "synchronous" section in
-            // https://osgi.org/download/r6/osgi.core-6.0.0.pdf#page=432. Sporadically not returning a valid service
-            // when a user calls getService, due to a service's references still resolving, was deemed undesirable
-            // for user workflows.
-            bindingPolicy->ServiceAdded(reference);
+                notifications = bindingPolicy->ServiceAdded(reference);
+            }
+
+            // Dispatch notifications outside stateChangeMutex to avoid lock inversion
+            // with oneAtATimeMutex (see issue #1192).
+            BatchNotifyAllListeners(notifications);
 
             // A non-null object must be returned to indicate to the ServiceTracker that
             // we are tracking the service and need to be called back when the service is removed.
@@ -227,17 +228,20 @@ namespace cppmicroservices
         ReferenceManagerBaseImpl::RemovedService(cppmicroservices::ServiceReference<void> const& reference,
                                                  cppmicroservices::InterfaceMapConstPtr const& /*service*/)
         {
-            std::lock_guard l(stateChangeMutex);
-            { // acquire lock on matchedRefs
-                auto matchedRefsHandle = matchedRefs.lock();
-                matchedRefsHandle->erase(reference);
-            } // release lock on matchedRefs
+            std::vector<RefChangeNotification> notifications;
+            {
+                std::lock_guard l(stateChangeMutex);
+                {
+                    auto matchedRefsHandle = matchedRefs.lock();
+                    matchedRefsHandle->erase(reference);
+                }
 
-            // After updating the bound references on this thread, notifying listeners happens on the same thread.
-            // This behavior deviates from what is described in the "synchronous" section in
-            // https://osgi.org/download/r6/osgi.core-6.0.0.pdf#page=432. Sometimes not returning a valid service
-            // due to a service's references still resolving was deemed undesirable for user workflows.
-            bindingPolicy->ServiceRemoved(reference);
+                notifications = bindingPolicy->ServiceRemoved(reference);
+            }
+
+            // Dispatch notifications outside stateChangeMutex to avoid lock inversion
+            // with oneAtATimeMutex (see issue #1192).
+            BatchNotifyAllListeners(notifications);
         }
 
         std::atomic<cppmicroservices::ListenerTokenId> ReferenceManagerBaseImpl::tokenCounter(0);

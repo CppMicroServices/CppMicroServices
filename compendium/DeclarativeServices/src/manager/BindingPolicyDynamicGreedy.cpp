@@ -34,7 +34,7 @@ namespace cppmicroservices
          *  and then unbind the bound service.
          *
          */
-        void
+        std::vector<RefChangeNotification>
         ReferenceManagerBaseImpl::BindingPolicyDynamicGreedy::ServiceAdded(ServiceReferenceBase const& reference)
         {
             std::vector<RefChangeNotification> notifications;
@@ -42,7 +42,7 @@ namespace cppmicroservices
             {
                 Log("BindingPolicyDynamicGreedy::ServiceAdded called with an invalid "
                     "service reference");
-                return;
+                return notifications;
             }
 
             auto notifySatisfied = false;
@@ -105,13 +105,13 @@ namespace cppmicroservices
                 Log(mgr.configName_ + " has been SATISFIED for reference " + mgr.metadata_.name);
                 notifications.emplace_back(mgr.metadata_.name, RefEvent::BECAME_SATISFIED);
             }
-            mgr.BatchNotifyAllListeners(notifications);
+            return notifications;
         }
 
-        void
+        std::vector<RefChangeNotification>
         ReferenceManagerBaseImpl::BindingPolicyDynamicGreedy::ServiceRemoved(ServiceReferenceBase const& reference)
         {
-            DynamicRemoveService(reference);
+            return DynamicRemoveService(reference);
         }
 
     } // namespace scrimpl

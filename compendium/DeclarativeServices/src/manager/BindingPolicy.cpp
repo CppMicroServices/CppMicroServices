@@ -56,7 +56,7 @@ namespace cppmicroservices
             boundRefsHandle->clear();
         }
 
-        void
+        std::vector<RefChangeNotification>
         ReferenceManagerBaseImpl::BindingPolicy::StaticRemoveService(ServiceReferenceBase const& reference)
         {
             std::vector<RefChangeNotification> notifications;
@@ -71,12 +71,11 @@ namespace cppmicroservices
                     Log("Notify SATISFIED for reference " + mgr.metadata_.name);
                     notifications.emplace_back(mgr.metadata_.name, RefEvent::BECAME_SATISFIED);
                 }
-
-                mgr.BatchNotifyAllListeners(notifications);
             }
+            return notifications;
         }
 
-        void
+        std::vector<RefChangeNotification>
         ReferenceManagerBaseImpl::BindingPolicy::DynamicRemoveService(ServiceReferenceBase const& reference)
         {
             // OSGi Compendium Release 7 section 112.5.12 Bound Service Replacement
@@ -122,9 +121,8 @@ namespace cppmicroservices
                     Log(mgr.configName_ + " has been UNSATISFIED for reference " + mgr.metadata_.name);
                     notifications.emplace_back(mgr.metadata_.name, RefEvent::BECAME_UNSATISFIED);
                 }
-
-                mgr.BatchNotifyAllListeners(notifications);
             }
+            return notifications;
         }
     } // namespace scrimpl
 } // namespace cppmicroservices

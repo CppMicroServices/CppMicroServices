@@ -32,14 +32,15 @@ namespace cppmicroservices
 
         using namespace cppmicroservices::logservice;
 
-        void
+        std::vector<RefChangeNotification>
         ReferenceManagerBaseImpl::BindingPolicyStaticGreedy::ServiceAdded(ServiceReferenceBase const& reference)
         {
+            std::vector<RefChangeNotification> notifications;
             if (!reference)
             {
                 Log("BindingPolicyStaticGreedy::ServiceAdded called with an invalid "
                     "service reference");
-                return;
+                return notifications;
             }
 
             // If no service is bound, reactivate the component to bind to the better target service.
@@ -89,7 +90,6 @@ namespace cppmicroservices
             }
 
             auto notifySatisfied = ShouldNotifySatisfied();
-            std::vector<RefChangeNotification> notifications;
             if (replacementNeeded)
             {
                 Log(mgr.configName_ + " has been UNSATISFIED for reference " + mgr.metadata_.name);
@@ -107,13 +107,13 @@ namespace cppmicroservices
                 Log(mgr.configName_ + " has been SATISFIED for reference " + mgr.metadata_.name);
                 notifications.emplace_back(mgr.metadata_.name, RefEvent::BECAME_SATISFIED, reference);
             }
-            mgr.BatchNotifyAllListeners(notifications);
+            return notifications;
         }
 
-        void
+        std::vector<RefChangeNotification>
         ReferenceManagerBaseImpl::BindingPolicyStaticGreedy::ServiceRemoved(ServiceReferenceBase const& reference)
         {
-            StaticRemoveService(reference);
+            return StaticRemoveService(reference);
         }
 
     } // namespace scrimpl

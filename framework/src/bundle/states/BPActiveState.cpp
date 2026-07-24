@@ -25,7 +25,7 @@ namespace cppmicroservices
         auto fut = transitionAction.get_future();
         auto stoppingState = std::make_shared<BPStoppingState>(std::move(fut));
 
-        while(currState->GetState() != Bundle::STATE_STOPPING){
+        while(currState->GetState() == Bundle::STATE_ACTIVE){
             if (mgr.CompareAndSetState(&currState, stoppingState)){
                 currState->WaitForTransitionTask();
                 std::exception_ptr res;
@@ -45,15 +45,6 @@ namespace cppmicroservices
                                             + "), BundleActivator::Stop() failed: " + util::GetLastExceptionStr()));
                     }
                     mgr.bactivator = nullptr;
-                }
-
-                std::shared_ptr<BundleContextPrivate> ctx = mgr.bundleContext.Load();
-                if (ctx)
-                {
-                    mgr.coreCtx->listeners.HooksBundleStopped(ctx);
-                    mgr.RemoveBundleResources();
-                    ctx->Invalidate();
-                    mgr.bundleContext.Store(std::shared_ptr<BundleContextPrivate>());
                 }
 
                 transitionAction.set_value();
@@ -72,7 +63,7 @@ namespace cppmicroservices
         auto fut = transitionAction.get_future();
         auto stoppingState = std::make_shared<BPStoppingState>(std::move(fut));
 
-        while(currState->GetState() != Bundle::STATE_STOPPING){
+        while(currState->GetState() == Bundle::STATE_ACTIVE){
             if (mgr.CompareAndSetState(&currState, stoppingState)){
                 currState->WaitForTransitionTask();
                 std::exception_ptr res;
@@ -92,15 +83,6 @@ namespace cppmicroservices
                                             + "), BundleActivator::Stop() failed: " + util::GetLastExceptionStr()));
                     }
                     mgr.bactivator = nullptr;
-                }
-
-                std::shared_ptr<BundleContextPrivate> ctx = mgr.bundleContext.Load();
-                if (ctx)
-                {
-                    mgr.coreCtx->listeners.HooksBundleStopped(ctx);
-                    mgr.RemoveBundleResources();
-                    ctx->Invalidate();
-                    mgr.bundleContext.Store(std::shared_ptr<BundleContextPrivate>());
                 }
 
                 if (res){

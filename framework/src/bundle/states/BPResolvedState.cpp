@@ -42,7 +42,7 @@ namespace cppmicroservices
         auto currState = shared_from_this(); 
         auto installedState = std::make_shared<BPInstalledState>();
 
-        while(currState->GetState() != Bundle::STATE_INSTALLED){
+        while(currState->GetState() == Bundle::STATE_RESOLVED){
             if (mgr.CompareAndSetState(&currState, installedState))
             {
                 installedState->Uninstall(mgr);

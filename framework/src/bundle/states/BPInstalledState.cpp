@@ -45,7 +45,7 @@ namespace cppmicroservices
         auto fut = transitionAction.get_future();
         auto uninstalledState = std::make_shared<BPUninstalledState>(std::move(fut));
 
-        while(currState->GetState() != Bundle::STATE_UNINSTALLED){
+        while(currState->GetState() == Bundle::STATE_INSTALLED){
             if (mgr.CompareAndSetState(&currState, uninstalledState))
             {
                 currState->WaitForTransitionTask();

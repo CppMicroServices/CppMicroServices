@@ -2,6 +2,7 @@
 #include "BPResolvedState.h"
 #include "BPUninstalledState.h"
 #include "BundlePrivate.h"
+#include "BundleContextPrivate.h"
 #include "CoreBundleContext.h"
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/BundleEvent.h"
@@ -26,6 +27,14 @@ namespace cppmicroservices
         while(currState->GetState() == Bundle::STATE_STOPPING){
             if (mgr.CompareAndSetState(&currState, resolvedState)){
                 currState->WaitForTransitionTask();
+                std::shared_ptr<BundleContextPrivate> ctx = mgr.bundleContext.Load();
+                if (ctx)
+                {
+                    mgr.coreCtx->listeners.HooksBundleStopped(ctx);
+                    mgr.RemoveBundleResources();
+                    ctx->Invalidate();
+                    mgr.bundleContext.Store(std::shared_ptr<BundleContextPrivate>());
+                }
                 mgr.coreCtx->listeners.BundleChanged({ BundleEvent::BUNDLE_STOPPED, MakeBundle(mgr.shared_from_this()) }); //listener stopp-ED event
                 transitionAction.set_value();
                 break;
@@ -42,6 +51,14 @@ namespace cppmicroservices
         while(currState->GetState() == Bundle::STATE_STOPPING){
             if (mgr.CompareAndSetState(&currState, resolvedState)){
                 currState->WaitForTransitionTask();
+                std::shared_ptr<BundleContextPrivate> ctx = mgr.bundleContext.Load();
+                if (ctx)
+                {
+                    mgr.coreCtx->listeners.HooksBundleStopped(ctx);
+                    mgr.RemoveBundleResources();
+                    ctx->Invalidate();
+                    mgr.bundleContext.Store(std::shared_ptr<BundleContextPrivate>());
+                }
                 mgr.coreCtx->listeners.BundleChanged({ BundleEvent::BUNDLE_STOPPED, MakeBundle(mgr.shared_from_this()) }); //listener stopp-ED event
                 transitionAction.set_value();
                 resolvedState->Uninstall(mgr);

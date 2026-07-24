@@ -18,7 +18,7 @@ namespace cppmicroservices
     }
 
     void BPStoppingState::Stop(BundlePrivate& mgr, uint32_t options){
-        SetAutostart(mgr, options);
+        
         auto currState = shared_from_this(); 
         std::promise<void> transitionAction; 
         auto fut = transitionAction.get_future();
@@ -27,6 +27,9 @@ namespace cppmicroservices
         while(currState->GetState() == Bundle::STATE_STOPPING){
             if (mgr.CompareAndSetState(&currState, resolvedState)){
                 currState->WaitForTransitionTask();
+
+                SetAutostart(mgr, options);
+
                 std::shared_ptr<BundleContextPrivate> ctx = mgr.bundleContext.Load();
                 if (ctx)
                 {

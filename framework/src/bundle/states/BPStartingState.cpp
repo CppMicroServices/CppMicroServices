@@ -20,8 +20,6 @@ namespace cppmicroservices
 {
 
     void BPStartingState::Start(BundlePrivate& mgr, uint32_t options){
-        CheckFrameworkHasStopped(mgr);
-        SetAutostart(mgr, options);
 
         auto currState = shared_from_this(); 
         std::promise<void> transitionAction; 
@@ -30,7 +28,10 @@ namespace cppmicroservices
 
         while(currState->GetState() == Bundle::STATE_STARTING){
             if (mgr.CompareAndSetState(&currState, activeState)){
-                currState->WaitForTransitionTask();              
+                currState->WaitForTransitionTask();
+                
+                CheckFrameworkHasStopped(mgr);
+                SetAutostart(mgr, options);
 
                 auto const thisBundle = MakeBundle(mgr.shared_from_this());
                 auto const& headers = thisBundle.GetHeaders();
@@ -197,7 +198,6 @@ namespace cppmicroservices
     }
 
     void BPStartingState::Stop(BundlePrivate& mgr, uint32_t options){
-        SetAutostart(mgr, options);
         auto currState = shared_from_this(); 
         std::promise<void> transitionAction; 
         auto fut = transitionAction.get_future();
@@ -206,8 +206,12 @@ namespace cppmicroservices
         while(currState->GetState() == Bundle::STATE_STARTING){
             if (mgr.CompareAndSetState(&currState, stoppingState)){
                 currState->WaitForTransitionTask();
+                
+                SetAutostart(mgr, options);
+
                 mgr.coreCtx->listeners.BundleChanged(
                     BundleEvent(BundleEvent::BUNDLE_STOPPING, MakeBundle(mgr.shared_from_this())));
+                    
                 transitionAction.set_value();
                 stoppingState->Stop(mgr, options);
                 break;

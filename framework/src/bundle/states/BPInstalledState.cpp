@@ -13,9 +13,6 @@ namespace cppmicroservices
 {
     void BPInstalledState::Start(BundlePrivate& mgr, uint32_t options)
     {
-        CheckFrameworkHasStopped(mgr);
-        SetAutostart(mgr, options);
-
         auto currState = shared_from_this(); 
         std::promise<void> transitionAction; 
         auto fut = transitionAction.get_future();
@@ -23,9 +20,14 @@ namespace cppmicroservices
 
         while(currState->GetState() == Bundle::STATE_INSTALLED){
             if (mgr.CompareAndSetState(&currState, resolvedState)){
-                currState->WaitForTransitionTask();                   
+                currState->WaitForTransitionTask();      
+                
+                CheckFrameworkHasStopped(mgr);
+                SetAutostart(mgr, options);
+
                 mgr.coreCtx->listeners.BundleChanged(
                     { BundleEvent::BUNDLE_RESOLVED, MakeBundle(mgr.shared_from_this()) });
+                    
                 transitionAction.set_value();
                 resolvedState->Start(mgr, options);
                 break;

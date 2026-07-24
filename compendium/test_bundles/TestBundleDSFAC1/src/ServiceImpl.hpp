@@ -1,5 +1,5 @@
-#ifndef SERVICE_IMPL_HPP_
-#define SERVICE_IMPL_HPP_
+#ifndef SERVICE_IMPL_DSFAC1_HPP
+#define SERVICE_IMPL_DSFAC1_HPP
 
 #include "cppmicroservices/servicecomponent/ComponentContext.hpp"
 #include <TestInterfaces/Interfaces.hpp>
@@ -265,4 +265,4 @@ namespace sample
 
 } // namespace sample
 
-#endif // SERVICE_IMPL_HPP_
+#endif // SERVICE_IMPL_DSFAC1_HPP

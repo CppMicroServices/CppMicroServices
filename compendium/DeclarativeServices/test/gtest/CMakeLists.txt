@@ -70,6 +70,7 @@ set(_declarativeservices_tests
   TestComponentRegistry.cpp
   TestConfigPolicies.cpp
   TestConfigurationPropertiesWithMultipleConfigurations.cpp
+  TestMultipleRequiredConfigurations.cpp
   TestFactoryPid.cpp
   TestFactoryTarget.cpp
   TestComponentFactoryImpl.cpp
@@ -220,6 +221,8 @@ set(_test_bundles
   TestBundleDSCA26
   TestBundleDSCA27
   TestBundleDSCA28
+  TestBundleDSCA29
+  TestBundleDSCA30
   TestBundleDSFAC1
   EnglishDictionary
   )

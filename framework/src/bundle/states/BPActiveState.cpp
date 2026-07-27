@@ -16,7 +16,8 @@ namespace cppmicroservices
     };
     
     void BPActiveState::Start(BundlePrivate& mgr, uint32_t options){
-        CheckFrameworkHasStopped(mgr);
+        auto frameworkBlock = CheckAndBlockFramework(mgr);
+        US_UNUSED(frameworkBlock);
         US_UNUSED(options);
         return;
     };

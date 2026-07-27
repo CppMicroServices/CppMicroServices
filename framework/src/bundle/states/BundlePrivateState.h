@@ -8,10 +8,10 @@
 namespace cppmicroservices
 {
     class BundlePrivate;
+    class FrameworkShutdownBlocker;
 
     class BundlePrivateState : public std::enable_shared_from_this<BundlePrivateState>
     { 
-    
         public:
         BundlePrivateState();
         explicit BundlePrivateState(std::shared_future<void> blockUntil);
@@ -29,7 +29,7 @@ namespace cppmicroservices
         virtual uint32_t GetState()=0;
 
         void SetAutostart(BundlePrivate& mgr, uint32_t options);
-        void CheckFrameworkHasStopped(BundlePrivate& mgr);
+        std::unique_ptr<FrameworkShutdownBlocker> CheckAndBlockFramework(BundlePrivate& mgr);
 
         void WaitForTransitionTask();
 

@@ -34,7 +34,8 @@ namespace cppmicroservices
             if (mgr.CompareAndSetState(&currState, activeState)){
                 currState->WaitForTransitionTask();
                 
-                CheckFrameworkHasStopped(mgr);
+                auto frameworkBlock = CheckAndBlockFramework(mgr);
+                US_UNUSED(frameworkBlock);
                 SetAutostart(mgr, options);
 
                 auto const thisBundle = MakeBundle(mgr.shared_from_this());

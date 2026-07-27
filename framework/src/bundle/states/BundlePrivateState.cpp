@@ -24,13 +24,14 @@ namespace cppmicroservices {
         }
     }
 
-    void BundlePrivateState::CheckFrameworkHasStopped(BundlePrivate& mgr){
+    std::unique_ptr<FrameworkShutdownBlocker> BundlePrivateState::CheckAndBlockFramework(BundlePrivate& mgr){
         auto frameworkBlock = mgr.coreCtx->GetFrameworkStateAndBlock();
         if (frameworkBlock->frameworkHasStopped)
         {
             throw std::runtime_error("Bundle " + mgr.symbolicName + " (location=" + mgr.location
                                      + ") belongs to a stopped framework");
         }
+        return frameworkBlock;
     }
 
     void BundlePrivateState::WaitForTransitionTask()

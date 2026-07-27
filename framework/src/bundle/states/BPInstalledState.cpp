@@ -27,7 +27,8 @@ namespace cppmicroservices
             if (mgr.CompareAndSetState(&currState, resolvedState)){
                 currState->WaitForTransitionTask();      
                 
-                CheckFrameworkHasStopped(mgr);
+                auto frameworkBlock = CheckAndBlockFramework(mgr);
+                US_UNUSED(frameworkBlock);
                 SetAutostart(mgr, options);
 
                 mgr.coreCtx->listeners.BundleChanged(

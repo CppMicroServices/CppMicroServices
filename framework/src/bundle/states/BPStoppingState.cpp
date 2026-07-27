@@ -14,7 +14,8 @@ namespace cppmicroservices
     };
 
     void BPStoppingState::Start(BundlePrivate& mgr, uint32_t options){
-        CheckFrameworkHasStopped(mgr);
+        auto frameworkBlock = CheckAndBlockFramework(mgr);
+        US_UNUSED(frameworkBlock);
         SetAutostart(mgr, options);
         throw std::runtime_error("Bundle " + mgr.symbolicName + " (location=" + mgr.location
                                     + "), start called from BundleActivator::Stop");

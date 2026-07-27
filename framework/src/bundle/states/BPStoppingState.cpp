@@ -9,6 +9,9 @@
 
 namespace cppmicroservices
 {
+    uint32_t BPStoppingState::GetState(){
+        return Bundle::STATE_STOPPING;
+    };
 
     void BPStoppingState::Start(BundlePrivate& mgr, uint32_t options){
         CheckFrameworkHasStopped(mgr);

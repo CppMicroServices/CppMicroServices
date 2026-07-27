@@ -9,15 +9,17 @@ namespace cppmicroservices
     { 
         public:
         using BundlePrivateState::BundlePrivateState;
-        virtual ~BPStartingState() = default;
+        ~BPStartingState() override = default;
+        BPStartingState(BPStartingState const&) = delete;
+        BPStartingState& operator=(BPStartingState const&) = delete;
+        BPStartingState(BPStartingState&&) = delete;
+        BPStartingState& operator=(BPStartingState&&) = delete;
 
         void Start(BundlePrivate& mgr, uint32_t options) override;
         void Stop(BundlePrivate& mgr, uint32_t options) override;
         void Uninstall(BundlePrivate& mgr) override;
 
-        uint32_t GetState() override {
-            return 0x00000008;
-        };
+        uint32_t GetState() override;
     };
 } 
 

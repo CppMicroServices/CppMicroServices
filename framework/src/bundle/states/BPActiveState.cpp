@@ -11,6 +11,9 @@
 
 namespace cppmicroservices
 {
+    uint32_t BPActiveState::GetState(){
+        return Bundle::STATE_ACTIVE;
+    };
     
     void BPActiveState::Start(BundlePrivate& mgr, uint32_t options){
         CheckFrameworkHasStopped(mgr);

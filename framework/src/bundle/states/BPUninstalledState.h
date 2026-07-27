@@ -9,13 +9,18 @@ namespace cppmicroservices
     { 
         public:
         using BundlePrivateState::BundlePrivateState;
+        ~BPUninstalledState() override = default;
+        BPUninstalledState(BPUninstalledState const&) = delete;
+        BPUninstalledState& operator=(BPUninstalledState const&) = delete;
+        BPUninstalledState(BPUninstalledState&&) = delete;
+        BPUninstalledState& operator=(BPUninstalledState&&) = delete;
+
+
         virtual void Start(BundlePrivate&, uint32_t) override;
         virtual void Stop(BundlePrivate&, uint32_t) override;
         virtual void Uninstall(BundlePrivate&) override;
 
-        uint32_t GetState() override {
-            return 0x00000001;
-        };
+        uint32_t GetState() override;
 
     };
 } 

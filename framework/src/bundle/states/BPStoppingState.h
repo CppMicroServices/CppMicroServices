@@ -9,7 +9,11 @@ namespace cppmicroservices
     { 
         public:
         using BundlePrivateState::BundlePrivateState;
-        virtual ~BPStoppingState() = default;
+        ~BPStoppingState() override = default;
+        BPStoppingState(BPStoppingState const&) = delete;
+        BPStoppingState& operator=(BPStoppingState const&) = delete;
+        BPStoppingState(BPStoppingState&&) = delete;
+        BPStoppingState& operator=(BPStoppingState&&) = delete;
 
         void Start(BundlePrivate& mgr, uint32_t options) override;
 
@@ -17,10 +21,7 @@ namespace cppmicroservices
 
         void Uninstall(BundlePrivate& mgr) override;
 
-        uint32_t GetState() override {
-            return 0x00000010;
-        };
-
+        uint32_t GetState() override; 
     };
 } 
 

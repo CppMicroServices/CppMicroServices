@@ -9,6 +9,11 @@
 
 namespace cppmicroservices
 {
+
+    uint32_t BPResolvedState::GetState(){
+        return Bundle::STATE_RESOLVED;
+    };
+
     void BPResolvedState::Start(BundlePrivate& mgr, uint32_t options){
         auto currState = shared_from_this(); 
         std::promise<void> transitionAction; 

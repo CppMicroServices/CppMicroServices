@@ -48,11 +48,15 @@ namespace cppmicroservices
 
     void BPResolvedState::Uninstall(BundlePrivate& mgr){
         auto currState = shared_from_this(); 
-        auto installedState = std::make_shared<BPInstalledState>();
+        std::promise<void> transitionAction; 
+        auto fut = transitionAction.get_future();
+        auto installedState = std::make_shared<BPInstalledState>(std::move(fut));
 
         while(currState->GetState() == Bundle::STATE_RESOLVED){
             if (mgr.CompareAndSetState(&currState, installedState))
             {
+                currState->WaitForTransitionTask();
+                transitionAction.set_value();
                 installedState->Uninstall(mgr);
                 break;
             }

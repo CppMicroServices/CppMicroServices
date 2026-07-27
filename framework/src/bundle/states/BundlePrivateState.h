@@ -16,6 +16,11 @@ namespace cppmicroservices
         BundlePrivateState();
         explicit BundlePrivateState(std::shared_future<void> blockUntil);
         virtual ~BundlePrivateState() = default;
+        BundlePrivateState(BundlePrivateState const&) = delete;
+        BundlePrivateState& operator=(BundlePrivateState const&) = delete;
+        BundlePrivateState(BundlePrivateState&&) = delete;
+        BundlePrivateState& operator=(BundlePrivateState&&) = delete;
+
 
         virtual void Start(BundlePrivate& mgr, uint32_t options)=0;
         virtual void Stop(BundlePrivate& mgr, uint32_t options)=0;

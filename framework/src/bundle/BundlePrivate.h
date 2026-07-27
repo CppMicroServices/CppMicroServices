@@ -153,13 +153,6 @@ namespace cppmicroservices
         const std::string location;
 
         /**
-         * State of the bundle
-         */
-        // GCC 4.6 atomics do not support custom trivially copyable types
-        // like enums yet, so we use the underlying primitive type here.
-        // std::atomic<uint32_t> state;
-
-        /**
          * Bundle archive containing persistent data.
          */
         std::shared_ptr<BundleArchive> barchive;
@@ -228,7 +221,10 @@ namespace cppmicroservices
         SharedLibrary lib;
 
         SetBundleContextFn SetBundleContext;
-
+        
+        /**
+         * State of the bundle
+         */
         std::shared_ptr<BundlePrivateState> state;
         bool virtual CompareAndSetState(std::shared_ptr<BundlePrivateState>* expectedState,
                                 std::shared_ptr<BundlePrivateState> desiredState);

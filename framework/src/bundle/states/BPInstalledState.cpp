@@ -42,9 +42,20 @@ namespace cppmicroservices
     }
 
     void BPInstalledState::Stop(BundlePrivate& mgr, uint32_t options){
-        SetAutostart(mgr, options);
-        return;
-    };
+        auto currState = shared_from_this(); 
+        std::promise<void> transitionAction; 
+        auto fut = transitionAction.get_future();
+        auto installedState = std::make_shared<BPInstalledState>(std::move(fut)); 
+
+        while(currState->GetState() == Bundle::STATE_INSTALLED){
+            if (mgr.CompareAndSetState(&currState, installedState)){
+                currState->WaitForTransitionTask(); 
+                SetAutostart(mgr, options);
+                transitionAction.set_value();
+                break;
+            }
+        }
+    }
 
     void BPInstalledState::Uninstall(BundlePrivate& mgr){
 
@@ -88,6 +99,6 @@ namespace cppmicroservices
             }
         }
         
-    };
+    }
 
 } 

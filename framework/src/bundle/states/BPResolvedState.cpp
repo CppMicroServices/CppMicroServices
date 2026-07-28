@@ -42,9 +42,20 @@ namespace cppmicroservices
     }
 
     void BPResolvedState::Stop(BundlePrivate& mgr, uint32_t options){
-        SetAutostart(mgr, options);
-        return;
-    };
+        auto currState = shared_from_this(); 
+        std::promise<void> transitionAction; 
+        auto fut = transitionAction.get_future();
+        auto resolvedState = std::make_shared<BPResolvedState>(std::move(fut)); 
+
+        while(currState->GetState() == Bundle::STATE_RESOLVED){
+            if (mgr.CompareAndSetState(&currState, resolvedState)){
+                currState->WaitForTransitionTask(); 
+                SetAutostart(mgr, options);
+                transitionAction.set_value();
+                break;
+            }
+        }
+    }
 
     void BPResolvedState::Uninstall(BundlePrivate& mgr){
         auto currState = shared_from_this(); 
@@ -61,7 +72,7 @@ namespace cppmicroservices
                 break;
             }
         }
-    };
+    }
 
     
 } 

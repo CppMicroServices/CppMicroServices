@@ -14,11 +14,27 @@ namespace cppmicroservices
     };
 
     void BPStoppingState::Start(BundlePrivate& mgr, uint32_t options){
-        auto frameworkBlock = CheckAndBlockFramework(mgr);
-        US_UNUSED(frameworkBlock);
-        SetAutostart(mgr, options);
-        throw std::runtime_error("Bundle " + mgr.symbolicName + " (location=" + mgr.location
-                                    + "), start called from BundleActivator::Stop");
+
+        auto currState = shared_from_this(); 
+        std::promise<void> transitionAction; 
+        auto fut = transitionAction.get_future();
+        auto stoppingState = std::make_shared<BPStoppingState>(std::move(fut)); 
+
+        while(currState->GetState() == Bundle::STATE_STOPPING){
+            if (mgr.CompareAndSetState(&currState, stoppingState)){
+                currState->WaitForTransitionTask();
+
+                auto frameworkBlock = CheckAndBlockFramework(mgr);
+                US_UNUSED(frameworkBlock);
+                SetAutostart(mgr, options);
+
+                transitionAction.set_value();
+
+                throw std::runtime_error("Bundle " + mgr.symbolicName + " (location=" + mgr.location
+                                            + "), start called from BundleActivator::Stop");
+            }
+        }
+
     }
 
     void BPStoppingState::Stop(BundlePrivate& mgr, uint32_t options){

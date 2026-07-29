@@ -18,6 +18,7 @@ namespace cppmicroservices
 
     void BPInstalledState::Start(BundlePrivate& mgr, uint32_t options)
     {
+        bool successfulTransition = false;
         auto currState = shared_from_this(); 
         std::promise<void> transitionAction; 
         auto fut = transitionAction.get_future();
@@ -35,13 +36,19 @@ namespace cppmicroservices
                     { BundleEvent::BUNDLE_RESOLVED, MakeBundle(mgr.shared_from_this()) });
                     
                 transitionAction.set_value();
+                successfulTransition = true;
                 resolvedState->Start(mgr, options);
                 break;
             }
         }
+
+        if(!successfulTransition){
+            LogDroppedTransition(mgr, "Start()", Bundle::STATE_INSTALLED, currState->GetState());
+        }
     }
 
     void BPInstalledState::Stop(BundlePrivate& mgr, uint32_t options){
+        bool successfulTransition = false;
         auto currState = shared_from_this(); 
         std::promise<void> transitionAction; 
         auto fut = transitionAction.get_future();
@@ -52,13 +59,19 @@ namespace cppmicroservices
                 currState->WaitForTransitionTask(); 
                 SetAutostart(mgr, options);
                 transitionAction.set_value();
+                successfulTransition = true;
                 break;
             }
+        }
+
+        if(!successfulTransition){
+            LogDroppedTransition(mgr, "Stop()", Bundle::STATE_INSTALLED, currState->GetState());
         }
     }
 
     void BPInstalledState::Uninstall(BundlePrivate& mgr){
 
+        bool successfulTransition = false;
         auto currState = shared_from_this(); 
         std::promise<void> transitionAction; 
         auto fut = transitionAction.get_future();
@@ -95,8 +108,13 @@ namespace cppmicroservices
                 }
                 mgr.coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::BUNDLE_UNINSTALLED, MakeBundle(mgr.shared_from_this())));
                 transitionAction.set_value();
+                successfulTransition = true;
                 break;
             }
+        }
+
+        if(!successfulTransition){
+            LogDroppedTransition(mgr, "Uninstall()", Bundle::STATE_INSTALLED, currState->GetState());
         }
         
     }

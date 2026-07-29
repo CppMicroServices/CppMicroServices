@@ -23,6 +23,7 @@ namespace cppmicroservices
     };
 
     void BPActiveState::Stop(BundlePrivate& mgr, uint32_t options){
+        bool successfulTransition = false;
         auto currState = shared_from_this(); 
         std::promise<void> transitionAction; 
         auto fut = transitionAction.get_future();
@@ -58,8 +59,13 @@ namespace cppmicroservices
                 if (res){
                     std::rethrow_exception(res);
                 }
+                successfulTransition = true;
                 break;
             }
+        }
+
+        if(!successfulTransition){
+            LogDroppedTransition(mgr, "Stop()", Bundle::STATE_ACTIVE, currState->GetState());
         }
     }
 
@@ -68,6 +74,7 @@ namespace cppmicroservices
         std::promise<void> transitionAction; 
         auto fut = transitionAction.get_future();
         auto stoppingState = std::make_shared<BPStoppingState>(std::move(fut));
+        bool successfulTransition = false;
 
         while(currState->GetState() == Bundle::STATE_ACTIVE){
             if (mgr.CompareAndSetState(&currState, stoppingState)){
@@ -100,8 +107,13 @@ namespace cppmicroservices
                 
                 transitionAction.set_value();
                 stoppingState->Uninstall(mgr);
+                successfulTransition = true;
                 break;
             }
+        }
+
+        if(!successfulTransition){
+            LogDroppedTransition(mgr, "Uninstall()", Bundle::STATE_ACTIVE, currState->GetState());
         }
     }
 

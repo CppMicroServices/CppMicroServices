@@ -30,6 +30,10 @@ namespace cppmicroservices
 
         void SetAutostart(BundlePrivate& mgr, uint32_t options);
         std::unique_ptr<FrameworkShutdownBlocker> CheckAndBlockFramework(BundlePrivate& mgr);
+        void LogDroppedTransition(BundlePrivate& mgr,
+                                    std::string const& transitionName,
+                                    uint32_t expectedState,
+                                    uint32_t actualState);
 
         void WaitForTransitionTask();
 

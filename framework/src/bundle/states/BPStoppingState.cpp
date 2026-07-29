@@ -15,6 +15,7 @@ namespace cppmicroservices
 
     void BPStoppingState::Start(BundlePrivate& mgr, uint32_t options){
 
+        bool successfulTransition = false;
         auto currState = shared_from_this(); 
         std::promise<void> transitionAction; 
         auto fut = transitionAction.get_future();
@@ -29,16 +30,22 @@ namespace cppmicroservices
                 SetAutostart(mgr, options);
 
                 transitionAction.set_value();
+                successfulTransition = true;
 
                 throw std::runtime_error("Bundle " + mgr.symbolicName + " (location=" + mgr.location
                                             + "), start called from BundleActivator::Stop");
             }
         }
 
+        if(!successfulTransition){
+            LogDroppedTransition(mgr, "Start()", Bundle::STATE_STOPPING, currState->GetState());
+        }
+
     }
 
     void BPStoppingState::Stop(BundlePrivate& mgr, uint32_t options){
         
+        bool successfulTransition = false;
         auto currState = shared_from_this(); 
         std::promise<void> transitionAction; 
         auto fut = transitionAction.get_future();
@@ -60,12 +67,18 @@ namespace cppmicroservices
                 }
                 mgr.coreCtx->listeners.BundleChanged({ BundleEvent::BUNDLE_STOPPED, MakeBundle(mgr.shared_from_this()) }); //listener stopp-ED event
                 transitionAction.set_value();
+                successfulTransition = true;
                 break;
             }
+        }
+
+        if(!successfulTransition){
+            LogDroppedTransition(mgr, "Stop()", Bundle::STATE_STOPPING, currState->GetState());
         }
     }
 
     void BPStoppingState::Uninstall(BundlePrivate& mgr){
+        bool successfulTransition = false;
         auto currState = shared_from_this(); 
         std::promise<void> transitionAction; 
         auto fut = transitionAction.get_future();
@@ -84,9 +97,14 @@ namespace cppmicroservices
                 }
                 mgr.coreCtx->listeners.BundleChanged({ BundleEvent::BUNDLE_STOPPED, MakeBundle(mgr.shared_from_this()) }); //listener stopp-ED event
                 transitionAction.set_value();
+                successfulTransition = true;
                 resolvedState->Uninstall(mgr);
                 break;
             }
+        }
+
+        if(!successfulTransition){
+            LogDroppedTransition(mgr, "Uninstall()", Bundle::STATE_STOPPING, currState->GetState());
         }
     }
 

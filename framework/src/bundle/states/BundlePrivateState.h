@@ -8,7 +8,7 @@
 namespace cppmicroservices
 {
     class BundlePrivate;
-    class FrameworkShutdownBlocker;
+    struct FrameworkShutdownBlocker;
 
     class BundlePrivateState : public std::enable_shared_from_this<BundlePrivateState>
     { 

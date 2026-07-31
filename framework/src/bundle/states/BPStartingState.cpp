@@ -36,7 +36,6 @@ namespace cppmicroservices
                 currState->WaitForTransitionTask();
                 
                 auto frameworkBlock = CheckAndBlockFramework(mgr);
-                US_UNUSED(frameworkBlock);
                 SetAutostart(mgr, options);
 
                 auto const thisBundle = MakeBundle(mgr.shared_from_this());
@@ -85,12 +84,14 @@ namespace cppmicroservices
                                         thisBundle,
                                         "The bundle validation function threw an exception",
                                         std::current_exception()));
+                        frameworkBlock.reset();
                         transitionAction.set_value();
                         activeState->Stop(mgr, options);
                         throw (SecurityException { util::GetLastExceptionStr(), thisBundle });
                     }
 
                     if(!valid){
+                        frameworkBlock.reset();
                         transitionAction.set_value();
                         activeState->Stop(mgr, options);
                         throw (SecurityException {
@@ -163,6 +164,7 @@ namespace cppmicroservices
                     }
                     catch (std::system_error const& ex)
                     {
+                        frameworkBlock.reset();
                         transitionAction.set_value();
                         activeState->Stop(mgr, options);
                         throw (cppmicroservices::SharedLibraryException(ex.code(), ex.what(), thisBundle));
@@ -172,6 +174,7 @@ namespace cppmicroservices
                         mgr.coreCtx->logger->Log(logservice::SeverityLevel::LOG_INFO,
                                             "Failed to start Bundle " + mgr.symbolicName + " (location=" + mgr.location + ")",
                                             std::current_exception());
+                        frameworkBlock.reset();
                         transitionAction.set_value();
                         activeState->Stop(mgr, options);
                         throw (std::runtime_error("Bundle " + mgr.symbolicName + " (location= " + mgr.location
@@ -192,11 +195,13 @@ namespace cppmicroservices
                 }
                 catch (cppmicroservices::SecurityException const& ex)
                 {
+                    frameworkBlock.reset();
                     transitionAction.set_value();
                     activeState->Stop(mgr, options);
                     throw ex;
                 }
 
+                frameworkBlock.reset();
                 transitionAction.set_value();
                 successfulTransition = true;
                 break;

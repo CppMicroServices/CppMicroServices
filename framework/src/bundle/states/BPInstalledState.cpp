@@ -29,12 +29,12 @@ namespace cppmicroservices
                 currState->WaitForTransitionTask();      
                 
                 auto frameworkBlock = CheckAndBlockFramework(mgr);
-                US_UNUSED(frameworkBlock);
                 SetAutostart(mgr, options);
 
                 mgr.coreCtx->listeners.BundleChanged(
                     { BundleEvent::BUNDLE_RESOLVED, MakeBundle(mgr.shared_from_this()) });
-                    
+                
+                frameworkBlock.reset();
                 transitionAction.set_value();
                 successfulTransition = true;
                 resolvedState->Start(mgr, options);
@@ -107,6 +107,7 @@ namespace cppmicroservices
                     mgr.bundleDir.clear();
                 }
                 mgr.coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::BUNDLE_UNINSTALLED, MakeBundle(mgr.shared_from_this())));
+
                 transitionAction.set_value();
                 successfulTransition = true;
                 break;

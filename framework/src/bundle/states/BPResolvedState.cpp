@@ -26,7 +26,6 @@ namespace cppmicroservices
                 currState->WaitForTransitionTask();
 
                 auto frameworkBlock = CheckAndBlockFramework(mgr);
-                US_UNUSED(frameworkBlock);
                 SetAutostart(mgr, options);
 
                 std::shared_ptr<BundleContextPrivate> null_expected;
@@ -34,10 +33,11 @@ namespace cppmicroservices
                 mgr.bundleContext.CompareExchange(null_expected, ctx);
                 auto const thisBundle = MakeBundle(mgr.shared_from_this());
                 mgr.coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::BUNDLE_STARTING, thisBundle));
-                
+
+                frameworkBlock.reset();
                 transitionAction.set_value();
-                successfulTransition = true;
                 startingState->Start(mgr, options);
+                successfulTransition = true;
                 break;
             }
         }

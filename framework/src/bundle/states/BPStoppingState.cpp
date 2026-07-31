@@ -15,7 +15,6 @@ namespace cppmicroservices
 
     void BPStoppingState::Start(BundlePrivate& mgr, uint32_t options){
 
-        bool successfulTransition = false;
         auto currState = shared_from_this(); 
         std::promise<void> transitionAction; 
         auto fut = transitionAction.get_future();
@@ -26,21 +25,14 @@ namespace cppmicroservices
                 currState->WaitForTransitionTask();
 
                 auto frameworkBlock = CheckAndBlockFramework(mgr);
-                US_UNUSED(frameworkBlock);
                 SetAutostart(mgr, options);
-
+                frameworkBlock.reset();
                 transitionAction.set_value();
-                successfulTransition = true;
 
                 throw std::runtime_error("Bundle " + mgr.symbolicName + " (location=" + mgr.location
                                             + "), start called from BundleActivator::Stop");
             }
         }
-
-        if(!successfulTransition){
-            LogDroppedTransition(mgr, "Start()", Bundle::STATE_STOPPING, currState->GetState());
-        }
-
     }
 
     void BPStoppingState::Stop(BundlePrivate& mgr, uint32_t options){

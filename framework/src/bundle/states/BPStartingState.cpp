@@ -68,14 +68,11 @@ namespace cppmicroservices
 
                 if (useActivator)
                 {
-                    bool valid = true;
+                    bool failedValidation;
                     try
                     {
-                        if (mgr.coreCtx->validationFunc && (mgr.lib.GetFilePath() != util::GetExecutablePath())
-                            && !mgr.coreCtx->validationFunc(thisBundle))
-                        {
-                            valid = false;
-                        }
+                        failedValidation = (mgr.coreCtx->validationFunc && (mgr.lib.GetFilePath() != util::GetExecutablePath())
+                            && !mgr.coreCtx->validationFunc(thisBundle));
                     }
                     catch (...)
                     {
@@ -90,7 +87,7 @@ namespace cppmicroservices
                         throw (SecurityException { util::GetLastExceptionStr(), thisBundle });
                     }
 
-                    if(!valid){
+                    if(failedValidation){
                         frameworkBlock.reset();
                         transitionAction.set_value();
                         activeState->Stop(mgr, options);

@@ -1,5 +1,6 @@
 #include "BPStoppingState.h"
 #include "BPResolvedState.h"
+#include "BPInstalledState.h"
 #include "BPUninstalledState.h"
 #include "BundlePrivate.h"
 #include "BundleContextPrivate.h"
@@ -74,10 +75,10 @@ namespace cppmicroservices
         auto currState = shared_from_this(); 
         std::promise<void> transitionAction; 
         auto fut = transitionAction.get_future();
-        auto resolvedState = std::make_shared<BPResolvedState>(std::move(fut)); 
+        auto installedState = std::make_shared<BPInstalledState>(std::move(fut)); 
 
         while(currState->GetState() == Bundle::STATE_STOPPING){
-            if (mgr.CompareAndSetState(&currState, resolvedState)){
+            if (mgr.CompareAndSetState(&currState, installedState)){
                 currState->WaitForTransitionTask();
                 std::shared_ptr<BundleContextPrivate> ctx = mgr.bundleContext.Load();
                 if (ctx)
@@ -90,7 +91,7 @@ namespace cppmicroservices
                 mgr.coreCtx->listeners.BundleChanged({ BundleEvent::BUNDLE_STOPPED, MakeBundle(mgr.shared_from_this()) }); //listener stopp-ED event
                 transitionAction.set_value();
                 successfulTransition = true;
-                resolvedState->Uninstall(mgr);
+                installedState->Uninstall(mgr);
                 break;
             }
         }

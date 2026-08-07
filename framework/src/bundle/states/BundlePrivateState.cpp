@@ -67,10 +67,10 @@ namespace cppmicroservices {
     {
         mgr.coreCtx->logger->Log(
             logservice::SeverityLevel::LOG_DEBUG,
-            "Dropped bundle lifecycle transition '" + transitionName
-                + "' for Bundle " + mgr.symbolicName
+            "Dropped bundle lifecycle transition '" + transitionName + "' because another transition completed first. This can occur when a high frequency of transitions is called on the same bundle."
+                + "\nBundle: " + mgr.symbolicName 
                 + " (location=" + mgr.location + ")"
-                + "; expected state=" + BundleStateToString(expectedState)
-                + ", actual state=" + BundleStateToString(actualState));
+                + "\nRequired/expected state for the transition call: " + BundleStateToString(expectedState)
+                + "; actual state: " + BundleStateToString(actualState) + "\n");
     }
 }

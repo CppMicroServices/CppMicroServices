@@ -46,6 +46,7 @@ namespace cppmicroservices
             : registry(std::move(registry))
             , compDesc(std::move(metadata))
             , bundleContext(std::move(bundleContext))
+            , bundle_(this->bundleContext.GetBundle())
             , logger(std::move(logger))
             , state(std::make_shared<CMDisabledState>())
             , asyncWorkService(std::move(asyncWorkService))

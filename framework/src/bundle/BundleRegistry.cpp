@@ -50,8 +50,14 @@ namespace
     class InitialBundleMapCleanup
     {
       public:
-        InitialBundleMapCleanup(std::function<void()> cleanupFcn) : _cleanupFcn(std::move(cleanupFcn)) {}
-        ~InitialBundleMapCleanup() { _cleanupFcn(); }
+        InitialBundleMapCleanup(std::function<void()> cleanupFcn)
+            : _cleanupFcn(std::move(cleanupFcn))
+        {
+        }
+        ~InitialBundleMapCleanup()
+        {
+            _cleanupFcn();
+        }
 
       private:
         std::function<void()> _cleanupFcn;
@@ -62,7 +68,10 @@ namespace
 namespace cppmicroservices
 {
 
-    BundleRegistry::BundleRegistry(CoreBundleContext* coreCtx) : coreCtx(coreCtx) {}
+    BundleRegistry::BundleRegistry(CoreBundleContext* coreCtx)
+        : coreCtx(coreCtx)
+    {
+    }
 
     BundleRegistry::~BundleRegistry() = default;
 
@@ -128,7 +137,7 @@ namespace cppmicroservices
         while (foundBundles.first != foundBundles.second)
         {
             auto installedBundlePrivate = foundBundles.first->second;
-            alreadyInstalled.emplace_back(installedBundlePrivate->symbolicName);
+            alreadyInstalled.emplace_back(installedBundlePrivate->sharedState->symbolicName);
             Bundle actualBundle;
             if (filter)
             {
@@ -205,7 +214,7 @@ namespace cppmicroservices
                                                                 bundleManifest,
                                                                 resultingBundles,
                                                                 alreadyInstalled,
-                                                                installingBundle->id != 0);
+                                                                installingBundle->sharedState->id != 0);
 
             // Perform the install
             auto newBundles = Install0(location, resCont, alreadyInstalled, bundleManifest);
@@ -287,7 +296,7 @@ namespace cppmicroservices
                                                                     bundleManifest,
                                                                     resultingBundles,
                                                                     alreadyInstalled,
-                                                                    installingBundle->id != 0);
+                                                                    installingBundle->sharedState->id != 0);
 
                 std::vector<Bundle> newBundles;
                 {
@@ -405,7 +414,7 @@ namespace cppmicroservices
         auto range = bundles.v.equal_range(location);
         for (auto iter = range.first; iter != range.second; ++iter)
         {
-            if (iter->second->id == id)
+            if (iter->second->sharedState->id == id)
             {
                 bundles.v.erase(iter);
                 return;
@@ -423,7 +432,7 @@ namespace cppmicroservices
 
         for (auto& m : bundles.v)
         {
-            if (m.second->id == id)
+            if (m.second->sharedState->id == id)
             {
                 return m.second;
             }
@@ -461,7 +470,7 @@ namespace cppmicroservices
         for (auto& p : bundles.v)
         {
             auto& b = p.second;
-            if (name == b->symbolicName && version == b->version)
+            if (name == b->sharedState->symbolicName && version == b->version)
             {
                 res.push_back(b);
             }

@@ -104,8 +104,7 @@ namespace cppmicroservices
         return false;
     }
 
-    Bundle::
-    operator bool() const
+    Bundle::operator bool() const
     {
         return d != nullptr;
     }

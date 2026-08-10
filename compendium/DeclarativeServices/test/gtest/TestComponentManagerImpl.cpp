@@ -111,6 +111,16 @@ namespace cppmicroservices
                     },
                     std::invalid_argument);
             }
+            {
+                EXPECT_NO_THROW({
+                    US_UNUSED(std::make_shared<ComponentManagerImpl>(mockMetadata,
+                                                                     mockRegistry,
+                                                                     bc,
+                                                                     fakeLogger,
+                                                                     asyncWorkService,
+                                                                     notifier));
+                });
+            }
         }
 
         // The fixture for testing class ComponentManagerImpl.

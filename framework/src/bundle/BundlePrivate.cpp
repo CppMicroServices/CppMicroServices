@@ -131,8 +131,8 @@ namespace cppmicroservices
         }
 
         auto installedState = std::make_shared<BPInstalledState>();
-        auto currState = GetStateObj();
-        CompareAndSetState(&currState, installedState);
+        auto observedState = GetStateObj();
+        CompareAndSetState(&observedState, installedState);
         // state = Bundle::STATE_INSTALLED;
 
         if (sendEvent)

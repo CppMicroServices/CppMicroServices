@@ -70,8 +70,8 @@ namespace cppmicroservices
     FrameworkPrivate::DoInit()
     {
         auto startingState = std::make_shared<BPStartingState>();
-        auto currState = GetStateObj();
-        CompareAndSetState(&currState, startingState);
+        auto observedState = GetStateObj();
+        CompareAndSetState(&observedState, startingState);
         // state = Bundle::STATE_STARTING;
         coreCtx->Init();
     }
@@ -281,8 +281,8 @@ namespace cppmicroservices
             }
 
             auto activeState = std::make_shared<BPActiveState>();
-            auto currState = GetStateObj();
-            CompareAndSetState(&currState, activeState);
+            auto observedState = GetStateObj();
+            CompareAndSetState(&observedState, activeState);
         }
 
         coreCtx->listeners.SendFrameworkEvent(
@@ -324,8 +324,8 @@ namespace cppmicroservices
                 auto l = Lock();
                 US_UNUSED(l);
                 auto activeState = std::make_shared<BPStoppingState>();
-                auto currState = GetStateObj();
-                CompareAndSetState(&currState, activeState);
+                auto observedState = GetStateObj();
+                CompareAndSetState(&observedState, activeState);
             }
             coreCtx->listeners.BundleChanged(
                 BundleEvent(BundleEvent::BUNDLE_STOPPING, MakeBundle(this->shared_from_this())));
@@ -420,8 +420,8 @@ namespace cppmicroservices
         if (GetState() != Bundle::STATE_INSTALLED)
         {
             auto resolvedState = std::make_shared<BPResolvedState>();
-            auto currState = GetStateObj();
-            CompareAndSetState(&currState, resolvedState);
+            auto observedState = GetStateObj();
+            CompareAndSetState(&observedState, resolvedState);
             NotifyAll();
         }
         stopEvent = fe;

@@ -26,14 +26,14 @@ namespace cppmicroservices
     void BPStartingState::Start(BundlePrivate& mgr, uint32_t options){
 
         TransitionLogger transitionLogger(mgr, "Start()", Bundle::STATE_STARTING);
-        auto currState = shared_from_this(); 
+        auto observedState = shared_from_this(); 
         std::promise<void> transitionAction; 
         auto fut = transitionAction.get_future();
         auto activeState = std::make_shared<BPActiveState>(std::move(fut)); 
 
-        while(currState->GetState() == Bundle::STATE_STARTING){
-            if (mgr.CompareAndSetState(&currState, activeState)){
-                currState->WaitForTransitionTask();
+        while(observedState->GetState() == Bundle::STATE_STARTING){
+            if (mgr.CompareAndSetState(&observedState, activeState)){
+                observedState->WaitForTransitionTask();
                 
                 auto frameworkBlock = CheckAndBlockFramework(mgr);
                 SetAutostart(mgr, options);
@@ -205,19 +205,19 @@ namespace cppmicroservices
             }
         }
 
-        transitionLogger.SetActualState(currState);
+        transitionLogger.SetActualState(observedState);
     }
 
     void BPStartingState::Stop(BundlePrivate& mgr, uint32_t options){
         TransitionLogger transitionLogger(mgr, "Stop()", Bundle::STATE_STARTING);
-        auto currState = shared_from_this(); 
+        auto observedState = shared_from_this(); 
         std::promise<void> transitionAction; 
         auto fut = transitionAction.get_future();
         auto stoppingState = std::make_shared<BPStoppingState>(std::move(fut));
 
-        while(currState->GetState() == Bundle::STATE_STARTING){
-            if (mgr.CompareAndSetState(&currState, stoppingState)){
-                currState->WaitForTransitionTask();
+        while(observedState->GetState() == Bundle::STATE_STARTING){
+            if (mgr.CompareAndSetState(&observedState, stoppingState)){
+                observedState->WaitForTransitionTask();
                 
                 SetAutostart(mgr, options);
 
@@ -231,19 +231,19 @@ namespace cppmicroservices
             }
         }
 
-        transitionLogger.SetActualState(currState);
+        transitionLogger.SetActualState(observedState);
     }
 
     void BPStartingState::Uninstall(BundlePrivate& mgr){
         TransitionLogger transitionLogger(mgr, "Uninstall()", Bundle::STATE_STARTING);
-        auto currState = shared_from_this(); 
+        auto observedState = shared_from_this(); 
         std::promise<void> transitionAction; 
         auto fut = transitionAction.get_future();
         auto stoppingState = std::make_shared<BPStoppingState>(std::move(fut));
 
-        while(currState->GetState() == Bundle::STATE_STARTING){
-            if (mgr.CompareAndSetState(&currState, stoppingState)){
-                currState->WaitForTransitionTask();
+        while(observedState->GetState() == Bundle::STATE_STARTING){
+            if (mgr.CompareAndSetState(&observedState, stoppingState)){
+                observedState->WaitForTransitionTask();
                 mgr.coreCtx->listeners.BundleChanged(
                     BundleEvent(BundleEvent::BUNDLE_STOPPING, MakeBundle(mgr.shared_from_this())));
                 transitionAction.set_value();
@@ -253,7 +253,7 @@ namespace cppmicroservices
             }
         }
 
-        transitionLogger.SetActualState(currState);
+        transitionLogger.SetActualState(observedState);
     }
 
 } 

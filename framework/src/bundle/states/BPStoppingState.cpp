@@ -16,14 +16,14 @@ namespace cppmicroservices
 
     void BPStoppingState::Start(BundlePrivate& mgr, uint32_t options){
 
-        auto currState = shared_from_this(); 
+        auto observedState = shared_from_this(); 
         std::promise<void> transitionAction; 
         auto fut = transitionAction.get_future();
         auto stoppingState = std::make_shared<BPStoppingState>(std::move(fut)); 
 
-        while(currState->GetState() == Bundle::STATE_STOPPING){
-            if (mgr.CompareAndSetState(&currState, stoppingState)){
-                currState->WaitForTransitionTask();
+        while(observedState->GetState() == Bundle::STATE_STOPPING){
+            if (mgr.CompareAndSetState(&observedState, stoppingState)){
+                observedState->WaitForTransitionTask();
 
                 auto frameworkBlock = CheckAndBlockFramework(mgr);
                 SetAutostart(mgr, options);
@@ -39,14 +39,14 @@ namespace cppmicroservices
     void BPStoppingState::Stop(BundlePrivate& mgr, uint32_t options){
         
         TransitionLogger transitionLogger(mgr, "Stop()", Bundle::STATE_STOPPING);
-        auto currState = shared_from_this(); 
+        auto observedState = shared_from_this(); 
         std::promise<void> transitionAction; 
         auto fut = transitionAction.get_future();
         auto resolvedState = std::make_shared<BPResolvedState>(std::move(fut)); 
 
-        while(currState->GetState() == Bundle::STATE_STOPPING){
-            if (mgr.CompareAndSetState(&currState, resolvedState)){
-                currState->WaitForTransitionTask();
+        while(observedState->GetState() == Bundle::STATE_STOPPING){
+            if (mgr.CompareAndSetState(&observedState, resolvedState)){
+                observedState->WaitForTransitionTask();
 
                 SetAutostart(mgr, options);
 
@@ -65,19 +65,19 @@ namespace cppmicroservices
             }
         }
 
-        transitionLogger.SetActualState(currState);
+        transitionLogger.SetActualState(observedState);
     }
 
     void BPStoppingState::Uninstall(BundlePrivate& mgr){
         TransitionLogger transitionLogger(mgr, "Uninstall()", Bundle::STATE_STOPPING);
-        auto currState = shared_from_this(); 
+        auto observedState = shared_from_this(); 
         std::promise<void> transitionAction; 
         auto fut = transitionAction.get_future();
         auto resolvedState = std::make_shared<BPResolvedState>(std::move(fut)); 
 
-        while(currState->GetState() == Bundle::STATE_STOPPING){
-            if (mgr.CompareAndSetState(&currState, resolvedState)){
-                currState->WaitForTransitionTask();
+        while(observedState->GetState() == Bundle::STATE_STOPPING){
+            if (mgr.CompareAndSetState(&observedState, resolvedState)){
+                observedState->WaitForTransitionTask();
                 std::shared_ptr<BundleContextPrivate> ctx = mgr.bundleContext.Load();
                 if (ctx)
                 {
@@ -94,7 +94,7 @@ namespace cppmicroservices
             }
         }
 
-        transitionLogger.SetActualState(currState);
+        transitionLogger.SetActualState(observedState);
 
     }
 

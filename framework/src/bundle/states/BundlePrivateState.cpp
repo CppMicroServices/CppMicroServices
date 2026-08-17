@@ -2,6 +2,7 @@
 #include "BundlePrivate.h"
 #include "CoreBundleContext.h"
 #include "cppmicroservices/Bundle.h"
+#include <exception>
 
 namespace cppmicroservices {
 
@@ -39,38 +40,68 @@ namespace cppmicroservices {
         ready.get();
     }
 
-    std::string BundleStateToString(uint32_t state)
+    namespace
     {
-        switch (state)
+        std::string
+        BundleStateToString(uint32_t state)
         {
-            case Bundle::STATE_UNINSTALLED:
-                return "STATE_UNINSTALLED";
-            case Bundle::STATE_INSTALLED:
-                return "STATE_INSTALLED";
-            case Bundle::STATE_RESOLVED:
-                return "STATE_RESOLVED";
-            case Bundle::STATE_STARTING:
-                return "STATE_STARTING";
-            case Bundle::STATE_STOPPING:
-                return "STATE_STOPPING";
-            case Bundle::STATE_ACTIVE:
-                return "STATE_ACTIVE";
-            default:
-                return "UNKNOWN_STATE(" + std::to_string(state) + ")";
+            switch (state)
+            {
+                case Bundle::STATE_UNINSTALLED:
+                    return "STATE_UNINSTALLED";
+                case Bundle::STATE_INSTALLED:
+                    return "STATE_INSTALLED";
+                case Bundle::STATE_RESOLVED:
+                    return "STATE_RESOLVED";
+                case Bundle::STATE_STARTING:
+                    return "STATE_STARTING";
+                case Bundle::STATE_STOPPING:
+                    return "STATE_STOPPING";
+                case Bundle::STATE_ACTIVE:
+                    return "STATE_ACTIVE";
+                default:
+                    return "UNKNOWN_STATE(" + std::to_string(state) + ")";
+            }
         }
     }
 
-    void BundlePrivateState::LogDroppedTransition(BundlePrivate& mgr,
-                                                std::string const& transitionName,
-                                                uint32_t expectedState,
-                                                uint32_t actualState)
+    TransitionLogger::TransitionLogger(BundlePrivate& mgr, std::string transitionName, uint32_t expectedState)
+        : mgr(mgr)
+        , transitionName(std::move(transitionName))
+        , expectedState(expectedState)
+        , actualState(expectedState)
+        , successfulTransition(false)
+        , uncaughtExceptionCount(std::uncaught_exceptions())
     {
-        mgr.coreCtx->logger->Log(
-            logservice::SeverityLevel::LOG_DEBUG,
-            "Dropped bundle lifecycle transition '" + transitionName + "' because another transition completed first. This can occur when a high frequency of transitions is called on the same bundle."
-                + "\nBundle: " + mgr.symbolicName 
-                + " (location=" + mgr.location + ")"
-                + "\nRequired/expected state for the transition call: " + BundleStateToString(expectedState)
-                + "; actual state: " + BundleStateToString(actualState) + "\n");
+    }
+
+    TransitionLogger::~TransitionLogger()
+    {
+        if (!successfulTransition && std::uncaught_exceptions() == uncaughtExceptionCount)
+        {
+            mgr.coreCtx->logger->Log(
+                logservice::SeverityLevel::LOG_DEBUG,
+                "Dropped bundle lifecycle transition '" + transitionName
+                    + "' because another transition completed first. This can happen when the same bundle is started, stopped, or uninstalled concurrently."
+                    + "\nBundle: " + mgr.symbolicName
+                    + " (location=" + mgr.location + ")"
+                    + "\nRequired state: " + BundleStateToString(expectedState)
+                    + "; actual state: " + BundleStateToString(actualState));
+        }
+    }
+
+    void
+    TransitionLogger::TransitionSucceeded()
+    {
+        successfulTransition = true;
+    }
+
+    void
+    TransitionLogger::SetActualState(std::shared_ptr<BundlePrivateState> const& state)
+    {
+        if (state)
+        {
+            actualState = state->GetState();
+        }
     }
 }

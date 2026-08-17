@@ -80,6 +80,8 @@ namespace cppmicroservices
             if (mgr.CompareAndSetState(&currState, installedState))
             {
                 currState->WaitForTransitionTask();
+                mgr.coreCtx->listeners.BundleChanged(
+                        { BundleEvent::BUNDLE_UNRESOLVED, MakeBundle(mgr.shared_from_this()) });
                 transitionAction.set_value();
                 successfulTransition = true;
                 installedState->Uninstall(mgr);

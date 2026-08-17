@@ -58,7 +58,7 @@ namespace cppmicroservices
                     ctx->Invalidate();
                     mgr.bundleContext.Store(std::shared_ptr<BundleContextPrivate>());
                 }
-                mgr.coreCtx->listeners.BundleChanged({ BundleEvent::BUNDLE_STOPPED, MakeBundle(mgr.shared_from_this()) }); //listener stopp-ED event
+                mgr.coreCtx->listeners.BundleChanged({ BundleEvent::BUNDLE_STOPPED, MakeBundle(mgr.shared_from_this()) });
                 transitionAction.set_value();
                 successfulTransition = true;
                 break;

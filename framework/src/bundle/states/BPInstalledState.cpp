@@ -81,8 +81,6 @@ namespace cppmicroservices
             if (mgr.CompareAndSetState(&currState, uninstalledState))
             {
                 currState->WaitForTransitionTask();
-                mgr.coreCtx->listeners.BundleChanged(
-                        { BundleEvent::BUNDLE_UNRESOLVED, MakeBundle(mgr.shared_from_this()) });
                 mgr.coreCtx->bundleRegistry.Remove(mgr.location, mgr.id);
                 mgr.bactivator = nullptr;
                 mgr.Purge();

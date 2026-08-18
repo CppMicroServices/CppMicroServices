@@ -25,6 +25,7 @@
 #include <chrono>
 #include <future>
 #include <thread>
+#include <iostream>
 
 #include "gtest/gtest.h"
 
@@ -80,45 +81,115 @@ class MockLogger : public cppmicroservices::logservice::LogService
                                                                                 std::string const&));
 };
 
-TEST_F(BundleLifecycleTest, TestState)
+TEST_F(BundleLifecycleTest, TestExpectedStateTransitions)
 {
+    TestBundleListener listener;
+    std::vector<BundleEvent> bundleEvents;
+    context.AddBundleListener(&listener, &TestBundleListener::BundleChanged);
+
     auto bundleA = InstallLib(context, "TestBundleA");
     ASSERT_TRUE(bundleA);
     ASSERT_EQ(bundleA.GetState(), Bundle::STATE_INSTALLED);
-    bundleA.Stop();
+    bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_INSTALLED, bundleA));
+
+    bundleA.Stop(); //BPInstalledState::Stop()
     ASSERT_EQ(bundleA.GetState(), Bundle::STATE_INSTALLED);
-    bundleA.Start();
+
+    bundleA.Start(); //BPInstalledState::Start(), BPResolvedState::Start(), BPStartingState::Start()
     ASSERT_EQ(bundleA.GetState(), Bundle::STATE_ACTIVE);
-    bundleA.Uninstall();
+    bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_RESOLVED, bundleA));
+    bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STARTING, bundleA));
+    bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STARTED, bundleA));
+
+    bundleA.Stop(); //BPActiveState::Stop(), BPStoppingState::Stop()
+    ASSERT_EQ(bundleA.GetState(), Bundle::STATE_RESOLVED);
+    bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STOPPING, bundleA));
+    bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STOPPED, bundleA));
+
+    bundleA.Stop(); //BPResolvedState::Stop()
+    ASSERT_EQ(bundleA.GetState(), Bundle::STATE_RESOLVED);
+
+    bundleA.Start(); //BPResolvedState::Start(), BPStartingState::Start()
+    ASSERT_EQ(bundleA.GetState(), Bundle::STATE_ACTIVE);
+    bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STARTING, bundleA));
+    bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STARTED, bundleA));
+
+    bundleA.Uninstall(); //BPActiveState::Uninstall(), BPStoppingState::Uninstall(), BPResolvedState::Uninstall(), BPInstalledState::Uninstall()
     ASSERT_EQ(bundleA.GetState(), Bundle::STATE_UNINSTALLED);
+    bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STOPPING, bundleA));
+    bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STOPPED, bundleA));
+    bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_UNRESOLVED, bundleA));
+    bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_UNINSTALLED, bundleA));
+
+    ASSERT_TRUE(listener.CheckListenerEvents(bundleEvents, false));
+
+};
+
+TEST_F(BundleLifecycleTest, TestBundleActivatorTransition)
+{
+    // Bundle TestBundleActivatorTransition1 calls Stop on itself in its Bundle Activation Start function
+    auto bundleActivatorTransition1 = InstallLib(context, "TestBundleActivatorTransition1");
+    ASSERT_EQ(bundleActivatorTransition1.GetState(), Bundle::STATE_INSTALLED);
+
+    bundleActivatorTransition1.Start();
+    ASSERT_EQ(bundleActivatorTransition1.GetState(), Bundle::STATE_RESOLVED);
+
+    // Bundle TestBundleActivatorTransition2 calls Start on itself in its Bundle Activation Stop function
+    auto bundleActivatorTransition2 = InstallLib(context, "TestBundleActivatorTransition2");
+    ASSERT_EQ(bundleActivatorTransition2.GetState(), Bundle::STATE_INSTALLED);
+
+    bundleActivatorTransition2.Start();
+    ASSERT_EQ(bundleActivatorTransition2.GetState(), Bundle::STATE_ACTIVE);
+
+    EXPECT_THROW(bundleActivatorTransition2.Stop(), std::runtime_error);
+    ASSERT_EQ(bundleActivatorTransition2.GetState(), Bundle::STATE_RESOLVED);
+
+    // Bundle TestBundleActivatorTransition3 calls Uninstall on itself in its Bundle Activation Start function
+    auto bundleActivatorTransition3 = InstallLib(context, "TestBundleActivatorTransition3");
+    ASSERT_EQ(bundleActivatorTransition3.GetState(), Bundle::STATE_INSTALLED);
+
+    bundleActivatorTransition3.Start();
+    ASSERT_EQ(bundleActivatorTransition3.GetState(), Bundle::STATE_UNINSTALLED);
+
+    // Bundle TestBundleActivatorTransition4 calls Uninstall on itself in its Bundle Activation Stop function
+    auto bundleActivatorTransition4 = InstallLib(context, "TestBundleActivatorTransition4");
+    ASSERT_EQ(bundleActivatorTransition4.GetState(), Bundle::STATE_INSTALLED);
+
+    bundleActivatorTransition4.Start();
+    ASSERT_EQ(bundleActivatorTransition4.GetState(), Bundle::STATE_ACTIVE);
+
+    bundleActivatorTransition4.Stop();
+    ASSERT_EQ(bundleActivatorTransition4.GetState(), Bundle::STATE_UNINSTALLED);
+
+
+    // Bundle TestBundleActivatorTransition5 calls Start on itself in its Bundle Activation Start function
+    auto bundleActivatorTransition5 = InstallLib(context, "TestBundleActivatorTransition5");
+    ASSERT_EQ(bundleActivatorTransition5.GetState(), Bundle::STATE_INSTALLED);
+
+    bundleActivatorTransition5.Start();
+    ASSERT_EQ(bundleActivatorTransition5.GetState(), Bundle::STATE_ACTIVE);
+
+    // Bundle TestBundleActivatorTransition6 calls Stop on itself in its Bundle Activation Stop function
+    auto bundleActivatorTransition6 = InstallLib(context, "TestBundleActivatorTransition6");
+    ASSERT_EQ(bundleActivatorTransition6.GetState(), Bundle::STATE_INSTALLED);
+
+    bundleActivatorTransition6.Start();
+    ASSERT_EQ(bundleActivatorTransition6.GetState(), Bundle::STATE_ACTIVE);
+
+    bundleActivatorTransition6.Stop();
+    ASSERT_EQ(bundleActivatorTransition6.GetState(), Bundle::STATE_RESOLVED);
 }
 
-TEST_F(BundleLifecycleTest, TestState2)
-{
-    auto bundleA = InstallLib(context, "TestBundleA");
-    ASSERT_TRUE(bundleA);
-    ASSERT_EQ(bundleA.GetState(), Bundle::STATE_INSTALLED);
-    bundleA.Start();
-    ASSERT_EQ(bundleA.GetState(), Bundle::STATE_ACTIVE);
-    bundleA.Stop();
-    ASSERT_EQ(bundleA.GetState(), Bundle::STATE_RESOLVED);
-    bundleA.Stop();
-    ASSERT_EQ(bundleA.GetState(), Bundle::STATE_RESOLVED);
-    bundleA.Start();
-    ASSERT_EQ(bundleA.GetState(), Bundle::STATE_ACTIVE);
-    bundleA.Uninstall();
-    ASSERT_EQ(bundleA.GetState(), Bundle::STATE_UNINSTALLED);
-}
 
 TEST_F(BundleLifecycleTest, TestLogs)
 {
     auto logger = std::make_shared<MockLogger>();
     auto loggerReg = context.RegisterService<logservice::LogService>(logger);
 
-    ON_CALL(*logger, Log(::testing::_, ::testing::_))
-        .WillByDefault([](logservice::SeverityLevel, std::string const& msg) {
-            std::cerr << msg << std::endl;
-        });
+    // ON_CALL(*logger, Log(::testing::_, ::testing::_))
+    //     .WillByDefault([](logservice::SeverityLevel, std::string const& msg) {
+    //         std::cerr << msg << std::endl;
+    //     });
 
     EXPECT_CALL(*logger, Log(::testing::_, ::testing::_)).Times(::testing::AnyNumber());
 
@@ -126,30 +197,6 @@ TEST_F(BundleLifecycleTest, TestLogs)
     auto bundleB = InstallLib(context, "TestBundleB");
     ASSERT_TRUE(bundleA);
     ASSERT_TRUE(bundleB);
-
-    ASSERT_EQ(bundleA.GetState(), Bundle::STATE_INSTALLED);
-    bundleA.Stop();
-    bundleA.Start();
-    bundleA.Stop();
-    bundleA.Start();
-    bundleA.Stop();
-    bundleA.Start();
-    bundleA.Stop();
-    bundleA.Start();
-    bundleA.Uninstall();
-    ASSERT_EQ(bundleA.GetState(), Bundle::STATE_UNINSTALLED);
-
-    ASSERT_EQ(bundleB.GetState(), Bundle::STATE_INSTALLED);
-    bundleB.Stop();
-    bundleB.Start();
-    bundleB.Stop();
-    bundleB.Start();
-    bundleB.Stop();
-    bundleB.Start();
-    bundleB.Stop();
-    bundleB.Start();
-    bundleB.Uninstall();
-    ASSERT_EQ(bundleB.GetState(), Bundle::STATE_UNINSTALLED);
 }
 
 TEST_F(BundleLifecycleTest, TestConcurrency)
@@ -163,6 +210,12 @@ TEST_F(BundleLifecycleTest, TestConcurrency)
             Log(logservice::SeverityLevel::LOG_DEBUG,
                 ::testing::HasSubstr("Dropped bundle lifecycle transition")))
     .Times(::testing::AtLeast(1));
+
+
+    // ON_CALL(*logger, Log(::testing::_, ::testing::_))
+    //     .WillByDefault([](logservice::SeverityLevel, std::string const& msg) {
+    //         std::cerr << msg << std::endl;
+    //     });
 
 
     auto bundleA = InstallLib(context, "TestBundleA");

@@ -64,3 +64,10 @@ add_subdirectory(libStartBundleA)
 add_subdirectory(libStopBundleA)
 
 add_subdirectory(libTestModuleWithEmbeddedZip)
+
+add_subdirectory(libActivatorTransition1)
+add_subdirectory(libActivatorTransition2)
+add_subdirectory(libActivatorTransition3)
+add_subdirectory(libActivatorTransition4)
+add_subdirectory(libActivatorTransition5)
+add_subdirectory(libActivatorTransition6)

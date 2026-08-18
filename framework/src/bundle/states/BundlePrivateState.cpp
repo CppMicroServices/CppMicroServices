@@ -6,7 +6,8 @@
 
 namespace cppmicroservices {
 
-    BundlePrivateState::BundlePrivateState()
+    BundlePrivateState::BundlePrivateState() 
+    : ownerThread(std::this_thread::get_id())
     {
         std::promise<void> prom;
         ready = prom.get_future().share();
@@ -15,6 +16,7 @@ namespace cppmicroservices {
 
     BundlePrivateState::BundlePrivateState(std::shared_future<void> blockUntil)
     : ready(std::move(blockUntil))
+    , ownerThread(std::this_thread::get_id())
     {
     }
 
@@ -37,6 +39,11 @@ namespace cppmicroservices {
 
     void BundlePrivateState::WaitForTransitionTask()
     {
+        if (std::this_thread::get_id() == ownerThread)
+        {
+            return;
+        }
+
         ready.get();
     }
 

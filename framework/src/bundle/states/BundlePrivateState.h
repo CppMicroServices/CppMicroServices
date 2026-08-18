@@ -60,6 +60,7 @@ namespace cppmicroservices
 
         private:
         std::shared_future<void> ready;
+        std::thread::id ownerThread;
 
     };
 

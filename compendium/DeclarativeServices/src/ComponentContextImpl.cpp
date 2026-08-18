@@ -76,15 +76,16 @@ namespace cppmicroservices::scrimpl
                               {
                                   ServiceReferenceU sRefU(sRef);
                                   auto bc = GetBundleContext();
-                                  auto boundServicesCacheHandle = boundServicesCache.lock();
-                                  auto& serviceMap = (*boundServicesCacheHandle)[refName];
-                                  // get us the service instance
+                                  // Acquire the service outside the boundServicesCache lock to
+                                  // avoid lock inversion with oneAtATimeMutex (see issue #1192).
                                   cppmicroservices::ServiceObjects<void> sObjs = bc.GetServiceObjects(sRefU);
                                   auto interfaceMap = sObjs.GetService();
                                   if (interfaceMap && !interfaceMap->empty())
                                   {
                                       foundAtLeastOneValidBoundService = true;
-                                      serviceMap.emplace_back(std::make_pair(sRef, interfaceMap));
+                                      auto boundServicesCacheHandle = boundServicesCache.lock();
+                                      (*boundServicesCacheHandle)[refName].emplace_back(
+                                          std::make_pair(sRef, interfaceMap));
                                   }
                               }
                           });
@@ -419,13 +420,13 @@ namespace cppmicroservices::scrimpl
     {
         auto bc = GetBundleContext();
         cppmicroservices::ServiceObjects<void> sObjs = bc.GetServiceObjects(ServiceReferenceU(sRef));
-        auto boundServicesCacheHandle = boundServicesCache.lock();
         auto interfaceMap = sObjs.GetService();
         if (!interfaceMap || interfaceMap->empty())
         {
             return nullptr;
         }
         std::shared_ptr<void> svcToBind = interfaceMap->begin()->second;
+        auto boundServicesCacheHandle = boundServicesCache.lock();
         (*boundServicesCacheHandle)[refName].emplace_back(std::make_pair(sRef, interfaceMap));
         return svcToBind;
     }

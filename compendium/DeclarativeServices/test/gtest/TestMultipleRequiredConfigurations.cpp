@@ -24,8 +24,8 @@
 #include "gtest/gtest.h"
 
 #include "TestInterfaces/Interfaces.hpp"
-#include <atomic>
 #include <thread>
+#include "../../../DeclarativeServices/test/gtest/ConcurrencyTestUtil.hpp"
 
 namespace test
 {
@@ -77,19 +77,18 @@ namespace test
     };
 
     /**
-     * Stress test to expose a race in ConfigurationManager::Initialize().
+     * Test to expose a race in ConfigurationManager::Initialize().
      *
      * The race: Initialize() calls ListConfigurations() which returns a
      * shared_ptr to a ConfigurationImpl. It then calls GetProperties() on
      * that reference. If a concurrent Remove() sets removed=true between
-     * those two calls, GetProperties() throws. The catch-all in Initialize()
-     * swallows the exception and returns, leaving the component permanently
-     * unsatisfied with no recovery path.
+     * those two calls, GetProperties() throws. The fix (try/catch in
+     * Initialize()) ensures the component eventually recovers when the
+     * config is re-created.
      *
-     * To trigger: concurrently start the bundle (which triggers async
-     * component initialization) and remove/re-create pid1.
-     *
-     * Run with --gtest_repeat=-1 to loop until failure.
+     * Strategy: concurrently start the bundle (which triggers async
+     * component initialization) and remove/re-create pid1. Fewer iterations
+     * than a brute-force stress test, but enough to exercise the window.
      */
     TEST_F(tMultipleRequiredConfigs, testRequireTwoConfigsStress)
     {
@@ -97,11 +96,10 @@ namespace test
 
         constexpr int NUM_ITERATIONS = 20;
         constexpr auto SERVICE_TIMEOUT = std::chrono::milliseconds(5000);
-        constexpr auto POLL_INTERVAL = std::chrono::milliseconds(5);
+        constexpr auto POLL_INTERVAL = std::chrono::milliseconds(50);
 
         for (int i = 0; i < NUM_ITERATIONS; ++i)
         {
-            std::cout << "repetition: " << i << std::endl;
             // Pre-create both configs.
             {
                 auto c0 = configAdmin->GetConfiguration(pid0);
@@ -118,22 +116,19 @@ namespace test
                 f2.get();
             }
 
-            // Spin-barrier so both threads release at the same time.
-            std::atomic<int> barrier{0};
+            Barrier barrier(2);
 
             // Thread 1: start the bundle (triggers async component init).
             std::thread t1([&]()
             {
-                barrier.fetch_add(1, std::memory_order_release);
-                while (barrier.load(std::memory_order_acquire) < 2) {}
+                barrier.Wait();
                 testBundle.Start();
             });
 
             // Thread 2: remove pid1 then immediately re-create it.
             std::thread t2([&]()
             {
-                barrier.fetch_add(1, std::memory_order_release);
-                while (barrier.load(std::memory_order_acquire) < 2) {}
+                barrier.Wait();
                 try { configAdmin->GetConfiguration(pid1)->Remove().get(); } catch (...) {}
 
                 auto nc = configAdmin->GetConfiguration(pid1);

@@ -243,7 +243,7 @@ namespace cppmicroservices
     std::shared_ptr<void>
     BundleContext::GetService(ServiceReferenceBase const& reference)
     {
-        if (!reference)
+        if (!reference.d.Load()->coreInfo)
         {
             throw std::invalid_argument("Default constructed ServiceReference is not a "
                                         "valid input to GetService()");
@@ -264,7 +264,7 @@ namespace cppmicroservices
     InterfaceMapConstPtr
     BundleContext::GetService(ServiceReferenceU const& reference)
     {
-        if (!reference)
+        if (!reference.d.Load()->coreInfo)
         {
             throw std::invalid_argument("Default constructed ServiceReference is not a "
                                         "valid input to GetService()");

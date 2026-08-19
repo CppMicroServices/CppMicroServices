@@ -2,6 +2,7 @@
 #include "BundlePrivate.h"
 #include "CoreBundleContext.h"
 #include "cppmicroservices/Bundle.h"
+#include <sstream>
 #include <exception>
 
 namespace cppmicroservices {
@@ -47,31 +48,6 @@ namespace cppmicroservices {
         ready.get();
     }
 
-    namespace
-    {
-        std::string
-        BundleStateToString(uint32_t state)
-        {
-            switch (state)
-            {
-                case Bundle::STATE_UNINSTALLED:
-                    return "STATE_UNINSTALLED";
-                case Bundle::STATE_INSTALLED:
-                    return "STATE_INSTALLED";
-                case Bundle::STATE_RESOLVED:
-                    return "STATE_RESOLVED";
-                case Bundle::STATE_STARTING:
-                    return "STATE_STARTING";
-                case Bundle::STATE_STOPPING:
-                    return "STATE_STOPPING";
-                case Bundle::STATE_ACTIVE:
-                    return "STATE_ACTIVE";
-                default:
-                    return "UNKNOWN_STATE(" + std::to_string(state) + ")";
-            }
-        }
-    }
-
     TransitionLogger::TransitionLogger(BundlePrivate& mgr, std::string transitionName, uint32_t expectedState)
         : mgr(mgr)
         , transitionName(std::move(transitionName))
@@ -86,14 +62,16 @@ namespace cppmicroservices {
     {
         if (!successfulTransition && std::uncaught_exceptions() == uncaughtExceptionCount)
         {
-            mgr.coreCtx->logger->Log(
-                logservice::SeverityLevel::LOG_DEBUG,
-                "Dropped bundle lifecycle transition '" + transitionName
-                    + "' because another transition completed first. This can happen when the same bundle is started, stopped, or uninstalled concurrently."
-                    + "\nBundle: " + mgr.symbolicName
-                    + " (location=" + mgr.location + ")"
-                    + "\nRequired state: " + BundleStateToString(expectedState)
-                    + "; actual state: " + BundleStateToString(actualState));
+            std::ostringstream msg;
+            msg << "Dropped bundle lifecycle transition '" << transitionName
+                << "' because another transition completed first. This can happen when the same bundle is started, stopped, or uninstalled concurrently."
+                << "\nBundle: " << mgr.symbolicName
+                << " (location=" << mgr.location << ")"
+                << "\nExpected state: " << static_cast<Bundle::State>(expectedState)
+                << "; actual state: " << static_cast<Bundle::State>(actualState)
+                << "\n";
+
+            mgr.coreCtx->logger->Log(logservice::SeverityLevel::LOG_DEBUG, msg.str());
         }
     }
 

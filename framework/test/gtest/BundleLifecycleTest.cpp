@@ -123,6 +123,8 @@ TEST_F(BundleLifecycleTest, TestExpectedStateTransitions)
 
     ASSERT_TRUE(listener.CheckListenerEvents(bundleEvents, false));
 
+    context.RemoveBundleListener(&listener, &TestBundleListener::BundleChanged);
+
 };
 
 TEST_F(BundleLifecycleTest, TestBundleActivatorTransition)

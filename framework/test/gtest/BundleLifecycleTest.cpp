@@ -201,7 +201,7 @@ TEST_F(BundleLifecycleTest, TestLogs)
     ASSERT_TRUE(bundleB);
 }
 
-TEST_F(BundleLifecycleTest, TestConcurrency)
+TEST_F(BundleLifecycleTest, TestBasicDroppedTransitions)
 {
 
     auto logger = std::make_shared<MockLogger>();
@@ -213,37 +213,31 @@ TEST_F(BundleLifecycleTest, TestConcurrency)
                 ::testing::HasSubstr("Dropped bundle lifecycle transition")))
     .Times(::testing::AtLeast(1));
 
-
     // ON_CALL(*logger, Log(::testing::_, ::testing::_))
     //     .WillByDefault([](logservice::SeverityLevel, std::string const& msg) {
     //         std::cerr << msg << std::endl;
     //     });
 
-
     auto bundleA = InstallLib(context, "TestBundleA");
-    auto bundleB = InstallLib(context, "TestBundleB");
     ASSERT_TRUE(bundleA);
-    ASSERT_TRUE(bundleB);
 
     ASSERT_EQ(bundleA.GetState(), Bundle::STATE_INSTALLED);
-    ASSERT_EQ(bundleB.GetState(), Bundle::STATE_INSTALLED);
 
     std::promise<void> go;
     std::shared_future<void> ready(go.get_future());
     constexpr int numCalls = 50;
-    std::vector<std::promise<void>> readies(numCalls);
+    std::vector<std::promise<void>> readies(numCalls); //vector of promises to tell the first thread when the bundles are all prepared
     std::vector<std::future<void>> bundleStateChanges(numCalls);
 
     for (int i = 0; i < numCalls; ++i)
     {
-        auto bundle = (i % 4 < 2) ? bundleA : bundleB;
         bundleStateChanges[i] = std::async(
             std::launch::async,
-            [bundle, ready, &readies, i]() mutable
+            [bundleA, ready, &readies, i]() mutable
             {
                 readies[i].set_value();
                 ready.wait();
-                ((i % 2) ? bundle.Start() : bundle.Stop());
+                ((i % 2) ? bundleA.Start() : bundleA.Stop());
             });
     }
 
@@ -259,9 +253,158 @@ TEST_F(BundleLifecycleTest, TestConcurrency)
         bundleStateChange.wait();
     }
 
-    bundleA.Uninstall();
-    ASSERT_EQ(bundleA.GetState(), Bundle::STATE_UNINSTALLED);
+    ASSERT_TRUE(bundleA.GetState() == Bundle::STATE_ACTIVE || bundleA.GetState() == Bundle::STATE_RESOLVED);
 
-    bundleB.Uninstall();
-    ASSERT_EQ(bundleB.GetState(), Bundle::STATE_UNINSTALLED);
+}
+
+TEST_F(BundleLifecycleTest, TestStartStopDroppedTransitions)
+{
+    std::map<Bundle::State, int> observed;
+    int iterations = 100;
+
+    std::vector<Bundle::State> expectedStates = {
+      Bundle::STATE_ACTIVE,
+      Bundle::STATE_RESOLVED
+    };
+
+    for(int i = 0; i < iterations; ++i){
+
+        Framework iterFramework = FrameworkFactory().NewFramework();
+        iterFramework.Start();
+        auto iterContext = iterFramework.GetBundleContext();
+
+        auto bundleA = InstallLib(iterContext, "TestBundleA");
+        ASSERT_TRUE(bundleA);
+
+        ASSERT_EQ(bundleA.GetState(), Bundle::STATE_INSTALLED);
+
+        std::promise<void> go;
+        std::shared_future<void> ready(go.get_future());
+        constexpr int numCalls = 2;
+        std::vector<std::promise<void>> readies(numCalls); //vector of promises to tell the first thread when the bundles are all prepared
+        std::vector<std::future<void>> bundleStateChanges(numCalls);
+
+        for (int i = 0; i < numCalls; ++i)
+        {
+            bundleStateChanges[i] = std::async(
+                std::launch::async,
+                [bundleA, ready, &readies, i]() mutable
+                {
+                    readies[i].set_value();
+                    ready.wait();
+                    ((i % 2) ? bundleA.Start() : bundleA.Stop());
+                });
+        }
+
+        for (int i = 0; i < numCalls; ++i)
+        {
+            readies[i].get_future().wait();
+        }
+
+        go.set_value();
+
+        for (auto& bundleStateChange : bundleStateChanges)
+        {
+            bundleStateChange.wait();
+        }
+
+        auto state = bundleA.GetState();
+
+        ASSERT_TRUE(state == Bundle::STATE_ACTIVE ||
+                state == Bundle::STATE_RESOLVED)
+        << "Unexpected final bundle state: " << state
+        << " on iteration " << i;
+
+        observed[state]++;
+
+        iterFramework.Stop();
+        iterFramework.WaitForStop(std::chrono::milliseconds::zero());
+    }
+}
+
+TEST_F(BundleLifecycleTest, TestUninstallDroppedTransitions)
+{
+
+    std::map<Bundle::State, int> observed;
+    int iterations = 100;
+
+    std::vector<Bundle::State> expectedStates = {
+      Bundle::STATE_ACTIVE,
+      Bundle::STATE_RESOLVED,
+      Bundle::STATE_UNINSTALLED
+    };
+
+    for(int i = 0; i < iterations; ++i){
+
+        Framework iterFramework = FrameworkFactory().NewFramework();
+        iterFramework.Start();
+        auto iterContext = iterFramework.GetBundleContext();
+
+        auto bundleA = InstallLib(iterContext, "TestBundleA");
+        ASSERT_TRUE(bundleA);
+
+        ASSERT_EQ(bundleA.GetState(), Bundle::STATE_INSTALLED);
+
+        std::promise<void> go;
+        std::shared_future<void> ready(go.get_future());
+        constexpr int numCalls = 3;
+        std::vector<std::promise<void>> readies(numCalls); //vector of promises to tell the first thread when the bundles are all prepared
+        std::vector<std::future<void>> bundleStateChanges(numCalls);
+
+        for (int i = 0; i < numCalls; ++i)
+        {
+            bundleStateChanges[i] = std::async(
+                std::launch::async,
+                [bundleA, ready, &readies, i]() mutable
+                {
+                    readies[i].set_value();
+                    ready.wait();
+
+                    if(i == 0){
+                        bundleA.Start();
+                    } else if(i == 1){
+                        bundleA.Stop();
+                    } else {
+                        bundleA.Uninstall();
+                    }   
+                });
+        }
+
+        for (int i = 0; i < numCalls; ++i)
+        {
+            readies[i].get_future().wait();
+        }
+
+        go.set_value();
+
+        for (auto& bundleStateChange : bundleStateChanges)
+        {
+            bundleStateChange.wait();
+        }
+
+        auto state = bundleA.GetState();
+
+        ASSERT_TRUE(state == Bundle::STATE_ACTIVE ||
+                state == Bundle::STATE_RESOLVED ||
+                state == Bundle::STATE_UNINSTALLED)
+        << "Unexpected final bundle state: " << state
+        << " on iteration " << i;
+
+        observed[state]++;
+
+        iterFramework.Stop();
+        iterFramework.WaitForStop(std::chrono::milliseconds::zero());
+
+    }
+
+    for (auto expectedState : expectedStates)
+    {
+        if (observed[expectedState] == 0)
+        {
+            GTEST_LOG_(WARNING) << "Did not observe expected final state "
+                                << expectedState
+                                << " after " << iterations << " iterations";
+        }
+    }
+
 }

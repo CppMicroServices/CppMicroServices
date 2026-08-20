@@ -18,6 +18,7 @@
 #include "TestUtilFrameworkListener.h"
 #include "TestUtils.h"
 #include "TestingConfig.h"
+#include "TestUtilListenerHelpers.h"
 
 #include "gmock/gmock.h"
 #include "cppmicroservices/logservice/LogService.hpp"
@@ -84,13 +85,16 @@ class MockLogger : public cppmicroservices::logservice::LogService
 TEST_F(BundleLifecycleTest, TestExpectedStateTransitions)
 {
     TestBundleListener listener;
+    BundleListenerRegistrationHelper<TestBundleListener> listenerReg(
+        context, &listener, &TestBundleListener::BundleChanged);
     std::vector<BundleEvent> bundleEvents;
-    context.AddBundleListener(&listener, &TestBundleListener::BundleChanged);
 
     auto bundleA = InstallLib(context, "TestBundleA");
     ASSERT_TRUE(bundleA);
     ASSERT_EQ(bundleA.GetState(), Bundle::STATE_INSTALLED);
+#ifdef US_BUILD_SHARED_LIBS
     bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_INSTALLED, bundleA));
+#endif
 
     bundleA.Stop(); //BPInstalledState::Stop()
     ASSERT_EQ(bundleA.GetState(), Bundle::STATE_INSTALLED);
@@ -122,8 +126,6 @@ TEST_F(BundleLifecycleTest, TestExpectedStateTransitions)
     bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_UNINSTALLED, bundleA));
 
     ASSERT_TRUE(listener.CheckListenerEvents(bundleEvents, false));
-
-    context.RemoveBundleListener(&listener, &TestBundleListener::BundleChanged);
 
 };
 

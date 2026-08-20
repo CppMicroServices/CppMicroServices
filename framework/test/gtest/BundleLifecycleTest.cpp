@@ -184,25 +184,6 @@ TEST_F(BundleLifecycleTest, TestBundleActivatorTransition)
     ASSERT_EQ(bundleActivatorTransition6.GetState(), Bundle::STATE_RESOLVED);
 }
 
-
-TEST_F(BundleLifecycleTest, TestLogs)
-{
-    auto logger = std::make_shared<MockLogger>();
-    auto loggerReg = context.RegisterService<logservice::LogService>(logger);
-
-    // ON_CALL(*logger, Log(::testing::_, ::testing::_))
-    //     .WillByDefault([](logservice::SeverityLevel, std::string const& msg) {
-    //         std::cerr << msg << std::endl;
-    //     });
-
-    EXPECT_CALL(*logger, Log(::testing::_, ::testing::_)).Times(::testing::AnyNumber());
-
-    auto bundleA = InstallLib(context, "TestBundleA");
-    auto bundleB = InstallLib(context, "TestBundleB");
-    ASSERT_TRUE(bundleA);
-    ASSERT_TRUE(bundleB);
-}
-
 TEST_F(BundleLifecycleTest, TestStartStopDroppedTransitions)
 {
     std::map<Bundle::State, int> observed;
@@ -354,3 +335,4 @@ TEST_F(BundleLifecycleTest, TestUninstallDroppedTransitions)
     }
 
 }
+

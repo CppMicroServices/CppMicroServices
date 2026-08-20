@@ -428,8 +428,19 @@ TEST_F(BundleTest, TestBundleStates)
         // of a different test. Instead of complicating this test code, skip starting
         // these bundles. In the future, refactor this test code to execute only for static
         // builds and to start and stop an explicit list of bundles instead of them all.
-        if (bundle != framework && "TestStartBundleA" != bundle.GetSymbolicName()
-            && "TestStopBundleA" != bundle.GetSymbolicName())
+
+        // Similarly TestBundleActivatorTransition1 through TestBundleActivatorTransition6 
+        // will Start/Stop itself, which can complicate things, so those are skipped too.
+        auto name = bundle.GetSymbolicName();
+        if (bundle != framework 
+            && name != "TestStartBundleA"
+            && name != "TestStopBundleA"
+            && name != "TestBundleActivatorTransition1"
+            && name != "TestBundleActivatorTransition2"
+            && name != "TestBundleActivatorTransition3"
+            && name != "TestBundleActivatorTransition4"
+            && name != "TestBundleActivatorTransition5"
+            && name != "TestBundleActivatorTransition6")
         {
             // Test installed bundle state
             ASSERT_EQ(bundle.GetState(), Bundle::STATE_INSTALLED);

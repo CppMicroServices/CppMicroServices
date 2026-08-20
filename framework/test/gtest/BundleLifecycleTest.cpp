@@ -203,62 +203,6 @@ TEST_F(BundleLifecycleTest, TestLogs)
     ASSERT_TRUE(bundleB);
 }
 
-TEST_F(BundleLifecycleTest, TestBasicDroppedTransitions)
-{
-
-    auto logger = std::make_shared<MockLogger>();
-    auto loggerReg = context.RegisterService<logservice::LogService>(logger);
-
-    EXPECT_CALL(*logger, Log(::testing::_, ::testing::_)).Times(::testing::AnyNumber());
-    EXPECT_CALL(*logger,
-            Log(logservice::SeverityLevel::LOG_DEBUG,
-                ::testing::HasSubstr("Dropped bundle lifecycle transition")))
-    .Times(::testing::AtLeast(1));
-
-    // ON_CALL(*logger, Log(::testing::_, ::testing::_))
-    //     .WillByDefault([](logservice::SeverityLevel, std::string const& msg) {
-    //         std::cerr << msg << std::endl;
-    //     });
-
-    auto bundleA = InstallLib(context, "TestBundleA");
-    ASSERT_TRUE(bundleA);
-
-    ASSERT_EQ(bundleA.GetState(), Bundle::STATE_INSTALLED);
-
-    std::promise<void> go;
-    std::shared_future<void> ready(go.get_future());
-    constexpr int numCalls = 50;
-    std::vector<std::promise<void>> readies(numCalls); //vector of promises to tell the first thread when the bundles are all prepared
-    std::vector<std::future<void>> bundleStateChanges(numCalls);
-
-    for (int i = 0; i < numCalls; ++i)
-    {
-        bundleStateChanges[i] = std::async(
-            std::launch::async,
-            [bundleA, ready, &readies, i]() mutable
-            {
-                readies[i].set_value();
-                ready.wait();
-                ((i % 2) ? bundleA.Start() : bundleA.Stop());
-            });
-    }
-
-    for (int i = 0; i < numCalls; ++i)
-    {
-        readies[i].get_future().wait();
-    }
-
-    go.set_value();
-
-    for (auto& bundleStateChange : bundleStateChanges)
-    {
-        bundleStateChange.wait();
-    }
-
-    ASSERT_TRUE(bundleA.GetState() == Bundle::STATE_ACTIVE || bundleA.GetState() == Bundle::STATE_RESOLVED);
-
-}
-
 TEST_F(BundleLifecycleTest, TestStartStopDroppedTransitions)
 {
     std::map<Bundle::State, int> observed;

@@ -336,3 +336,11 @@ TEST_F(BundleLifecycleTest, TestUninstallDroppedTransitions)
 
 }
 
+TEST_F(BundleLifecycleTest, TestBundleMissingDestroyActivator)
+{
+  auto bundle = cppmicroservices::testing::InstallLib(context, "TestBundleMissingDestroyActivator");
+
+  EXPECT_THROW(
+      bundle.Start(),
+      std::runtime_error);
+}

@@ -440,7 +440,8 @@ TEST_F(BundleTest, TestBundleStates)
             && name != "TestBundleActivatorTransition3"
             && name != "TestBundleActivatorTransition4"
             && name != "TestBundleActivatorTransition5"
-            && name != "TestBundleActivatorTransition6")
+            && name != "TestBundleActivatorTransition6"
+            && name != "TestBundleMissingDestroyActivator")
         {
             // Test installed bundle state
             ASSERT_EQ(bundle.GetState(), Bundle::STATE_INSTALLED);

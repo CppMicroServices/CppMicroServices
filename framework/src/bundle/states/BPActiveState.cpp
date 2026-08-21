@@ -42,14 +42,6 @@ namespace cppmicroservices
                 }
                 mgr.bactivator = nullptr;
             }
-
-            if (res){
-                mgr.coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
-                                                                            MakeBundle(mgr.shared_from_this()),
-                                                                            std::string(),
-                                                                            res));
-            }
-
             return res;
         }
     }
@@ -91,7 +83,13 @@ namespace cppmicroservices
             if (mgr.CompareAndSetState(&observedState, stoppingState)){
                 TransitionCompletionGuard completeTransition(transitionAction);
                 observedState->WaitForTransitionTask();
-                StopActiveBundle(mgr);
+                std::exception_ptr res = StopActiveBundle(mgr);
+                if (res){
+                    mgr.coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
+                                                                                MakeBundle(mgr.shared_from_this()),
+                                                                                std::string(),
+                                                                                res));
+                }
                 completeTransition.Complete();
                 stoppingState->Uninstall(mgr);
                 transitionLogger.TransitionSucceeded();

@@ -34,7 +34,7 @@ namespace cppmicroservices
     };
 }
 
-//manually make a Create hook but not a Destructor hook
+//manually make a Create Activator function but not a Destroy Activator function
 extern "C" US_ABI_EXPORT cppmicroservices::BundleActivator*
 US_CREATE_ACTIVATOR_FUNC(TestBundleMissingDestroyActivator)()
 {

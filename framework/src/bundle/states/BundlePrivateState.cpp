@@ -50,6 +50,26 @@ namespace cppmicroservices {
         ready.get();
     }
 
+    TransitionCompletionGuard::TransitionCompletionGuard(std::promise<void>& transitionAction)
+    : transitionAction(&transitionAction)
+    {
+    }
+
+    TransitionCompletionGuard::~TransitionCompletionGuard()
+    {
+        Complete();
+    }
+
+    void
+    TransitionCompletionGuard::Complete()
+    {
+        if (transitionAction != nullptr)
+        {
+            transitionAction->set_value();
+            transitionAction = nullptr;
+        }
+    }
+
     TransitionLogger::TransitionLogger(BundlePrivate& mgr, std::string transitionName, uint32_t expectedState)
         : mgr(mgr)
         , transitionName(std::move(transitionName))

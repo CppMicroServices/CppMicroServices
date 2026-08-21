@@ -33,6 +33,7 @@ namespace cppmicroservices
 
         while(observedState->GetState() == Bundle::STATE_STARTING){
             if (mgr.CompareAndSetState(&observedState, activeState)){
+                TransitionCompletionGuard completeTransition(transitionAction);
                 observedState->WaitForTransitionTask();
                 
                 auto frameworkBlock = CheckAndBlockFramework(mgr);
@@ -44,21 +45,16 @@ namespace cppmicroservices
                         BundleEvent(BundleEvent::BUNDLE_STARTED, MakeBundle(mgr.shared_from_this())));
                     
                 }
-                catch (cppmicroservices::SharedLibraryException const& ex)
-                {
-                    transitionAction.set_value();
-                    throw ex;
-                }
                 catch (cppmicroservices::SecurityException const& ex)
                 {
                     frameworkBlock.reset();
-                    transitionAction.set_value();
+                    completeTransition.Complete();
                     activeState->Stop(mgr, options);
                     throw ex;
                 }
 
                 frameworkBlock.reset();
-                transitionAction.set_value();
+                completeTransition.Complete();
                 transitionLogger.TransitionSucceeded();
                 break;
             }
@@ -83,10 +79,11 @@ namespace cppmicroservices
 
         while(observedState->GetState() == Bundle::STATE_STARTING){
             if (mgr.CompareAndSetState(&observedState, stoppingState)){
+                TransitionCompletionGuard completeTransition(transitionAction);
                 observedState->WaitForTransitionTask();
                 SetAutostart(mgr, options);
                 StopStartingBundle(mgr);
-                transitionAction.set_value();
+                completeTransition.Complete();
                 transitionLogger.TransitionSucceeded();
                 stoppingState->Stop(mgr, options);
                 break;
@@ -105,9 +102,10 @@ namespace cppmicroservices
 
         while(observedState->GetState() == Bundle::STATE_STARTING){
             if (mgr.CompareAndSetState(&observedState, stoppingState)){
+                TransitionCompletionGuard completeTransition(transitionAction);
                 observedState->WaitForTransitionTask();
                 StopStartingBundle(mgr);
-                transitionAction.set_value();
+                completeTransition.Complete();
                 transitionLogger.TransitionSucceeded();
                 stoppingState->Uninstall(mgr);
                 break;

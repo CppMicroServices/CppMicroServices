@@ -32,6 +32,7 @@ namespace cppmicroservices
 
         while(observedState->GetState() == Bundle::STATE_RESOLVED){
             if (mgr.CompareAndSetState(&observedState, startingState)){
+                TransitionCompletionGuard completeTransition(transitionAction);
                 observedState->WaitForTransitionTask();
 
                 auto frameworkBlock = CheckAndBlockFramework(mgr);
@@ -86,14 +87,14 @@ namespace cppmicroservices
                                         "The bundle validation function threw an exception",
                                         std::current_exception()));
                         frameworkBlock.reset();
-                        transitionAction.set_value();
+                        completeTransition.Complete();
                         startingState->Stop(mgr, options);
                         throw (SecurityException { util::GetLastExceptionStr(), thisBundle });
                     }
 
                     if(failedValidation){
                         frameworkBlock.reset();
-                        transitionAction.set_value();
+                        completeTransition.Complete();
                         startingState->Stop(mgr, options);
                         throw (SecurityException {
                             "Bundle " + mgr.symbolicName + " (location=" + mgr.location + ") failed bundle validation.",
@@ -166,7 +167,7 @@ namespace cppmicroservices
                     catch (std::system_error const& ex)
                     {
                         frameworkBlock.reset();
-                        transitionAction.set_value();
+                        completeTransition.Complete();
                         startingState->Stop(mgr, options);
                         throw (cppmicroservices::SharedLibraryException(ex.code(), ex.what(), thisBundle));
                     }
@@ -176,7 +177,7 @@ namespace cppmicroservices
                                             "Failed to start Bundle " + mgr.symbolicName + " (location=" + mgr.location + ")",
                                             std::current_exception());
                         frameworkBlock.reset();
-                        transitionAction.set_value();
+                        completeTransition.Complete();
                         startingState->Stop(mgr, options);
                         throw (std::runtime_error("Bundle " + mgr.symbolicName + " (location= " + mgr.location
                                                                         + ") start failed: " + util::GetLastExceptionStr()));
@@ -184,7 +185,7 @@ namespace cppmicroservices
                 }
 
                 frameworkBlock.reset();
-                transitionAction.set_value();
+                completeTransition.Complete();
                 startingState->Start(mgr, options);
                 transitionLogger.TransitionSucceeded();
                 break;
@@ -203,9 +204,10 @@ namespace cppmicroservices
 
         while(observedState->GetState() == Bundle::STATE_RESOLVED){
             if (mgr.CompareAndSetState(&observedState, resolvedState)){
+                TransitionCompletionGuard completeTransition(transitionAction);
                 observedState->WaitForTransitionTask(); 
                 SetAutostart(mgr, options);
-                transitionAction.set_value();
+                completeTransition.Complete();
                 transitionLogger.TransitionSucceeded();
                 break;
             }
@@ -224,8 +226,9 @@ namespace cppmicroservices
         while(observedState->GetState() == Bundle::STATE_RESOLVED){
             if (mgr.CompareAndSetState(&observedState, installedState))
             {
+                TransitionCompletionGuard completeTransition(transitionAction);
                 observedState->WaitForTransitionTask();
-                transitionAction.set_value();
+                completeTransition.Complete();
                 transitionLogger.TransitionSucceeded();
                 installedState->Uninstall(mgr);
                 break;

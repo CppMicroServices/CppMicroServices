@@ -23,12 +23,13 @@ namespace cppmicroservices
 
         while(observedState->GetState() == Bundle::STATE_STOPPING){
             if (mgr.CompareAndSetState(&observedState, stoppingState)){
+                TransitionCompletionGuard completeTransition(transitionAction);
                 observedState->WaitForTransitionTask();
 
                 auto frameworkBlock = CheckAndBlockFramework(mgr);
                 SetAutostart(mgr, options);
                 frameworkBlock.reset();
-                transitionAction.set_value();
+                completeTransition.Complete();
 
                 throw std::runtime_error("Bundle " + mgr.symbolicName + " (location=" + mgr.location
                                             + "), start called from BundleActivator::Stop");
@@ -60,10 +61,11 @@ namespace cppmicroservices
 
         while(observedState->GetState() == Bundle::STATE_STOPPING){
             if (mgr.CompareAndSetState(&observedState, resolvedState)){
+                TransitionCompletionGuard completeTransition(transitionAction);
                 observedState->WaitForTransitionTask();
                 SetAutostart(mgr, options);
                 FinishBundleStop(mgr);
-                transitionAction.set_value();
+                completeTransition.Complete();
                 transitionLogger.TransitionSucceeded();
                 break;
             }
@@ -81,9 +83,10 @@ namespace cppmicroservices
 
         while(observedState->GetState() == Bundle::STATE_STOPPING){
             if (mgr.CompareAndSetState(&observedState, resolvedState)){
+                TransitionCompletionGuard completeTransition(transitionAction);
                 observedState->WaitForTransitionTask();
                 FinishBundleStop(mgr);
-                transitionAction.set_value();
+                completeTransition.Complete();
                 transitionLogger.TransitionSucceeded();
                 resolvedState->Uninstall(mgr);
                 break;

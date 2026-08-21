@@ -5,35 +5,13 @@
 #include <future>
 #include <memory>
 #include <string>
+#include <thread>
 
 namespace cppmicroservices
 {
     class BundlePrivate;
     class BundlePrivateState;
     struct FrameworkShutdownBlocker;
-
-    class TransitionLogger
-    {
-    public:
-        TransitionLogger(BundlePrivate& mgr, std::string transitionName, uint32_t expectedState);
-        ~TransitionLogger();
-
-        TransitionLogger(TransitionLogger const&) = delete;
-        TransitionLogger& operator=(TransitionLogger const&) = delete;
-        TransitionLogger(TransitionLogger&&) = delete;
-        TransitionLogger& operator=(TransitionLogger&&) = delete;
-
-        void TransitionSucceeded();
-        void SetActualState(std::shared_ptr<BundlePrivateState> const& state);
-
-    private:
-        BundlePrivate& mgr;
-        std::string transitionName;
-        uint32_t expectedState;
-        uint32_t actualState;
-        bool successfulTransition;
-        int uncaughtExceptionCount;
-    };
 
     class BundlePrivateState : public std::enable_shared_from_this<BundlePrivateState>
     { 
@@ -62,6 +40,46 @@ namespace cppmicroservices
         std::shared_future<void> ready;
         std::thread::id ownerThread;
 
+    };
+
+    class TransitionCompletionGuard
+    {
+      public:
+        explicit TransitionCompletionGuard(std::promise<void>& transitionAction);
+        ~TransitionCompletionGuard();
+
+        TransitionCompletionGuard(TransitionCompletionGuard const&) = delete;
+        TransitionCompletionGuard& operator=(TransitionCompletionGuard const&) = delete;
+        TransitionCompletionGuard(TransitionCompletionGuard&&) = delete;
+        TransitionCompletionGuard& operator=(TransitionCompletionGuard&&) = delete;
+
+        void Complete();
+
+      private:
+        std::promise<void>* transitionAction;
+    };
+
+    class TransitionLogger
+    {
+    public:
+        TransitionLogger(BundlePrivate& mgr, std::string transitionName, uint32_t expectedState);
+        ~TransitionLogger();
+
+        TransitionLogger(TransitionLogger const&) = delete;
+        TransitionLogger& operator=(TransitionLogger const&) = delete;
+        TransitionLogger(TransitionLogger&&) = delete;
+        TransitionLogger& operator=(TransitionLogger&&) = delete;
+
+        void TransitionSucceeded();
+        void SetActualState(std::shared_ptr<BundlePrivateState> const& state);
+
+    private:
+        BundlePrivate& mgr;
+        std::string transitionName;
+        uint32_t expectedState;
+        uint32_t actualState;
+        bool successfulTransition;
+        int uncaughtExceptionCount;
     };
 
 } 

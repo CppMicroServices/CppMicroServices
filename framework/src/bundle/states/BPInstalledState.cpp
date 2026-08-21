@@ -26,6 +26,7 @@ namespace cppmicroservices
 
         while(observedState->GetState() == Bundle::STATE_INSTALLED){
             if (mgr.CompareAndSetState(&observedState, resolvedState)){
+                TransitionCompletionGuard completeTransition(transitionAction);
                 observedState->WaitForTransitionTask();      
                 
                 auto frameworkBlock = CheckAndBlockFramework(mgr);
@@ -35,7 +36,7 @@ namespace cppmicroservices
                     { BundleEvent::BUNDLE_RESOLVED, MakeBundle(mgr.shared_from_this()) });
                 
                 frameworkBlock.reset();
-                transitionAction.set_value();
+                completeTransition.Complete();
                 transitionLogger.TransitionSucceeded();
                 resolvedState->Start(mgr, options);
                 break;
@@ -54,9 +55,10 @@ namespace cppmicroservices
 
         while(observedState->GetState() == Bundle::STATE_INSTALLED){
             if (mgr.CompareAndSetState(&observedState, installedState)){
+                TransitionCompletionGuard completeTransition(transitionAction);
                 observedState->WaitForTransitionTask(); 
                 SetAutostart(mgr, options);
-                transitionAction.set_value();
+                completeTransition.Complete();
                 transitionLogger.TransitionSucceeded();
                 break;
             }
@@ -76,6 +78,7 @@ namespace cppmicroservices
         while(observedState->GetState() == Bundle::STATE_INSTALLED){
             if (mgr.CompareAndSetState(&observedState, uninstalledState))
             {
+                TransitionCompletionGuard completeTransition(transitionAction);
                 observedState->WaitForTransitionTask();
                 mgr.coreCtx->bundleRegistry.Remove(mgr.location, mgr.id);
                 mgr.coreCtx->listeners.BundleChanged(
@@ -104,7 +107,7 @@ namespace cppmicroservices
                 }
                 mgr.coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::BUNDLE_UNINSTALLED, MakeBundle(mgr.shared_from_this())));
 
-                transitionAction.set_value();
+                completeTransition.Complete();
                 transitionLogger.TransitionSucceeded();
                 break;
             }

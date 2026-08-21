@@ -22,6 +22,38 @@ namespace cppmicroservices
         return;
     };
 
+    namespace {
+        std::exception_ptr StopActiveBundle(BundlePrivate& mgr){
+            std::exception_ptr res;
+            mgr.coreCtx->listeners.BundleChanged(
+                BundleEvent(BundleEvent::BUNDLE_STOPPING, MakeBundle(mgr.shared_from_this())));
+
+            if (mgr.bactivator != nullptr)
+            {
+                try
+                {
+                    mgr.bactivator->Stop(MakeBundleContext(mgr.bundleContext.Load()));
+                }
+                catch (...)
+                {
+                    res = std::make_exception_ptr(
+                        std::runtime_error("Bundle " + mgr.symbolicName + " (location=" + mgr.location
+                                        + "), BundleActivator::Stop() failed: " + util::GetLastExceptionStr()));
+                }
+                mgr.bactivator = nullptr;
+            }
+
+            if (res){
+                mgr.coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
+                                                                            MakeBundle(mgr.shared_from_this()),
+                                                                            std::string(),
+                                                                            res));
+            }
+
+            return res;
+        }
+    }
+
     void BPActiveState::Stop(BundlePrivate& mgr, uint32_t options){
         TransitionLogger transitionLogger(mgr, "Stop()", Bundle::STATE_ACTIVE);
         auto observedState = shared_from_this(); 
@@ -32,28 +64,8 @@ namespace cppmicroservices
         while(observedState->GetState() == Bundle::STATE_ACTIVE){
             if (mgr.CompareAndSetState(&observedState, stoppingState)){
                 observedState->WaitForTransitionTask();
-
                 SetAutostart(mgr, options);
-
-                std::exception_ptr res;
-                mgr.coreCtx->listeners.BundleChanged(
-                    BundleEvent(BundleEvent::BUNDLE_STOPPING, MakeBundle(mgr.shared_from_this())));
-
-                if (mgr.bactivator != nullptr)
-                {
-                    try
-                    {
-                        mgr.bactivator->Stop(MakeBundleContext(mgr.bundleContext.Load()));
-                    }
-                    catch (...)
-                    {
-                        res = std::make_exception_ptr(
-                            std::runtime_error("Bundle " + mgr.symbolicName + " (location=" + mgr.location
-                                            + "), BundleActivator::Stop() failed: " + util::GetLastExceptionStr()));
-                    }
-                    mgr.bactivator = nullptr;
-                }
-
+                std::exception_ptr res = StopActiveBundle(mgr);
                 transitionAction.set_value();
                 stoppingState->Stop(mgr, options);
                 if (res){
@@ -77,32 +89,7 @@ namespace cppmicroservices
         while(observedState->GetState() == Bundle::STATE_ACTIVE){
             if (mgr.CompareAndSetState(&observedState, stoppingState)){
                 observedState->WaitForTransitionTask();
-                std::exception_ptr res;
-                mgr.coreCtx->listeners.BundleChanged(
-                    BundleEvent(BundleEvent::BUNDLE_STOPPING, MakeBundle(mgr.shared_from_this())));
-
-                if (mgr.bactivator != nullptr)
-                {
-                    try
-                    {
-                        mgr.bactivator->Stop(MakeBundleContext(mgr.bundleContext.Load()));
-                    }
-                    catch (...)
-                    {
-                        res = std::make_exception_ptr(
-                            std::runtime_error("Bundle " + mgr.symbolicName + " (location=" + mgr.location
-                                            + "), BundleActivator::Stop() failed: " + util::GetLastExceptionStr()));
-                    }
-                    mgr.bactivator = nullptr;
-                }
-
-                if (res){
-                    mgr.coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
-                                                                                MakeBundle(mgr.shared_from_this()),
-                                                                                std::string(),
-                                                                                res));
-                }
-                
+                StopActiveBundle(mgr);
                 transitionAction.set_value();
                 stoppingState->Uninstall(mgr);
                 transitionLogger.TransitionSucceeded();

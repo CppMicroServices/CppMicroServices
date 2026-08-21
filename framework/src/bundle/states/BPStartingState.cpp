@@ -37,6 +37,7 @@ namespace cppmicroservices
                 
                 auto frameworkBlock = CheckAndBlockFramework(mgr);
                 SetAutostart(mgr, options);
+
                 try
                 {
                     mgr.coreCtx->listeners.BundleChanged(
@@ -66,6 +67,13 @@ namespace cppmicroservices
         transitionLogger.SetActualState(observedState);
     }
 
+    namespace{
+        void StopStartingBundle(BundlePrivate& mgr){
+            mgr.coreCtx->listeners.BundleChanged(
+                BundleEvent(BundleEvent::BUNDLE_STOPPING, MakeBundle(mgr.shared_from_this())));
+        }
+    }
+
     void BPStartingState::Stop(BundlePrivate& mgr, uint32_t options){
         TransitionLogger transitionLogger(mgr, "Stop()", Bundle::STATE_STARTING);
         auto observedState = shared_from_this(); 
@@ -76,12 +84,8 @@ namespace cppmicroservices
         while(observedState->GetState() == Bundle::STATE_STARTING){
             if (mgr.CompareAndSetState(&observedState, stoppingState)){
                 observedState->WaitForTransitionTask();
-                
                 SetAutostart(mgr, options);
-
-                mgr.coreCtx->listeners.BundleChanged(
-                    BundleEvent(BundleEvent::BUNDLE_STOPPING, MakeBundle(mgr.shared_from_this())));
-                    
+                StopStartingBundle(mgr);
                 transitionAction.set_value();
                 transitionLogger.TransitionSucceeded();
                 stoppingState->Stop(mgr, options);
@@ -102,8 +106,7 @@ namespace cppmicroservices
         while(observedState->GetState() == Bundle::STATE_STARTING){
             if (mgr.CompareAndSetState(&observedState, stoppingState)){
                 observedState->WaitForTransitionTask();
-                mgr.coreCtx->listeners.BundleChanged(
-                    BundleEvent(BundleEvent::BUNDLE_STOPPING, MakeBundle(mgr.shared_from_this())));
+                StopStartingBundle(mgr);
                 transitionAction.set_value();
                 transitionLogger.TransitionSucceeded();
                 stoppingState->Uninstall(mgr);

@@ -42,6 +42,8 @@ namespace cppmicroservices
           context.GetBundle().Uninstall();
         }
 
+        // we don't expect Stop to be called since Stop is only called if 
+        // the Bundle is being stopped from a fully activated state
         void
         Stop(BundleContext)
         {

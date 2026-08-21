@@ -41,9 +41,11 @@ namespace cppmicroservices
         {
           context.GetBundle().Stop();
         }
-
+        
+        // we don't expect Stop to be called since Stop is only called if 
+        // the Bundle is being stopped from a fully activated state
         void
-        Stop(BundleContext)
+        Stop(BundleContext) 
         {
         }
     };

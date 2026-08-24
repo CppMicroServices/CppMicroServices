@@ -86,16 +86,16 @@ namespace cppmicroservices
                                         thisBundle,
                                         "The bundle validation function threw an exception",
                                         std::current_exception()));
+                        startingState->StartFailed(mgr);
                         frameworkBlock.reset();
                         completeTransition.Complete();
-                        startingState->Stop(mgr, options);
                         throw (SecurityException { util::GetLastExceptionStr(), thisBundle });
                     }
 
                     if(failedValidation){
+                        startingState->StartFailed(mgr);
                         frameworkBlock.reset();
                         completeTransition.Complete();
-                        startingState->Stop(mgr, options);
                         throw (SecurityException {
                             "Bundle " + mgr.symbolicName + " (location=" + mgr.location + ") failed bundle validation.",
                             thisBundle });
@@ -166,9 +166,9 @@ namespace cppmicroservices
                     }
                     catch (std::system_error const& ex)
                     {
+                        startingState->StartFailed(mgr);
                         frameworkBlock.reset();
                         completeTransition.Complete();
-                        startingState->Stop(mgr, options);
                         throw (cppmicroservices::SharedLibraryException(ex.code(), ex.what(), thisBundle));
                     }
                     catch (...)
@@ -176,9 +176,9 @@ namespace cppmicroservices
                         mgr.coreCtx->logger->Log(logservice::SeverityLevel::LOG_INFO,
                                             "Failed to start Bundle " + mgr.symbolicName + " (location=" + mgr.location + ")",
                                             std::current_exception());
+                        startingState->StartFailed(mgr);
                         frameworkBlock.reset();
                         completeTransition.Complete();
-                        startingState->Stop(mgr, options);
                         throw (std::runtime_error("Bundle " + mgr.symbolicName + " (location= " + mgr.location
                                                                         + ") start failed: " + util::GetLastExceptionStr()));
                     }

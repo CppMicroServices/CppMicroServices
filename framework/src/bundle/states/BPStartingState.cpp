@@ -48,8 +48,8 @@ namespace cppmicroservices
                 catch (cppmicroservices::SecurityException const& ex)
                 {
                     frameworkBlock.reset();
+                    activeState->StartFailed(mgr);
                     completeTransition.Complete();
-                    activeState->Stop(mgr, options);
                     throw ex;
                 }
 
@@ -113,6 +113,24 @@ namespace cppmicroservices
         }
 
         transitionLogger.SetActualState(observedState);
+    }
+
+    void BPStartingState::StartFailed(BundlePrivate& mgr){
+        auto observedState = shared_from_this(); 
+        std::promise<void> transitionAction; 
+        auto fut = transitionAction.get_future();
+        auto stoppingState = std::make_shared<BPStoppingState>(std::move(fut));
+
+        while(observedState->GetState() == Bundle::STATE_STARTING){
+            observedState->WaitForTransitionTask();
+            if (mgr.CompareAndSetState(&observedState, stoppingState)){
+                TransitionCompletionGuard completeTransition(transitionAction);
+                StopStartingBundle(mgr);
+                completeTransition.Complete();
+                stoppingState->StartFailed(mgr);
+                break;
+            }
+        }
     }
 
 } 

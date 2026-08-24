@@ -54,9 +54,9 @@ namespace cppmicroservices
         auto stoppingState = std::make_shared<BPStoppingState>(std::move(fut));
 
         while(observedState->GetState() == Bundle::STATE_ACTIVE){
+            observedState->WaitForTransitionTask();
             if (mgr.CompareAndSetState(&observedState, stoppingState)){
                 TransitionCompletionGuard completeTransition(transitionAction);
-                observedState->WaitForTransitionTask();
                 SetAutostart(mgr, options);
                 std::exception_ptr res = StopActiveBundle(mgr);
                 completeTransition.Complete();
@@ -80,9 +80,9 @@ namespace cppmicroservices
         auto stoppingState = std::make_shared<BPStoppingState>(std::move(fut));
 
         while(observedState->GetState() == Bundle::STATE_ACTIVE){
+            observedState->WaitForTransitionTask();
             if (mgr.CompareAndSetState(&observedState, stoppingState)){
                 TransitionCompletionGuard completeTransition(transitionAction);
-                observedState->WaitForTransitionTask();
                 std::exception_ptr res = StopActiveBundle(mgr);
                 if (res){
                     mgr.coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,

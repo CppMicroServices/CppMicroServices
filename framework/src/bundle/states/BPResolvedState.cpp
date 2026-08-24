@@ -31,9 +31,9 @@ namespace cppmicroservices
         auto startingState = std::make_shared<BPStartingState>(std::move(fut));
 
         while(observedState->GetState() == Bundle::STATE_RESOLVED){
+            observedState->WaitForTransitionTask();
             if (mgr.CompareAndSetState(&observedState, startingState)){
                 TransitionCompletionGuard completeTransition(transitionAction);
-                observedState->WaitForTransitionTask();
 
                 auto frameworkBlock = CheckAndBlockFramework(mgr);
                 SetAutostart(mgr, options);
@@ -203,9 +203,9 @@ namespace cppmicroservices
         auto resolvedState = std::make_shared<BPResolvedState>(std::move(fut)); 
 
         while(observedState->GetState() == Bundle::STATE_RESOLVED){
+            observedState->WaitForTransitionTask();
             if (mgr.CompareAndSetState(&observedState, resolvedState)){
                 TransitionCompletionGuard completeTransition(transitionAction);
-                observedState->WaitForTransitionTask(); 
                 SetAutostart(mgr, options);
                 completeTransition.Complete();
                 transitionLogger.TransitionSucceeded();
@@ -224,10 +224,10 @@ namespace cppmicroservices
         auto installedState = std::make_shared<BPInstalledState>(std::move(fut));
 
         while(observedState->GetState() == Bundle::STATE_RESOLVED){
+            observedState->WaitForTransitionTask();
             if (mgr.CompareAndSetState(&observedState, installedState))
             {
                 TransitionCompletionGuard completeTransition(transitionAction);
-                observedState->WaitForTransitionTask();
                 completeTransition.Complete();
                 transitionLogger.TransitionSucceeded();
                 installedState->Uninstall(mgr);

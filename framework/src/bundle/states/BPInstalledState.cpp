@@ -25,9 +25,9 @@ namespace cppmicroservices
         auto resolvedState = std::make_shared<BPResolvedState>(std::move(fut)); 
 
         while(observedState->GetState() == Bundle::STATE_INSTALLED){
+            observedState->WaitForTransitionTask();
             if (mgr.CompareAndSetState(&observedState, resolvedState)){
                 TransitionCompletionGuard completeTransition(transitionAction);
-                observedState->WaitForTransitionTask();      
                 
                 auto frameworkBlock = CheckAndBlockFramework(mgr);
                 SetAutostart(mgr, options);
@@ -54,9 +54,9 @@ namespace cppmicroservices
         auto installedState = std::make_shared<BPInstalledState>(std::move(fut)); 
 
         while(observedState->GetState() == Bundle::STATE_INSTALLED){
+            observedState->WaitForTransitionTask();
             if (mgr.CompareAndSetState(&observedState, installedState)){
                 TransitionCompletionGuard completeTransition(transitionAction);
-                observedState->WaitForTransitionTask(); 
                 SetAutostart(mgr, options);
                 completeTransition.Complete();
                 transitionLogger.TransitionSucceeded();
@@ -76,10 +76,10 @@ namespace cppmicroservices
         auto uninstalledState = std::make_shared<BPUninstalledState>(std::move(fut));
 
         while(observedState->GetState() == Bundle::STATE_INSTALLED){
+            observedState->WaitForTransitionTask();
             if (mgr.CompareAndSetState(&observedState, uninstalledState))
             {
                 TransitionCompletionGuard completeTransition(transitionAction);
-                observedState->WaitForTransitionTask();
                 mgr.coreCtx->bundleRegistry.Remove(mgr.location, mgr.id);
                 mgr.coreCtx->listeners.BundleChanged(
                     { BundleEvent::BUNDLE_UNRESOLVED, MakeBundle(mgr.shared_from_this()) });

@@ -100,9 +100,12 @@ namespace cppmicroservices
     void BPStoppingState::StartFailed(BundlePrivate& mgr){
         
         auto observedState = shared_from_this(); 
-        auto resolvedState = std::make_shared<BPResolvedState>(); 
+        std::promise<void> transitionAction; 
+        auto fut = transitionAction.get_future();
+        auto resolvedState = std::make_shared<BPResolvedState>(std::move(fut)); 
 
         if (mgr.CompareAndSetState(&observedState, resolvedState)){
+            TransitionCompletionGuard completeTransition(transitionAction);
             mgr.RemoveBundleResources();
             auto oldBundleContext = mgr.bundleContext.Exchange(std::shared_ptr<BundleContextPrivate>());
             if (oldBundleContext)
@@ -110,9 +113,7 @@ namespace cppmicroservices
                 oldBundleContext->Invalidate();
             }
             mgr.coreCtx->listeners.BundleChanged({ BundleEvent::BUNDLE_STOPPED, MakeBundle(mgr.shared_from_this()) }); 
-        }else {
-            throw std::runtime_error("Bundle " + mgr.symbolicName + " (location=" + mgr.location
-                                     + ") failed to start and could not reset.");
+            completeTransition.Complete();
         }
     }
 }

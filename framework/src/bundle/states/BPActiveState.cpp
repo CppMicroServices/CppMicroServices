@@ -102,14 +102,15 @@ namespace cppmicroservices
 
     void BPActiveState::StartFailed(BundlePrivate& mgr){
         auto observedState = shared_from_this(); 
-        auto stoppingState = std::make_shared<BPStoppingState>();
+        std::promise<void> transitionAction; 
+        auto fut = transitionAction.get_future();
+        auto stoppingState = std::make_shared<BPStoppingState>(std::move(fut));
         if(mgr.CompareAndSetState(&observedState, stoppingState)){
+            TransitionCompletionGuard completeTransition(transitionAction);
             mgr.coreCtx->listeners.BundleChanged(
                 BundleEvent(BundleEvent::BUNDLE_STOPPING, MakeBundle(mgr.shared_from_this())));
             stoppingState->StartFailed(mgr);
-        } else {
-            throw std::runtime_error("Bundle " + mgr.symbolicName + " (location=" + mgr.location
-                                     + ") failed to start and could not reset.");
+            completeTransition.Complete();
         }
         
     }

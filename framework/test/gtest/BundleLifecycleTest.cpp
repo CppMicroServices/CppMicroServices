@@ -9,6 +9,8 @@
 #include "cppmicroservices/GetBundleContext.h"
 #include "cppmicroservices/ListenerToken.h"
 #include "cppmicroservices/ServiceEvent.h"
+#include "cppmicroservices/SecurityException.h"
+#include "cppmicroservices/SharedLibraryException.h"
 
 #include "cppmicroservices/util/FileSystem.h"
 #include "cppmicroservices/util/String.h"
@@ -27,6 +29,8 @@
 #include <future>
 #include <thread>
 #include <iostream>
+#include <algorithm>
+#include <mutex>
 
 #include "gtest/gtest.h"
 
@@ -247,6 +251,16 @@ TEST_F(BundleLifecycleTest, TestStartStopDroppedTransitions)
         iterFramework.Stop();
         iterFramework.WaitForStop(std::chrono::milliseconds::zero());
     }
+
+    for (auto expectedState : expectedStates)
+    {
+        if (observed[expectedState] == 0)
+        {
+            GTEST_LOG_(WARNING) << "Did not observe expected final state "
+                                << expectedState
+                                << " after " << iterations << " iterations";
+        }
+    }
 }
 
 TEST_F(BundleLifecycleTest, TestUninstallDroppedTransitions)
@@ -343,4 +357,95 @@ TEST_F(BundleLifecycleTest, TestBundleMissingDestroyActivator)
   EXPECT_THROW(
       bundle.Start(),
       std::runtime_error);
+}
+
+TEST_F(BundleLifecycleTest, TestStartedBundleListenerThrowsSecurityException)
+{
+    auto bundle = InstallLib(context, "TestBundleA");
+
+    auto listener = [&](BundleEvent const& evt)
+    {
+        if (evt.GetType() == BundleEvent::BUNDLE_STARTED
+            && evt.GetBundle().GetBundleId() == bundle.GetBundleId())
+        {
+            throw cppmicroservices::SecurityException("test security exception", evt.GetBundle());
+        }
+    };
+
+    auto listenerToken = context.AddBundleListener(listener);
+
+    EXPECT_THROW(bundle.Start(), cppmicroservices::SecurityException);
+
+    ASSERT_EQ(bundle.GetState(), Bundle::STATE_RESOLVED);
+
+    context.RemoveListener(std::move(listenerToken));
+}
+
+TEST_F(BundleLifecycleTest, TestStartFailedRaceWithStart)
+{
+
+      auto bundle = InstallLib(context, "TestBundleA");
+
+      std::mutex eventsMutex;
+      std::vector<BundleEvent> observedEvents;
+
+      std::promise<void> secondStartAttemptStartedPromise;
+      auto secondStartAttemptStarted = secondStartAttemptStartedPromise.get_future();
+
+      std::future<void> secondStartAttempt;
+      bool firstStartCall = true;
+
+      auto listener = [&](BundleEvent const& evt)
+      {
+          if (evt.GetBundle().GetBundleId() != bundle.GetBundleId())
+          {
+              return;
+          }
+
+          {
+              std::lock_guard<std::mutex> lock(eventsMutex);
+              observedEvents.push_back(evt);
+          }
+
+          if (evt.GetType() == BundleEvent::BUNDLE_STARTED && firstStartCall)
+          {
+              firstStartCall = false;
+
+              secondStartAttempt = std::async(
+                  std::launch::async,
+                  [&bundle, &secondStartAttemptStartedPromise]() mutable
+                  {
+                      secondStartAttemptStartedPromise.set_value();
+                      bundle.Start();
+                  });
+
+              secondStartAttemptStarted.wait();
+
+              throw cppmicroservices::SecurityException("test security exception", evt.GetBundle());
+          }
+      };
+
+      auto listenerToken = context.AddBundleListener(listener);
+
+      EXPECT_THROW(bundle.Start(), cppmicroservices::SecurityException);
+
+      ASSERT_TRUE(secondStartAttempt.valid());
+      EXPECT_NO_THROW(secondStartAttempt.get());
+
+      context.RemoveListener(std::move(listenerToken));
+
+      bool sawStoppedEvent = false;
+      {
+          std::lock_guard<std::mutex> lock(eventsMutex);
+          sawStoppedEvent = std::any_of(
+              observedEvents.begin(),
+              observedEvents.end(),
+              [](BundleEvent const& evt)
+              {
+                  return evt.GetType() == BundleEvent::BUNDLE_STOPPED;
+              });
+      }
+
+      EXPECT_TRUE(sawStoppedEvent);
+
 }

@@ -113,7 +113,6 @@ namespace cppmicroservices
                 oldBundleContext->Invalidate();
             }
             mgr.coreCtx->listeners.BundleChanged({ BundleEvent::BUNDLE_STOPPED, MakeBundle(mgr.shared_from_this()) }); 
-            completeTransition.Complete();
         }
     }
 }

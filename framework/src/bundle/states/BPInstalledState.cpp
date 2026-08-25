@@ -58,7 +58,6 @@ namespace cppmicroservices
             if (mgr.CompareAndSetState(&observedState, installedState)){
                 TransitionCompletionGuard completeTransition(transitionAction);
                 SetAutostart(mgr, options);
-                completeTransition.Complete();
                 transitionLogger.TransitionSucceeded();
                 break;
             }
@@ -106,8 +105,6 @@ namespace cppmicroservices
                     mgr.bundleDir.clear();
                 }
                 mgr.coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::BUNDLE_UNINSTALLED, MakeBundle(mgr.shared_from_this())));
-
-                completeTransition.Complete();
                 transitionLogger.TransitionSucceeded();
                 break;
             }

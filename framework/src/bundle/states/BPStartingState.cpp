@@ -48,12 +48,8 @@ namespace cppmicroservices
                 catch (cppmicroservices::SecurityException const& ex)
                 {
                     activeState->StartFailed(mgr);
-                    frameworkBlock.reset();
-                    completeTransition.Complete();
                     throw;
                 }
-                completeTransition.Complete();
-                frameworkBlock.reset();
                 transitionLogger.TransitionSucceeded();
                 break;
             }
@@ -123,7 +119,6 @@ namespace cppmicroservices
             TransitionCompletionGuard completeTransition(transitionAction);
             StopStartingBundle(mgr);
             stoppingState->StartFailed(mgr);
-            completeTransition.Complete();
         }
     }
 

@@ -60,11 +60,11 @@ namespace cppmicroservices
                 SetAutostart(mgr, options);
                 std::exception_ptr res = StopActiveBundle(mgr);
                 completeTransition.Complete();
+                transitionLogger.TransitionSucceeded();
                 stoppingState->Stop(mgr, options);
                 if (res){
                     std::rethrow_exception(res);
                 }
-                transitionLogger.TransitionSucceeded();
                 break;
             }
         }
@@ -91,8 +91,8 @@ namespace cppmicroservices
                                                                                 res));
                 }
                 completeTransition.Complete();
-                stoppingState->Uninstall(mgr);
                 transitionLogger.TransitionSucceeded();
+                stoppingState->Uninstall(mgr);
                 break;
             }
         }
@@ -110,7 +110,6 @@ namespace cppmicroservices
             mgr.coreCtx->listeners.BundleChanged(
                 BundleEvent(BundleEvent::BUNDLE_STOPPING, MakeBundle(mgr.shared_from_this())));
             stoppingState->StartFailed(mgr);
-            completeTransition.Complete();
         }
         
     }

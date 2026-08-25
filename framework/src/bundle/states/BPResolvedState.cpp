@@ -87,15 +87,11 @@ namespace cppmicroservices
                                         "The bundle validation function threw an exception",
                                         std::current_exception()));
                         startingState->StartFailed(mgr);
-                        frameworkBlock.reset();
-                        completeTransition.Complete();
                         throw (SecurityException { util::GetLastExceptionStr(), thisBundle });
                     }
 
                     if(failedValidation){
                         startingState->StartFailed(mgr);
-                        frameworkBlock.reset();
-                        completeTransition.Complete();
                         throw (SecurityException {
                             "Bundle " + mgr.symbolicName + " (location=" + mgr.location + ") failed bundle validation.",
                             thisBundle });
@@ -167,8 +163,6 @@ namespace cppmicroservices
                     catch (std::system_error const& ex)
                     {
                         startingState->StartFailed(mgr);
-                        frameworkBlock.reset();
-                        completeTransition.Complete();
                         throw (cppmicroservices::SharedLibraryException(ex.code(), ex.what(), thisBundle));
                     }
                     catch (...)
@@ -177,8 +171,6 @@ namespace cppmicroservices
                                             "Failed to start Bundle " + mgr.symbolicName + " (location=" + mgr.location + ")",
                                             std::current_exception());
                         startingState->StartFailed(mgr);
-                        frameworkBlock.reset();
-                        completeTransition.Complete();
                         throw (std::runtime_error("Bundle " + mgr.symbolicName + " (location= " + mgr.location
                                                                         + ") start failed: " + util::GetLastExceptionStr()));
                     }
@@ -186,8 +178,8 @@ namespace cppmicroservices
 
                 frameworkBlock.reset();
                 completeTransition.Complete();
-                startingState->Start(mgr, options);
                 transitionLogger.TransitionSucceeded();
+                startingState->Start(mgr, options);
                 break;
             }
         }
@@ -207,7 +199,6 @@ namespace cppmicroservices
             if (mgr.CompareAndSetState(&observedState, resolvedState)){
                 TransitionCompletionGuard completeTransition(transitionAction);
                 SetAutostart(mgr, options);
-                completeTransition.Complete();
                 transitionLogger.TransitionSucceeded();
                 break;
             }

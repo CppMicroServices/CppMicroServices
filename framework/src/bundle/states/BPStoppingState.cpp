@@ -28,8 +28,6 @@ namespace cppmicroservices
 
                 auto frameworkBlock = CheckAndBlockFramework(mgr);
                 SetAutostart(mgr, options);
-                frameworkBlock.reset();
-                completeTransition.Complete();
 
                 throw std::runtime_error("Bundle " + mgr.symbolicName + " (location=" + mgr.location
                                             + "), start called from BundleActivator::Stop");
@@ -65,7 +63,6 @@ namespace cppmicroservices
                 TransitionCompletionGuard completeTransition(transitionAction);
                 SetAutostart(mgr, options);
                 FinishBundleStop(mgr);
-                completeTransition.Complete();
                 transitionLogger.TransitionSucceeded();
                 break;
             }

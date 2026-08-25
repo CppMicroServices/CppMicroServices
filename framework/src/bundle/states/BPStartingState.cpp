@@ -21,7 +21,7 @@ namespace cppmicroservices
     
     uint32_t BPStartingState::GetState(){
         return Bundle::STATE_STARTING;
-    };
+    }
 
     void BPStartingState::Start(BundlePrivate& mgr, uint32_t options){
 
@@ -50,7 +50,7 @@ namespace cppmicroservices
                     activeState->StartFailed(mgr);
                     frameworkBlock.reset();
                     completeTransition.Complete();
-                    throw ex;
+                    throw;
                 }
                 completeTransition.Complete();
                 frameworkBlock.reset();

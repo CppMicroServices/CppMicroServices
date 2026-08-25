@@ -13,14 +13,14 @@ namespace cppmicroservices
 {
     uint32_t BPActiveState::GetState(){
         return Bundle::STATE_ACTIVE;
-    };
+    }
     
     void BPActiveState::Start(BundlePrivate& mgr, uint32_t options){
         auto frameworkBlock = CheckAndBlockFramework(mgr);
         US_UNUSED(frameworkBlock);
         US_UNUSED(options);
         return;
-    };
+    }
 
     namespace {
         std::exception_ptr StopActiveBundle(BundlePrivate& mgr){

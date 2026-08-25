@@ -89,6 +89,8 @@ namespace cppmicroservices
         GetStateObj()->Uninstall(*this);
     }
 
+    // TODO: When C++20 is officially supported, replace the atomic shared_ptr
+    // free functions with std::atomic<std::shared_ptr<BundlePrivateState>>.
     bool
     BundlePrivate::CompareAndSetState(std::shared_ptr<BundlePrivateState>* expectedState,
                                                     std::shared_ptr<BundlePrivateState> desiredState)

@@ -389,11 +389,17 @@ endif()
 #-----------------------------------------------------------------------------
 
 if(US_USE_SYSTEM_BOOST)
+    if(WIN32)
+        set(Boost_USE_STATIC_LIBS ON)
+    endif()
     find_package(Boost 1.74.0 REQUIRED)
     add_library(nowide::nowide INTERFACE IMPORTED GLOBAL)
     target_include_directories(nowide::nowide INTERFACE ${Boost_INCLUDE_DIRS})
     target_compile_definitions(nowide::nowide INTERFACE US_HAVE_BOOST_NOWIDE)
-    target_link_libraries(nowide::nowide INTERFACE boost::boost)
+    if(WIN32)
+        target_link_directories(nowide::nowide INTERFACE ${Boost_LIBRARY_DIRS})
+    endif()
+    target_link_libraries(nowide::nowide INTERFACE Boost::boost)
 endif()
 
 if(US_USE_SYSTEM_SPDLOG)
@@ -402,6 +408,12 @@ else()
     add_library(spdlog::spdlog INTERFACE IMPORTED)
     target_include_directories(spdlog::spdlog INTERFACE
         ${CMAKE_CURRENT_SOURCE_DIR}/third_party/spdlog/include)
+endif()
+
+# Set by the Conan recipe to reflect spdlog's linkage; undefined in the legacy
+# vendored build (which is always a static, non-system spdlog).
+if(NOT DEFINED US_SPDLOG_SHARED)
+    set(US_SPDLOG_SHARED OFF)
 endif()
 
 if(US_USE_SYSTEM_RAPIDJSON)
@@ -431,6 +443,10 @@ else()
     add_library(miniz::miniz INTERFACE IMPORTED)
     target_include_directories(miniz::miniz INTERFACE
         ${CMAKE_CURRENT_SOURCE_DIR}/third_party)
+endif()
+
+if(NOT DEFINED US_MINIZ_SHARED)
+    set(US_MINIZ_SHARED OFF)
 endif()
 
 #-----------------------------------------------------------------------------

@@ -47,6 +47,7 @@
 #include "ConfigurationAdminTestingConfig.h"
 
 #include "TestFixtures.hpp"
+#include "../TestUtils.hpp"
 
 namespace test
 {
@@ -147,52 +148,6 @@ namespace test
         cppmicroservices::Framework framework;
     };
 
-    class AsyncWorkServiceThreadPool : public cppmicroservices::async::AsyncWorkService
-    {
-      public:
-        AsyncWorkServiceThreadPool(int nThreads) : cppmicroservices::async::AsyncWorkService()
-        {
-            threadpool = std::make_shared<boost::asio::thread_pool>(nThreads);
-        }
-
-        ~AsyncWorkServiceThreadPool() override
-        {
-            try
-            {
-                if (threadpool)
-                {
-                    try
-                    {
-                        threadpool->join();
-                    }
-                    catch (...)
-                    {
-                        //
-                    }
-                }
-            }
-            catch (...)
-            {
-                //
-            }
-        }
-
-        void
-        post(std::packaged_task<void()>&& task) override
-        {
-            using Sig = void();
-            using Result = boost::asio::async_result<decltype(task), Sig>;
-            using Handler = typename Result::completion_handler_type;
-
-            Handler handler(std::forward<decltype(task)>(task));
-            Result result(handler);
-
-            boost::asio::post(threadpool->get_executor(), [handler = std::move(handler)]() mutable { handler(); });
-        }
-
-      private:
-        std::shared_ptr<boost::asio::thread_pool> threadpool;
-    };
 
     TEST_F(tGenericDSAndCASuite, TestAsyncWorkServiceWithoutUserService)
     {

@@ -1,0 +1,7 @@
+usFunctionCreateDSTestBundle(TestBundleDSDROM)
+
+usFunctionCreateTestBundleWithResources(TestBundleDSDROM
+  SOURCES src/ServiceComponentDynamicReluctantOptionalMultiple.cpp ${_glue_file}
+  RESOURCES manifest.json
+  BUNDLE_SYMBOLIC_NAME TestBundleDSDROM
+  OTHER_LIBRARIES usTestInterfaces usServiceComponent usServiceComponent)

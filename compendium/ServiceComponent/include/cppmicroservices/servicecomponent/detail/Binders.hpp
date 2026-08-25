@@ -173,6 +173,10 @@ namespace cppmicroservices
                     Bind(std::shared_ptr<ComponentContext> const& ctxt, std::shared_ptr<T> const& comp) override
                     {
                         std::shared_ptr<R> service = ctxt->LocateService<R>(this->GetReferenceName());
+                        if (!service)
+                        {
+                            return;
+                        }
                         DoBind(service, comp);
                     }
 
@@ -180,6 +184,10 @@ namespace cppmicroservices
                     Unbind(std::shared_ptr<ComponentContext> const& ctxt, std::shared_ptr<T> const& comp) override
                     {
                         std::shared_ptr<R> service = ctxt->LocateService<R>(this->GetReferenceName());
+                        if (!service)
+                        {
+                            return;
+                        }
                         DoUnbind(service, comp);
                     }
 

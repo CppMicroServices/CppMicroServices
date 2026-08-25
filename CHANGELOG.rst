@@ -7,6 +7,45 @@ The format is based on `Keep a Changelog <http://keepachangelog.com/>`_
 and this project adheres to `Semantic Versioning <http://semver.org/>`_.
 
 
+`v3.8.13 <https://github.com/cppmicroservices/cppmicroservices/tree/3.8.13>`_ (2026-8-25)
+---------------------------------------------------------------------------------------------------------
+
+`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.8.12...3.8.13>`_
+
+Added
+-----
+
+
+Changed
+-------
+- `[Core Framework] Refactor AnyMap to use std::variant-based inline storage. <https://github.com/CppMicroServices/CppMicroServices/pull/1265>`_
+- `[Core Framework] Improve LDAP filter performance with caching, pre-lowercased attributes, and iterative wildcard matching. <https://github.com/CppMicroServices/CppMicroServices/pull/1263>`_
+- `[Core Framework] Hoist ToLower(key) out of loop in LDAPExpr::Evaluate. <https://github.com/CppMicroServices/CppMicroServices/pull/1260>`_
+- `[Declarative Services] Updated #ifndef and #define statements of all bundles. <https://github.com/CppMicroServices/CppMicroServices/pull/1267>`_
+- `[Core Framework] Add space in error message. <https://github.com/CppMicroServices/CppMicroServices/pull/1272>`_
+- `[Core Framework] Update the json parser. <https://github.com/CppMicroServices/CppMicroServices/pull/1273>`_
+- `[Core Framework] Update rapidjson to latest from github repo. <https://github.com/CppMicroServices/CppMicroServices/pull/1274>`_
+- `[Core Framework] misc fixes for conan build support. <https://github.com/CppMicroServices/CppMicroServices/pull/1279>`_
+
+Removed
+-------
+
+Deprecated
+----------
+
+
+Fixed
+-----
+- `[Declarative Services] Fix bugs with binding when optional dependency. <https://github.com/CppMicroServices/CppMicroServices/pull/1266>`_
+- `[Declarative Services] Fix race condition when a configuration is removed whilst a DS component with a configuration policy:required dependency is instantiated. <https://github.com/CppMicroServices/CppMicroServices/pull/1264>`_
+- `[Declarative Services] Fix race in concurrent service initialization and configuration removal. <https://github.com/CppMicroServices/CppMicroServices/pull/1248>`_
+- `[Core Framework] Fix Windows CI workflow <https://github.com/CppMicroServices/CppMicroServices/pull/1268>`_
+- `[Configuration Admin] updateIfDifferent(emptyMap) on first update SHOULD cause config notifications to fire <https://github.com/CppMicroServices/CppMicroServices/pull/1271>`_
+- `[Declarative Services] remove virtual method on non inherited final class <https://github.com/CppMicroServices/CppMicroServices/pull/1275>`_
+- `[Declarative Services] localize locking more to remove deadlock potential <https://github.com/CppMicroServices/CppMicroServices/pull/1278>`_
+- `[Core Framework] An assortment of fixes required for builds on all platforms. <https://github.com/CppMicroServices/CppMicroServices/pull/1283>`_
+
+
 `v3.8.12 <https://github.com/cppmicroservices/cppmicroservices/tree/3.8.12>`_ (2026-5-12)
 ---------------------------------------------------------------------------------------------------------
 

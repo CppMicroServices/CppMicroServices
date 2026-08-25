@@ -27,6 +27,7 @@ namespace cppmicroservices
         while(observedState->GetState() == Bundle::STATE_INSTALLED){
             observedState->WaitForTransitionTask();
             if (mgr.CompareAndSetState(&observedState, resolvedState)){
+                transitionLogger.MarkTransitionAccepted();
                 TransitionCompletionGuard completeTransition(transitionAction);
                 
                 auto frameworkBlock = CheckAndBlockFramework(mgr);
@@ -37,7 +38,6 @@ namespace cppmicroservices
                 
                 frameworkBlock.reset();
                 completeTransition.Complete();
-                transitionLogger.TransitionSucceeded();
                 resolvedState->Start(mgr, options);
                 break;
             }
@@ -56,9 +56,9 @@ namespace cppmicroservices
         while(observedState->GetState() == Bundle::STATE_INSTALLED){
             observedState->WaitForTransitionTask();
             if (mgr.CompareAndSetState(&observedState, installedState)){
+                transitionLogger.MarkTransitionAccepted();
                 TransitionCompletionGuard completeTransition(transitionAction);
                 SetAutostart(mgr, options);
-                transitionLogger.TransitionSucceeded();
                 break;
             }
         }
@@ -78,6 +78,7 @@ namespace cppmicroservices
             observedState->WaitForTransitionTask();
             if (mgr.CompareAndSetState(&observedState, uninstalledState))
             {
+                transitionLogger.MarkTransitionAccepted();
                 TransitionCompletionGuard completeTransition(transitionAction);
                 mgr.coreCtx->bundleRegistry.Remove(mgr.location, mgr.id);
                 mgr.coreCtx->listeners.BundleChanged(
@@ -105,7 +106,6 @@ namespace cppmicroservices
                     mgr.bundleDir.clear();
                 }
                 mgr.coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::BUNDLE_UNINSTALLED, MakeBundle(mgr.shared_from_this())));
-                transitionLogger.TransitionSucceeded();
                 break;
             }
         }

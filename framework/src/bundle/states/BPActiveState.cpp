@@ -56,11 +56,11 @@ namespace cppmicroservices
         while(observedState->GetState() == Bundle::STATE_ACTIVE){
             observedState->WaitForTransitionTask();
             if (mgr.CompareAndSetState(&observedState, stoppingState)){
+                transitionLogger.MarkTransitionAccepted();
                 TransitionCompletionGuard completeTransition(transitionAction);
                 SetAutostart(mgr, options);
                 std::exception_ptr res = StopActiveBundle(mgr);
                 completeTransition.Complete();
-                transitionLogger.TransitionSucceeded();
                 stoppingState->Stop(mgr, options);
                 if (res){
                     std::rethrow_exception(res);
@@ -82,6 +82,7 @@ namespace cppmicroservices
         while(observedState->GetState() == Bundle::STATE_ACTIVE){
             observedState->WaitForTransitionTask();
             if (mgr.CompareAndSetState(&observedState, stoppingState)){
+                transitionLogger.MarkTransitionAccepted();
                 TransitionCompletionGuard completeTransition(transitionAction);
                 std::exception_ptr res = StopActiveBundle(mgr);
                 if (res){
@@ -91,7 +92,6 @@ namespace cppmicroservices
                                                                                 res));
                 }
                 completeTransition.Complete();
-                transitionLogger.TransitionSucceeded();
                 stoppingState->Uninstall(mgr);
                 break;
             }

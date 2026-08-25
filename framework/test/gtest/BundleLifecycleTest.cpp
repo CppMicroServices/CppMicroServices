@@ -133,7 +133,7 @@ TEST_F(BundleLifecycleTest, TestExpectedStateTransitions)
 
 };
 
-TEST_F(BundleLifecycleTest, TestBundleActivatorTransition)
+TEST_F(BundleLifecycleTest, TestBundleActivatorTransitionCalls)
 {
     // Bundle TestBundleActivatorTransition1 calls Stop on itself in its Bundle Activation Start function
     auto bundleActivatorTransition1 = InstallLib(context, "TestBundleActivatorTransition1");
@@ -289,7 +289,7 @@ TEST_F(BundleLifecycleTest, TestUninstallDroppedTransitions)
         std::promise<void> go;
         std::shared_future<void> ready(go.get_future());
         constexpr int numCalls = 3;
-        std::vector<std::promise<void>> readies(numCalls); //vector of promises to tell the first thread when the bundles are all prepared
+        std::vector<std::promise<void>> readies(numCalls);
         std::vector<std::future<void>> bundleStateChanges(numCalls);
 
         for (int i = 0; i < numCalls; ++i)
@@ -383,6 +383,11 @@ TEST_F(BundleLifecycleTest, TestStartedBundleListenerThrowsSecurityException)
 
 TEST_F(BundleLifecycleTest, TestStartFailedRaceWithStart)
 {
+    // We intentionally fail the first Start() call with a SecurityException.
+    // We intentionally call a second Start() that we setup so it won't fail like the first call.
+    // The second Start() call will race with the SecurityException recovery.
+    // Regardless of if the second Start() succeeds (which is sporadic), the SecurityException recovery should never be interrupted.
+    // We check that the Security Exception recovery succeeded via a BundleEvent::BUNDLE_STOPPED listener event.
 
       auto bundle = InstallLib(context, "TestBundleA");
 

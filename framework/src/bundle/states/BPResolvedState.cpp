@@ -33,6 +33,7 @@ namespace cppmicroservices
         while(observedState->GetState() == Bundle::STATE_RESOLVED){
             observedState->WaitForTransitionTask();
             if (mgr.CompareAndSetState(&observedState, startingState)){
+                transitionLogger.MarkTransitionAccepted();
                 TransitionCompletionGuard completeTransition(transitionAction);
 
                 auto frameworkBlock = CheckAndBlockFramework(mgr);
@@ -178,7 +179,6 @@ namespace cppmicroservices
 
                 frameworkBlock.reset();
                 completeTransition.Complete();
-                transitionLogger.TransitionSucceeded();
                 startingState->Start(mgr, options);
                 break;
             }
@@ -197,9 +197,9 @@ namespace cppmicroservices
         while(observedState->GetState() == Bundle::STATE_RESOLVED){
             observedState->WaitForTransitionTask();
             if (mgr.CompareAndSetState(&observedState, resolvedState)){
+                transitionLogger.MarkTransitionAccepted();
                 TransitionCompletionGuard completeTransition(transitionAction);
                 SetAutostart(mgr, options);
-                transitionLogger.TransitionSucceeded();
                 break;
             }
         }
@@ -218,9 +218,9 @@ namespace cppmicroservices
             observedState->WaitForTransitionTask();
             if (mgr.CompareAndSetState(&observedState, installedState))
             {
+                transitionLogger.MarkTransitionAccepted();
                 TransitionCompletionGuard completeTransition(transitionAction);
                 completeTransition.Complete();
-                transitionLogger.TransitionSucceeded();
                 installedState->Uninstall(mgr);
                 break;
             }

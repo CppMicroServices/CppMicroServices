@@ -98,7 +98,7 @@ namespace cppmicroservices {
     }
 
     void
-    TransitionLogger::TransitionSucceeded()
+    TransitionLogger::MarkTransitionAccepted()
     {
         successfulTransition = true;
     }

@@ -70,7 +70,7 @@ namespace cppmicroservices
         TransitionLogger(TransitionLogger&&) = delete;
         TransitionLogger& operator=(TransitionLogger&&) = delete;
 
-        void TransitionSucceeded();
+        void MarkTransitionAccepted();
         void SetActualState(std::shared_ptr<BundlePrivateState> const& state);
 
     private:

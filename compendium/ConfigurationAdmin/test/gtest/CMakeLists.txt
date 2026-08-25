@@ -16,6 +16,7 @@ else()
 endif()
 
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../TestingConfig.h.in" "${PROJECT_BINARY_DIR}/include/ConfigurationAdminTestingConfig.h")
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../TestingConfig.h.in" "${PROJECT_BINARY_DIR}/include/DSTestingConfig.h")
 
 include_directories(
   ${GTEST_INCLUDE_DIRS}
@@ -51,6 +52,7 @@ set(_configurationadmin_tests
   TestCMBundleExtension.cpp
   TestCMLogger.cpp
   TestConfigAdmin.cpp
+  TestConfigAdminConfigRace.cpp
   TestConfigurationAdminImpl.cpp
   TestConfigurationImpl.cpp
   TestMetadataParserFactory.cpp
@@ -66,6 +68,7 @@ include_directories(${PROJECT_BINARY_DIR}/include
 
 set(_additional_srcs
   ../../src/CMActivator.cpp
+  ../TestUtils.cpp
   )
 
 #-----------------------------------------------------------------------------
@@ -124,6 +127,7 @@ set(_test_bundles
   ManagedServiceAndFactoryBundle
   TestBundleManagedServiceFactory
   TestBundleMultipleManagedServiceFactory
+  TestBundleDSCA29
   )
 
 target_link_libraries(${us_configurationadmin_test_exe_name}
@@ -153,6 +157,11 @@ add_dependencies(${us_configurationadmin_test_exe_name}
 # Needed for clock_gettime with glibc < 2.17
 if((UNIX AND NOT APPLE) AND NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Android")
   target_link_libraries(${us_configurationadmin_test_exe_name} PRIVATE rt)
+endif()
+
+# Needed for EnumProcessModules in TestUtils.cpp
+if(MINGW)
+  target_link_libraries(${us_configurationadmin_test_exe_name} PRIVATE -lpsapi)
 endif()
 
 # Run the GTest EXE from ctest.

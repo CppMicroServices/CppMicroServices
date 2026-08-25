@@ -54,7 +54,7 @@ namespace cppmicroservices
             ConfigurationManager(ConfigurationManager&&) = delete;
             ConfigurationManager& operator=(ConfigurationManager const&) = delete;
             ConfigurationManager& operator=(ConfigurationManager&&) = delete;
-            virtual ~ConfigurationManager() = default;
+            ~ConfigurationManager() = default;
 
             /**
              * Method to initialize a newly constructed Configuration Manager.
@@ -85,6 +85,12 @@ namespace cppmicroservices
                                         bool& configWasSatisfied,
                                         bool& configIsNowSatisfied,
                                         bool& changeCountDifferent);
+
+            /**
+             * Returns true if removing the given pid would transition config from satisfied to unsatisfied.
+             * Read-only query — does not mutate state.
+             */
+            bool WouldDeletionUnsatisfy(std::string const& pid) const noexcept;
 
             /* Returns the merged properties for the component. These properties
              * are a merged from the component properties and the properties for

@@ -380,6 +380,56 @@ TEST_F(BundleLifecycleTest, TestStartedBundleListenerThrowsSecurityException)
     context.RemoveListener(std::move(listenerToken));
 }
 
+TEST_F(BundleLifecycleTest, TestStartingBundleListenerStopsBundle)
+{
+
+    // If Stop is called while the Bundle is in the middle of Starting, 
+    // the previous implementation guarenteed the final state to be Resolved.
+    // New implementation has a race between the recursive Starting->Start call and the Stop call,
+    // meaning the final state can be Active if the Stop call loses and gets dropped.
+
+    auto bundle = InstallLib(context, "TestBundleA");
+
+    bool sawStartingEvent = false;
+    bool stopScheduledFromListener = false;
+    std::future<void> stopAttempt;
+
+    auto listener = [&](BundleEvent const& evt)
+    {
+        if (evt.GetBundle().GetBundleId() != bundle.GetBundleId())
+        {
+            return;
+        }
+
+        if (evt.GetType() == BundleEvent::BUNDLE_STARTING && !stopScheduledFromListener)
+        {
+            sawStartingEvent = true;
+            stopScheduledFromListener = true;
+
+            stopAttempt = std::async(
+                std::launch::async,
+                [bundle]() mutable
+                {
+                    bundle.Stop();
+                });
+        }
+    };
+
+    auto listenerToken = context.AddBundleListener(listener);
+
+    EXPECT_NO_THROW(bundle.Start());
+
+    context.RemoveListener(std::move(listenerToken));
+
+    ASSERT_TRUE(sawStartingEvent);
+    ASSERT_TRUE(stopScheduledFromListener);
+    ASSERT_TRUE(stopAttempt.valid());
+
+    EXPECT_NO_THROW(stopAttempt.get());
+
+    ASSERT_EQ(bundle.GetState(), Bundle::STATE_RESOLVED);
+}
+
 TEST_F(BundleLifecycleTest, TestStartFailedRaceWithStart)
 {
     // We intentionally fail the first Start() call with a SecurityException.

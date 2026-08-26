@@ -185,8 +185,6 @@ namespace cppmicroservices
     }
 
     void BPResolvedState::Stop(BundlePrivate& mgr, uint32_t options){
-        // US_UNUSED(mgr);
-        // US_UNUSED(options);
         TransitionLogger transitionLogger(mgr, "Stop()", Bundle::STATE_RESOLVED);
         auto observedState = shared_from_this(); 
         std::promise<void> transitionAction; 
@@ -199,7 +197,6 @@ namespace cppmicroservices
             TransitionCompletionGuard completeTransition(transitionAction);
             SetAutostart(mgr, options);
         }
-
         transitionLogger.SetActualState(observedState);
     }
 

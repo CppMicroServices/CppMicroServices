@@ -15,24 +15,11 @@ namespace cppmicroservices
     }
 
     void BPStoppingState::Start(BundlePrivate& mgr, uint32_t options){
-        TransitionLogger transitionLogger(mgr, "Stop()", Bundle::STATE_STOPPING);
-        auto observedState = shared_from_this(); 
-        std::promise<void> transitionAction; 
-        auto fut = transitionAction.get_future();
-        auto stoppingState = std::make_shared<BPStoppingState>(std::move(fut)); 
-
-        while(observedState->GetState() == Bundle::STATE_STOPPING){
-            observedState->WaitForTransitionTask();
-            if (mgr.CompareAndSetState(&observedState, stoppingState)){
-                transitionLogger.MarkTransitionAccepted();
-                TransitionCompletionGuard completeTransition(transitionAction);
-                auto frameworkBlock = CheckAndBlockFramework(mgr);
-                SetAutostart(mgr, options);
-                throw std::runtime_error("Bundle " + mgr.symbolicName + " (location=" + mgr.location
-                                            + "), Start() called while Bundle is currently stopping. This can happen when Start() is called from BundleActivator::Stop, which is not allowed.");
-            }
-        }
-        transitionLogger.SetActualState(observedState);
+        US_UNUSED(options);
+        auto frameworkBlock = CheckAndBlockFramework(mgr);
+        US_UNUSED(frameworkBlock);
+        throw std::runtime_error("Bundle " + mgr.symbolicName + " (location=" + mgr.location
+                                        + "), Start() called while Bundle is currently stopping. This can happen when Start() is called from BundleActivator::Stop, which is not allowed.");
     }
 
     namespace {
@@ -57,15 +44,12 @@ namespace cppmicroservices
         auto fut = transitionAction.get_future();
         auto resolvedState = std::make_shared<BPResolvedState>(std::move(fut)); 
 
-        while(observedState->GetState() == Bundle::STATE_STOPPING){
-            observedState->WaitForTransitionTask();
-            if (mgr.CompareAndSetState(&observedState, resolvedState)){
-                transitionLogger.MarkTransitionAccepted();
-                TransitionCompletionGuard completeTransition(transitionAction);
-                SetAutostart(mgr, options);
-                FinishBundleStop(mgr);
-                break;
-            }
+        observedState->WaitForTransitionTask();
+        if (mgr.CompareAndSetState(&observedState, resolvedState)){
+            transitionLogger.MarkTransitionAccepted();
+            TransitionCompletionGuard completeTransition(transitionAction);
+            SetAutostart(mgr, options);
+            FinishBundleStop(mgr);
         }
 
         transitionLogger.SetActualState(observedState);
@@ -78,16 +62,13 @@ namespace cppmicroservices
         auto fut = transitionAction.get_future();
         auto resolvedState = std::make_shared<BPResolvedState>(std::move(fut)); 
 
-        while(observedState->GetState() == Bundle::STATE_STOPPING){
-            observedState->WaitForTransitionTask();
-            if (mgr.CompareAndSetState(&observedState, resolvedState)){
-                transitionLogger.MarkTransitionAccepted();
-                TransitionCompletionGuard completeTransition(transitionAction);
-                FinishBundleStop(mgr);
-                completeTransition.Complete();
-                resolvedState->Uninstall(mgr);
-                break;
-            }
+        observedState->WaitForTransitionTask();
+        if (mgr.CompareAndSetState(&observedState, resolvedState)){
+            transitionLogger.MarkTransitionAccepted();
+            TransitionCompletionGuard completeTransition(transitionAction);
+            FinishBundleStop(mgr);
+            completeTransition.Complete();
+            resolvedState->Uninstall(mgr);
         }
 
         transitionLogger.SetActualState(observedState);
@@ -113,4 +94,3 @@ namespace cppmicroservices
         }
     }
 }
-

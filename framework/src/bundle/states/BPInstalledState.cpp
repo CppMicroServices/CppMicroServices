@@ -24,23 +24,20 @@ namespace cppmicroservices
         auto fut = transitionAction.get_future();
         auto resolvedState = std::make_shared<BPResolvedState>(std::move(fut)); 
 
-        while(observedState->GetState() == Bundle::STATE_INSTALLED){
-            observedState->WaitForTransitionTask();
-            if (mgr.CompareAndSetState(&observedState, resolvedState)){
-                transitionLogger.MarkTransitionAccepted();
-                TransitionCompletionGuard completeTransition(transitionAction);
-                
-                auto frameworkBlock = CheckAndBlockFramework(mgr);
-                SetAutostart(mgr, options);
+        observedState->WaitForTransitionTask();
+        if (mgr.CompareAndSetState(&observedState, resolvedState)){
+            transitionLogger.MarkTransitionAccepted();
+            TransitionCompletionGuard completeTransition(transitionAction);
 
-                mgr.coreCtx->listeners.BundleChanged(
-                    { BundleEvent::BUNDLE_RESOLVED, MakeBundle(mgr.shared_from_this()) });
-                
-                frameworkBlock.reset();
-                completeTransition.Complete();
-                resolvedState->Start(mgr, options);
-                break;
-            }
+            auto frameworkBlock = CheckAndBlockFramework(mgr);
+            SetAutostart(mgr, options);
+
+            mgr.coreCtx->listeners.BundleChanged(
+                { BundleEvent::BUNDLE_RESOLVED, MakeBundle(mgr.shared_from_this()) });
+
+            frameworkBlock.reset();
+            completeTransition.Complete();
+            resolvedState->Start(mgr, options);
         }
 
         transitionLogger.SetActualState(observedState);
@@ -53,14 +50,11 @@ namespace cppmicroservices
         auto fut = transitionAction.get_future();
         auto installedState = std::make_shared<BPInstalledState>(std::move(fut)); 
 
-        while(observedState->GetState() == Bundle::STATE_INSTALLED){
-            observedState->WaitForTransitionTask();
-            if (mgr.CompareAndSetState(&observedState, installedState)){
-                transitionLogger.MarkTransitionAccepted();
-                TransitionCompletionGuard completeTransition(transitionAction);
-                SetAutostart(mgr, options);
-                break;
-            }
+        observedState->WaitForTransitionTask();
+        if (mgr.CompareAndSetState(&observedState, installedState)){
+            transitionLogger.MarkTransitionAccepted();
+            TransitionCompletionGuard completeTransition(transitionAction);
+            SetAutostart(mgr, options);
         }
 
         transitionLogger.SetActualState(observedState);
@@ -74,40 +68,37 @@ namespace cppmicroservices
         auto fut = transitionAction.get_future();
         auto uninstalledState = std::make_shared<BPUninstalledState>(std::move(fut));
 
-        while(observedState->GetState() == Bundle::STATE_INSTALLED){
-            observedState->WaitForTransitionTask();
-            if (mgr.CompareAndSetState(&observedState, uninstalledState))
+        observedState->WaitForTransitionTask();
+        if (mgr.CompareAndSetState(&observedState, uninstalledState))
+        {
+            transitionLogger.MarkTransitionAccepted();
+            TransitionCompletionGuard completeTransition(transitionAction);
+            mgr.coreCtx->bundleRegistry.Remove(mgr.location, mgr.id);
+            mgr.coreCtx->listeners.BundleChanged(
+                { BundleEvent::BUNDLE_UNRESOLVED, MakeBundle(mgr.shared_from_this()) });
+            mgr.bactivator = nullptr;
+            mgr.Purge();
+            mgr.barchive->SetLastModified(std::chrono::steady_clock::now());
+            if (!mgr.bundleDir.empty())
             {
-                transitionLogger.MarkTransitionAccepted();
-                TransitionCompletionGuard completeTransition(transitionAction);
-                mgr.coreCtx->bundleRegistry.Remove(mgr.location, mgr.id);
-                mgr.coreCtx->listeners.BundleChanged(
-                    { BundleEvent::BUNDLE_UNRESOLVED, MakeBundle(mgr.shared_from_this()) });
-                mgr.bactivator = nullptr;
-                mgr.Purge();
-                mgr.barchive->SetLastModified(std::chrono::steady_clock::now());
-                if (!mgr.bundleDir.empty())
+                try
                 {
-                    try
+                    if (util::Exists(mgr.bundleDir))
                     {
-                        if (util::Exists(mgr.bundleDir))
-                        {
-                            util::RemoveDirectoryRecursive(mgr.bundleDir);
-                        }
+                        util::RemoveDirectoryRecursive(mgr.bundleDir);
                     }
-                    catch (...)
-                    {
-                        mgr.coreCtx->listeners.SendFrameworkEvent(
-                            FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING,
-                                            MakeBundle(mgr.shared_from_this()),
-                                            std::string(),
-                                            std::current_exception()));
-                    }
-                    mgr.bundleDir.clear();
                 }
-                mgr.coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::BUNDLE_UNINSTALLED, MakeBundle(mgr.shared_from_this())));
-                break;
+                catch (...)
+                {
+                    mgr.coreCtx->listeners.SendFrameworkEvent(
+                        FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING,
+                                        MakeBundle(mgr.shared_from_this()),
+                                        std::string(),
+                                        std::current_exception()));
+                }
+                mgr.bundleDir.clear();
             }
+            mgr.coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::BUNDLE_UNINSTALLED, MakeBundle(mgr.shared_from_this())));
         }
 
         transitionLogger.SetActualState(observedState);

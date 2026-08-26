@@ -31,27 +31,24 @@ namespace cppmicroservices
         auto fut = transitionAction.get_future();
         auto activeState = std::make_shared<BPActiveState>(std::move(fut)); 
 
-        while(observedState->GetState() == Bundle::STATE_STARTING){
-            observedState->WaitForTransitionTask();
-            if (mgr.CompareAndSetState(&observedState, activeState)){
-                transitionLogger.MarkTransitionAccepted();
-                TransitionCompletionGuard completeTransition(transitionAction);
-                
-                auto frameworkBlock = CheckAndBlockFramework(mgr);
-                SetAutostart(mgr, options);
+        observedState->WaitForTransitionTask();
+        if (mgr.CompareAndSetState(&observedState, activeState)){
+            transitionLogger.MarkTransitionAccepted();
+            TransitionCompletionGuard completeTransition(transitionAction);
 
-                try
-                {
-                    mgr.coreCtx->listeners.BundleChanged(
-                        BundleEvent(BundleEvent::BUNDLE_STARTED, MakeBundle(mgr.shared_from_this())));
-                    
-                }
-                catch (cppmicroservices::SecurityException const& ex)
-                {
-                    activeState->StartFailed(mgr);
-                    throw;
-                }
-                break;
+            auto frameworkBlock = CheckAndBlockFramework(mgr);
+            SetAutostart(mgr, options);
+
+            try
+            {
+                mgr.coreCtx->listeners.BundleChanged(
+                    BundleEvent(BundleEvent::BUNDLE_STARTED, MakeBundle(mgr.shared_from_this())));
+
+            }
+            catch (cppmicroservices::SecurityException const& ex)
+            {
+                activeState->StartFailed(mgr);
+                throw;
             }
         }
 
@@ -72,17 +69,14 @@ namespace cppmicroservices
         auto fut = transitionAction.get_future();
         auto stoppingState = std::make_shared<BPStoppingState>(std::move(fut));
 
-        while(observedState->GetState() == Bundle::STATE_STARTING){
-            observedState->WaitForTransitionTask();
-            if (mgr.CompareAndSetState(&observedState, stoppingState)){
-                transitionLogger.MarkTransitionAccepted();
-                TransitionCompletionGuard completeTransition(transitionAction);
-                SetAutostart(mgr, options);
-                StopStartingBundle(mgr);
-                completeTransition.Complete();
-                stoppingState->Stop(mgr, options);
-                break;
-            }
+        observedState->WaitForTransitionTask();
+        if (mgr.CompareAndSetState(&observedState, stoppingState)){
+            transitionLogger.MarkTransitionAccepted();
+            TransitionCompletionGuard completeTransition(transitionAction);
+            SetAutostart(mgr, options);
+            StopStartingBundle(mgr);
+            completeTransition.Complete();
+            stoppingState->Stop(mgr, options);
         }
 
         transitionLogger.SetActualState(observedState);
@@ -95,16 +89,13 @@ namespace cppmicroservices
         auto fut = transitionAction.get_future();
         auto stoppingState = std::make_shared<BPStoppingState>(std::move(fut));
 
-        while(observedState->GetState() == Bundle::STATE_STARTING){
-            observedState->WaitForTransitionTask();
-            if (mgr.CompareAndSetState(&observedState, stoppingState)){
-                transitionLogger.MarkTransitionAccepted();
-                TransitionCompletionGuard completeTransition(transitionAction);
-                StopStartingBundle(mgr);
-                completeTransition.Complete();
-                stoppingState->Uninstall(mgr);
-                break;
-            }
+        observedState->WaitForTransitionTask();
+        if (mgr.CompareAndSetState(&observedState, stoppingState)){
+            transitionLogger.MarkTransitionAccepted();
+            TransitionCompletionGuard completeTransition(transitionAction);
+            StopStartingBundle(mgr);
+            completeTransition.Complete();
+            stoppingState->Uninstall(mgr);
         }
 
         transitionLogger.SetActualState(observedState);

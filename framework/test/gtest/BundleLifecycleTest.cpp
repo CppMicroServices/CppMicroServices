@@ -195,7 +195,8 @@ TEST_F(BundleLifecycleTest, TestStartStopDroppedTransitions)
 
     std::vector<Bundle::State> expectedStates = {
       Bundle::STATE_ACTIVE,
-      Bundle::STATE_RESOLVED
+      Bundle::STATE_RESOLVED,
+      Bundle::STATE_INSTALLED
     };
 
     for(int i = 0; i < iterations; ++i){
@@ -241,8 +242,7 @@ TEST_F(BundleLifecycleTest, TestStartStopDroppedTransitions)
 
         auto state = bundleA.GetState();
 
-        ASSERT_TRUE(state == Bundle::STATE_ACTIVE ||
-                state == Bundle::STATE_RESOLVED)
+        ASSERT_TRUE(std::find(expectedStates.begin(), expectedStates.end(), state) != expectedStates.end())
         << "Unexpected final bundle state: " << state
         << " on iteration " << i;
 
@@ -272,6 +272,7 @@ TEST_F(BundleLifecycleTest, TestUninstallDroppedTransitions)
     std::vector<Bundle::State> expectedStates = {
       Bundle::STATE_ACTIVE,
       Bundle::STATE_RESOLVED,
+      Bundle::STATE_INSTALLED,
       Bundle::STATE_UNINSTALLED
     };
 
@@ -325,9 +326,7 @@ TEST_F(BundleLifecycleTest, TestUninstallDroppedTransitions)
 
         auto state = bundleA.GetState();
 
-        ASSERT_TRUE(state == Bundle::STATE_ACTIVE ||
-                state == Bundle::STATE_RESOLVED ||
-                state == Bundle::STATE_UNINSTALLED)
+        ASSERT_TRUE(std::find(expectedStates.begin(), expectedStates.end(), state) != expectedStates.end())
         << "Unexpected final bundle state: " << state
         << " on iteration " << i;
 

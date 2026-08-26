@@ -53,19 +53,16 @@ namespace cppmicroservices
         auto fut = transitionAction.get_future();
         auto stoppingState = std::make_shared<BPStoppingState>(std::move(fut));
 
-        while(observedState->GetState() == Bundle::STATE_ACTIVE){
-            observedState->WaitForTransitionTask();
-            if (mgr.CompareAndSetState(&observedState, stoppingState)){
-                transitionLogger.MarkTransitionAccepted();
-                TransitionCompletionGuard completeTransition(transitionAction);
-                SetAutostart(mgr, options);
-                std::exception_ptr res = StopActiveBundle(mgr);
-                completeTransition.Complete();
-                stoppingState->Stop(mgr, options);
-                if (res){
-                    std::rethrow_exception(res);
-                }
-                break;
+        observedState->WaitForTransitionTask();
+        if (mgr.CompareAndSetState(&observedState, stoppingState)){
+            transitionLogger.MarkTransitionAccepted();
+            TransitionCompletionGuard completeTransition(transitionAction);
+            SetAutostart(mgr, options);
+            std::exception_ptr res = StopActiveBundle(mgr);
+            completeTransition.Complete();
+            stoppingState->Stop(mgr, options);
+            if (res){
+                std::rethrow_exception(res);
             }
         }
 
@@ -79,22 +76,19 @@ namespace cppmicroservices
         auto fut = transitionAction.get_future();
         auto stoppingState = std::make_shared<BPStoppingState>(std::move(fut));
 
-        while(observedState->GetState() == Bundle::STATE_ACTIVE){
-            observedState->WaitForTransitionTask();
-            if (mgr.CompareAndSetState(&observedState, stoppingState)){
-                transitionLogger.MarkTransitionAccepted();
-                TransitionCompletionGuard completeTransition(transitionAction);
-                std::exception_ptr res = StopActiveBundle(mgr);
-                if (res){
-                    mgr.coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
-                                                                                MakeBundle(mgr.shared_from_this()),
-                                                                                std::string(),
-                                                                                res));
-                }
-                completeTransition.Complete();
-                stoppingState->Uninstall(mgr);
-                break;
+        observedState->WaitForTransitionTask();
+        if (mgr.CompareAndSetState(&observedState, stoppingState)){
+            transitionLogger.MarkTransitionAccepted();
+            TransitionCompletionGuard completeTransition(transitionAction);
+            std::exception_ptr res = StopActiveBundle(mgr);
+            if (res){
+                mgr.coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
+                                                                            MakeBundle(mgr.shared_from_this()),
+                                                                            std::string(),
+                                                                            res));
             }
+            completeTransition.Complete();
+            stoppingState->Uninstall(mgr);
         }
 
         transitionLogger.SetActualState(observedState);

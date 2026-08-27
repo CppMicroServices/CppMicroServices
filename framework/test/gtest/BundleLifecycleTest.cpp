@@ -145,7 +145,7 @@ TEST_F(BundleLifecycleTest, TestBundleStateDuringListenerEvents)
         { BundleEvent::BUNDLE_STARTED, Bundle::STATE_ACTIVE },
         { BundleEvent::BUNDLE_STOPPING, Bundle::STATE_STOPPING },
         { BundleEvent::BUNDLE_STOPPED, Bundle::STATE_RESOLVED },
-        // { BundleEvent::BUNDLE_UNRESOLVED, Bundle::STATE_INSTALLED },
+        { BundleEvent::BUNDLE_UNRESOLVED, Bundle::STATE_INSTALLED },
         { BundleEvent::BUNDLE_UNINSTALLED, Bundle::STATE_UNINSTALLED }
     };
     std::map<BundleEvent::Type, int> observedEvents;
@@ -534,6 +534,56 @@ TEST_F(BundleLifecycleTest, TestStoppingBundleListenerStartsBundle)
     EXPECT_NO_THROW(stopAttempt.get());
 
     ASSERT_EQ(bundle.GetState(), Bundle::STATE_ACTIVE);
+}
+
+TEST_F(BundleLifecycleTest, TestResolvedBundleListenerStartsBundle)
+{
+
+    // If Start is called while the Bundle is in the middle of Stopping, 
+    // the previous implementation guarenteed the final state to be Active.
+    // New implementation has a race between the recursive Stopping->Stop call and the Start call,
+    // meaning the final state can be Resolved if the Start call loses and gets dropped.
+
+    auto bundle = InstallLib(context, "TestBundleA");
+
+    bool sawStartingEvent = false;
+    bool stopScheduledFromListener = false;
+    std::future<void> stopAttempt;
+
+    auto listener = [&](BundleEvent const& evt)
+    {
+        if (evt.GetBundle().GetBundleId() != bundle.GetBundleId())
+        {
+            return;
+        }
+
+        if (evt.GetType() == BundleEvent::BUNDLE_RESOLVED && !stopScheduledFromListener)
+        {
+            sawStartingEvent = true;
+            stopScheduledFromListener = true;
+
+            stopAttempt = std::async(
+                std::launch::async,
+                [bundle]() mutable
+                {
+                    bundle.Stop();
+                });
+        }
+    };
+
+    auto listenerToken = context.AddBundleListener(listener);
+
+    EXPECT_NO_THROW(bundle.Start());
+
+    context.RemoveListener(std::move(listenerToken));
+
+    ASSERT_TRUE(sawStartingEvent);
+    ASSERT_TRUE(stopScheduledFromListener);
+    ASSERT_TRUE(stopAttempt.valid());
+
+    EXPECT_NO_THROW(stopAttempt.get());
+
+    ASSERT_EQ(bundle.GetState(), Bundle::STATE_RESOLVED);
 }
 
 TEST_F(BundleLifecycleTest, TestStartFailedRaceWithStart)

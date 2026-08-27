@@ -38,6 +38,9 @@ namespace cppmicroservices
             SetAutostart(mgr, options, options);
             StartFromIdle(mgr, newState);
         }
+        else {
+            observedState->WaitForTransitionTask();
+        }        
 
         transitionLogger.SetActualState(observedState);
     }
@@ -55,6 +58,10 @@ namespace cppmicroservices
             TransitionCompletionGuard completeTransition(transitionAction);
             SetAutostart(mgr, options, -1);
         }
+        else {
+            observedState->WaitForTransitionTask();
+        }        
+
         transitionLogger.SetActualState(observedState);
     }
 
@@ -72,6 +79,9 @@ namespace cppmicroservices
             TransitionCompletionGuard completeTransition(transitionAction);
             newState->Uninstall(mgr);
         }
+        else {
+            observedState->WaitForTransitionTask();
+        }        
 
         transitionLogger.SetActualState(observedState);
     }

@@ -159,9 +159,9 @@ namespace cppmicroservices
             }
         }
 
+        mgr.SetStateValue(Bundle::STATE_ACTIVE);
         try
         {
-            mgr.SetStateValue(Bundle::STATE_ACTIVE);
             mgr.coreCtx->listeners.BundleChanged(
                 BundleEvent(BundleEvent::BUNDLE_STARTED, MakeBundle(mgr.shared_from_this())));
 

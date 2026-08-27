@@ -36,6 +36,9 @@ namespace cppmicroservices
                 { BundleEvent::BUNDLE_RESOLVED, MakeBundle(mgr.shared_from_this()) });
             StartFromIdle(mgr, newState);
         }
+        else {
+            observedState->WaitForTransitionTask();
+        }        
 
         transitionLogger.SetActualState(observedState);
     }
@@ -53,6 +56,9 @@ namespace cppmicroservices
             TransitionCompletionGuard completeTransition(transitionAction);
             SetAutostart(mgr, options, -1);
         }
+        else {
+            observedState->WaitForTransitionTask();
+        }        
 
         transitionLogger.SetActualState(observedState);
     }
@@ -99,6 +105,9 @@ namespace cppmicroservices
             mgr.SetStateValue(Bundle::STATE_UNINSTALLED);
             mgr.coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::BUNDLE_UNINSTALLED, MakeBundle(mgr.shared_from_this())));
         }
+        else {
+            observedState->WaitForTransitionTask();
+        }        
 
         transitionLogger.SetActualState(observedState);
         

@@ -243,6 +243,46 @@ TEST_F(BundleLifecycleTest, TestBundleActivatorTransitionCalls)
     ASSERT_EQ(bundleActivatorTransition6.GetState(), Bundle::STATE_RESOLVED);
 }
 
+TEST_F(BundleLifecycleTest, TestConcurrentStartCallsBothObserveActive)
+{
+    auto bundle = InstallLib(context, "TestBundleA");
+    ASSERT_TRUE(bundle);
+    ASSERT_EQ(bundle.GetState(), Bundle::STATE_INSTALLED);
+
+    std::promise<void> go;
+    std::shared_future<void> ready(go.get_future());
+    constexpr int numCalls = 10;
+    std::vector<std::promise<void>> readies(numCalls);
+    std::vector<std::future<Bundle::State>> startResults(numCalls);
+
+    for (int i = 0; i < numCalls; ++i)
+    {
+        startResults[i] = std::async(
+            std::launch::async,
+            [bundle, ready, &readies, i]() mutable
+            {
+                readies[i].set_value();
+                ready.wait();
+                bundle.Start();
+                return bundle.GetState();
+            });
+    }
+
+    for (int i = 0; i < numCalls; ++i)
+    {
+        readies[i].get_future().wait();
+    }
+
+    go.set_value();
+
+    for (auto& startResult : startResults)
+    {
+        EXPECT_EQ(startResult.get(), Bundle::STATE_ACTIVE);
+    }
+
+    ASSERT_EQ(bundle.GetState(), Bundle::STATE_ACTIVE);
+}
+
 TEST_F(BundleLifecycleTest, TestStartStopDroppedTransitions)
 {
     std::map<Bundle::State, int> observed;

@@ -16,9 +16,24 @@ namespace cppmicroservices
     }
     
     void BPActiveState::Start(BundlePrivate& mgr, uint32_t){
-        auto frameworkBlock = CheckAndBlockFramework(mgr);
-        US_UNUSED(frameworkBlock);
-        return;
+
+        TransitionLogger transitionLogger(mgr, "Start()", Bundle::STATE_ACTIVE);
+        auto observedState = shared_from_this(); 
+        std::promise<void> transitionAction; 
+        auto fut = transitionAction.get_future();
+        auto newState = std::make_shared<BPActiveState>(std::move(fut));
+
+        observedState->WaitForTransitionTask();
+        if (mgr.CompareAndSetState(&observedState, newState)){
+            transitionLogger.MarkTransitionAccepted();
+            TransitionCompletionGuard completeTransition(transitionAction);
+            auto frameworkBlock = CheckAndBlockFramework(mgr);
+            US_UNUSED(frameworkBlock);
+        }
+        else {
+            observedState->WaitForTransitionTask();
+        }
+        transitionLogger.SetActualState(observedState);
     }
 
     namespace {
@@ -75,7 +90,10 @@ namespace cppmicroservices
                 std::rethrow_exception(res);
             }
         }
-
+        else {
+            observedState->WaitForTransitionTask();
+        }
+        
         transitionLogger.SetActualState(observedState);
     }
 
@@ -99,6 +117,9 @@ namespace cppmicroservices
             }
             newState->Uninstall(mgr);
         }
+        else {
+            observedState->WaitForTransitionTask();
+        }        
 
         transitionLogger.SetActualState(observedState);
     }

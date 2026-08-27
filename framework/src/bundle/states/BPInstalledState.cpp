@@ -1,6 +1,6 @@
 #include "BPInstalledState.h"
 #include "BPUninstalledState.h"
-#include "BPResolvedState.h"
+#include "BPActiveState.h"
 #include "CoreBundleContext.h"
 #include "BundlePrivate.h"
 #include "cppmicroservices/Bundle.h"
@@ -22,7 +22,7 @@ namespace cppmicroservices
         auto observedState = shared_from_this(); 
         std::promise<void> transitionAction; 
         auto fut = transitionAction.get_future();
-        auto newState = std::make_shared<BPResolvedState>(std::move(fut)); 
+        auto newState = std::make_shared<BPActiveState>(std::move(fut)); 
 
         observedState->WaitForTransitionTask();
         if (mgr.CompareAndSetState(&observedState, newState)){
@@ -31,13 +31,10 @@ namespace cppmicroservices
 
             auto frameworkBlock = CheckAndBlockFramework(mgr);
             SetAutostart(mgr, options, options);
-
             mgr.SetStateValue(Bundle::STATE_RESOLVED);
             mgr.coreCtx->listeners.BundleChanged(
                 { BundleEvent::BUNDLE_RESOLVED, MakeBundle(mgr.shared_from_this()) });
-
-            frameworkBlock.reset();
-            newState->Start(mgr, options);
+            StartFromIdle(mgr, newState);
         }
 
         transitionLogger.SetActualState(observedState);

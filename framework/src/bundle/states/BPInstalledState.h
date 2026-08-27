@@ -1,14 +1,14 @@
 #ifndef BPInstalledState_h
 #define BPInstalledState_h
 
-#include "BundlePrivateState.h"
+#include "BPIdleState.h"
 
 namespace cppmicroservices
 {
-    class BPInstalledState final : public BundlePrivateState
+    class BPInstalledState final : public BPIdleState
     { 
         public:
-        using BundlePrivateState::BundlePrivateState;
+        using BPIdleState::BPIdleState;
         ~BPInstalledState() override = default;
         BPInstalledState(BPInstalledState const&) = delete;
         BPInstalledState& operator=(BPInstalledState const&) = delete;

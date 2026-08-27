@@ -1,4 +1,5 @@
 #include "BPIdleState.h"
+#include "BPResolvedState.h"
 #include "BPActiveState.h"
 #include "BundlePrivate.h"
 #include "BundleContextPrivate.h"
@@ -18,7 +19,6 @@
 
 namespace cppmicroservices
 {
-
     void BPIdleState::StartFromIdle(BundlePrivate& mgr, std::shared_ptr<BPActiveState> const& newState){
         mgr.SetStateValue(Bundle::STATE_STARTING);
         std::shared_ptr<BundleContextPrivate> null_expected;
@@ -69,12 +69,12 @@ namespace cppmicroservices
                                 thisBundle,
                                 "The bundle validation function threw an exception",
                                 std::current_exception()));
-                newState->StartFailed(mgr);
+                StartFailed(mgr);
                 throw (SecurityException { util::GetLastExceptionStr(), thisBundle });
             }
 
             if(failedValidation){
-                newState->StartFailed(mgr);
+                StartFailed(mgr);
                 throw (SecurityException {
                     "Bundle " + mgr.symbolicName + " (location=" + mgr.location + ") failed bundle validation.",
                     thisBundle });
@@ -145,7 +145,7 @@ namespace cppmicroservices
             }
             catch (std::system_error const& ex)
             {
-                newState->StartFailed(mgr);
+                StartFailed(mgr);
                 throw (cppmicroservices::SharedLibraryException(ex.code(), ex.what(), thisBundle));
             }
             catch (...)
@@ -153,7 +153,7 @@ namespace cppmicroservices
                 mgr.coreCtx->logger->Log(logservice::SeverityLevel::LOG_INFO,
                                     "Failed to start Bundle " + mgr.symbolicName + " (location=" + mgr.location + ")",
                                     std::current_exception());
-                newState->StartFailed(mgr);
+                StartFailed(mgr);
                 throw (std::runtime_error("Bundle " + mgr.symbolicName + " (location= " + mgr.location
                                                                 + ") start failed: " + util::GetLastExceptionStr()));
             }
@@ -168,10 +168,30 @@ namespace cppmicroservices
         }
         catch (cppmicroservices::SecurityException const& ex)
         {
-            newState->StartFailed(mgr);
+            StartFailed(mgr);
             throw;
         }
     }
 
+    void BPIdleState::StartFailed(BundlePrivate& mgr){
+        auto observedState = shared_from_this(); 
+        std::promise<void> transitionAction; 
+        auto fut = transitionAction.get_future();
+        auto newState = std::make_shared<BPResolvedState>(std::move(fut));
+        if(mgr.CompareAndSetState(&observedState, newState)){ 
+            TransitionCompletionGuard completeTransition(transitionAction);
+            mgr.SetStateValue(Bundle::STATE_STOPPING);
+            mgr.coreCtx->listeners.BundleChanged(
+                BundleEvent(BundleEvent::BUNDLE_STOPPING, MakeBundle(mgr.shared_from_this())));
+            mgr.RemoveBundleResources();
+            auto oldBundleContext = mgr.bundleContext.Exchange(std::shared_ptr<BundleContextPrivate>());
+            if (oldBundleContext)
+            {
+                oldBundleContext->Invalidate();
+            }
+            mgr.SetStateValue(Bundle::STATE_RESOLVED);
+            mgr.coreCtx->listeners.BundleChanged({ BundleEvent::BUNDLE_STOPPED, MakeBundle(mgr.shared_from_this()) }); 
+        }
+    }
 
 } 

@@ -225,11 +225,13 @@ namespace cppmicroservices
         /**
          * State of the bundle
          */
-        std::shared_ptr<BundlePrivateState> state;
+        std::shared_ptr<BundlePrivateState> state_object;
+        std::atomic<uint32_t> state_value;
         bool virtual CompareAndSetState(std::shared_ptr<BundlePrivateState>* expectedState,
                                 std::shared_ptr<BundlePrivateState> desiredState);
 
         uint32_t GetState() const;
+        void SetStateValue(Bundle::State newValue);
         std::shared_ptr<BundlePrivateState> GetStateObj() const;
     };
 

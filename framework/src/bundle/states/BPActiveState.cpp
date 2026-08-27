@@ -1,5 +1,5 @@
-#include "BPStoppingState.h"
 #include "BPActiveState.h"
+#include "BPResolvedState.h"
 #include "BundlePrivate.h"
 #include "cppmicroservices/BundleActivator.h"
 #include "CoreBundleContext.h"
@@ -15,16 +15,16 @@ namespace cppmicroservices
         return Bundle::STATE_ACTIVE;
     }
     
-    void BPActiveState::Start(BundlePrivate& mgr, uint32_t options){
+    void BPActiveState::Start(BundlePrivate& mgr, uint32_t){
         auto frameworkBlock = CheckAndBlockFramework(mgr);
         US_UNUSED(frameworkBlock);
-        US_UNUSED(options);
         return;
     }
 
     namespace {
         std::exception_ptr StopActiveBundle(BundlePrivate& mgr){
             std::exception_ptr res;
+            mgr.SetStateValue(Bundle::STATE_STOPPING);
             mgr.coreCtx->listeners.BundleChanged(
                 BundleEvent(BundleEvent::BUNDLE_STOPPING, MakeBundle(mgr.shared_from_this())));
 
@@ -42,6 +42,18 @@ namespace cppmicroservices
                 }
                 mgr.bactivator = nullptr;
             }
+
+            std::shared_ptr<BundleContextPrivate> ctx = mgr.bundleContext.Load();
+            if (ctx)
+            {
+                mgr.coreCtx->listeners.HooksBundleStopped(ctx);
+                mgr.RemoveBundleResources();
+                ctx->Invalidate();
+                mgr.bundleContext.Store(std::shared_ptr<BundleContextPrivate>());
+            }
+            mgr.SetStateValue(Bundle::STATE_RESOLVED);
+            mgr.coreCtx->listeners.BundleChanged({ BundleEvent::BUNDLE_STOPPED, MakeBundle(mgr.shared_from_this()) }); 
+
             return res;
         }
     }
@@ -51,16 +63,14 @@ namespace cppmicroservices
         auto observedState = shared_from_this(); 
         std::promise<void> transitionAction; 
         auto fut = transitionAction.get_future();
-        auto stoppingState = std::make_shared<BPStoppingState>(std::move(fut));
+        auto newState = std::make_shared<BPResolvedState>(std::move(fut));
 
         observedState->WaitForTransitionTask();
-        if (mgr.CompareAndSetState(&observedState, stoppingState)){
+        if (mgr.CompareAndSetState(&observedState, newState)){
             transitionLogger.MarkTransitionAccepted();
             TransitionCompletionGuard completeTransition(transitionAction);
-            SetAutostart(mgr, options);
+            SetAutostart(mgr, options, -1);
             std::exception_ptr res = StopActiveBundle(mgr);
-            completeTransition.Complete();
-            stoppingState->Stop(mgr, options);
             if (res){
                 std::rethrow_exception(res);
             }
@@ -74,10 +84,10 @@ namespace cppmicroservices
         auto observedState = shared_from_this(); 
         std::promise<void> transitionAction; 
         auto fut = transitionAction.get_future();
-        auto stoppingState = std::make_shared<BPStoppingState>(std::move(fut));
+        auto newState = std::make_shared<BPResolvedState>(std::move(fut));
 
         observedState->WaitForTransitionTask();
-        if (mgr.CompareAndSetState(&observedState, stoppingState)){
+        if (mgr.CompareAndSetState(&observedState, newState)){
             transitionLogger.MarkTransitionAccepted();
             TransitionCompletionGuard completeTransition(transitionAction);
             std::exception_ptr res = StopActiveBundle(mgr);
@@ -87,8 +97,7 @@ namespace cppmicroservices
                                                                             std::string(),
                                                                             res));
             }
-            completeTransition.Complete();
-            stoppingState->Uninstall(mgr);
+            newState->Uninstall(mgr);
         }
 
         transitionLogger.SetActualState(observedState);
@@ -98,12 +107,20 @@ namespace cppmicroservices
         auto observedState = shared_from_this(); 
         std::promise<void> transitionAction; 
         auto fut = transitionAction.get_future();
-        auto stoppingState = std::make_shared<BPStoppingState>(std::move(fut));
-        if(mgr.CompareAndSetState(&observedState, stoppingState)){
+        auto newState = std::make_shared<BPResolvedState>(std::move(fut));
+        if(mgr.CompareAndSetState(&observedState, newState)){
             TransitionCompletionGuard completeTransition(transitionAction);
+            mgr.SetStateValue(Bundle::STATE_STOPPING);
             mgr.coreCtx->listeners.BundleChanged(
                 BundleEvent(BundleEvent::BUNDLE_STOPPING, MakeBundle(mgr.shared_from_this())));
-            stoppingState->StartFailed(mgr);
+            mgr.RemoveBundleResources();
+            auto oldBundleContext = mgr.bundleContext.Exchange(std::shared_ptr<BundleContextPrivate>());
+            if (oldBundleContext)
+            {
+                oldBundleContext->Invalidate();
+            }
+            mgr.SetStateValue(Bundle::STATE_RESOLVED);
+            mgr.coreCtx->listeners.BundleChanged({ BundleEvent::BUNDLE_STOPPED, MakeBundle(mgr.shared_from_this()) }); 
         }
         
     }

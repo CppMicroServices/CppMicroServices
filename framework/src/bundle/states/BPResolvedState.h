@@ -15,9 +15,9 @@ namespace cppmicroservices
         BPResolvedState(BPResolvedState&&) = delete;
         BPResolvedState& operator=(BPResolvedState&&) = delete;
         
-        void Start(BundlePrivate& mgr, uint32_t options) override;
-        void Uninstall(BundlePrivate& mgr) override;
-        void Stop(BundlePrivate& mgr, uint32_t options) override;
+        void Start(BundlePrivate&, uint32_t) override;
+        void Uninstall(BundlePrivate&) override;
+        void Stop(BundlePrivate&, uint32_t) override;
 
         uint32_t GetState() override;
 

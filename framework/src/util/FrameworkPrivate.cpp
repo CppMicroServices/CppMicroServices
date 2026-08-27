@@ -29,13 +29,6 @@ limitations under the License.
 #include "BundleContextPrivate.h"
 #include "BundleStorage.h"
 
-#include "states/BPStartingState.h"
-#include "states/BPStoppingState.h"
-#include "states/BPResolvedState.h"
-#include "states/BPInstalledState.h"
-#include "states/BPActiveState.h"
-#include "states/BPUninstalledState.h"
-
 #include <chrono>
 
 namespace cppmicroservices
@@ -69,10 +62,7 @@ namespace cppmicroservices
     void
     FrameworkPrivate::DoInit()
     {
-        auto startingState = std::make_shared<BPStartingState>();
-        auto observedState = GetStateObj();
-        CompareAndSetState(&observedState, startingState);
-        // state = Bundle::STATE_STARTING;
+        SetStateValue(Bundle::STATE_STARTING);
         coreCtx->Init();
     }
 
@@ -280,9 +270,7 @@ namespace cppmicroservices
                 return;
             }
 
-            auto activeState = std::make_shared<BPActiveState>();
-            auto observedState = GetStateObj();
-            CompareAndSetState(&observedState, activeState);
+            SetStateValue(Bundle::STATE_ACTIVE);
         }
 
         coreCtx->listeners.SendFrameworkEvent(
@@ -323,9 +311,7 @@ namespace cppmicroservices
             {
                 auto l = Lock();
                 US_UNUSED(l);
-                auto activeState = std::make_shared<BPStoppingState>();
-                auto observedState = GetStateObj();
-                CompareAndSetState(&observedState, activeState);
+                SetStateValue(Bundle::STATE_STOPPING);
             }
             coreCtx->listeners.BundleChanged(
                 BundleEvent(BundleEvent::BUNDLE_STOPPING, MakeBundle(this->shared_from_this())));
@@ -419,9 +405,7 @@ namespace cppmicroservices
     {
         if (GetState() != Bundle::STATE_INSTALLED)
         {
-            auto resolvedState = std::make_shared<BPResolvedState>();
-            auto observedState = GetStateObj();
-            CompareAndSetState(&observedState, resolvedState);
+            SetStateValue(Bundle::STATE_RESOLVED);
             NotifyAll();
         }
         stopEvent = fe;

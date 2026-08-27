@@ -25,14 +25,14 @@ namespace cppmicroservices
         BundlePrivateState& operator=(BundlePrivateState&&) = delete;
 
 
-        virtual void Start(BundlePrivate& mgr, uint32_t options)=0;
-        virtual void Stop(BundlePrivate& mgr, uint32_t options)=0;
+        virtual void Start(BundlePrivate&, uint32_t)=0;
+        virtual void Stop(BundlePrivate&, uint32_t)=0;
         virtual void Uninstall(BundlePrivate& mgr)=0;
 
         virtual uint32_t GetState()=0;
 
-        void SetAutostart(BundlePrivate& mgr, uint32_t options);
-        std::unique_ptr<FrameworkShutdownBlocker> CheckAndBlockFramework(BundlePrivate& mgr);
+        void SetAutostart(BundlePrivate&, uint32_t, uint32_t);
+        std::unique_ptr<FrameworkShutdownBlocker> CheckAndBlockFramework(BundlePrivate&);
 
         void WaitForTransitionTask();
 

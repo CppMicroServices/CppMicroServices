@@ -48,12 +48,7 @@
 #include "CoreBundleContext.h"
 #include "ServiceReferenceBasePrivate.h"
 
-#include "states/BPStartingState.h"
-#include "states/BPStoppingState.h"
-#include "states/BPResolvedState.h"
 #include "states/BPInstalledState.h"
-#include "states/BPActiveState.h"
-#include "states/BPUninstalledState.h"
 
 #include <algorithm>
 #include <cassert>
@@ -95,7 +90,7 @@ namespace cppmicroservices
     BundlePrivate::CompareAndSetState(std::shared_ptr<BundlePrivateState>* expectedState,
                                                     std::shared_ptr<BundlePrivateState> desiredState)
     {
-        return std::atomic_compare_exchange_strong(&state, expectedState, desiredState);
+        return std::atomic_compare_exchange_strong(&state_object, expectedState, desiredState);
     }
 
     AnyMap const&
@@ -107,14 +102,18 @@ namespace cppmicroservices
     std::shared_ptr<BundlePrivateState>
     BundlePrivate::GetStateObj() const
     {
-        return std::atomic_load(&state);
+        return std::atomic_load(&state_object);
     }
 
     uint32_t BundlePrivate::GetState() const
     {
-        return GetStateObj()->GetState();
+        return state_value.load();
     }
 
+    void BundlePrivate::SetStateValue(Bundle::State newValue)
+    {
+        state_value.store(static_cast<uint32_t>(newValue));
+    }
 
     std::string
     BundlePrivate::GetLocation() const
@@ -132,10 +131,7 @@ namespace cppmicroservices
             ctx->Invalidate();
         }
 
-        auto installedState = std::make_shared<BPInstalledState>();
-        auto observedState = GetStateObj();
-        CompareAndSetState(&observedState, installedState);
-        // state = Bundle::STATE_INSTALLED;
+        SetStateValue(Bundle::STATE_INSTALLED);
 
         if (sendEvent)
         {
@@ -160,7 +156,8 @@ namespace cppmicroservices
         , bundleManifest()
         , lib()
         , SetBundleContext(nullptr)
-        , state(std::make_shared<BPInstalledState>())
+        , state_object(std::make_shared<BPInstalledState>())
+        , state_value(Bundle::STATE_INSTALLED)
     {
     }
 
@@ -180,7 +177,8 @@ namespace cppmicroservices
         , bundleManifest(ba->GetInjectedManifest())
         , lib(location)
         , SetBundleContext(nullptr)
-        , state(std::make_shared<BPInstalledState>())
+        , state_object(std::make_shared<BPInstalledState>())
+        , state_value(Bundle::STATE_INSTALLED)
     {
         // Only take the time to read the manifest out of the BundleArchive file if we don't already have
         // a manifest.

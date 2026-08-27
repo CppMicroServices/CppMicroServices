@@ -21,10 +21,10 @@ namespace cppmicroservices {
     {
     }
 
-    void BundlePrivateState::SetAutostart(BundlePrivate& mgr, uint32_t options){
+    void BundlePrivateState::SetAutostart(BundlePrivate& mgr, uint32_t options, uint32_t autostartValue){
         if ((options & Bundle::START_TRANSIENT) == 0)
         {
-            mgr.SetAutostartSetting(options);
+            mgr.SetAutostartSetting(autostartValue);
         }
     }
 

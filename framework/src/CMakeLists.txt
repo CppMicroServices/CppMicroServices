@@ -65,8 +65,6 @@ set(_srcs
   bundle/states/BPUninstalledState.cpp
   bundle/states/BPInstalledState.cpp
   bundle/states/BPResolvedState.cpp
-  bundle/states/BPStartingState.cpp
-  bundle/states/BPStoppingState.cpp
   bundle/states/BPActiveState.cpp
 )
 

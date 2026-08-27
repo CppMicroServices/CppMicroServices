@@ -15,10 +15,10 @@ namespace cppmicroservices
         BPActiveState(BPActiveState&&) = delete;
         BPActiveState& operator=(BPActiveState&&) = delete;
 
-        void Start(BundlePrivate& mgr, uint32_t options) override;
-        void Stop(BundlePrivate& mgr, uint32_t options) override;
-        void Uninstall(BundlePrivate& mgr) override;
-        void StartFailed(BundlePrivate& mgr);
+        void Start(BundlePrivate&, uint32_t) override;
+        void Stop(BundlePrivate&, uint32_t) override;
+        void Uninstall(BundlePrivate&) override;
+        void StartFailed(BundlePrivate&);
 
         uint32_t GetState() override;
 

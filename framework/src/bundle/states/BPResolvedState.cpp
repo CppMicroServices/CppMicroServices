@@ -1,5 +1,5 @@
 #include "BPResolvedState.h"
-#include "BPStartingState.h"
+#include "BPActiveState.h"
 #include "BPInstalledState.h"
 #include "BundlePrivate.h"
 #include "BundleContextPrivate.h"
@@ -28,16 +28,17 @@ namespace cppmicroservices
         auto observedState = shared_from_this(); 
         std::promise<void> transitionAction; 
         auto fut = transitionAction.get_future();
-        auto startingState = std::make_shared<BPStartingState>(std::move(fut));
+        auto newState = std::make_shared<BPActiveState>(std::move(fut));
 
         observedState->WaitForTransitionTask();
-        if (mgr.CompareAndSetState(&observedState, startingState)){
+        if (mgr.CompareAndSetState(&observedState, newState)){
             transitionLogger.MarkTransitionAccepted();
             TransitionCompletionGuard completeTransition(transitionAction);
 
             auto frameworkBlock = CheckAndBlockFramework(mgr);
-            SetAutostart(mgr, options);
+            SetAutostart(mgr, options, options);
 
+            mgr.SetStateValue(Bundle::STATE_STARTING);
             std::shared_ptr<BundleContextPrivate> null_expected;
             std::shared_ptr<BundleContextPrivate> ctx(new BundleContextPrivate(&mgr));
             mgr.bundleContext.CompareExchange(null_expected, ctx);
@@ -86,12 +87,12 @@ namespace cppmicroservices
                                     thisBundle,
                                     "The bundle validation function threw an exception",
                                     std::current_exception()));
-                    startingState->StartFailed(mgr);
+                    newState->StartFailed(mgr);
                     throw (SecurityException { util::GetLastExceptionStr(), thisBundle });
                 }
 
                 if(failedValidation){
-                    startingState->StartFailed(mgr);
+                    newState->StartFailed(mgr);
                     throw (SecurityException {
                         "Bundle " + mgr.symbolicName + " (location=" + mgr.location + ") failed bundle validation.",
                         thisBundle });
@@ -162,7 +163,7 @@ namespace cppmicroservices
                 }
                 catch (std::system_error const& ex)
                 {
-                    startingState->StartFailed(mgr);
+                    newState->StartFailed(mgr);
                     throw (cppmicroservices::SharedLibraryException(ex.code(), ex.what(), thisBundle));
                 }
                 catch (...)
@@ -170,15 +171,25 @@ namespace cppmicroservices
                     mgr.coreCtx->logger->Log(logservice::SeverityLevel::LOG_INFO,
                                         "Failed to start Bundle " + mgr.symbolicName + " (location=" + mgr.location + ")",
                                         std::current_exception());
-                    startingState->StartFailed(mgr);
+                    newState->StartFailed(mgr);
                     throw (std::runtime_error("Bundle " + mgr.symbolicName + " (location= " + mgr.location
                                                                     + ") start failed: " + util::GetLastExceptionStr()));
                 }
             }
 
-            frameworkBlock.reset();
-            completeTransition.Complete();
-            startingState->Start(mgr, options);
+            try
+            {
+                mgr.SetStateValue(Bundle::STATE_ACTIVE);
+                mgr.coreCtx->listeners.BundleChanged(
+                    BundleEvent(BundleEvent::BUNDLE_STARTED, MakeBundle(mgr.shared_from_this())));
+
+            }
+            catch (cppmicroservices::SecurityException const& ex)
+            {
+                newState->StartFailed(mgr);
+                throw;
+            }
+
         }
 
         transitionLogger.SetActualState(observedState);
@@ -189,13 +200,13 @@ namespace cppmicroservices
         auto observedState = shared_from_this(); 
         std::promise<void> transitionAction; 
         auto fut = transitionAction.get_future();
-        auto resolvedState = std::make_shared<BPResolvedState>(std::move(fut)); 
+        auto newState = std::make_shared<BPResolvedState>(std::move(fut)); 
 
         observedState->WaitForTransitionTask();
-        if (mgr.CompareAndSetState(&observedState, resolvedState)){
+        if (mgr.CompareAndSetState(&observedState, newState)){
             transitionLogger.MarkTransitionAccepted();
             TransitionCompletionGuard completeTransition(transitionAction);
-            SetAutostart(mgr, options);
+            SetAutostart(mgr, options, -1);
         }
         transitionLogger.SetActualState(observedState);
     }
@@ -205,15 +216,14 @@ namespace cppmicroservices
         auto observedState = shared_from_this(); 
         std::promise<void> transitionAction; 
         auto fut = transitionAction.get_future();
-        auto installedState = std::make_shared<BPInstalledState>(std::move(fut));
+        auto newState = std::make_shared<BPInstalledState>(std::move(fut));
 
         observedState->WaitForTransitionTask();
-        if (mgr.CompareAndSetState(&observedState, installedState))
+        if (mgr.CompareAndSetState(&observedState, newState))
         {
             transitionLogger.MarkTransitionAccepted();
             TransitionCompletionGuard completeTransition(transitionAction);
-            completeTransition.Complete();
-            installedState->Uninstall(mgr);
+            newState->Uninstall(mgr);
         }
 
         transitionLogger.SetActualState(observedState);

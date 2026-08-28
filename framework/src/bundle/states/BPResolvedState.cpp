@@ -36,7 +36,7 @@ namespace cppmicroservices
             TransitionCompletionGuard completeTransition(transitionAction);
             auto frameworkBlock = CheckAndBlockFramework(mgr);
             SetAutostart(mgr, options, options);
-            StartFromIdle(mgr, newState);
+            StartFromIdle(mgr);
         }
         else {
             observedState->WaitForTransitionTask();

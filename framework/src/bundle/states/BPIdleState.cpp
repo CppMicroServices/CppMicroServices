@@ -19,7 +19,7 @@
 
 namespace cppmicroservices
 {
-    void BPIdleState::StartFromIdle(BundlePrivate& mgr){
+    void BPIdleState::StartFromIdle(BundlePrivate& mgr, std::shared_ptr<BPActiveState> const& newState){
         mgr.SetStateValue(Bundle::STATE_STARTING);
         std::shared_ptr<BundleContextPrivate> null_expected;
         std::shared_ptr<BundleContextPrivate> ctx(new BundleContextPrivate(&mgr));

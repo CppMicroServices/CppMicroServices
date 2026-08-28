@@ -10,7 +10,7 @@ namespace cppmicroservices
     { 
         public:
         using BundlePrivateState::BundlePrivateState;
-        void StartFromIdle(BundlePrivate&);
+        void StartFromIdle(BundlePrivate&, std::shared_ptr<BPActiveState> const&);
         void StartFailed(BundlePrivate&);
         
     };

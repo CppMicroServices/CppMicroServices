@@ -81,9 +81,7 @@ namespace cppmicroservices
     void
     BundlePrivate::Uninstall()
     {
-        while(GetState() != Bundle::STATE_UNINSTALLED){
-            GetStateObj()->Uninstall(*this);
-        }
+        GetStateObj()->Uninstall(*this);
     }
 
     // TODO: When C++20 is officially supported, replace the atomic shared_ptr

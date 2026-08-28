@@ -85,5 +85,6 @@ namespace cppmicroservices
 
         transitionLogger.SetActualState(observedState);
     }
+
     
 } 

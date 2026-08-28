@@ -75,8 +75,6 @@ namespace cppmicroservices
     private:
         BundlePrivate& mgr;
         std::string transitionName;
-        uint32_t expectedState;
-        uint32_t actualState;
         bool successfulTransition;
         int uncaughtExceptionCount;
     };

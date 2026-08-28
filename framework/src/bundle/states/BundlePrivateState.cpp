@@ -40,13 +40,6 @@ namespace cppmicroservices {
 
     void BundlePrivateState::WaitForTransitionTask()
     {
-        // This check will prevent a thread from waiting on a promise that it's responsible for releasing later
-        // ownerThread is the thread that created the BundlePrivateState object and therefore the one who created the promise
-        if (std::this_thread::get_id() == ownerThread)
-        {
-            return;
-        }
-
         ready.get();
     }
 

@@ -77,6 +77,7 @@ namespace cppmicroservices
         {
             transitionLogger.MarkTransitionAccepted();
             TransitionCompletionGuard completeTransition(transitionAction);
+            completeTransition.Complete();
             newState->Uninstall(mgr);
         }
         else {

@@ -115,6 +115,7 @@ namespace cppmicroservices
                                                                             std::string(),
                                                                             res));
             }
+            completeTransition.Complete();
             newState->Uninstall(mgr);
         }
         else {

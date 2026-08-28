@@ -34,7 +34,7 @@ namespace cppmicroservices
             mgr.SetStateValue(Bundle::STATE_RESOLVED);
             mgr.coreCtx->listeners.BundleChanged(
                 { BundleEvent::BUNDLE_RESOLVED, MakeBundle(mgr.shared_from_this()) });
-            StartFromIdle(mgr);
+            StartFromIdle(mgr, newState);
         }
         else {
             observedState->WaitForTransitionTask();

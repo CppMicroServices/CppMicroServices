@@ -62,7 +62,7 @@ namespace cppmicroservices
     class TransitionLogger
     {
     public:
-        TransitionLogger(BundlePrivate& mgr, std::string transitionName, uint32_t expectedState);
+        TransitionLogger(BundlePrivate& mgr, std::string transitionName);
         ~TransitionLogger();
 
         TransitionLogger(TransitionLogger const&) = delete;
@@ -71,7 +71,6 @@ namespace cppmicroservices
         TransitionLogger& operator=(TransitionLogger&&) = delete;
 
         void MarkTransitionAccepted();
-        void SetActualState(std::shared_ptr<BundlePrivateState> const& state);
 
     private:
         BundlePrivate& mgr;

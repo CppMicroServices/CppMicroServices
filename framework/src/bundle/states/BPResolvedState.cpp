@@ -24,7 +24,7 @@ namespace cppmicroservices
     }
 
     void BPResolvedState::Start(BundlePrivate& mgr, uint32_t options){
-        TransitionLogger transitionLogger(mgr, "Start()", Bundle::STATE_RESOLVED);
+        TransitionLogger transitionLogger(mgr, "Start()");
         auto observedState = shared_from_this(); 
         std::promise<void> transitionAction; 
         auto fut = transitionAction.get_future();
@@ -41,12 +41,10 @@ namespace cppmicroservices
         else {
             observedState->WaitForTransitionTask();
         }        
-
-        transitionLogger.SetActualState(observedState);
     }
 
     void BPResolvedState::Stop(BundlePrivate& mgr, uint32_t options){
-        TransitionLogger transitionLogger(mgr, "Stop()", Bundle::STATE_RESOLVED);
+        TransitionLogger transitionLogger(mgr, "Stop()");
         auto observedState = shared_from_this(); 
         std::promise<void> transitionAction; 
         auto fut = transitionAction.get_future();
@@ -61,12 +59,10 @@ namespace cppmicroservices
         else {
             observedState->WaitForTransitionTask();
         }        
-
-        transitionLogger.SetActualState(observedState);
     }
 
     void BPResolvedState::Uninstall(BundlePrivate& mgr){
-        TransitionLogger transitionLogger(mgr, "Uninstall()", Bundle::STATE_RESOLVED);
+        TransitionLogger transitionLogger(mgr, "Uninstall()");
         auto observedState = shared_from_this(); 
         std::promise<void> transitionAction; 
         auto fut = transitionAction.get_future();
@@ -83,8 +79,6 @@ namespace cppmicroservices
         else {
             observedState->WaitForTransitionTask();
         }        
-
-        transitionLogger.SetActualState(observedState);
     }
 
     

@@ -63,11 +63,9 @@ namespace cppmicroservices {
         }
     }
 
-    TransitionLogger::TransitionLogger(BundlePrivate& mgr, std::string transitionName, uint32_t expectedState)
+    TransitionLogger::TransitionLogger(BundlePrivate& mgr, std::string transitionName)
         : mgr(mgr)
         , transitionName(std::move(transitionName))
-        , expectedState(expectedState)
-        , actualState(expectedState)
         , successfulTransition(false)
         , uncaughtExceptionCount(std::uncaught_exceptions())
     {
@@ -81,10 +79,7 @@ namespace cppmicroservices {
             msg << "Dropped bundle lifecycle transition '" << transitionName
                 << "' because another transition completed first. This can happen when the same bundle is started, stopped, or uninstalled concurrently."
                 << "\nBundle: " << mgr.symbolicName
-                << " (location=" << mgr.location << ")"
-                << "\nExpected state: " << static_cast<Bundle::State>(expectedState)
-                << "; actual state: " << static_cast<Bundle::State>(actualState)
-                << "\n";
+                << " (location=" << mgr.location << ")\n";
 
             mgr.coreCtx->logger->Log(logservice::SeverityLevel::LOG_DEBUG, msg.str());
         }
@@ -94,14 +89,5 @@ namespace cppmicroservices {
     TransitionLogger::MarkTransitionAccepted()
     {
         successfulTransition = true;
-    }
-
-    void
-    TransitionLogger::SetActualState(std::shared_ptr<BundlePrivateState> const& state)
-    {
-        if (state)
-        {
-            actualState = state->GetState();
-        }
     }
 }

@@ -81,6 +81,7 @@ namespace cppmicroservices
     void
     BundlePrivate::Uninstall()
     {
+        GetStateObj()->Uninstall(*this);
         while(GetState() != Bundle::STATE_UNINSTALLED){
             GetStateObj()->Uninstall(*this);
         }

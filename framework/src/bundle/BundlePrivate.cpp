@@ -81,10 +81,11 @@ namespace cppmicroservices
     void
     BundlePrivate::Uninstall()
     {
-        GetStateObj()->Uninstall(*this);
-        while(GetState() != Bundle::STATE_UNINSTALLED){
+        // We want to run Uninstall once even if it's already uninstalled to get the execption
+        do{
             GetStateObj()->Uninstall(*this);
         }
+        while(GetState() != Bundle::STATE_UNINSTALLED);
     }
 
     // TODO: When C++20 is officially supported, replace the atomic shared_ptr

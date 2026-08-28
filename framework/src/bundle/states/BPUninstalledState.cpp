@@ -10,19 +10,18 @@ namespace cppmicroservices
         return Bundle::STATE_UNINSTALLED;
     }
 
-    void BPUninstalledState::Start(BundlePrivate& mgr, uint32_t options){
-        US_UNUSED(options);
-        auto frameworkBlock = CheckAndBlockFramework(mgr);
-        US_UNUSED(frameworkBlock);
+    void BPUninstalledState::Start(BundlePrivate& mgr, uint32_t){
+        shared_from_this()->WaitForTransitionTask();
         throw std::logic_error("Bundle " + mgr.symbolicName + " (location=" + mgr.location + ") is uninstalled");
     }
 
-    void BPUninstalledState::Stop(BundlePrivate& mgr, uint32_t options){
-        US_UNUSED(options);
+    void BPUninstalledState::Stop(BundlePrivate& mgr, uint32_t){
+        shared_from_this()->WaitForTransitionTask();
         throw std::logic_error("Bundle " + mgr.symbolicName + " (location=" + mgr.location + ") is uninstalled");
     }
 
     void BPUninstalledState::Uninstall(BundlePrivate& mgr){
+        shared_from_this()->WaitForTransitionTask();
         throw std::logic_error("Bundle " + mgr.symbolicName + " (location=" + mgr.location
                         + ") is in BUNDLE_UNINSTALLED state");
     }

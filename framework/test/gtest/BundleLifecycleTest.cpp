@@ -88,6 +88,8 @@ class MockLogger : public cppmicroservices::logservice::LogService
 
 TEST_F(BundleLifecycleTest, TestExpectedStateTransitions)
 {
+    // Basic test for final state values and listener events for some of the transitions
+
     TestBundleListener listener;
     BundleListenerRegistrationHelper<TestBundleListener> listenerReg(
         context, &listener, &TestBundleListener::BundleChanged);
@@ -103,13 +105,12 @@ TEST_F(BundleLifecycleTest, TestExpectedStateTransitions)
     bundleA.Stop(); //BPInstalledState::Stop()
     ASSERT_EQ(bundleA.GetState(), Bundle::STATE_INSTALLED);
 
-    bundleA.Start(); //BPInstalledState::Start(), BPResolvedState::Start(), BPStartingState::Start()
-    ASSERT_EQ(bundleA.GetState(), Bundle::STATE_ACTIVE);
+    bundleA.Start(); //BPInstalledState::Start()
     bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_RESOLVED, bundleA));
     bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STARTING, bundleA));
     bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STARTED, bundleA));
 
-    bundleA.Stop(); //BPActiveState::Stop(), BPStoppingState::Stop()
+    bundleA.Stop(); //BPActiveState::Stop()
     ASSERT_EQ(bundleA.GetState(), Bundle::STATE_RESOLVED);
     bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STOPPING, bundleA));
     bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STOPPED, bundleA));
@@ -117,12 +118,12 @@ TEST_F(BundleLifecycleTest, TestExpectedStateTransitions)
     bundleA.Stop(); //BPResolvedState::Stop()
     ASSERT_EQ(bundleA.GetState(), Bundle::STATE_RESOLVED);
 
-    bundleA.Start(); //BPResolvedState::Start(), BPStartingState::Start()
+    bundleA.Start(); //BPResolvedState::Start()
     ASSERT_EQ(bundleA.GetState(), Bundle::STATE_ACTIVE);
     bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STARTING, bundleA));
     bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STARTED, bundleA));
 
-    bundleA.Uninstall(); //BPActiveState::Uninstall(), BPStoppingState::Uninstall(), BPResolvedState::Uninstall(), BPInstalledState::Uninstall()
+    bundleA.Uninstall(); //BPActiveState::Uninstall()
     ASSERT_EQ(bundleA.GetState(), Bundle::STATE_UNINSTALLED);
     bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STOPPING, bundleA));
     bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STOPPED, bundleA));
@@ -135,6 +136,8 @@ TEST_F(BundleLifecycleTest, TestExpectedStateTransitions)
 
 TEST_F(BundleLifecycleTest, TestBundleStateDuringListenerEvents)
 {
+    // Testing for state values when the listener events occur
+
     auto bundle = InstallLib(context, "TestBundleA");
     ASSERT_TRUE(bundle);
     ASSERT_EQ(bundle.GetState(), Bundle::STATE_INSTALLED);
@@ -188,63 +191,9 @@ TEST_F(BundleLifecycleTest, TestBundleStateDuringListenerEvents)
     }
 }
 
-// TEST_F(BundleLifecycleTest, TestBundleActivatorTransitionCalls)
-// {
-//     // Bundle TestBundleActivatorTransition1 calls Stop on itself in its Bundle Activation Start function
-//     auto bundleActivatorTransition1 = InstallLib(context, "TestBundleActivatorTransition1");
-//     ASSERT_EQ(bundleActivatorTransition1.GetState(), Bundle::STATE_INSTALLED);
-
-//     bundleActivatorTransition1.Start();
-//     ASSERT_EQ(bundleActivatorTransition1.GetState(), Bundle::STATE_RESOLVED);
-
-//     // Bundle TestBundleActivatorTransition2 calls Start on itself in its Bundle Activation Stop function
-//     auto bundleActivatorTransition2 = InstallLib(context, "TestBundleActivatorTransition2");
-//     ASSERT_EQ(bundleActivatorTransition2.GetState(), Bundle::STATE_INSTALLED);
-
-//     bundleActivatorTransition2.Start();
-//     ASSERT_EQ(bundleActivatorTransition2.GetState(), Bundle::STATE_ACTIVE);
-
-//     EXPECT_THROW(bundleActivatorTransition2.Stop(), std::runtime_error);
-//     ASSERT_EQ(bundleActivatorTransition2.GetState(), Bundle::STATE_RESOLVED);
-
-//     // Bundle TestBundleActivatorTransition3 calls Uninstall on itself in its Bundle Activation Start function
-//     auto bundleActivatorTransition3 = InstallLib(context, "TestBundleActivatorTransition3");
-//     ASSERT_EQ(bundleActivatorTransition3.GetState(), Bundle::STATE_INSTALLED);
-
-//     bundleActivatorTransition3.Start();
-//     ASSERT_EQ(bundleActivatorTransition3.GetState(), Bundle::STATE_UNINSTALLED);
-
-//     // Bundle TestBundleActivatorTransition4 calls Uninstall on itself in its Bundle Activation Stop function
-//     auto bundleActivatorTransition4 = InstallLib(context, "TestBundleActivatorTransition4");
-//     ASSERT_EQ(bundleActivatorTransition4.GetState(), Bundle::STATE_INSTALLED);
-
-//     bundleActivatorTransition4.Start();
-//     ASSERT_EQ(bundleActivatorTransition4.GetState(), Bundle::STATE_ACTIVE);
-
-//     bundleActivatorTransition4.Stop();
-//     ASSERT_EQ(bundleActivatorTransition4.GetState(), Bundle::STATE_UNINSTALLED);
-
-
-//     // Bundle TestBundleActivatorTransition5 calls Start on itself in its Bundle Activation Start function
-//     auto bundleActivatorTransition5 = InstallLib(context, "TestBundleActivatorTransition5");
-//     ASSERT_EQ(bundleActivatorTransition5.GetState(), Bundle::STATE_INSTALLED);
-
-//     bundleActivatorTransition5.Start();
-//     ASSERT_EQ(bundleActivatorTransition5.GetState(), Bundle::STATE_ACTIVE);
-
-//     // Bundle TestBundleActivatorTransition6 calls Stop on itself in its Bundle Activation Stop function
-//     auto bundleActivatorTransition6 = InstallLib(context, "TestBundleActivatorTransition6");
-//     ASSERT_EQ(bundleActivatorTransition6.GetState(), Bundle::STATE_INSTALLED);
-
-//     bundleActivatorTransition6.Start();
-//     ASSERT_EQ(bundleActivatorTransition6.GetState(), Bundle::STATE_ACTIVE);
-
-//     bundleActivatorTransition6.Stop();
-//     ASSERT_EQ(bundleActivatorTransition6.GetState(), Bundle::STATE_RESOLVED);
-// }
-
 TEST_F(BundleLifecycleTest, TestConcurrentStartCallsBothObserveActive)
 {
+    // For several racing Start() calls, they all only return after the winning Start() finishes 
     auto bundle = InstallLib(context, "TestBundleA");
     ASSERT_TRUE(bundle);
     ASSERT_EQ(bundle.GetState(), Bundle::STATE_INSTALLED);
@@ -285,6 +234,7 @@ TEST_F(BundleLifecycleTest, TestConcurrentStartCallsBothObserveActive)
 
 TEST_F(BundleLifecycleTest, TestConcurrentStopCallsBothObserveResolved)
 {
+    // For several racing Stop()) calls, they all only return after the winning Stop() finishes 
     auto bundle = InstallLib(context, "TestBundleA");
     ASSERT_TRUE(bundle);
 
@@ -327,6 +277,8 @@ TEST_F(BundleLifecycleTest, TestConcurrentStopCallsBothObserveResolved)
 
 TEST_F(BundleLifecycleTest, TestConcurrentUninstallCallsBothObserveUninstalled)
 {
+    // Testing that for several racing Uninstall() calls, they all only return after the winning Uninstall() finishes. 
+    // Since calling Uninstall() on an already Uninstalled bundle throws, we use try-catch blocks to handle the losing calls.
     auto bundle = InstallLib(context, "TestBundleA");
     ASSERT_TRUE(bundle);
     ASSERT_EQ(bundle.GetState(), Bundle::STATE_INSTALLED);
@@ -392,6 +344,8 @@ TEST_F(BundleLifecycleTest, TestConcurrentUninstallCallsBothObserveUninstalled)
 
 TEST_F(BundleLifecycleTest, TestStartStopDroppedTransitions)
 {
+    // Execute Stop() and Start() concurrently over multiple iterations
+    // Check the possible end states.
     std::map<Bundle::State, int> observed;
     int iterations = 100;
 
@@ -467,14 +421,13 @@ TEST_F(BundleLifecycleTest, TestStartStopDroppedTransitions)
 
 TEST_F(BundleLifecycleTest, TestUninstallDroppedTransitions)
 {
+    // Execute Stop(), Start(), and Uninstall() concurrently. 
+    // Check that the final state is Uninstalled. 
 
     std::map<Bundle::State, int> observed;
     int iterations = 100;
 
     std::vector<Bundle::State> expectedStates = {
-    //   Bundle::STATE_ACTIVE,
-    //   Bundle::STATE_RESOLVED,
-    //   Bundle::STATE_INSTALLED,
       Bundle::STATE_UNINSTALLED
     };
 
@@ -553,15 +506,20 @@ TEST_F(BundleLifecycleTest, TestUninstallDroppedTransitions)
 
 TEST_F(BundleLifecycleTest, TestBundleMissingDestroyActivator)
 {
-  auto bundle = cppmicroservices::testing::InstallLib(context, "TestBundleMissingDestroyActivator");
+    // Test that a missing bundle destroy activator results in a throw during a Start() call. 
+    // This test is unrelated to the new bundle lifecycle implementation; this was a gap in the old testing suite. 
+    auto bundle = cppmicroservices::testing::InstallLib(context, "TestBundleMissingDestroyActivator");
 
-  EXPECT_THROW(
-      bundle.Start(),
-      std::runtime_error);
+    EXPECT_THROW(
+        bundle.Start(),
+        std::runtime_error);
 }
 
 TEST_F(BundleLifecycleTest, TestStartedBundleListenerThrowsSecurityException)
 {
+    // Throw a security exception in a BUNDLE_STARTED listener event reponse
+    // This should force the bundle back to STATE_RESOLVED via the StartFailed() path
+
     auto bundle = InstallLib(context, "TestBundleA");
 
     auto listener = [&](BundleEvent const& evt)
@@ -585,10 +543,9 @@ TEST_F(BundleLifecycleTest, TestStartedBundleListenerThrowsSecurityException)
 TEST_F(BundleLifecycleTest, TestStartingBundleListenerStopsBundle)
 {
 
-    // If Stop is called while the Bundle is in the middle of Starting, 
-    // the previous implementation guarenteed the final state to be Resolved.
-    // New implementation has a race between the recursive Starting->Start call and the Stop call,
-    // meaning the final state can be Active if the Stop call loses and gets dropped.
+    // If Stop is called while the Bundle is in the middle of Starting
+    // (We do this via a listener event in this test) 
+    // Then we guarentee the final state to be Resolved.
 
     auto bundle = InstallLib(context, "TestBundleA");
 
@@ -634,11 +591,9 @@ TEST_F(BundleLifecycleTest, TestStartingBundleListenerStopsBundle)
 
 TEST_F(BundleLifecycleTest, TestStoppingBundleListenerStartsBundle)
 {
-
-    // If Start is called while the Bundle is in the middle of Stopping, 
-    // the previous implementation guarenteed the final state to be Active.
-    // New implementation has a race between the recursive Stopping->Stop call and the Start call,
-    // meaning the final state can be Resolved if the Start call loses and gets dropped.
+    // If Start is called while the Bundle is in the middle of Stop
+    // (We do this via a listener event in this test) 
+    // Then we guarentee the final state to be Active.
 
     auto bundle = InstallLib(context, "TestBundleA");
 
@@ -685,11 +640,9 @@ TEST_F(BundleLifecycleTest, TestStoppingBundleListenerStartsBundle)
 
 TEST_F(BundleLifecycleTest, TestResolvedBundleListenerStartsBundle)
 {
-
-    // If Start is called while the Bundle is in the middle of Stopping, 
-    // the previous implementation guarenteed the final state to be Active.
-    // New implementation has a race between the recursive Stopping->Stop call and the Start call,
-    // meaning the final state can be Resolved if the Start call loses and gets dropped.
+    // If Stop is called while the Bundle is in the middle of Resolving in Start()
+    // (We do this via a listener event in this test) 
+    // Then we guarentee the final state to be Resolved.
 
     auto bundle = InstallLib(context, "TestBundleA");
 

@@ -131,6 +131,7 @@ function(usFunctionEmbedResources)
 
     # The host resource compiler may need a specific LD_LIBRARY_PATH to find
     # the correct libstdc++.
+    set(_rc_env_cmd)
     if(US_HOST_LD_LIBRARY_PATH)
       set(_rc_env_cmd ${CMAKE_COMMAND} -E env "LD_LIBRARY_PATH=${US_HOST_LD_LIBRARY_PATH}")
     endif()

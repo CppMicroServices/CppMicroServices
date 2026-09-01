@@ -66,7 +66,6 @@ set(_srcs
   bundle/states/BPInstalledState.cpp
   bundle/states/BPResolvedState.cpp
   bundle/states/BPActiveState.cpp
-  bundle/states/BPIdleState.cpp
 )
 
 if(NOT US_USE_SYSTEM_MINIZ)

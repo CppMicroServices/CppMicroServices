@@ -1,14 +1,14 @@
 #ifndef BPResolvedState_h
 #define BPResolvedState_h
 
-#include "BPIdleState.h"
+#include "BundlePrivateState.h"
 
 namespace cppmicroservices
 {
-    class BPResolvedState final : public BPIdleState
+    class BPResolvedState final : public BundlePrivateState
     { 
         public:
-        using BPIdleState::BPIdleState;
+        using BundlePrivateState::BundlePrivateState;
         ~BPResolvedState() override = default;
         BPResolvedState(BPResolvedState const&) = delete;
         BPResolvedState& operator=(BPResolvedState const&) = delete;

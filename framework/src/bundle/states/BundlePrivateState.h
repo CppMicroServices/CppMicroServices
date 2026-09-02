@@ -30,8 +30,6 @@ namespace cppmicroservices
         virtual void Stop(BundlePrivate&, uint32_t)=0;
         virtual void Uninstall(BundlePrivate& mgr)=0;
 
-        virtual uint32_t GetState()=0;
-
         void SetAutostart(BundlePrivate&, uint32_t, uint32_t);
         std::unique_ptr<FrameworkShutdownBlocker> CheckAndBlockFramework(BundlePrivate&);
         void StartFromIdle(BundlePrivate&, std::shared_ptr<BPActiveState> const&);

@@ -19,9 +19,6 @@ namespace cppmicroservices
         void Stop(BundlePrivate&, uint32_t) override;
         void Uninstall(BundlePrivate&) override;
         void StartFailed(BundlePrivate&);
-
-        uint32_t GetState() override;
-
     };
 } 
 

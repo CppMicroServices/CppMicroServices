@@ -18,11 +18,6 @@
 
 namespace cppmicroservices
 {
-
-    uint32_t BPResolvedState::GetState(){
-        return Bundle::STATE_RESOLVED;
-    }
-
     void BPResolvedState::Start(BundlePrivate& mgr, uint32_t options){
         TransitionLogger transitionLogger(mgr, "Start()");
         auto observedState = shared_from_this(); 

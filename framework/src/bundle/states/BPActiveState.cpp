@@ -11,12 +11,7 @@
 
 namespace cppmicroservices
 {
-    uint32_t BPActiveState::GetState(){
-        return Bundle::STATE_ACTIVE;
-    }
-    
     void BPActiveState::Start(BundlePrivate& mgr, uint32_t){
-
         TransitionLogger transitionLogger(mgr, "Start()");
         auto observedState = shared_from_this(); 
         std::promise<void> transitionAction; 

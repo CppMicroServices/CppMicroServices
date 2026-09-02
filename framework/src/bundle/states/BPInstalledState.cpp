@@ -11,11 +11,6 @@
 
 namespace cppmicroservices
 {
-
-    uint32_t BPInstalledState::GetState(){
-        return Bundle::STATE_INSTALLED;
-    }
-
     void BPInstalledState::Start(BundlePrivate& mgr, uint32_t options)
     {
         TransitionLogger transitionLogger(mgr, "Start()");

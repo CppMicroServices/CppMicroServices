@@ -262,6 +262,28 @@ TEST(AnyTest, NonStringMapKeyIsQuotedInCPP)
     EXPECT_EQ(anyMap.ToCPP(), R"(AnyMap { ORDERED_MAP, {{"1" , 0.3}, {"3" , std::string("bonjour")}}})");
 }
 
+TEST(AnyTest, NonStringKeyMapsSerializeViaFreeFunctions)
+{
+    std::map<int32_t, Any> mapAny = {{1, 0.3}};
+    std::map<int32_t, int32_t> mapPlain = {{2, 4}};
+
+    std::ostringstream jsonAny;
+    any_value_to_json(jsonAny, mapAny, 0, 0);
+    EXPECT_EQ(jsonAny.str(), R"({"1" : 0.3})");
+
+    std::ostringstream jsonPlain;
+    any_value_to_json(jsonPlain, mapPlain, 0, 0);
+    EXPECT_EQ(jsonPlain.str(), R"({"2" : 4})");
+
+    std::ostringstream cppAny;
+    any_value_to_cpp(cppAny, mapAny, 0, 0);
+    EXPECT_EQ(cppAny.str(), R"(AnyMap { ORDERED_MAP, {{"1" , 0.3}}})");
+
+    std::ostringstream cppPlain;
+    any_value_to_cpp(cppPlain, mapPlain, 0, 0);
+    EXPECT_EQ(cppPlain.str(), R"(AnyMap { ORDERED_MAP, {{"2" , 4}}})");
+}
+
 TEST(AnyTest, AnyStringEscapeCharacters)
 {
     Any anyString = std::string("\"\\\b\f\n\r\t\x1f");

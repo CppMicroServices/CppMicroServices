@@ -1114,7 +1114,14 @@ namespace cppmicroservices
             }
             newline_and_indent(os, increment, indent);
             os << "{";
-            any_value_to_json(os, i1->first, 0, 0);
+            if constexpr (std::is_same_v<K, std::string>)
+            {
+                any_value_to_json(os, i1->first, 0, 0);
+            }
+            else
+            {
+                os << "\"" << i1->first << "\"";
+            }
             os << " , " << i1->second.ToCPP(increment, indent + increment) << "}";
         }
         newline_and_indent(os, increment, indent - increment);
@@ -1145,7 +1152,14 @@ namespace cppmicroservices
             }
             newline_and_indent(os, increment, indent);
             os << "{";
-            any_value_to_json(os, i1->first, 0, 0);
+            if constexpr (std::is_same_v<K, std::string>)
+            {
+                any_value_to_json(os, i1->first, 0, 0);
+            }
+            else
+            {
+                os << "\"" << i1->first << "\"";
+            }
             os << " , " << i1->second << "}";
         }
         newline_and_indent(os, increment, (std::max)(0, indent - increment));

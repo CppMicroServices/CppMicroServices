@@ -252,6 +252,16 @@ TEST(AnyTest, MapKeyWithQuoteIsEscapedInCPP)
     EXPECT_EQ(anyMap.ToCPP(), "AnyMap { ORDERED_MAP, {{\"key\\\"quote\" , 1}}}");
 }
 
+TEST(AnyTest, NonStringMapKeyIsQuotedInCPP)
+{
+    std::map<int32_t, Any> map = {
+        {1, 0.3},
+        {3, std::string("bonjour")}
+    };
+    Any anyMap = map;
+    EXPECT_EQ(anyMap.ToCPP(), "AnyMap { ORDERED_MAP, {{\"1\" , 0.3}, {\"3\" , std::string(\"bonjour\")}}}");
+}
+
 TEST(AnyTest, AnyStringEscapeCharacters)
 {
     Any anyString = std::string("\"\\\b\f\n\r\t\x1f");

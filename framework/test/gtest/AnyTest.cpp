@@ -216,10 +216,62 @@ TEST(AnyTest, AnyMapAny)
     EXPECT_EQ(anyMap.ToJSON(), "{\"1\" : 0.3, \"3\" : \"bonjour\"}");
 }
 
+TEST(AnyTest, MapKeyWithQuoteIsEscapedInJSON)
+{
+    std::map<std::string, Any> map = {
+        {std::string("key\"quote"), 1}
+    };
+    Any anyMap = map;
+    EXPECT_EQ(anyMap.ToJSON(), "{\"key\\\"quote\" : 1}");
+}
+
+TEST(AnyTest, MapKeyWithBackslashIsEscapedInJSON)
+{
+    std::map<std::string, Any> map = {
+        {std::string("key\\slash"), 1}
+    };
+    Any anyMap = map;
+    EXPECT_EQ(anyMap.ToJSON(), "{\"key\\\\slash\" : 1}");
+}
+
+TEST(AnyTest, MapKeyWithControlCharIsEscapedInJSON)
+{
+    std::map<std::string, Any> map = {
+        {std::string("key\nline"), 1}
+    };
+    Any anyMap = map;
+    EXPECT_EQ(anyMap.ToJSON(), "{\"key\\nline\" : 1}");
+}
+
+TEST(AnyTest, MapKeyWithQuoteIsEscapedInCPP)
+{
+    std::map<std::string, Any> map = {
+        {std::string("key\"quote"), 1}
+    };
+    Any anyMap = map;
+    EXPECT_EQ(anyMap.ToCPP(), "AnyMap { ORDERED_MAP, {{\"key\\\"quote\" , 1}}}");
+}
+
 TEST(AnyTest, AnyStringEscapeCharacters)
 {
     Any anyString = std::string("\"\\\b\f\n\r\t\x1f");
     EXPECT_EQ(anyString.ToJSON(), "\"\\\"\\\\\\b\\f\\n\\r\\t\\u001f\"");
+}
+
+TEST(AnyTest, ControlCharInStringDoesNotCorruptSubsequentInteger)
+{
+    std::ostringstream os;
+    any_value_to_json(os, std::string("hello\x01world"), 0, 0);
+    os << 42;
+    EXPECT_EQ(os.str(), "\"hello\\u0001world\"42");
+}
+
+TEST(AnyTest, ControlCharInStringDoesNotCorruptSubsequentIntegerCPP)
+{
+    std::ostringstream os;
+    any_value_to_cpp(os, std::string("hello\x01world"), 0, 0);
+    os << 42;
+    EXPECT_EQ(os.str(), "std::string(\"hello\\u0001world\")42");
 }
 
 TEST(AnyTest, AnyToJSONWithFormatting)

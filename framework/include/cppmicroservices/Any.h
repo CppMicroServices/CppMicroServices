@@ -1039,7 +1039,15 @@ namespace cppmicroservices
                 os << ", ";
             }
             newline_and_indent(os, increment, indent);
-            os << "\"" << i1->first << "\" : " << i1->second.ToJSON(increment, indent + increment);
+            if constexpr (std::is_same_v<K, std::string>)
+            {
+                any_value_to_json(os, i1->first, 0, 0);
+            }
+            else
+            {
+                os << "\"" << i1->first << "\"";
+            }
+            os << " : " << i1->second.ToJSON(increment, indent + increment);
         }
         newline_and_indent(os, increment, indent - increment);
         os << "}";
@@ -1068,7 +1076,15 @@ namespace cppmicroservices
                 os << ", ";
             }
             newline_and_indent(os, increment, indent);
-            os << "\"" << i1->first << "\" : " << i1->second;
+            if constexpr (std::is_same_v<K, std::string>)
+            {
+                any_value_to_json(os, i1->first, 0, 0);
+            }
+            else
+            {
+                os << "\"" << i1->first << "\"";
+            }
+            os << " : " << i1->second;
         }
         newline_and_indent(os, increment, (std::max)(0, indent - increment));
         os << "}";
@@ -1097,7 +1113,9 @@ namespace cppmicroservices
                 os << ", ";
             }
             newline_and_indent(os, increment, indent);
-            os << "{\"" << i1->first << "\" , " << i1->second.ToCPP(increment, indent + increment) << "}";
+            os << "{";
+            any_value_to_json(os, i1->first, 0, 0);
+            os << " , " << i1->second.ToCPP(increment, indent + increment) << "}";
         }
         newline_and_indent(os, increment, indent - increment);
         os << "}}";
@@ -1126,7 +1144,9 @@ namespace cppmicroservices
                 os << ", ";
             }
             newline_and_indent(os, increment, indent);
-            os << "{\"" << i1->first << "\" , " << i1->second << "}";
+            os << "{";
+            any_value_to_json(os, i1->first, 0, 0);
+            os << " , " << i1->second << "}";
         }
         newline_and_indent(os, increment, (std::max)(0, indent - increment));
         os << "}}";

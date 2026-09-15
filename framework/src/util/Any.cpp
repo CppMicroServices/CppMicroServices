@@ -116,7 +116,11 @@ namespace cppmicroservices
 #endif
                     if ('\x00' <= *c && *c <= '\x1f')
                     {
+                        auto const oldFlags = o.flags();
+                        auto const oldFill = o.fill();
                         o << "\\u" << std::hex << std::setw(4) << std::setfill('0') << static_cast<int>(*c);
+                        o.flags(oldFlags);
+                        o.fill(oldFill);
                     }
                     else
                     {
@@ -202,7 +206,11 @@ namespace cppmicroservices
 #endif
                     if ('\x00' <= *c && *c <= '\x1f')
                     {
+                        auto const oldFlags = o.flags();
+                        auto const oldFill = o.fill();
                         o << "\\u" << std::hex << std::setw(4) << std::setfill('0') << static_cast<int>(*c);
+                        o.flags(oldFlags);
+                        o.fill(oldFill);
                     }
                     else
                     {

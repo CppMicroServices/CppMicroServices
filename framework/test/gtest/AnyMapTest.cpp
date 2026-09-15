@@ -632,3 +632,17 @@ TEST(AnyMapTest, doublePrecision)
     ASSERT_NE(jsonOutput.find("1.12345678"), std::string::npos)
         << "JSON output did not preserve double precision: " << jsonOutput;
 }
+
+TEST(AnyMapTest, AnyMapKeyWithSpecialCharsIsEscaped)
+{
+    AnyMap map(AnyMap::ORDERED_MAP);
+    map["key\"quote"] = Any(1);
+
+    std::ostringstream jsonStream;
+    any_value_to_json(jsonStream, map);
+    EXPECT_EQ(jsonStream.str(), R"({"key\"quote" : 1})");
+
+    std::ostringstream cppStream;
+    any_value_to_cpp(cppStream, map);
+    EXPECT_EQ(cppStream.str(), R"(AnyMap { ORDERED_MAP, {{"key\"quote" , 1}}})");
+}

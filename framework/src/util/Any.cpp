@@ -21,6 +21,7 @@
 =============================================================================*/
 
 #include "cppmicroservices/Any.h"
+#include "cppmicroservices/detail/ScopeGuard.h"
 #include "Utils.h"
 
 #include <iomanip>
@@ -118,9 +119,8 @@ namespace cppmicroservices
                     {
                         auto const oldFlags = o.flags();
                         auto const oldFill = o.fill();
+                        detail::ScopeGuard restoreStream([&] { o.flags(oldFlags); o.fill(oldFill); });
                         o << "\\u" << std::hex << std::setw(4) << std::setfill('0') << static_cast<int>(*c);
-                        o.flags(oldFlags);
-                        o.fill(oldFill);
                     }
                     else
                     {
@@ -208,9 +208,8 @@ namespace cppmicroservices
                     {
                         auto const oldFlags = o.flags();
                         auto const oldFill = o.fill();
+                        detail::ScopeGuard restoreStream([&] { o.flags(oldFlags); o.fill(oldFill); });
                         o << "\\u" << std::hex << std::setw(4) << std::setfill('0') << static_cast<int>(*c);
-                        o.flags(oldFlags);
-                        o.fill(oldFill);
                     }
                     else
                     {

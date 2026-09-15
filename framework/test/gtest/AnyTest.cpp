@@ -222,7 +222,7 @@ TEST(AnyTest, MapKeyWithQuoteIsEscapedInJSON)
         {std::string("key\"quote"), 1}
     };
     Any anyMap = map;
-    EXPECT_EQ(anyMap.ToJSON(), "{\"key\\\"quote\" : 1}");
+    EXPECT_EQ(anyMap.ToJSON(), R"({"key\"quote" : 1})");
 }
 
 TEST(AnyTest, MapKeyWithBackslashIsEscapedInJSON)
@@ -231,7 +231,7 @@ TEST(AnyTest, MapKeyWithBackslashIsEscapedInJSON)
         {std::string("key\\slash"), 1}
     };
     Any anyMap = map;
-    EXPECT_EQ(anyMap.ToJSON(), "{\"key\\\\slash\" : 1}");
+    EXPECT_EQ(anyMap.ToJSON(), R"({"key\\slash" : 1})");
 }
 
 TEST(AnyTest, MapKeyWithControlCharIsEscapedInJSON)
@@ -240,7 +240,7 @@ TEST(AnyTest, MapKeyWithControlCharIsEscapedInJSON)
         {std::string("key\nline"), 1}
     };
     Any anyMap = map;
-    EXPECT_EQ(anyMap.ToJSON(), "{\"key\\nline\" : 1}");
+    EXPECT_EQ(anyMap.ToJSON(), R"({"key\nline" : 1})");
 }
 
 TEST(AnyTest, MapKeyWithQuoteIsEscapedInCPP)
@@ -249,7 +249,7 @@ TEST(AnyTest, MapKeyWithQuoteIsEscapedInCPP)
         {std::string("key\"quote"), 1}
     };
     Any anyMap = map;
-    EXPECT_EQ(anyMap.ToCPP(), "AnyMap { ORDERED_MAP, {{\"key\\\"quote\" , 1}}}");
+    EXPECT_EQ(anyMap.ToCPP(), R"(AnyMap { ORDERED_MAP, {{"key\"quote" , 1}}})");
 }
 
 TEST(AnyTest, NonStringMapKeyIsQuotedInCPP)
@@ -259,7 +259,7 @@ TEST(AnyTest, NonStringMapKeyIsQuotedInCPP)
         {3, std::string("bonjour")}
     };
     Any anyMap = map;
-    EXPECT_EQ(anyMap.ToCPP(), "AnyMap { ORDERED_MAP, {{\"1\" , 0.3}, {\"3\" , std::string(\"bonjour\")}}}");
+    EXPECT_EQ(anyMap.ToCPP(), R"(AnyMap { ORDERED_MAP, {{"1" , 0.3}, {"3" , std::string("bonjour")}}})");
 }
 
 TEST(AnyTest, AnyStringEscapeCharacters)
@@ -270,18 +270,20 @@ TEST(AnyTest, AnyStringEscapeCharacters)
 
 TEST(AnyTest, ControlCharInStringDoesNotCorruptSubsequentInteger)
 {
+    constexpr int kDecimalProbe = 42;
     std::ostringstream os;
     any_value_to_json(os, std::string("hello\x01world"), 0, 0);
-    os << 42;
-    EXPECT_EQ(os.str(), "\"hello\\u0001world\"42");
+    os << kDecimalProbe;
+    EXPECT_EQ(os.str(), R"("hello\u0001world"42)");
 }
 
 TEST(AnyTest, ControlCharInStringDoesNotCorruptSubsequentIntegerCPP)
 {
+    constexpr int kDecimalProbe = 42;
     std::ostringstream os;
     any_value_to_cpp(os, std::string("hello\x01world"), 0, 0);
-    os << 42;
-    EXPECT_EQ(os.str(), "std::string(\"hello\\u0001world\")42");
+    os << kDecimalProbe;
+    EXPECT_EQ(os.str(), R"(std::string("hello\u0001world")42)");
 }
 
 TEST(AnyTest, AnyToJSONWithFormatting)

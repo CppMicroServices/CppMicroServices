@@ -640,9 +640,9 @@ TEST(AnyMapTest, AnyMapKeyWithSpecialCharsIsEscaped)
 
     std::ostringstream jsonStream;
     any_value_to_json(jsonStream, map);
-    EXPECT_EQ(jsonStream.str(), R"({"key\"quote" : 1})");
+    EXPECT_EQ(jsonStream.str(), R"esc({"key\"quote" : 1})esc");
 
     std::ostringstream cppStream;
     any_value_to_cpp(cppStream, map);
-    EXPECT_EQ(cppStream.str(), R"(AnyMap { ORDERED_MAP, {{"key\"quote" , 1}}})");
+    EXPECT_EQ(cppStream.str(), R"esc(AnyMap { ORDERED_MAP, {{"key\"quote" , 1}}})esc");
 }

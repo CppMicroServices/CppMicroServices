@@ -222,7 +222,7 @@ TEST(AnyTest, MapKeyWithQuoteIsEscapedInJSON)
         {std::string("key\"quote"), 1}
     };
     Any anyMap = map;
-    EXPECT_EQ(anyMap.ToJSON(), R"({"key\"quote" : 1})");
+    EXPECT_EQ(anyMap.ToJSON(), R"esc({"key\"quote" : 1})esc");
 }
 
 TEST(AnyTest, MapKeyWithBackslashIsEscapedInJSON)
@@ -249,7 +249,7 @@ TEST(AnyTest, MapKeyWithQuoteIsEscapedInCPP)
         {std::string("key\"quote"), 1}
     };
     Any anyMap = map;
-    EXPECT_EQ(anyMap.ToCPP(), R"(AnyMap { ORDERED_MAP, {{"key\"quote" , 1}}})");
+    EXPECT_EQ(anyMap.ToCPP(), R"esc(AnyMap { ORDERED_MAP, {{"key\"quote" , 1}}})esc");
 }
 
 TEST(AnyTest, NonStringMapKeyIsQuotedInCPP)

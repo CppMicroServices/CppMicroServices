@@ -184,9 +184,10 @@ namespace cppmicroservices
             {
                 // Make sure that we don't crash if the shared_ptr service object outlives
                 // the BundlePrivate or CoreBundleContext objects.
-                if (!b.expired())
+                auto bPrivateShared = b.lock();
+                if (bPrivateShared)
                 {
-                    DIAG_LOG(*b.lock()->coreCtx->sink)
+                    DIAG_LOG(*(bPrivateShared->coreCtx->sink))
                         << "UngetService threw an exception. " << util::GetLastExceptionStr();
                 }
                 // don't throw exceptions from the destructor. For an explanation, see:
@@ -234,7 +235,10 @@ namespace cppmicroservices
     class CustomServiceDeleter
     {
       public:
-        CustomServiceDeleter(ServiceHolder<void>* sh) : sHolder(sh) {}
+        CustomServiceDeleter(ServiceHolder<void>* sh)
+            : sHolder(sh)
+        {
+        }
 
         void
         operator()(ServiceHolder<void>* sh)

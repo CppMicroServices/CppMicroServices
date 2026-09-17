@@ -28,11 +28,12 @@
 #else
 #    define FRIEND_TEST(x, y)
 #endif
-#include "SingleInvokeTask.hpp"
 #include "ComponentManager.hpp"
 #include "ConfigurationNotifier.hpp"
+#include "SingleInvokeTask.hpp"
 #include "states/CMEnabledState.hpp"
 
+#include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/asyncworkservice/AsyncWorkService.hpp"
 #include "cppmicroservices/logservice/LogService.hpp"
@@ -124,11 +125,13 @@ namespace cppmicroservices
 
             /**
              * This method returns the {@link Bundle} which contains the component managed by this object.
+             * Returns the Bundle captured at construction time, so that identity (id, symbolicName)
+             * remains accessible even after the bundle has been stopped or uninstalled.
              */
             Bundle
             GetBundle() const
             {
-                return bundleContext ? bundleContext.GetBundle() : Bundle();
+                return bundle_;
             }
 
             /**
@@ -222,6 +225,7 @@ namespace cppmicroservices
                 registry; ///< component registry associated with the current runtime
             std::shared_ptr<metadata::ComponentMetadata const> const compDesc; ///< the component description
             cppmicroservices::BundleContext bundleContext; ///< context of the bundle which contains the component
+            cppmicroservices::Bundle bundle_; ///< bundle captured at construction, retains persistent identity
             std::shared_ptr<cppmicroservices::logservice::LogService> const
                 logger;                                   ///< logger associated with the current runtime
             std::shared_ptr<ComponentManagerState> state; ///< This member is always accessed using atomic operations

@@ -100,11 +100,18 @@ namespace cppmicroservices
     BundleResourceContainer::GetStat(BundleResourceContainer::Stat& stat)
     {
         OpenAndInitializeContainer();
+        {
+            static std::mutex logMtx;
+            std::lock_guard<std::mutex> lg(logMtx);
+            std::cerr << "GetStat(path) this=" << this << " mutex=" << &m_ZipFileStreamMutex
+                      << " archive=" << &m_ZipArchive << std::endl;
+        }
+        std::unique_lock<std::mutex> l(m_ZipFileStreamMutex);
         int fileIndex
             = mz_zip_reader_locate_file(const_cast<mz_zip_archive*>(&m_ZipArchive), stat.filePath.c_str(), nullptr, 0);
         if (fileIndex >= 0)
         {
-            return GetStat(fileIndex, stat);
+            return GetStatLocked(fileIndex, stat);
         }
         return false;
     }
@@ -113,6 +120,19 @@ namespace cppmicroservices
     BundleResourceContainer::GetStat(int index, BundleResourceContainer::Stat& stat)
     {
         OpenAndInitializeContainer();
+        {
+            static std::mutex logMtx;
+            std::lock_guard<std::mutex> lg(logMtx);
+            std::cerr << "GetStat(index) this=" << this << " mutex=" << &m_ZipFileStreamMutex
+                      << " archive=" << &m_ZipArchive << std::endl;
+        }
+        std::unique_lock<std::mutex> l(m_ZipFileStreamMutex);
+        return GetStatLocked(index, stat);
+    }
+
+    bool
+    BundleResourceContainer::GetStatLocked(int index, BundleResourceContainer::Stat& stat)
+    {
         if (index >= 0)
         {
             mz_zip_archive_file_stat zipStat;
@@ -142,6 +162,12 @@ namespace cppmicroservices
     BundleResourceContainer::GetData(int index)
     {
         OpenAndInitializeContainer();
+        {
+            static std::mutex logMtx;
+            std::lock_guard<std::mutex> lg(logMtx);
+            std::cerr << "GetData this=" << this << " mutex=" << &m_ZipFileStreamMutex << " archive=" << &m_ZipArchive
+                      << std::endl;
+        }
         std::unique_lock<std::mutex> l(m_ZipFileStreamMutex);
         void* data = mz_zip_reader_extract_to_heap(const_cast<mz_zip_archive*>(&m_ZipArchive), index, nullptr, 0);
         return { data, ::free };

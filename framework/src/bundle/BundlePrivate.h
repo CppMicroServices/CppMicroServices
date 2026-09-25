@@ -29,6 +29,7 @@
 #include "cppmicroservices/SharedLibrary.h"
 #include "cppmicroservices/detail/Threads.h"
 #include "cppmicroservices/detail/WaitCondition.h"
+#include "states/BundlePrivateState.h"
 
 #include "BundleArchive.h"
 #include "BundleManifest.h"
@@ -92,24 +93,6 @@ namespace cppmicroservices
 
         virtual void Stop(uint32_t);
 
-        std::exception_ptr Stop0();
-
-        /**
-         * Stop code that is executed without holding the packages
-         * lock.
-         */
-        std::exception_ptr Stop1();
-
-        void Stop2();
-
-        /**
-         * Get updated bundle state. That means check if an installed bundle has been
-         * resolved.
-         *
-         * @return Bundles state
-         */
-        Bundle::State GetUpdatedState();
-
         /**
          * Set state to BUNDLE_INSTALLED.
          * We assume that the bundle is resolved when entering this method.
@@ -153,13 +136,6 @@ namespace cppmicroservices
 
         virtual AnyMap const& GetHeaders() const;
 
-        /**
-         * Start code that is executed without holding the
-         * packages lock.
-         */
-        std::exception_ptr Start0();
-
-        void StartFailed();
 
         /**
          * Framework context.
@@ -175,13 +151,6 @@ namespace cppmicroservices
          * Bundle location identifier.
          */
         const std::string location;
-
-        /**
-         * State of the bundle
-         */
-        // GCC 4.6 atomics do not support custom trivially copyable types
-        // like enums yet, so we use the underlying primitive type here.
-        std::atomic<uint32_t> state;
 
         /**
          * Bundle archive containing persistent data.
@@ -219,27 +188,9 @@ namespace cppmicroservices
          * Type of operation in progress. Blocks bundle calls during activator and
          * listener calls
          */
-        // GCC 4.6 atomics do not support custom trivially copyable types
-        // like enums yet, so we use the underlying primitive type here.
-        std::atomic<uint8_t> operation;
 
         /** Saved exception of resolve failure. */
         std::exception_ptr resolveFailException;
-
-        /** Remember if bundle was started */
-        bool wasStarted;
-
-        enum class Aborted : uint8_t
-        {
-            NONE,
-            YES,
-            NO
-        };
-
-        /** start/stop time-out/uninstall flag */
-        // GCC 4.6 atomics do not support custom trivially copyable types
-        // like enums yet, so we use the underlying primitive type here.
-        std::atomic<uint8_t> aborted;
 
         /**
          * Bundle symbolic name.
@@ -270,6 +221,18 @@ namespace cppmicroservices
         SharedLibrary lib;
 
         SetBundleContextFn SetBundleContext;
+        
+        /**
+         * State of the bundle
+         */
+        std::shared_ptr<BundlePrivateState> state_object;
+        std::atomic<uint32_t> state_value;
+        bool virtual CompareAndSetState(std::shared_ptr<BundlePrivateState>* expectedState,
+                                std::shared_ptr<BundlePrivateState> desiredState);
+
+        uint32_t GetState() const;
+        void SetStateValue(Bundle::State newValue);
+        std::shared_ptr<BundlePrivateState> GetStateObj() const;
     };
 
     Bundle MakeBundle(std::shared_ptr<BundlePrivate> const& d);

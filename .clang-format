@@ -14,8 +14,8 @@ AlignConsecutiveMacros:
 AlignEscapedNewlines: Left
 AllowAllArgumentsOnNextLine: false
 AllowAllParametersOfDeclarationOnNextLine: false
-AllowShortBlocksOnASingleLine: Always
-AllowShortFunctionsOnASingleLine: All
+AllowShortBlocksOnASingleLine: Never
+AllowShortFunctionsOnASingleLine: None
 AlwaysBreakAfterReturnType: AllDefinitions
 AlwaysBreakTemplateDeclarations: Yes
 BinPackArguments: false
@@ -35,7 +35,7 @@ IndentGotoLabels: false
 IndentPPDirectives: AfterHash
 InsertBraces: true
 NamespaceIndentation: All
-PackConstructorInitializers: CurrentLine
+PackConstructorInitializers: Never
 PointerAlignment: Left
 QualifierAlignment: Right
 ReferenceAlignment: Left

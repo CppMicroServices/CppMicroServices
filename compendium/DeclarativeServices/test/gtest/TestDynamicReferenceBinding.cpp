@@ -473,3 +473,50 @@ TEST(DynamicReferenceBinding, DynamicRefBindsDeclaredInterfaceOfMultiInterfaceSe
     framework.Stop();
     framework.WaitForStop(std::chrono::milliseconds::zero());
 }
+
+// ============================================================
+// Regression test for the same defect on the UNBIND path.
+//
+// Unlike the bind path (now fixed), ComponentContextImpl::LocateService(refName,
+// ServiceReferenceBase const&) still passes an empty interface id to the
+// interface-map lookup, which falls back to begin()->second. This overload is
+// invoked in production by SingletonComponentConfigurationImpl::UnbindReference
+// (and the BundleOrPrototype equivalent): the pointer it returns is handed to
+// InvokeUnbindMethod -> the component's Unbind callback.
+//
+// The consumer stores the shared_ptr it received at bind time (the correct
+// MultiInterfaceA sub-object) and, on unbind, erases by shared_ptr identity.
+// When unbind delivers the begin()->second sub-object (MultiInterfaceB) instead,
+// the pointers compare unequal, the erase removes nothing, and the bound service
+// is never released -- BoundCount stays at 1 after the provider is removed.
+TEST(DynamicReferenceBinding, DynamicRefUnbindsDeclaredInterfaceOfMultiInterfaceService)
+{
+    auto framework = cppmicroservices::FrameworkFactory().NewFramework();
+    framework.Start();
+    auto bc = framework.GetBundleContext();
+
+    test::InstallAndStartDS(bc);
+
+    auto consumerBundle = test::InstallAndStartBundle(bc, "TestBundleDSMIConsumer");
+    ASSERT_TRUE(consumerBundle);
+
+    auto probeRef = bc.GetServiceReference<test::MultiInterfaceProbe>();
+    ASSERT_TRUE(probeRef);
+    auto probe = bc.GetService<test::MultiInterfaceProbe>(probeRef);
+    ASSERT_TRUE(probe);
+
+    auto providerBundle = test::InstallAndStartBundle(bc, "TestBundleDSMIProvider");
+    ASSERT_TRUE(providerBundle);
+    ASSERT_EQ(probe->BoundCount(), 1u) << "Setup failed: provider should be bound once.";
+
+    // Removing the provider deactivates its component, unregisters its service and
+    // drives the consumer's dynamic reference through UnbindReference.
+    providerBundle.Stop();
+
+    EXPECT_EQ(probe->BoundCount(), 0u)
+        << "Unbind delivered a pointer that did not match the bound MultiInterfaceA "
+           "sub-object, so the consumer could not release it.";
+
+    framework.Stop();
+    framework.WaitForStop(std::chrono::milliseconds::zero());
+}

@@ -248,6 +248,34 @@ namespace cppmicroservices::scrimpl
         return nullptr;
     }
 
+    /**
+     * Returns the interface id declared for the reference named refName in the
+     * component's metadata, or an empty string if no such reference is found (or
+     * the metadata is unavailable).
+     *
+     * A service may be registered under several interfaces, each stored in the
+     * InterfaceMap under its own id. A reference binds a specific declared
+     * interface, so lookups must key on that id rather than falling back to an
+     * arbitrary (begin()) entry, which for a multi-interface service would return
+     * a sub-object of the wrong, mis-adjusted type.
+     */
+    std::string
+    GetDeclaredInterfaceId(std::shared_ptr<ComponentConfiguration> const& configManagerPtr,
+                           std::string const& refName)
+    {
+        if (auto const metadata = configManagerPtr->GetMetadata(); metadata)
+        {
+            for (auto const& refMeta : metadata->refsMetadata)
+            {
+                if (refMeta.name == refName)
+                {
+                    return refMeta.interfaceName;
+                }
+            }
+        }
+        return {};
+    }
+
     std::shared_ptr<void>
     ComponentContextImpl::LocateService(std::string const& refName, std::string const& type) const
     {
@@ -295,8 +323,12 @@ namespace cppmicroservices::scrimpl
 
             if (matchingServiceInterfaceMapPtr != services.end())
             {
-                // returns the service at the interfacemap::begin() position
-                return GetServicePointer(configManagerPtr, matchingServiceInterfaceMapPtr->second, refName, "");
+                // Resolve the pointer by the interface the reference declared. A
+                // service bound to this reference may implement several interfaces;
+                // passing an empty type would fall back to the first map entry and
+                // return a mis-adjusted sub-object of the wrong type.
+                auto const interfaceId = GetDeclaredInterfaceId(configManagerPtr, refName);
+                return GetServicePointer(configManagerPtr, matchingServiceInterfaceMapPtr->second, refName, interfaceId);
             }
         }
 
@@ -434,18 +466,7 @@ namespace cppmicroservices::scrimpl
 
         // Bind the interface that this reference actually declared. The bound
         // service may implement several interfaces, select the right one using the config's metadata
-        std::string interfaceId;
-        if (auto const metadata = configManagerPtr->GetMetadata(); metadata)
-        {
-            for (auto const& refMeta : metadata->refsMetadata)
-            {
-                if (refMeta.name == refName)
-                {
-                    interfaceId = refMeta.interfaceName;
-                    break;
-                }
-            }
-        }
+        std::string const interfaceId = GetDeclaredInterfaceId(configManagerPtr, refName);
 
         // GetInterfacePointer handles the degenerate case (empty interfaceId
         // falls back to the first entry) and distinguishes "not present" from

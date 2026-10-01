@@ -182,6 +182,8 @@ set(_test_bundles
   TestBundleDSDRMU_userMethodStaticChecks
   TestBundleDSDROM
   TestBundleDSDROU
+  TestBundleDSMIProvider
+  TestBundleDSMIConsumer
   TestBundleDSSLE1
   TestBundleDSSLE2
   TestBundleDSTOI1

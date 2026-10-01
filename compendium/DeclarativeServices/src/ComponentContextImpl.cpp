@@ -418,6 +418,12 @@ namespace cppmicroservices::scrimpl
     ComponentContextImpl::AddToBoundServicesCache(std::string const& refName,
                                                   cppmicroservices::ServiceReferenceBase const& sRef)
     {
+        auto const configManagerPtr = configManager.lock();
+        if (!configManagerPtr)
+        {
+            throw ComponentException("Context is invalid");
+        }
+
         auto bc = GetBundleContext();
         cppmicroservices::ServiceObjects<void> sObjs = bc.GetServiceObjects(ServiceReferenceU(sRef));
         auto interfaceMap = sObjs.GetService();
@@ -425,7 +431,29 @@ namespace cppmicroservices::scrimpl
         {
             return nullptr;
         }
-        std::shared_ptr<void> svcToBind = interfaceMap->begin()->second;
+
+        // Bind the interface that this reference actually declared. The bound
+        // service may implement several interfaces, select the right one using the config's metadata
+        std::string interfaceId;
+        if (auto const metadata = configManagerPtr->GetMetadata(); metadata)
+        {
+            for (auto const& refMeta : metadata->refsMetadata)
+            {
+                if (refMeta.name == refName)
+                {
+                    interfaceId = refMeta.interfaceName;
+                    break;
+                }
+            }
+        }
+
+        // GetInterfacePointer handles the degenerate case (empty interfaceId
+        // falls back to the first entry) and distinguishes "not present" from
+        // "present but null". The returned pointer may be null when the service
+        // failed to construct/activate; the service is still added to the cache
+        // so a subsequent LocateService can surface the error for a mandatory
+        // dependency.
+        std::shared_ptr<void> svcToBind = GetInterfacePointer(interfaceMap, interfaceId).service;
         auto boundServicesCacheHandle = boundServicesCache.lock();
         (*boundServicesCacheHandle)[refName].emplace_back(std::make_pair(sRef, interfaceMap));
         return svcToBind;

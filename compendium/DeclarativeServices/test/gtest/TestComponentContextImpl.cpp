@@ -365,6 +365,9 @@ namespace cppmicroservices
             auto mockCompConfig = std::make_shared<MockComponentConfiguration>();
 
             ON_CALL(*mockCompConfig, GetBundle).WillByDefault(::testing::Return(GetFramework()));
+            ON_CALL(*mockCompConfig, GetMetadata)
+                .WillByDefault(::testing::Return(std::make_shared<metadata::ComponentMetadata>()));
+
             auto registeredFooSvc = std::make_shared<test::Foo>();
             auto fooServiceReg = GetFramework().GetBundleContext().RegisterService<test::Foo>(registeredFooSvc);
 
@@ -632,6 +635,8 @@ namespace cppmicroservices
         {
             auto mockCompConfig = std::make_shared<MockComponentConfiguration>();
 
+            ON_CALL(*mockCompConfig, GetMetadata)
+                .WillByDefault(::testing::Return(std::make_shared<metadata::ComponentMetadata>()));
             ON_CALL(*mockCompConfig, GetBundle).WillByDefault(::testing::Return(GetFramework()));
             auto registeredFooSvc = std::make_shared<test::Foo>();
             auto fooServiceReg = GetFramework().GetBundleContext().RegisterService<test::Foo>(registeredFooSvc);
@@ -661,6 +666,9 @@ namespace cppmicroservices
         TEST_F(ComponentContextImplTest, VerifyBoundServicesCacheBehaviorWithMultiple)
         {
             auto mockCompConfig = std::make_shared<MockComponentConfiguration>();
+
+            ON_CALL(*mockCompConfig, GetMetadata)
+                .WillByDefault(::testing::Return(std::make_shared<metadata::ComponentMetadata>()));
             ON_CALL(*mockCompConfig, GetBundle).WillByDefault(::testing::Return(GetFramework()));
 
             // Create three distinct Foo services and register them

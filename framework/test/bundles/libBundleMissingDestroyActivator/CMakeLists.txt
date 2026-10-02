@@ -1,0 +1,5 @@
+
+usFunctionCreateTestBundleWithResources(TestBundleMissingDestroyActivator
+  SOURCES TestBundleMissingDestroyActivator.cpp
+  RESOURCES manifest.json)
+

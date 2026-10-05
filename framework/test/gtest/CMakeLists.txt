@@ -83,6 +83,7 @@ set(_gtest_tests
   BundleTrackerMethodTest.cpp
   BundleTrackerCustomCallbackTest.cpp
   BundleTrackerConcurrencyTest.cpp
+  BundleLifecycleTest.cpp
   main.cpp
 )
 

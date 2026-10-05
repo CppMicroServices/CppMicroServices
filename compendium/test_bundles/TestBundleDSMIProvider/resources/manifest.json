@@ -1,0 +1,18 @@
+{
+    "bundle.symbolic_name": "TestBundleDSMIProvider",
+    "scr": {
+        "version": 1,
+        "components": [
+            {
+                "immediate": true,
+                "implementation-class": "sample::MultiInterfaceProvider",
+                "service": {
+                    "interfaces": [
+                        "test::MultiInterfaceA",
+                        "test::MultiInterfaceB"
+                    ]
+                }
+            }
+        ]
+    }
+}

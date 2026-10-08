@@ -67,7 +67,6 @@ namespace cppmicroservices
         SingletonComponentConfigurationImpl::CreateAndActivateComponentInstance(
             cppmicroservices::Bundle const& /*bundle*/)
         {
-            auto instanceContextPair = data.lock();
             if (GetState()->GetValue() != service::component::runtime::dto::ComponentState::ACTIVE)
             {
                 GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
@@ -75,37 +74,47 @@ namespace cppmicroservices
                 return nullptr;
             }
 
-            if (!instanceContextPair->first)
             {
-                try
+                auto instanceContextPair = data.lock();
+                if (instanceContextPair->first)
                 {
-                    auto instCtxtTuple = CreateAndActivateComponentInstanceHelper(Bundle());
-                    instanceContextPair->first = instCtxtTuple.first;
-                    instanceContextPair->second = instCtxtTuple.second;
-                }
-                catch (cppmicroservices::SharedLibraryException const&)
-                {
-                    GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-                                     "Exception thrown while trying to load a shared library",
-                                     std::current_exception());
-                    throw;
-                }
-                catch (cppmicroservices::SecurityException const&)
-                {
-                    GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-                                     "Exception thrown while trying to validate a bundle",
-                                     std::current_exception());
-                    throw;
-                }
-                catch (...)
-                {
-                    GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-                                     "Exception received from user code while activating the "
-                                     "component configuration",
-                                     std::current_exception());
+                    return instanceContextPair->first;
                 }
             }
-            return instanceContextPair->first;
+
+            // Create the instance outside the data lock to avoid lock inversion with
+            // oneAtATimeMutex (see issue #1192). The caller (CCActiveState::Activate)
+            // holds oneAtATimeMutex, preventing concurrent creation.
+            try
+            {
+                auto instCtxtTuple = CreateAndActivateComponentInstanceHelper(Bundle());
+                auto instanceContextPair = data.lock();
+                instanceContextPair->first = instCtxtTuple.first;
+                instanceContextPair->second = instCtxtTuple.second;
+                return instanceContextPair->first;
+            }
+            catch (cppmicroservices::SharedLibraryException const&)
+            {
+                GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                                 "Exception thrown while trying to load a shared library",
+                                 std::current_exception());
+                throw;
+            }
+            catch (cppmicroservices::SecurityException const&)
+            {
+                GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                                 "Exception thrown while trying to validate a bundle",
+                                 std::current_exception());
+                throw;
+            }
+            catch (...)
+            {
+                GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                                 "Exception received from user code while activating the "
+                                 "component configuration",
+                                 std::current_exception());
+            }
+            return nullptr;
         }
         bool
         SingletonComponentConfigurationImpl::ModifyComponentInstanceProperties()

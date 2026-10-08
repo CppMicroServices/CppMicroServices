@@ -23,6 +23,7 @@
 #ifndef COMPONENTCONFIGURATIONIMPL_HPP
 #define COMPONENTCONFIGURATIONIMPL_HPP
 
+#include <atomic>
 #include <memory>
 #if defined(USING_GTEST)
 #    include "gtest/gtest_prod.h"
@@ -414,7 +415,7 @@ namespace cppmicroservices::scrimpl
             std::unique_ptr<RegistrationManager>
                 regManager; ///< registration manager used to manage registration/unregistration of the service provided
                             ///< by this component
-            bool currentlySettingProperties{false};
+            std::atomic<bool> currentlySettingProperties{false};
             std::unordered_map<std::string, std::shared_ptr<ReferenceManager>>
                 referenceManagers; ///< map of all the reference managers
             std::unordered_map<std::shared_ptr<ReferenceManager>, ListenerTokenId>

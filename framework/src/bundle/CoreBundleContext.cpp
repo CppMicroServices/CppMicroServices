@@ -174,7 +174,7 @@ namespace cppmicroservices
 
         bundleRegistry.Load();
 
-        logger = std::make_shared<cppmicroservices::cfrimpl::CFRLogger>(GetBundleContext());        
+        logger = std::make_shared<cppmicroservices::cfrimpl::CFRLogger>(GetBundleContext());
 
         std::string execPath;
         try
@@ -201,7 +201,7 @@ namespace cppmicroservices
         DIAG_LOG(*sink) << "inited\nInstalled bundles: ";
         for (auto b : bundleRegistry.GetBundles())
         {
-            DIAG_LOG(*sink) << " #" << b->id << " " << b->symbolicName << ":" << b->version
+            DIAG_LOG(*sink) << " #" << b->sharedState->id << " " << b->sharedState->symbolicName << ":" << b->version
                             << " location:" << b->location;
         }
 

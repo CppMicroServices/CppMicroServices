@@ -27,14 +27,19 @@
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/GetBundleContext.h"
+#include "cppmicroservices/ServiceFindHook.h"
 #include "cppmicroservices/ServiceInterface.h"
 #include "cppmicroservices/ServiceReference.h"
+#include "cppmicroservices/ShrinkableVector.h"
 
 #include "ServiceControlInterface.h"
 #include "TestUtils.h"
 #include <TestingConfig.h>
 
+#include <algorithm>
+#include <atomic>
 #include <chrono>
+#include <functional>
 #include <future>
 #include <memory>
 #include <thread>
@@ -564,6 +569,161 @@ TEST_F(ServiceTrackerTestFixture, ServiceTrackerConcurrentOpenClose)
     for (auto& asyncFuture : futures)
     {
         asyncFuture.get();
+    }
+}
+
+namespace
+{
+    // Customizer that tracks the *presence* of a reference: it returns a
+    // non-null object for every reference, even one whose service has already
+    // been unregistered. This mirrors the MATLAB waitForServiceUnregistered
+    // helper, which tracks reference presence rather than a live service
+    // instance -- the configuration under which the ServiceTracker::Open() race
+    // manifested as a permanent hang.
+    class PresenceCustomizer final : public cppmicroservices::ServiceTrackerCustomizer<FooService>
+    {
+      public:
+        std::shared_ptr<FooService>
+        AddingService(cppmicroservices::ServiceReference<FooService> const&) override
+        {
+            return std::make_shared<FooServiceImpl>();
+        }
+
+        void
+        ModifiedService(cppmicroservices::ServiceReference<FooService> const&,
+                        std::shared_ptr<FooService> const&) override
+        {
+        }
+
+        void
+        RemovedService(cppmicroservices::ServiceReference<FooService> const&,
+                       std::shared_ptr<FooService> const&) override
+        {
+        }
+    };
+
+    // Find hook used as a synchronous seam inside
+    // ServiceTracker::Open() -> GetInitialReferences() -> GetServiceReferences().
+    // When armed, it runs a user-supplied action exactly once, on the first find
+    // that returns at least one reference. The action runs on the Open() thread
+    // while the registry lock is held.
+    class OneShotFindHook final : public cppmicroservices::ServiceFindHook
+    {
+      public:
+        std::atomic_bool armed { false };
+        std::function<void()> action;
+
+        void
+        Find(cppmicroservices::BundleContext const&,
+             std::string const&,
+             std::string const&,
+             cppmicroservices::ShrinkableVector<cppmicroservices::ServiceReferenceBase>& references) override
+        {
+            bool expected = true;
+            if (!references.empty() && armed.compare_exchange_strong(expected, false))
+            {
+                action();
+            }
+        }
+    };
+} // namespace
+
+// Correctness / no-deadlock guard for the ServiceTracker::Open() race fix.
+//
+// A ServiceFindHook runs synchronously inside GetServiceReferences() on the
+// Open() thread while the registry lock is held, after the initial references
+// have been captured. From it we launch a thread that unregisters the service;
+// that thread blocks on the registry lock until the find returns, so its
+// unregistration -- and UNREGISTERING event -- is delivered right as Open()
+// proceeds into SetInitial().
+//
+// With the fix, Open() holds the tracked object's lock across
+// GetInitialReferences()/SetInitial(). This deterministically exercises that
+// new nesting (tracked lock held while the registry lock is acquired inside
+// GetInitialReferences, contended by the unregistering thread) and guards
+// against a lock-ordering deadlock. Open() must complete without hanging and
+// the unregistered service must not remain tracked.
+//
+// Note: this does not by itself reproduce the hang on unfixed code -- the
+// Open() thread almost always reaches SetInitial() before the just-unblocked
+// unregistration dispatches its event. OpenUnregisterRaceStress is the
+// probabilistic guard that reproduces the dropped-event bug.
+TEST_F(ServiceTrackerTestFixture, OpenUnregisterRace)
+{
+    BundleContext context = framework.GetBundleContext();
+
+    auto findHook = std::make_shared<OneShotFindHook>();
+    auto findHookReg = context.RegisterService<ServiceFindHook>(findHook);
+
+    auto targetReg = context.RegisterService<FooService>(std::make_shared<FooServiceImpl>());
+    auto targetRef = targetReg.GetReference();
+
+    std::future<void> unregisterFuture;
+    findHook->action = [&targetReg, &unregisterFuture]()
+    {
+        // Runs on the Open() thread with the registry lock held. The async
+        // task blocks on that same lock until this find returns.
+        unregisterFuture = std::async(std::launch::async, [&targetReg]() { targetReg.Unregister(); });
+        // Let the async task reach and block on the registry lock before Open()
+        // releases it, maximizing contention on the new nested lock.
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    };
+
+    PresenceCustomizer customizer;
+    cppmicroservices::ServiceTracker<FooService> tracker(context, &customizer);
+
+    findHook->armed.store(true);
+    tracker.Open(); // must not hang
+
+    if (unregisterFuture.valid())
+    {
+        unregisterFuture.get();
+    }
+
+    // The target service was unregistered during Open(); it must not remain
+    // tracked.
+    auto refs = tracker.GetServiceReferences();
+    EXPECT_EQ(std::find(refs.begin(), refs.end(), targetRef), refs.end())
+        << "tracker retained a reference whose service was unregistered during Open()";
+
+    tracker.Close();
+    findHookReg.Unregister();
+}
+
+// Probabilistic regression guard: repeatedly race Unregister() against Open().
+// Before the fix, some iteration's UNREGISTERING event is processed in the
+// window between GetInitialReferences() and SetInitial(), is dropped, and the
+// now-dead reference is tracked forever -- caught here as a non-empty tracker.
+// With the fix the tracker always settles to empty, so this test never fails
+// on correct code; the iteration count only trades runtime for the chance of
+// reproducing a reintroduced bug.
+TEST_F(ServiceTrackerTestFixture, OpenUnregisterRaceStress)
+{
+    BundleContext context = framework.GetBundleContext();
+    PresenceCustomizer customizer;
+
+    for (int i = 0; i < 20000; ++i)
+    {
+        auto svcReg = context.RegisterService<FooService>(std::make_shared<FooServiceImpl>());
+
+        std::promise<void> gate;
+        auto gateFuture = gate.get_future();
+        auto unregisterFuture = std::async(std::launch::async,
+                                           [&svcReg, &gateFuture]()
+                                           {
+                                               gateFuture.get();
+                                               svcReg.Unregister();
+                                           });
+
+        cppmicroservices::ServiceTracker<FooService> tracker(context, &customizer);
+        gate.set_value();
+        tracker.Open();
+
+        unregisterFuture.get();
+
+        ASSERT_TRUE(tracker.GetServiceReferences().empty())
+            << "tracker retained an unregistered reference on iteration " << i;
+        tracker.Close();
     }
 }
 #endif

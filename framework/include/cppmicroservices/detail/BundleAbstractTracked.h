@@ -72,12 +72,12 @@ namespace cppmicroservices
              * Set initial list of items into tracker before events begin to be
              * received.
              *
-             * This method must be called from Tracker's open method while synchronized
-             * on this object in the same synchronized block as the add listener call.
+             * This method is called from the Tracker's open method after the add
+             * listener call. It synchronizes on this object while storing the initial
+             * list, so it must not be called while already synchronized on this object.
              *
              * @param list The initial list of items to be tracked. <code>null</code>
              *        entries in the list are ignored.
-             * @GuardedBy this
              */
             void SetInitial(std::vector<S> const& list);
 
@@ -280,6 +280,29 @@ namespace cppmicroservices
              * previouslyAdded set
              */
             bool trackInitialFinished { false };
+
+            /**
+             * Set of items that were removed (untracked) before SetInitial() stored the
+             * initial list. An item is recorded here when its removal event is delivered
+             * in the window between adding the tracker's listener and SetInitial(): at
+             * that point the item is in none of the initial, adding or tracked lists, so
+             * the event would otherwise be silently dropped and the item would later be
+             * added to the initial list and tracked forever. SetInitial() consults this
+             * set and skips any such item. Only populated while initialReferencesSet is
+             * false.
+             *
+             * @GuardedBy this
+             */
+            std::unordered_set<S> removedBeforeInitial;
+
+            /**
+             * bool indicating that SetInitial() has stored the initial list. Until this
+             * is true, Untrack records items it finds in none of the lists into
+             * removedBeforeInitial so SetInitial() can skip them.
+             *
+             * @GuardedBy this
+             */
+            bool initialReferencesSet { false };
 
             /**
              * Modification count. This field is initialized to zero and incremented by

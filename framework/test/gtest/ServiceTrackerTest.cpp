@@ -576,10 +576,7 @@ namespace
 {
     // Customizer that tracks the *presence* of a reference: it returns a
     // non-null object for every reference, even one whose service has already
-    // been unregistered. This mirrors the MATLAB waitForServiceUnregistered
-    // helper, which tracks reference presence rather than a live service
-    // instance -- the configuration under which the ServiceTracker::Open() race
-    // manifested as a permanent hang.
+    // been unregistered. 
     class PresenceCustomizer final : public cppmicroservices::ServiceTrackerCustomizer<FooService>
     {
       public:
@@ -628,26 +625,12 @@ namespace
     };
 } // namespace
 
-// Correctness / no-deadlock guard for the ServiceTracker::Open() race fix.
-//
-// A ServiceFindHook runs synchronously inside GetServiceReferences() on the
-// Open() thread while the registry lock is held, after the initial references
-// have been captured. From it we launch a thread that unregisters the service;
-// that thread blocks on the registry lock until the find returns, so its
-// unregistration -- and UNREGISTERING event -- is delivered right as Open()
-// proceeds into SetInitial().
-//
-// With the fix, Open() holds the tracked object's lock across
-// GetInitialReferences()/SetInitial(). This deterministically exercises that
-// new nesting (tracked lock held while the registry lock is acquired inside
-// GetInitialReferences, contended by the unregistering thread) and guards
-// against a lock-ordering deadlock. Open() must complete without hanging and
-// the unregistered service must not remain tracked.
-//
-// Note: this does not by itself reproduce the hang on unfixed code -- the
-// Open() thread almost always reaches SetInitial() before the just-unblocked
-// unregistration dispatches its event. OpenUnregisterRaceStress is the
-// probabilistic guard that reproduces the dropped-event bug.
+/**
+ * verifies that there is no race between when the service tracker
+ * opens and when setInitial is called. This race tries to trigger
+ * that condition by tracking a service, and unregistering it
+ * concurrently.
+ */
 TEST_F(ServiceTrackerTestFixture, OpenUnregisterRace)
 {
     BundleContext context = framework.GetBundleContext();
@@ -693,10 +676,7 @@ TEST_F(ServiceTrackerTestFixture, OpenUnregisterRace)
 // Probabilistic regression guard: repeatedly race Unregister() against Open().
 // Before the fix, some iteration's UNREGISTERING event is processed in the
 // window between GetInitialReferences() and SetInitial(), is dropped, and the
-// now-dead reference is tracked forever -- caught here as a non-empty tracker.
-// With the fix the tracker always settles to empty, so this test never fails
-// on correct code; the iteration count only trades runtime for the chance of
-// reproducing a reintroduced bug.
+// now-dead reference is tracked forever
 TEST_F(ServiceTrackerTestFixture, OpenUnregisterRaceStress)
 {
     BundleContext context = framework.GetBundleContext();

@@ -52,11 +52,8 @@ namespace cppmicroservices
             for (auto const& item : initiallist)
             {
                 /*
-                 * Skip any item that was removed between adding the listener and this
-                 * call. Its removal event arrived while the item was in none of the
-                 * tracker's lists, so Untrack recorded it in removedBeforeInitial.
-                 * Adding it to the initial list now would begin tracking a dead item
-                 * that no future event will ever remove.
+                 * Skip any item that was removed (service unregistered) between 
+                 * adding the listener and this call.
                  */
                 if (removedBeforeInitial.find(item) != removedBeforeInitial.end())
                 {

@@ -283,13 +283,7 @@ namespace cppmicroservices
 
             /**
              * Set of items that were removed (untracked) before SetInitial() stored the
-             * initial list. An item is recorded here when its removal event is delivered
-             * in the window between adding the tracker's listener and SetInitial(): at
-             * that point the item is in none of the initial, adding or tracked lists, so
-             * the event would otherwise be silently dropped and the item would later be
-             * added to the initial list and tracked forever. SetInitial() consults this
-             * set and skips any such item. Only populated while initialReferencesSet is
-             * false.
+             * initial list retrieved by GetInitialReferences
              *
              * @GuardedBy this
              */

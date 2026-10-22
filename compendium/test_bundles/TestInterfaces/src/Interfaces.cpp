@@ -24,4 +24,8 @@ namespace test
     ServiceAInt::~ServiceAInt() = default;
     ServiceBInt::~ServiceBInt() = default;
     ServiceCInt::~ServiceCInt() = default;
+
+    MultiInterfaceA::~MultiInterfaceA() = default;
+    MultiInterfaceB::~MultiInterfaceB() = default;
+    MultiInterfaceProbe::~MultiInterfaceProbe() = default;
 } // namespace test

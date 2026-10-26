@@ -310,9 +310,6 @@ namespace cppmicroservices
         //
         // Expected (fixed) behavior: DS must not attempt to invoke a bind method for a
         // reference that has no binder, so no error is logged.
-        //
-        // NOTE: This test asserts the fixed behavior and therefore FAILS against the
-        // current (buggy) code, where the swallowed out_of_range is logged as an error.
         TEST_F(SingletonComponentConfigurationTest, VerifyBindReferenceNoBinderDoesNotLogError)
         {
             using cppmicroservices::logservice::SeverityLevel;

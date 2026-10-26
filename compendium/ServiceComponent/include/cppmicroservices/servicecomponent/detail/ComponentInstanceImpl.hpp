@@ -183,8 +183,7 @@ namespace cppmicroservices
                                      std::shared_ptr<void> svcToBind) override
                     {
                         // A reference with no binder (e.g. a component declared with
-                        // inject-references="false") has no user bind method to invoke,
-                        // so this is a no-op rather than an error.
+                        // inject-references="false") is a no-op
                         auto it = refBinderMap.find(refName);
                         if (it == refBinderMap.end())
                         {
@@ -197,8 +196,7 @@ namespace cppmicroservices
                     InvokeUnbindMethod(std::string const& refName,
                                        std::shared_ptr<void> svcToUnbind) override
                     {
-                        // See InvokeBindMethod: a reference with no binder has no user
-                        // unbind method to invoke.
+                        // See InvokeBindMethod: a reference with no binder is a no-op
                         auto it = refBinderMap.find(refName);
                         if (it == refBinderMap.end())
                         {

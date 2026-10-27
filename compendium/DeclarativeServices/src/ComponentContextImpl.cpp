@@ -414,7 +414,7 @@ namespace cppmicroservices::scrimpl
         boundServicesCacheHandle->clear();
     }
 
-    std::shared_ptr<void>
+    std::pair<std::shared_ptr<void>, bool>
     ComponentContextImpl::AddToBoundServicesCache(std::string const& refName,
                                                   cppmicroservices::ServiceReferenceBase const& sRef)
     {
@@ -423,12 +423,37 @@ namespace cppmicroservices::scrimpl
         auto interfaceMap = sObjs.GetService();
         if (!interfaceMap || interfaceMap->empty())
         {
-            return nullptr;
+            return { nullptr, false };
         }
         std::shared_ptr<void> svcToBind = interfaceMap->begin()->second;
+        // Binding is idempotent: don't bind the same service reference to the same
+        // reference more than once. This can happen when a service is captured by
+        // the activation path's bound-services snapshot while a rebind for that
+        // same service is concurrently queued
+        if (IsBound(refName, sRef))
+        {
+            return { svcToBind, false };
+        }
         auto boundServicesCacheHandle = boundServicesCache.lock();
         (*boundServicesCacheHandle)[refName].emplace_back(std::make_pair(sRef, interfaceMap));
-        return svcToBind;
+        return { svcToBind, true };
+    }
+
+    bool
+    ComponentContextImpl::IsBound(std::string const& refName,
+                                  cppmicroservices::ServiceReferenceBase const& sRef) const
+    {
+        auto boundServicesCacheHandle = boundServicesCache.lock();
+        auto refIt = boundServicesCacheHandle->find(refName);
+        if (refIt == boundServicesCacheHandle->end())
+        {
+            return false;
+        }
+        auto const& services = refIt->second;
+        return std::any_of(services.begin(),
+                           services.end(),
+                           [&sRef](std::pair<ServiceReferenceBase, InterfaceMapConstPtr> const& service)
+                           { return (std::get<0>(service) == sRef); });
     }
 
     void

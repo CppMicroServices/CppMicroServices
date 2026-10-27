@@ -369,7 +369,7 @@ namespace cppmicroservices
             auto fooServiceReg = GetFramework().GetBundleContext().RegisterService<test::Foo>(registeredFooSvc);
 
             auto compCtx = std::make_shared<ComponentContextImpl>(mockCompConfig, GetFramework());
-            ASSERT_TRUE(compCtx->AddToBoundServicesCache("foo", fooServiceReg.GetReference()));
+            ASSERT_TRUE(compCtx->AddToBoundServicesCache("foo", fooServiceReg.GetReference()).first);
             ASSERT_NO_THROW({
                 auto fooSvc = compCtx->LocateService("foo", "");
                 ASSERT_TRUE(fooSvc == registeredFooSvc);
@@ -412,7 +412,7 @@ namespace cppmicroservices
 
             auto compCtx = std::make_shared<ComponentContextImpl>(mockCompConfig, GetFramework());
 
-            ASSERT_EQ(compCtx->AddToBoundServicesCache("foo", sReg.GetReference()), nullptr);
+            ASSERT_EQ(compCtx->AddToBoundServicesCache("foo", sReg.GetReference()).first, nullptr);
             ASSERT_THROW(compCtx->LocateService("foo", "cppmicroservices::scrimpl::dummy::ServiceImpl"),
                          ComponentException);
 
@@ -436,7 +436,7 @@ namespace cppmicroservices
 
             auto compCtx = std::make_shared<ComponentContextImpl>(mockCompConfig, GetFramework());
 
-            ASSERT_FALSE(compCtx->AddToBoundServicesCache("foo", svcRef));
+            ASSERT_FALSE(compCtx->AddToBoundServicesCache("foo", svcRef).first);
             ASSERT_TRUE(nullptr == compCtx->LocateService("foo", "test::TestBundleDSUpstreamDependency"));
         }
 
@@ -637,7 +637,7 @@ namespace cppmicroservices
             auto fooServiceReg = GetFramework().GetBundleContext().RegisterService<test::Foo>(registeredFooSvc);
 
             auto compCtx = std::make_shared<ComponentContextImpl>(mockCompConfig, GetFramework());
-            auto addedService = compCtx->AddToBoundServicesCache("foo", fooServiceReg.GetReference());
+            auto addedService = compCtx->AddToBoundServicesCache("foo", fooServiceReg.GetReference()).first;
             ASSERT_TRUE(addedService && addedService == registeredFooSvc);
             ASSERT_NO_THROW({
                 auto fooSvc = compCtx->LocateService("foo", "");
@@ -673,11 +673,11 @@ namespace cppmicroservices
 
             // Create the ComponentContextImpl and add all three services to the cache in order
             auto compCtx = std::make_shared<ComponentContextImpl>(mockCompConfig, GetFramework());
-            auto addedService1 = compCtx->AddToBoundServicesCache("foo", foo1Reg.GetReference());
+            auto addedService1 = compCtx->AddToBoundServicesCache("foo", foo1Reg.GetReference()).first;
             ASSERT_EQ(foo1, addedService1);
-            auto addedService2 = compCtx->AddToBoundServicesCache("foo", foo2Reg.GetReference());
+            auto addedService2 = compCtx->AddToBoundServicesCache("foo", foo2Reg.GetReference()).first;
             ASSERT_EQ(foo2, addedService2);
-            auto addedService3 = compCtx->AddToBoundServicesCache("foo", foo3Reg.GetReference());
+            auto addedService3 = compCtx->AddToBoundServicesCache("foo", foo3Reg.GetReference()).first;
             ASSERT_EQ(foo3, addedService3);
 
             // 1. If I invoke LocateService without the service reference
@@ -746,6 +746,37 @@ namespace cppmicroservices
             foo2Reg.Unregister();
             foo3Reg.Unregister();
         }
+        // binding the same service
+        // reference twice for reference "foo" should show the service is bound exactly once.
+        TEST_F(ComponentContextImplTest, VerifyNoDuplicateBindForSameServiceReference)
+        {
+            auto mockCompConfig = std::make_shared<MockComponentConfiguration>();
+            ON_CALL(*mockCompConfig, GetBundle).WillByDefault(::testing::Return(GetFramework()));
+            auto registeredFooSvc = std::make_shared<test::Foo>();
+            auto fooServiceReg = GetFramework().GetBundleContext().RegisterService<test::Foo>(registeredFooSvc);
+
+            auto compCtx = std::make_shared<ComponentContextImpl>(mockCompConfig, GetFramework());
+
+            // bind #1: performed by the activation path when the service is already in
+            // the reference manager's bound set at construction time. The service is
+            // newly bound, so the second element of the returned pair is true.
+            auto [svc1, newlyBound1] = compCtx->AddToBoundServicesCache("foo", fooServiceReg.GetReference());
+            ASSERT_TRUE(svc1);
+            EXPECT_TRUE(newlyBound1);
+            // bind #2: performed by a Rebind that was queued while the instance was
+            // still being built - for the very same service reference. It must report
+            // that nothing was newly bound so the caller skips the bind callback.
+            auto [svc2, newlyBound2] = compCtx->AddToBoundServicesCache("foo", fooServiceReg.GetReference());
+            EXPECT_TRUE(svc2);
+            EXPECT_FALSE(newlyBound2);
+
+            auto svcs = compCtx->LocateServices("foo", "");
+            EXPECT_EQ(svcs.size(), 1u) << "The same service reference was bound twice for reference 'foo' "
+                                          "(double bind): AddToBoundServicesCache has no dedup.";
+
+            ASSERT_NO_THROW(fooServiceReg.Unregister());
+        }
+
         /**
          *  Test component rebinds from prototype service
          */

@@ -20,6 +20,7 @@
 
   =============================================================================*/
 
+#include "../../src/ComponentContextImpl.hpp"
 #include "../../src/SCRAsyncWorkService.hpp"
 #include "../../src/SCRExtensionRegistry.hpp"
 #include "../../src/manager/SingletonComponentConfiguration.hpp"
@@ -286,6 +287,49 @@ namespace cppmicroservices
             EXPECT_EQ(obj->GetComponentInstance(), nullptr);
             EXPECT_EQ(obj->GetComponentContext(), nullptr);
             EXPECT_EQ(obj->GetState()->GetValue(), ComponentState::UNSATISFIED_REFERENCE);
+        }
+
+        // If a dynamic reference changes while the component is in the activation
+        // window (state is ACTIVE but the instance is still being built), a queued
+        // Rebind calls SingletonComponentConfigurationImpl::BindReference for a
+        // reference that the activation path has already bound
+        //
+        // Expected behavior: binding an already-bound service reference is a
+        // no-op -- the user bind callback is not invoked again and the cache is not
+        // duplicated.
+        TEST_F(SingletonComponentConfigurationTest, VerifyBindReferenceDoesNotDoubleBind)
+        {
+            // register a service that the reference "ref" resolves to
+            auto regService = std::make_shared<dummy::ServiceImpl>();
+            auto svcReg = framework.GetBundleContext().RegisterService<dummy::ServiceImpl>(regService);
+            auto sRef = svcReg.GetReference();
+
+            auto realCtxt = std::make_shared<ComponentContextImpl>(obj, framework);
+            auto mockCompInstance = std::make_shared<MockComponentInstance>();
+            obj->SetComponentInstancePair(InstanceContextPair(mockCompInstance, realCtxt));
+
+            // bind #1: the activation path has already put this service reference in
+            // the bound services cache for reference "ref".
+            ASSERT_TRUE(realCtxt->AddToBoundServicesCache("ref", sRef).first);
+
+            // The second bind of the SAME service reference must be a no-op: the
+            // user's bind method must not be invoked again.
+            EXPECT_CALL(*mockCompInstance, InvokeBindMethod("ref", testing::_)).Times(0);
+
+            // bind #2: a Rebind queued during the activation window.
+            EXPECT_NO_THROW(obj->BindReference("ref", sRef));
+
+            // The cache must still hold exactly one entry for "ref".
+            EXPECT_EQ(realCtxt->LocateServices("ref", "").size(), 1u)
+                << "BindReference double-bound the same service reference for 'ref'.";
+
+            // clean up injected objects
+            {
+                auto instCtxtPair = obj->data.lock();
+                instCtxtPair->first.reset();
+                instCtxtPair->second.reset();
+            }
+            svcReg.Unregister();
         }
     } // namespace scrimpl
 } // namespace cppmicroservices

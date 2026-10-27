@@ -226,12 +226,18 @@ namespace cppmicroservices
             {
                 auto& instance = instancePair.first;
                 auto& context = instancePair.second;
-                auto svcToBind = context->AddToBoundServicesCache(refName, ref);
+                auto [svcToBind, newlyBound] = context->AddToBoundServicesCache(refName, ref);
                 if (!svcToBind)
                 {
                     GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
                                      "Failure while adding reference " + refName + " to the bound services cache.");
                     return;
+                }
+                // If this service was already bound to this
+                // instance's context, do not invoke the user's bind method again.
+                if (!newlyBound)
+                {
+                    continue;
                 }
                 try
                 {

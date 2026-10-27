@@ -222,19 +222,35 @@ namespace cppmicroservices
             /**
              * Add service object from the passed in serviceReference to cache.
              *
+             * Binding is idempotent: if \c sRef is already bound to \c refName the
+             * cache is left unchanged and the caller is told
+             *
              * @param refName The name of a reference as specified in a \c reference
              *        element in this component's description.
              * @param sRef The serviceReference of the desired service
-             * @return std::shared_ptr<void> pointing to the service instance object 
-             *         referred to by sRef, or nullptr if the service is no longer available
+             * @return A pair whose first element is a \c std::shared_ptr<void> pointing
+             *         to the service instance object referred to by \c sRef, or
+             *         \c nullptr if the service is no longer available. The
+             *         second element is \c true only if the service was newly added to
+             *         the cache.
              * @throws {@link ComponentException} if Service Component Runtime fails to
              *         return a service instance
              */
-            std::shared_ptr<void> AddToBoundServicesCache(std::string const& refName,
-                                                          cppmicroservices::ServiceReferenceBase const& sRef);
+            std::pair<std::shared_ptr<void>, bool> AddToBoundServicesCache(
+                std::string const& refName,
+                cppmicroservices::ServiceReferenceBase const& sRef);
 
             void RemoveFromBoundServicesCache(std::string const& refName,
                                               cppmicroservices::ServiceReferenceBase const& sRef);
+
+            /**
+             * Returns true if the service referred to by \c sRef is already bound to
+             * the reference named \c refName
+             *
+             * @param refName The name of a this component's reference in question
+             * @param sRef The serviceReference of the service to look for
+             */
+            bool IsBound(std::string const& refName, cppmicroservices::ServiceReferenceBase const& sRef) const;
 
           private:
             /**

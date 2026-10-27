@@ -22,10 +22,12 @@
 
 #include <memory>
 #include <string>
+#include <thread>
 #include <vector>
 
 #include "../../src/manager/ReferenceManagerImpl.hpp"
 #include "../TestUtils.hpp"
+#include "ConcurrencyTestUtil.hpp"
 #include "TestInterfaces/Interfaces.hpp"
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/Framework.h"
@@ -350,6 +352,95 @@ TEST(DynamicReferenceBinding, OneBindPerServiceForDynamicReluctantMultiple)
     optionalDepReg.Unregister();
     optionalDepReg2.Unregister();
     staticDepReg.Unregister();
+
+    framework.Stop();
+    framework.WaitForStop(std::chrono::milliseconds::zero());
+}
+
+namespace
+{
+    // Extract the integer value following "key=" in a component ExtendedDescription
+    // string such as "bindCount=1 nullBindCount=0 ... optionalDeps=1".
+    int
+    ExtractCount(std::string const& desc, std::string const& key)
+    {
+        auto pos = desc.find(key + "=");
+        if (pos == std::string::npos)
+        {
+            return -1;
+        }
+        return std::stoi(desc.substr(pos + key.size() + 1));
+    }
+} // namespace
+
+// The TestBundleDSDROM component has a static required reference (test::Interface1)
+// and a dynamic reluctant 0..n reference (test::Interface3). Registering Interface1
+// activates the (immediate) component; if a single Interface3 service is registered
+// concurrently, there is a window in which that service is both (a) captured by the
+// activation path's bound-services snapshot and bound during BindReferences, and
+// (b) delivered again by the queued Rebind -- ensure we don't double bind the same svc
+TEST(DynamicReferenceBinding, ConcurrentActivationAndDependencyChangeDoesNotDoubleBind)
+{
+    auto framework = cppmicroservices::FrameworkFactory().NewFramework();
+    framework.Start();
+    auto bc = framework.GetBundleContext();
+
+    test::InstallAndStartDS(bc);
+    auto testBundle = test::InstallAndStartBundle(bc, "TestBundleDSDROM");
+    ASSERT_TRUE(testBundle);
+
+    constexpr int kIterations = 500;
+    for (int i = 0; i < kIterations; ++i)
+    {
+        Barrier startLine(2);
+
+        // Thread A: trigger activation by registering the static required dependency.
+        // Thread B: register the single dynamic (Interface3) dependency.
+        // Both are released simultaneously so activation and the dependency change
+        // race, exactly as they would for a client whose provider bundles load
+        // concurrently.
+        cppmicroservices::ServiceRegistration<test::Interface1> staticDepReg;
+        cppmicroservices::ServiceRegistration<test::Interface3> optionalDepReg;
+
+        std::thread activator(
+            [&]
+            {
+                startLine.Wait();
+                staticDepReg = bc.RegisterService<test::Interface1>(std::make_shared<Interface1Impl>());
+            });
+        std::thread depChanger(
+            [&]
+            {
+                startLine.Wait();
+                optionalDepReg = bc.RegisterService<test::Interface3>(std::make_shared<Interface3Impl>());
+            });
+        activator.join();
+        depChanger.join();
+
+        auto svcRef = bc.GetServiceReference<test::Interface2>();
+        ASSERT_TRUE(svcRef);
+        auto svc = bc.GetService<test::Interface2>(svcRef);
+        ASSERT_TRUE(svc);
+
+        auto desc = svc->ExtendedDescription();
+        svc.reset();
+
+        int duplicateBinds = ExtractCount(desc, "duplicateBindCount");
+
+        ASSERT_EQ(duplicateBinds, 0)
+            << "iteration " << i
+            << ": the component's bind method was invoked twice for the SAME service on the SAME "
+               "'optionalDeps' reference (bind called twice for the same reference). Got: "
+            << desc;
+
+        // Reset for the next iteration: removing the static required dependency
+        // deactivates the component and destroys the instance, so bind counts start
+        // fresh on the next activation.
+        optionalDepReg.Unregister();
+        staticDepReg.Unregister();
+        ASSERT_FALSE(bc.GetServiceReference<test::Interface2>())
+            << "iteration " << i << ": component did not deactivate after removing its required dependency.";
+    }
 
     framework.Stop();
     framework.WaitForStop(std::chrono::milliseconds::zero());

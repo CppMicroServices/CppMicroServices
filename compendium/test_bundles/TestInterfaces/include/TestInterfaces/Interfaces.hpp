@@ -243,6 +243,28 @@ namespace test
         virtual std::string getAsyncSayHiResult() = 0;
     };
 
+    class US_TestInterfaces_EXPORT MultiInterfaceA
+    {
+      public:
+        virtual std::string WhoA() = 0;
+        virtual ~MultiInterfaceA();
+    };
+
+    class US_TestInterfaces_EXPORT MultiInterfaceB
+    {
+      public:
+        virtual std::string WhoB() = 0;
+        virtual ~MultiInterfaceB();
+    };
+
+    class US_TestInterfaces_EXPORT MultiInterfaceProbe
+    {
+      public:
+        virtual std::size_t BoundCount() = 0;
+        virtual std::string BoundIdentity() = 0;
+        virtual ~MultiInterfaceProbe();
+    };
+
 } // namespace test
 
 #endif

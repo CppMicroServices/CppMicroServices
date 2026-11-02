@@ -33,6 +33,7 @@ namespace sample
             << " nullBindCount=" << nullBindCount_.load()
             << " unbindCount=" << unbindCount_.load()
             << " nullUnbindCount=" << nullUnbindCount_.load()
+            << " duplicateBindCount=" << duplicateBindCount_.load()
             << " optionalDeps=" << optionalDeps_.size();
         return oss.str();
     }
@@ -48,6 +49,12 @@ namespace sample
         }
         bindCount_++;
         std::lock_guard<std::mutex> lock(optionalDepsMutex_);
+        // If this exact service is already bound to this reference, then bind was
+        // invoked twice for the same reference/service -- the double-bind defect.
+        if (std::find(optionalDeps_.begin(), optionalDeps_.end(), dep) != optionalDeps_.end())
+        {
+            duplicateBindCount_++;
+        }
         optionalDeps_.push_back(dep);
     }
 

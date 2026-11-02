@@ -221,11 +221,16 @@ namespace cppmicroservices
                                  "Failure while binding reference " + refName + "; invalid componentContext");
                 return;
             }
-            auto svcToBind = context->AddToBoundServicesCache(refName, ref);
+            auto [svcToBind, newlyBound] = context->AddToBoundServicesCache(refName, ref);
             if (!svcToBind)
             {
                 GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
                                  "Failure while adding reference " + refName + " to the bound services cache.");
+                return;
+            }
+            // Already bound, continue
+            if (!newlyBound)
+            {
                 return;
             }
             try
@@ -258,6 +263,11 @@ namespace cppmicroservices
             {
                 GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
                                  "Failure while unbinding reference " + refName + "; invalid componentContext");
+                return;
+            }
+            // only unbind a service that is bound
+            if (!context->IsBound(refName, ref))
+            {
                 return;
             }
             try

@@ -36,6 +36,10 @@ namespace sample
         std::atomic<int> bindCount_ {0};
         std::atomic<int> nullBindCount_ {0};
         std::atomic<int> unbindCount_ {0};
+        // Counts how many times bind was invoked for this reference with a service
+        // that was already bound -- i.e. the same reference bound to the same
+        // service twice. This must always be 0.
+        std::atomic<int> duplicateBindCount_ {0};
 
         // Static so it survives component instance destruction during deactivation
         // (UnbindReferences is called as part of DestroyComponentInstances)

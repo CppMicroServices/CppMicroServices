@@ -477,18 +477,18 @@ TEST(DynamicReferenceBinding, DynamicRefBindsDeclaredInterfaceOfMultiInterfaceSe
 // ============================================================
 // Regression test for the same defect on the UNBIND path.
 //
-// Unlike the bind path (now fixed), ComponentContextImpl::LocateService(refName,
-// ServiceReferenceBase const&) still passes an empty interface id to the
-// interface-map lookup, which falls back to begin()->second. This overload is
-// invoked in production by SingletonComponentConfigurationImpl::UnbindReference
-// (and the BundleOrPrototype equivalent): the pointer it returns is handed to
-// InvokeUnbindMethod -> the component's Unbind callback.
+// ComponentContextImpl::LocateService(refName, ServiceReferenceBase const&) is
+// invoked by SingletonComponentConfigurationImpl::UnbindReference (and the
+// BundleOrPrototype equivalent); the pointer it returns is handed to
+// InvokeUnbindMethod -> the component's Unbind callback. It previously passed an
+// empty interface id to the interface-map lookup, which falls back to
+// begin()->second; it now resolves the reference's declared interface id.
 //
 // The consumer stores the shared_ptr it received at bind time (the correct
 // MultiInterfaceA sub-object) and, on unbind, erases by shared_ptr identity.
-// When unbind delivers the begin()->second sub-object (MultiInterfaceB) instead,
-// the pointers compare unequal, the erase removes nothing, and the bound service
-// is never released -- BoundCount stays at 1 after the provider is removed.
+// If unbind were to deliver the begin()->second sub-object (MultiInterfaceB)
+// instead, the pointers would compare unequal, the erase would remove nothing,
+// and BoundCount would stay at 1 after the provider is removed.
 TEST(DynamicReferenceBinding, DynamicRefUnbindsDeclaredInterfaceOfMultiInterfaceService)
 {
     auto framework = cppmicroservices::FrameworkFactory().NewFramework();

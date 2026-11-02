@@ -58,19 +58,13 @@ namespace cppmicroservices
                                             std::current_exception());
                             }
                         });
-                    std::lock_guard<std::recursive_mutex> lock(oneAtATimeMutex);
+                    {
+                        std::lock_guard<std::recursive_mutex> lock(oneAtATimeMutex);
+                        instance = mgr.CreateAndActivateComponentInstance(clientBundle);
+                    }
 
-                    // no state change, already in active state. create and return a ComponentInstance object
-                    // This could throw; a scope guard is put in place to call latch.CountDown().
-                    instance = mgr.CreateAndActivateComponentInstance(clientBundle);
-
-                    // Just in case the configuration properties changed between Registration and
-                    // Construction of the component, update the properties in the service registration object.
-                    // An example of when this could happen is when immediate=false and configuration-policy
-                    // = optional. The component could be registered before all the configuration objects are
-                    // available but it won't be constructed until someone gets the service. In between those
-                    // two activities the configuration objects could change and the service registration properties
-                    // would be out of date.
+                    // SetRegistrationProperties outside oneAtATimeMutex to avoid lock inversion
+                    // with stateChangeMutex (issue #1192). Latch still held.
                     if (instance)
                     {
                         mgr.SetRegistrationProperties();
@@ -146,24 +140,29 @@ namespace cppmicroservices
                         }
                     });
 
-                std::lock_guard<std::recursive_mutex> lock(oneAtATimeMutex);
-                // Make sure the state didn't change while we were waiting
-                auto currentState = mgr.GetState();
-                if (currentState->GetValue() != service::component::runtime::dto::ComponentState::ACTIVE)
+                bool result;
                 {
-                    auto logger = mgr.GetLogger();
-                    logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
-                                "Modified failed. Component no longer in Active State.");
-                    return false;
+                    std::lock_guard<std::recursive_mutex> lock(oneAtATimeMutex);
+                    // Make sure the state didn't change while we were waiting
+                    auto currentState = mgr.GetState();
+                    if (currentState->GetValue() != service::component::runtime::dto::ComponentState::ACTIVE)
+                    {
+                        auto logger = mgr.GetLogger();
+                        logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
+                                    "Modified failed. Component no longer in Active State.");
+                        return false;
+                    }
+                    result = mgr.ModifyComponentInstanceProperties();
                 }
-                bool result = mgr.ModifyComponentInstanceProperties();
+
                 if (result)
                 {
-                    // Update service registration properties
+                    // SetRegistrationProperties outside oneAtATimeMutex to avoid lock inversion
+                    // with stateChangeMutex (issue #1192). Latch still held.
                     mgr.SetRegistrationProperties();
                     return true;
                 }
-            } // count down the latch and release the lock
+            } // count down the latch
             Deactivate(mgr);
             // Service registration properties will be updated when the service is
             // registered. Don't need to do it here.

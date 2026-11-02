@@ -512,10 +512,13 @@ namespace
         auto s1 = fc.GetService<ServiceDependency1>(fc.GetServiceReference<ServiceDependency1>());
         auto s2 = fc.GetService<ServiceDependency2>(fc.GetServiceReference<ServiceDependency2>());
 
-        EXPECT_THROW(compInstance.InvokeBindMethod("foo", s1), std::out_of_range);
-        EXPECT_THROW(compInstance.InvokeBindMethod("bar", s2), std::out_of_range);
-        EXPECT_THROW(compInstance.InvokeUnbindMethod("foo", s1), std::out_of_range);
-        EXPECT_THROW(compInstance.InvokeUnbindMethod("bar", s2), std::out_of_range);
+        // "foo" and "bar" are static (constructor-injected) references with no
+        // binder. Invoking the dynamic bind/unbind for a reference that has no
+        // binder is a no-op rather than throwing std::out_of_range.
+        EXPECT_NO_THROW(compInstance.InvokeBindMethod("foo", s1));
+        EXPECT_NO_THROW(compInstance.InvokeBindMethod("bar", s2));
+        EXPECT_NO_THROW(compInstance.InvokeUnbindMethod("foo", s1));
+        EXPECT_NO_THROW(compInstance.InvokeUnbindMethod("bar", s2));
 
         f.Stop();
         f.WaitForStop(std::chrono::milliseconds::zero());
@@ -584,8 +587,11 @@ namespace
         // for binding.
         auto s1 = fc.GetService<ServiceDependency1>(fc.GetServiceReference<ServiceDependency1>());
         auto s2 = fc.GetService<ServiceDependency2>(fc.GetServiceReference<ServiceDependency2>());
-        EXPECT_THROW(compInstance.InvokeUnbindMethod("bar", s2), std::out_of_range);
-        EXPECT_THROW(compInstance.InvokeBindMethod("bar", s2), std::out_of_range);
+        // "bar" is static (no binder): invoking bind/unbind for it is a no-op and
+        // must not affect the bound instance. "foo" is dynamic and is re-bound.
+        EXPECT_NO_THROW(compInstance.InvokeUnbindMethod("bar", s2));
+        EXPECT_NO_THROW(compInstance.InvokeBindMethod("bar", s2));
+        ASSERT_NE(compObj->GetBar(), nullptr);
         EXPECT_NO_THROW(compInstance.InvokeUnbindMethod("foo", s1));
         ASSERT_EQ(compObj->GetFoo(), nullptr);
         EXPECT_NO_THROW(compInstance.InvokeBindMethod("foo", s1));
@@ -712,12 +718,14 @@ namespace
         ASSERT_TRUE(compObj->GetDep2());
         ASSERT_TRUE(compObj->GetDep3().size() > 0);
 
-        EXPECT_THROW(compInstance.InvokeBindMethod("dep1", s1), std::out_of_range);
-        EXPECT_THROW(compInstance.InvokeBindMethod("dep2", s2), std::out_of_range);
-        EXPECT_THROW(compInstance.InvokeBindMethod("dep3", s2), std::out_of_range);
-        EXPECT_THROW(compInstance.InvokeUnbindMethod("dep1", s1), std::out_of_range);
-        EXPECT_THROW(compInstance.InvokeUnbindMethod("dep2", s2), std::out_of_range);
-        EXPECT_THROW(compInstance.InvokeUnbindMethod("dep3", s2), std::out_of_range);
+        // These references are all static (no binders); invoking the dynamic
+        // bind/unbind for a reference with no binder is a no-op, not an error.
+        EXPECT_NO_THROW(compInstance.InvokeBindMethod("dep1", s1));
+        EXPECT_NO_THROW(compInstance.InvokeBindMethod("dep2", s2));
+        EXPECT_NO_THROW(compInstance.InvokeBindMethod("dep3", s2));
+        EXPECT_NO_THROW(compInstance.InvokeUnbindMethod("dep1", s1));
+        EXPECT_NO_THROW(compInstance.InvokeUnbindMethod("dep2", s2));
+        EXPECT_NO_THROW(compInstance.InvokeUnbindMethod("dep3", s2));
 
         f.Stop();
         f.WaitForStop(std::chrono::milliseconds::zero());
@@ -807,15 +815,17 @@ namespace
         // ensure only dynamic dependencies can be re-bound.
         // The runtime calls the wrapper object with the name of the reference and the ServiceReference object to use
         // for binding.
+        // "dep1" and "dep2" are static (no binder): invoking bind/unbind for them
+        // is a no-op. "dep3" is dynamic and is re-bound below.
         auto sRef = fc.GetServiceReference<ServiceDependency1>();
         auto s = fc.GetService<ServiceDependency1>(sRef);
-        EXPECT_THROW(compInstance.InvokeUnbindMethod("dep1", s), std::out_of_range);
-        EXPECT_THROW(compInstance.InvokeBindMethod("dep1", s), std::out_of_range);
+        EXPECT_NO_THROW(compInstance.InvokeUnbindMethod("dep1", s));
+        EXPECT_NO_THROW(compInstance.InvokeBindMethod("dep1", s));
 
         auto sRef2 = fc.GetServiceReference<ServiceDependency2>();
         auto s2 = fc.GetService<ServiceDependency2>(sRef2);
-        EXPECT_THROW(compInstance.InvokeUnbindMethod("dep2", s2), std::out_of_range);
-        EXPECT_THROW(compInstance.InvokeBindMethod("dep2", s2), std::out_of_range);
+        EXPECT_NO_THROW(compInstance.InvokeUnbindMethod("dep2", s2));
+        EXPECT_NO_THROW(compInstance.InvokeBindMethod("dep2", s2));
 
         auto sRef3 = fc.GetServiceReference<ServiceDependency3>();
         auto s3 = fc.GetService<ServiceDependency3>(sRef3);

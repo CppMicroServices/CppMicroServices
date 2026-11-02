@@ -182,16 +182,27 @@ namespace cppmicroservices
                     InvokeBindMethod(std::string const& refName,
                                      std::shared_ptr<void> svcToBind) override
                     {
-                        size_t index = refBinderMap.at(refName);
-                        refBinders.at(index)->Bind(svcToBind, mServiceImpl);
+                        // A reference with no binder (e.g. a component declared with
+                        // inject-references="false") is a no-op
+                        auto it = refBinderMap.find(refName);
+                        if (it == refBinderMap.end())
+                        {
+                            return;
+                        }
+                        refBinders.at(it->second)->Bind(svcToBind, mServiceImpl);
                     };
 
                     void
                     InvokeUnbindMethod(std::string const& refName,
                                        std::shared_ptr<void> svcToUnbind) override
                     {
-                        size_t index = refBinderMap.at(refName);
-                        refBinders.at(index)->UnBind(svcToUnbind, mServiceImpl);
+                        // See InvokeBindMethod: a reference with no binder is a no-op
+                        auto it = refBinderMap.find(refName);
+                        if (it == refBinderMap.end())
+                        {
+                            return;
+                        }
+                        refBinders.at(it->second)->UnBind(svcToUnbind, mServiceImpl);
                     };
 
                     virtual std::shared_ptr<T>

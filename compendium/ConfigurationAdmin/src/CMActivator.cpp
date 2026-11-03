@@ -73,8 +73,13 @@ namespace cppmicroservices
         void
         CMActivator::Stop(cppmicroservices::BundleContext context)
         {
-            WriteLock l(*notificationLock);
-            *activatorStopped = true;
+            // Only hold the lock while setting the flag. Once it is set, in-flight bundle
+            // notifications have drained and new ones return early. Holding it any longer
+            // deadlocks with CA async work that fires bundle events while we wait for it.
+            {
+                WriteLock l(*notificationLock);
+                *activatorStopped = true;
+            }
             try
             {
                 // remove the bundle listener

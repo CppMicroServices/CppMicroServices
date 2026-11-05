@@ -86,6 +86,9 @@ namespace cppmicroservices
                     std::lock_guard<std::mutex> l(bundleRegMutex);
                     bundleRegistry.clear();
                 }
+                // Every extension is gone, so a BUNDLE_STOPPING notification still in flight
+                // can be let through: it will see activatorStopped and return.
+                l.unlock();
                 // Clean up the ConfigurationAdminImpl
                 // WAITFOR all configAdmin work to stop
                 // dont queue any new work and wait for existing work

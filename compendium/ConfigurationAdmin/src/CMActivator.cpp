@@ -73,13 +73,8 @@ namespace cppmicroservices
         void
         CMActivator::Stop(cppmicroservices::BundleContext context)
         {
-            // Only hold the lock while setting the flag. Once it is set, in-flight bundle
-            // notifications have drained and new ones return early. Holding it any longer
-            // deadlocks with CA async work that fires bundle events while we wait for it.
-            {
-                WriteLock l(*notificationLock);
-                *activatorStopped = true;
-            }
+            WriteLock l(*notificationLock);
+            *activatorStopped = true;
             try
             {
                 // remove the bundle listener
@@ -91,6 +86,9 @@ namespace cppmicroservices
                     std::lock_guard<std::mutex> l(bundleRegMutex);
                     bundleRegistry.clear();
                 }
+                // Every extension is gone, so a BUNDLE_STOPPING notification still in flight
+                // can be let through: it will see activatorStopped and return.
+                l.unlock();
                 // Clean up the ConfigurationAdminImpl
                 // WAITFOR all configAdmin work to stop
                 // dont queue any new work and wait for existing work

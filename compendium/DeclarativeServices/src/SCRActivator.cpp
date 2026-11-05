@@ -107,13 +107,8 @@ namespace cppmicroservices::scrimpl
     void
     SCRActivator::Stop(cppmicroservices::BundleContext context)
     {
-        // Only hold the lock while setting the flag. Once it is set, in-flight bundle
-        // notifications have drained and new ones return early. Holding it any longer
-        // deadlocks with component code that fires bundle events during disposal.
-        {
-            WriteLock l(*notificationLock);
-            *activatorStopped = true;
-        }
+        WriteLock l(*notificationLock);
+        *activatorStopped = true;
         try
         {
             // remove the bundle listener

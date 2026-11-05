@@ -37,6 +37,7 @@
 
 #include "../TestUtils.hpp"
 
+#include <atomic>
 #include <chrono>
 #include <future>
 #include <mutex>
@@ -47,7 +48,7 @@ namespace cm = cppmicroservices::service::cm;
 
 namespace
 {
-    auto const WAIT_TIMEOUT = std::chrono::seconds(10);
+    auto const kWaitTimeout = std::chrono::seconds(10);
 
     std::string const FACTORY_PID { "test.shutdowndeadlock.factory" };
 
@@ -62,9 +63,6 @@ namespace
         std::promise<void> updated;
         std::once_flag updatedOnce;
 
-        std::mutex removedThreadMutex;
-        std::thread::id removedThread;
-
         // B is inside the BundleEventHook, i.e. the framework has already
         // snapshotted the bundle listeners (including CA's) for this event.
         std::promise<void> hookReached;
@@ -73,6 +71,16 @@ namespace
         // A is inside CMActivator::Stop holding WriteLock(*notificationLock).
         std::promise<void> caUnregistering;
         std::once_flag caUnregisteringOnce;
+
+        // Set if the hook gave up waiting for caUnregistering, meaning the
+        // interleaving under test never happened.
+        std::atomic<bool> hookTimedOut { false };
+
+        void
+        ReleaseHook()
+        {
+            std::call_once(caUnregisteringOnce, [this] { caUnregistering.set_value(); });
+        }
     };
 
     /**
@@ -92,17 +100,8 @@ namespace
         void
         Removed(std::string const&) override
         {
-            {
-                std::lock_guard<std::mutex> l(sync->removedThreadMutex);
-                sync->removedThread = std::this_thread::get_id();
-            }
-            try
-            {
-                sync->bundleToStop.Stop();
-            }
-            catch (...)
-            {
-            }
+            // CA catches and logs anything thrown from Removed().
+            sync->bundleToStop.Stop();
         }
 
       private:
@@ -133,15 +132,11 @@ namespace
             {
                 return;
             }
-            {
-                std::lock_guard<std::mutex> l(sync->removedThreadMutex);
-                if (sync->removedThread != std::this_thread::get_id())
-                {
-                    return;
-                }
-            }
             std::call_once(sync->hookReachedOnce, [this] { sync->hookReached.set_value(); });
-            caUnregistering.wait_for(WAIT_TIMEOUT);
+            if (caUnregistering.wait_for(kWaitTimeout) != std::future_status::ready)
+            {
+                sync->hookTimedOut = true;
+            }
         }
 
       private:
@@ -159,6 +154,8 @@ namespace
  * waits in StopAndWaitForAllAsync for the Removed task.
  * Thread B (CA worker): Removed -> Bundle::Stop -> CA's bundle listener blocks on
  * ReadLock(*notificationLock).
+ * Before the fix, A still held the write lock while waiting, so neither could proceed.
+ * Now A releases it once the bundle registry is cleared, before it waits.
  */
 TEST(CMShutdownDeadlockTest, testFrameworkStopWhileManagedServiceFactoryRemovedStopsBundle)
 {
@@ -168,8 +165,23 @@ TEST(CMShutdownDeadlockTest, testFrameworkStopWhileManagedServiceFactoryRemovedS
 
     auto sync = std::make_shared<Sync>();
 
-    // Install the bundle stopped by Removed() before CA, so it has a lower bundle id
-    // and framework shutdown has not reached it yet when it stops CA.
+    // If an assertion fails, don't leave a CA worker blocked in the hook or the
+    // framework running into later tests.
+    struct Cleanup
+    {
+        std::shared_ptr<Sync> sync;
+        cppmicroservices::Framework& framework;
+        ~Cleanup()
+        {
+            sync->ReleaseHook();
+            framework.Stop();
+            framework.WaitForStop(kWaitTimeout);
+        }
+    } cleanup { sync, framework };
+
+    // Framework shutdown would stop this bundle before CA (StopAllBundles goes in
+    // reverse location order), but Removed() has already put it in STOPPING by
+    // then, so shutdown skips it and it is still stopping when CA is stopped.
     sync->bundleToStop = test::InstallAndStartBundle(context, "TestBundleManagedServiceFactory");
     ASSERT_TRUE(sync->bundleToStop);
     test::InstallAndStartConfigAdmin(context);
@@ -186,7 +198,7 @@ TEST(CMShutdownDeadlockTest, testFrameworkStopWhileManagedServiceFactoryRemovedS
         {
             if (evt.GetType() == cppmicroservices::ServiceEvent::SERVICE_UNREGISTERING)
             {
-                std::call_once(sync->caUnregisteringOnce, [&sync] { sync->caUnregistering.set_value(); });
+                sync->ReleaseHook();
             }
         },
         "(" + cppmicroservices::Constants::OBJECTCLASS + "=" + us_service_interface_iid<cm::ConfigurationAdmin>()
@@ -204,12 +216,12 @@ TEST(CMShutdownDeadlockTest, testFrameworkStopWhileManagedServiceFactoryRemovedS
         ->Update(cppmicroservices::AnyMap { cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS,
                                             { { "host", std::string("remotehost") } } })
         .get();
-    ASSERT_EQ(sync->updated.get_future().wait_for(WAIT_TIMEOUT), std::future_status::ready)
+    ASSERT_EQ(sync->updated.get_future().wait_for(kWaitTimeout), std::future_status::ready)
         << "ManagedServiceFactory::Updated was never called";
 
     // Queue the CA task which calls ManagedServiceFactory::Removed. Don't wait on it.
     auto removeFuture = configuration->Remove();
-    ASSERT_EQ(sync->hookReached.get_future().wait_for(WAIT_TIMEOUT), std::future_status::ready)
+    ASSERT_EQ(sync->hookReached.get_future().wait_for(kWaitTimeout), std::future_status::ready)
         << "ManagedServiceFactory::Removed never stopped the bundle";
 
     configAdmin.reset();
@@ -217,7 +229,25 @@ TEST(CMShutdownDeadlockTest, testFrameworkStopWhileManagedServiceFactoryRemovedS
 
     // Shut down while the Removed() task is still running. Before the fix this blocks
     // forever in CMActivator::Stop.
+    // Framework::WaitForStop joins the shutdown thread even when it times out, so poll
+    // the state instead. A deadlock then shows up as a failure here rather than only
+    // as the ctest timeout.
     framework.Stop();
+    auto const stopping = [&framework]
+    {
+        return ((cppmicroservices::Bundle::STATE_ACTIVE | cppmicroservices::Bundle::STATE_STOPPING)
+                & framework.GetState())
+               != 0;
+    };
+    auto const deadline = std::chrono::steady_clock::now() + kWaitTimeout;
+    while (stopping() && std::chrono::steady_clock::now() < deadline)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+    ASSERT_FALSE(stopping()) << "Framework shutdown deadlocked";
     auto evt = framework.WaitForStop(std::chrono::milliseconds::zero());
-    EXPECT_EQ(evt.GetType(), cppmicroservices::FrameworkEvent::Type::FRAMEWORK_STOPPED);
+    ASSERT_EQ(evt.GetType(), cppmicroservices::FrameworkEvent::Type::FRAMEWORK_STOPPED);
+    EXPECT_FALSE(sync->hookTimedOut) << "CMActivator::Stop never ran while the bundle event was held";
+    EXPECT_EQ(removeFuture.wait_for(kWaitTimeout), std::future_status::ready)
+        << "ManagedServiceFactory::Removed task never finished";
 }

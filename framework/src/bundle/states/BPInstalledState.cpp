@@ -14,15 +14,13 @@ namespace cppmicroservices
     void BPInstalledState::Start(BundlePrivate& mgr, uint32_t options)
     {
         TransitionLogger transitionLogger(mgr, "Start()");
-        auto observedState = shared_from_this(); 
-        std::promise<void> transitionAction; 
-        auto fut = transitionAction.get_future();
-        auto newState = std::make_shared<BPActiveState>(std::move(fut)); 
+        auto observedState = shared_from_this();
+        auto newState = std::make_shared<BPActiveState>(BundlePrivateState::PENDING_TRANSITION);
 
         observedState->WaitForTransitionTask();
         if (mgr.CompareAndSetState(&observedState, newState)){
             transitionLogger.MarkTransitionAccepted();
-            TransitionCompletionGuard completeTransition(transitionAction);
+            TransitionCompletionGuard completeTransition(*newState);
 
             auto frameworkBlock = CheckAndBlockFramework(mgr);
             SetAutostart(mgr, options, options);
@@ -33,40 +31,36 @@ namespace cppmicroservices
         }
         else {
             observedState->WaitForTransitionTask();
-        }        
+        }
     }
 
     void BPInstalledState::Stop(BundlePrivate& mgr, uint32_t options){
         TransitionLogger transitionLogger(mgr, "Stop()");
-        auto observedState = shared_from_this(); 
-        std::promise<void> transitionAction; 
-        auto fut = transitionAction.get_future();
-        auto newState = std::make_shared<BPInstalledState>(std::move(fut)); 
+        auto observedState = shared_from_this();
+        auto newState = std::make_shared<BPInstalledState>(BundlePrivateState::PENDING_TRANSITION);
 
         observedState->WaitForTransitionTask();
         if (mgr.CompareAndSetState(&observedState, newState)){
             transitionLogger.MarkTransitionAccepted();
-            TransitionCompletionGuard completeTransition(transitionAction);
+            TransitionCompletionGuard completeTransition(*newState);
             SetAutostart(mgr, options, -1);
         }
         else {
             observedState->WaitForTransitionTask();
-        } 
+        }
     }
 
     void BPInstalledState::Uninstall(BundlePrivate& mgr){
 
         TransitionLogger transitionLogger(mgr, "Uninstall()");
-        auto observedState = shared_from_this(); 
-        std::promise<void> transitionAction; 
-        auto fut = transitionAction.get_future();
-        auto newState = std::make_shared<BPUninstalledState>(std::move(fut));
+        auto observedState = shared_from_this();
+        auto newState = std::make_shared<BPUninstalledState>(BundlePrivateState::PENDING_TRANSITION);
 
         observedState->WaitForTransitionTask();
         if (mgr.CompareAndSetState(&observedState, newState))
         {
             transitionLogger.MarkTransitionAccepted();
-            TransitionCompletionGuard completeTransition(transitionAction);
+            TransitionCompletionGuard completeTransition(*newState);
             mgr.coreCtx->bundleRegistry.Remove(mgr.location, mgr.id);
             mgr.SetStateValue(Bundle::STATE_INSTALLED);
             mgr.coreCtx->listeners.BundleChanged(
@@ -98,8 +92,8 @@ namespace cppmicroservices
         }
         else {
             observedState->WaitForTransitionTask();
-        }        
-        
+        }
+
     }
 
-} 
+}

@@ -21,16 +21,8 @@
 
 namespace cppmicroservices {
 
-    BundlePrivateState::BundlePrivateState() 
-    : ownerThread(std::this_thread::get_id())
-    {
-        std::promise<void> prom;
-        ready = prom.get_future().share();
-        prom.set_value();
-    }
-
-    BundlePrivateState::BundlePrivateState(std::shared_future<void> blockUntil)
-    : ready(std::move(blockUntil))
+    BundlePrivateState::BundlePrivateState(bool pendingTransition)
+    : transitionComplete(!pendingTransition)
     , ownerThread(std::this_thread::get_id())
     {
     }
@@ -54,7 +46,21 @@ namespace cppmicroservices {
 
     void BundlePrivateState::WaitForTransitionTask()
     {
-        ready.get();
+        if (transitionComplete.load(std::memory_order_acquire))
+        {
+            return;
+        }
+        std::unique_lock<std::mutex> lock(transitionMutex);
+        transitionCv.wait(lock, [this] { return transitionComplete.load(std::memory_order_acquire); });
+    }
+
+    void BundlePrivateState::SignalTransitionComplete()
+    {
+        {
+            std::lock_guard<std::mutex> lock(transitionMutex);
+            transitionComplete.store(true, std::memory_order_release);
+        }
+        transitionCv.notify_all();
     }
 
     void BundlePrivateState::StartFromIdle(BundlePrivate& mgr, std::shared_ptr<BPActiveState> const& newState){
@@ -211,8 +217,8 @@ namespace cppmicroservices {
         }
     }
 
-    TransitionCompletionGuard::TransitionCompletionGuard(std::promise<void>& transitionAction)
-    : transitionAction(&transitionAction)
+    TransitionCompletionGuard::TransitionCompletionGuard(BundlePrivateState& state)
+    : state(&state)
     {
     }
 
@@ -224,10 +230,10 @@ namespace cppmicroservices {
     void
     TransitionCompletionGuard::Complete()
     {
-        if (transitionAction != nullptr)
+        if (state != nullptr)
         {
-            transitionAction->set_value();
-            transitionAction = nullptr;
+            state->SignalTransitionComplete();
+            state = nullptr;
         }
     }
 

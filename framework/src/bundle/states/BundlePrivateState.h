@@ -1,9 +1,11 @@
 #ifndef BundlePrivateState_h
 #define BundlePrivateState_h
 
+#include <atomic>
+#include <condition_variable>
 #include <cstdint>
-#include <future>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <thread>
 
@@ -15,10 +17,16 @@ namespace cppmicroservices
     class BPActiveState;
 
     class BundlePrivateState : public std::enable_shared_from_this<BundlePrivateState>
-    { 
+    {
         public:
-        BundlePrivateState();
-        explicit BundlePrivateState(std::shared_future<void> blockUntil);
+        // Pass to the constructor when the state is the target of an in-flight
+        // transition. Such a state starts out NOT yet complete; the thread performing
+        // the transition signals completion via SignalTransitionComplete() (normally
+        // through a TransitionCompletionGuard). The default (false) creates an idle
+        // state with no producing transition to wait for.
+        static constexpr bool PENDING_TRANSITION = true;
+
+        explicit BundlePrivateState(bool pendingTransition = false);
         virtual ~BundlePrivateState() = default;
         BundlePrivateState(BundlePrivateState const&) = delete;
         BundlePrivateState& operator=(BundlePrivateState const&) = delete;
@@ -34,10 +42,22 @@ namespace cppmicroservices
         std::unique_ptr<FrameworkShutdownBlocker> CheckAndBlockFramework(BundlePrivate&);
         void StartFromIdle(BundlePrivate&, std::shared_ptr<BPActiveState> const&);
 
+        // Block until the transition that produced this state object has finished
+        // its work. Lock-free fast path once completion has been signalled.
         void WaitForTransitionTask();
 
+        // Mark the transition that produced this state object as complete, waking
+        // any threads blocked in WaitForTransitionTask(). Idempotent.
+        void SignalTransitionComplete();
+
         private:
-        std::shared_future<void> ready;
+        // One-shot completion latch for this state's producing transition. The
+        // atomic flag is the common-case fast path; the mutex/condition_variable
+        // are touched only when a thread actually has to block. Replaces the
+        // per-transition heap-allocated std::promise/std::shared_future baton.
+        std::mutex transitionMutex;
+        std::condition_variable transitionCv;
+        std::atomic<bool> transitionComplete;
         std::thread::id ownerThread;
 
     };
@@ -45,7 +65,7 @@ namespace cppmicroservices
     class TransitionCompletionGuard
     {
       public:
-        explicit TransitionCompletionGuard(std::promise<void>& transitionAction);
+        explicit TransitionCompletionGuard(BundlePrivateState& state);
         ~TransitionCompletionGuard();
 
         TransitionCompletionGuard(TransitionCompletionGuard const&) = delete;
@@ -56,7 +76,7 @@ namespace cppmicroservices
         void Complete();
 
       private:
-        std::promise<void>* transitionAction;
+        BundlePrivateState* state;
     };
 
     class TransitionLogger
@@ -79,6 +99,6 @@ namespace cppmicroservices
         int uncaughtExceptionCount;
     };
 
-} 
+}
 
-#endif 
+#endif

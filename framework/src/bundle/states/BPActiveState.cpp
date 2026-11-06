@@ -13,15 +13,13 @@ namespace cppmicroservices
 {
     void BPActiveState::Start(BundlePrivate& mgr, uint32_t){
         TransitionLogger transitionLogger(mgr, "Start()");
-        auto observedState = shared_from_this(); 
-        std::promise<void> transitionAction; 
-        auto fut = transitionAction.get_future();
-        auto newState = std::make_shared<BPActiveState>(std::move(fut));
+        auto observedState = shared_from_this();
+        auto newState = std::make_shared<BPActiveState>(BundlePrivateState::PENDING_TRANSITION);
 
         observedState->WaitForTransitionTask();
         if (mgr.CompareAndSetState(&observedState, newState)){
             transitionLogger.MarkTransitionAccepted();
-            TransitionCompletionGuard completeTransition(transitionAction);
+            TransitionCompletionGuard completeTransition(*newState);
             auto frameworkBlock = CheckAndBlockFramework(mgr);
             US_UNUSED(frameworkBlock);
         }
@@ -61,7 +59,7 @@ namespace cppmicroservices
                 mgr.bundleContext.Store(std::shared_ptr<BundleContextPrivate>());
             }
             mgr.SetStateValue(Bundle::STATE_RESOLVED);
-            mgr.coreCtx->listeners.BundleChanged({ BundleEvent::BUNDLE_STOPPED, MakeBundle(mgr.shared_from_this()) }); 
+            mgr.coreCtx->listeners.BundleChanged({ BundleEvent::BUNDLE_STOPPED, MakeBundle(mgr.shared_from_this()) });
 
             return res;
         }
@@ -69,15 +67,13 @@ namespace cppmicroservices
 
     void BPActiveState::Stop(BundlePrivate& mgr, uint32_t options){
         TransitionLogger transitionLogger(mgr, "Stop()");
-        auto observedState = shared_from_this(); 
-        std::promise<void> transitionAction; 
-        auto fut = transitionAction.get_future();
-        auto newState = std::make_shared<BPResolvedState>(std::move(fut));
+        auto observedState = shared_from_this();
+        auto newState = std::make_shared<BPResolvedState>(BundlePrivateState::PENDING_TRANSITION);
 
         observedState->WaitForTransitionTask();
         if (mgr.CompareAndSetState(&observedState, newState)){
             transitionLogger.MarkTransitionAccepted();
-            TransitionCompletionGuard completeTransition(transitionAction);
+            TransitionCompletionGuard completeTransition(*newState);
             SetAutostart(mgr, options, -1);
             std::exception_ptr res = StopActiveBundle(mgr);
             if (res){
@@ -91,15 +87,13 @@ namespace cppmicroservices
 
     void BPActiveState::Uninstall(BundlePrivate& mgr){
         TransitionLogger transitionLogger(mgr, "Uninstall()");
-        auto observedState = shared_from_this(); 
-        std::promise<void> transitionAction; 
-        auto fut = transitionAction.get_future();
-        auto newState = std::make_shared<BPResolvedState>(std::move(fut));
+        auto observedState = shared_from_this();
+        auto newState = std::make_shared<BPResolvedState>(BundlePrivateState::PENDING_TRANSITION);
 
         observedState->WaitForTransitionTask();
         if (mgr.CompareAndSetState(&observedState, newState)){
             transitionLogger.MarkTransitionAccepted();
-            TransitionCompletionGuard completeTransition(transitionAction);
+            TransitionCompletionGuard completeTransition(*newState);
             std::exception_ptr res = StopActiveBundle(mgr);
             if (res){
                 mgr.coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
@@ -112,16 +106,14 @@ namespace cppmicroservices
         }
         else {
             observedState->WaitForTransitionTask();
-        }        
+        }
     }
 
     void BPActiveState::StartFailed(BundlePrivate& mgr){
-        auto observedState = shared_from_this(); 
-        std::promise<void> transitionAction; 
-        auto fut = transitionAction.get_future();
-        auto newState = std::make_shared<BPResolvedState>(std::move(fut));
+        auto observedState = shared_from_this();
+        auto newState = std::make_shared<BPResolvedState>(BundlePrivateState::PENDING_TRANSITION);
         if(mgr.CompareAndSetState(&observedState, newState)){
-            TransitionCompletionGuard completeTransition(transitionAction);
+            TransitionCompletionGuard completeTransition(*newState);
             mgr.SetStateValue(Bundle::STATE_STOPPING);
             mgr.coreCtx->listeners.BundleChanged(
                 BundleEvent(BundleEvent::BUNDLE_STOPPING, MakeBundle(mgr.shared_from_this())));
@@ -132,9 +124,9 @@ namespace cppmicroservices
                 oldBundleContext->Invalidate();
             }
             mgr.SetStateValue(Bundle::STATE_RESOLVED);
-            mgr.coreCtx->listeners.BundleChanged({ BundleEvent::BUNDLE_STOPPED, MakeBundle(mgr.shared_from_this()) }); 
+            mgr.coreCtx->listeners.BundleChanged({ BundleEvent::BUNDLE_STOPPED, MakeBundle(mgr.shared_from_this()) });
         }
-        
+
     }
 
-} 
+}

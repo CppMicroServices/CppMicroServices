@@ -64,3 +64,5 @@ add_subdirectory(libStartBundleA)
 add_subdirectory(libStopBundleA)
 
 add_subdirectory(libTestModuleWithEmbeddedZip)
+
+add_subdirectory(libBundleMissingDestroyActivator)

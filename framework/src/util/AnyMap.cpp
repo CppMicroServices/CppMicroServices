@@ -567,7 +567,8 @@ namespace cppmicroservices
                 os << ", ";
             }
             newline_and_indent(os, increment, indent);
-            os << "\"" << i1->first << "\" : " << i1->second.ToJSON(increment, indent + increment);
+            any_value_to_json(os, i1->first, 0, 0);
+            os << " : " << i1->second.ToJSON(increment, indent + increment);
         }
         newline_and_indent(os, increment, indent - increment);
         os << "}";
@@ -609,7 +610,9 @@ namespace cppmicroservices
                 os << ", ";
             }
             newline_and_indent(os, increment, indent + increment);
-            os << "{\"" << i1->first << "\" , " << i1->second.ToCPP(increment, indent + increment + increment) << "}";
+            os << "{";
+            any_value_to_json(os, i1->first, 0, 0);
+            os << " , " << i1->second.ToCPP(increment, indent + increment + increment) << "}";
         }
         newline_and_indent(os, increment, indent - increment);
         os << "}}";

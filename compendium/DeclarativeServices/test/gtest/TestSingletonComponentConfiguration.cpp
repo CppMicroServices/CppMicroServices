@@ -20,6 +20,7 @@
 
   =============================================================================*/
 
+#include "../../src/ComponentContextImpl.hpp"
 #include "../../src/SCRAsyncWorkService.hpp"
 #include "../../src/SCRExtensionRegistry.hpp"
 #include "../../src/manager/SingletonComponentConfiguration.hpp"
@@ -31,6 +32,7 @@
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/logservice/LogService.hpp"
+#include "cppmicroservices/servicecomponent/detail/ComponentInstanceImpl.hpp"
 
 namespace cppmicroservices
 {
@@ -286,6 +288,57 @@ namespace cppmicroservices
             EXPECT_EQ(obj->GetComponentInstance(), nullptr);
             EXPECT_EQ(obj->GetComponentContext(), nullptr);
             EXPECT_EQ(obj->GetState()->GetValue(), ComponentState::UNSATISFIED_REFERENCE);
+        }
+
+        // A dummy implementation class with NO bound references, standing in for a
+        // component declared with inject-references="false". SCRCodeGen emits no
+        // Binders for such a component, so the generated ComponentInstanceImpl has an
+        // empty refBinderMap.
+        struct NoInjectImpl
+        {
+        };
+
+        // Demonstrates the std::out_of_range defect for inject-references="false"
+        // components (DS 1.5.20).
+        //
+        // When DS delivers a dynamic bind to a component declared
+        // inject-references="false", the component's ComponentInstanceImpl has no
+        // binders, so InvokeBindMethod does refBinderMap.at(refName), which throws
+        // std::out_of_range. BindReference catches it and logs it as "Exception
+        // received from user code while binding..." even though no user code ran and
+        // nothing is wrong with the user's component.
+        //
+        // Expected (fixed) behavior: DS must not attempt to invoke a bind method for a
+        // reference that has no binder, so no error is logged.
+        TEST_F(SingletonComponentConfigurationTest, VerifyBindReferenceNoBinderDoesNotLogError)
+        {
+            using cppmicroservices::logservice::SeverityLevel;
+            namespace scd = cppmicroservices::service::component::detail;
+
+            auto regService = std::make_shared<dummy::ServiceImpl>();
+            auto svcReg = framework.GetBundleContext().RegisterService<dummy::ServiceImpl>(regService);
+            auto sRef = svcReg.GetReference();
+
+            auto realCtxt = std::make_shared<ComponentContextImpl>(obj, framework);
+            // A component instance with no binders (inject-references="false").
+            auto noBinderInstance = std::make_shared<scd::ComponentInstanceImpl<NoInjectImpl>>();
+            obj->SetComponentInstancePair(InstanceContextPair(noBinderInstance, realCtxt));
+
+            // No "user code" bind error must be logged: there is no binder to invoke.
+            auto BindExceptionLog
+                = testing::AllOf(testing::HasSubstr("Exception received from user code while binding"),
+                                 testing::HasSubstr("ref"));
+            EXPECT_CALL(*mockLogger, Log(SeverityLevel::LOG_ERROR, BindExceptionLog, testing::_)).Times(0);
+
+            EXPECT_NO_THROW(obj->BindReference("ref", sRef));
+
+            // clean up injected objects
+            {
+                auto instCtxtPair = obj->data.lock();
+                instCtxtPair->first.reset();
+                instCtxtPair->second.reset();
+            }
+            svcReg.Unregister();
         }
     } // namespace scrimpl
 } // namespace cppmicroservices

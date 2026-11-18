@@ -72,12 +72,12 @@ namespace cppmicroservices
              * Set initial list of items into tracker before events begin to be
              * received.
              *
-             * This method must be called from Tracker's open method while synchronized
-             * on this object in the same synchronized block as the add listener call.
+             * This method is called from the Tracker's open method after the add
+             * listener call. It synchronizes on this object while storing the initial
+             * list, so it must not be called while already synchronized on this object.
              *
              * @param list The initial list of items to be tracked. <code>null</code>
              *        entries in the list are ignored.
-             * @GuardedBy this
              */
             void SetInitial(std::vector<S> const& list);
 
@@ -280,6 +280,23 @@ namespace cppmicroservices
              * previouslyAdded set
              */
             bool trackInitialFinished { false };
+
+            /**
+             * Set of items that were removed (untracked) before SetInitial() stored the
+             * initial list retrieved by GetInitialReferences
+             *
+             * @GuardedBy this
+             */
+            std::unordered_set<S> removedBeforeInitial;
+
+            /**
+             * bool indicating that SetInitial() has stored the initial list. Until this
+             * is true, Untrack records items it finds in none of the lists into
+             * removedBeforeInitial so SetInitial() can skip them.
+             *
+             * @GuardedBy this
+             */
+            bool initialReferencesSet { false };
 
             /**
              * Modification count. This field is initialized to zero and incremented by

@@ -132,7 +132,13 @@ namespace cppmicroservices
                                                                                          : d->listenerFilter);
                     }
                 }
-                /* set tracked with the initial references */
+                /*
+                 * Set tracked with the initial references. A service may unregister
+                 * between GetInitialReferences() above and this call; SetInitial()
+                 * synchronizes on the tracked object and skips any reference whose
+                 * UNREGISTERING event was recorded by Untrack in that window,
+                 * so a since-unregistered reference is never tracked forever.
+                 */
                 t->SetInitial(references);
             }
             catch (std::invalid_argument const& e)

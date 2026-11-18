@@ -1,0 +1,26 @@
+{
+    "bundle.symbolic_name": "TestBundleDSMIConsumer",
+    "scr": {
+        "version": 1,
+        "components": [
+            {
+                "immediate": true,
+                "implementation-class": "sample::MultiInterfaceConsumer",
+                "service": {
+                    "interfaces": [
+                        "test::MultiInterfaceProbe"
+                    ]
+                },
+                "references": [
+                    {
+                        "name": "miA",
+                        "interface": "test::MultiInterfaceA",
+                        "cardinality": "0..n",
+                        "policy": "dynamic",
+                        "policy-option": "reluctant"
+                    }
+                ]
+            }
+        ]
+    }
+}

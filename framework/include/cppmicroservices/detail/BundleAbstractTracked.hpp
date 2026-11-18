@@ -47,7 +47,22 @@ namespace cppmicroservices
         void
         BundleAbstractTracked<S, T, R>::SetInitial(std::vector<S> const& initiallist)
         {
-            std::copy(initiallist.begin(), initiallist.end(), std::back_inserter(initial));
+            auto l = this->Lock();
+            US_UNUSED(l);
+            for (auto const& item : initiallist)
+            {
+                /*
+                 * Skip any item that was removed (service unregistered) between 
+                 * adding the listener and this call.
+                 */
+                if (removedBeforeInitial.find(item) != removedBeforeInitial.end())
+                {
+                    continue;
+                }
+                initial.push_back(item);
+            }
+            initialReferencesSet = true;
+            removedBeforeInitial.clear();
         }
 
         template <class S, class T, class R>
@@ -199,6 +214,16 @@ namespace cppmicroservices
                 // nothing to do, no item is being tracked.
                 if (trackedItemIter == tracked.end())
                 {
+                    /*
+                     * The item is in none of the initial, adding or tracked lists. If
+                     * this happens before SetInitial() has stored the initial list, the
+                     * item was removed during the window between adding the listener and
+                     * SetInitial(). Remember it so SetInitial() skips it
+                     */
+                    if (!initialReferencesSet)
+                    {
+                        removedBeforeInitial.insert(item);
+                    }
                     return;
                 }
                 /*

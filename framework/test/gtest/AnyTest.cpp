@@ -426,8 +426,38 @@ TEST(AnyTest, AnyEquality)
     rhs["int"] = 1;
     EXPECT_EQ(lhs, rhs); // now they should be equal again
     rhs.erase("int");
-    EXPECT_NE(lhs, rhs); // and finally, with the "int" element erased, they should not be equal 
+    EXPECT_NE(lhs, rhs); // and finally, with the "int" element erased, they should not be equal
                          // anymore.
+}
+
+/**
+ * @test Two empty Anys compare equal and are not unequal.
+ */
+TEST(AnyTest, EmptyAnysAreEqual)
+{
+    // Arrange
+    Any const lhs;
+    Any const rhs;
+
+    // Act / Assert
+    EXPECT_TRUE(lhs == rhs);
+    EXPECT_FALSE(lhs != rhs);
+}
+
+/**
+ * @test An empty Any never equals a non-empty Any, regardless of operand order.
+ */
+TEST(AnyTest, EmptyAnyNotEqualToNonEmptyAny)
+{
+    // Arrange
+    Any const empty;
+    Any const nonEmpty(1);
+
+    // Act / Assert
+    EXPECT_FALSE(empty == nonEmpty);
+    EXPECT_FALSE(nonEmpty == empty);
+    EXPECT_TRUE(empty != nonEmpty);
+    EXPECT_TRUE(nonEmpty != empty);
 }
 
 TEST(AnyTest, AnyMove)

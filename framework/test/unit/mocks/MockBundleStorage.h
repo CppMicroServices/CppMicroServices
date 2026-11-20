@@ -27,30 +27,28 @@
 
 #include "gmock/gmock.h"
 
-namespace cppmicroservices
+namespace cppmicroservices::test
 {
-    namespace test
+    // gmock implementation of the framework-private BundleStorage interface.
+    // BundleStorage is not exported from the CppMicroServices library, so
+    // this mock is only usable from tests that link the framework objects
+    // directly (usFrameworkUnitTests).
+    class MockBundleStorage : public BundleStorage
     {
-        // gmock implementation of the framework-private BundleStorage interface.
-        // BundleStorage is not exported from the CppMicroServices library, so
-        // this mock is only usable from tests that link the framework objects
-        // directly (usFrameworkUnitTests).
-        class MockBundleStorage : public BundleStorage
-        {
-          public:
-            MOCK_METHOD(std::shared_ptr<BundleArchive>,
-                        CreateAndInsertArchive,
-                        (std::shared_ptr<BundleResourceContainer> const&, std::string const&, ManifestT const&),
-                        (override));
-            MOCK_METHOD(std::vector<std::shared_ptr<BundleArchive>>, GetAllBundleArchives, (), (const, override));
-            MOCK_METHOD(std::vector<long>, GetStartOnLaunchBundles, (), (const, override));
-            MOCK_METHOD(void, Close, (), (override));
+      public:
+        MOCK_METHOD(std::shared_ptr<BundleArchive>,
+                    CreateAndInsertArchive,
+                    (std::shared_ptr<BundleResourceContainer> const&, std::string const&, ManifestT const&),
+                    (override));
+        MOCK_METHOD(std::vector<std::shared_ptr<BundleArchive>>, GetAllBundleArchives, (), (const, override));
+        MOCK_METHOD(std::vector<long>, GetStartOnLaunchBundles, (), (const, override));
+        MOCK_METHOD(void, Close, (), (override));
 
-            // RemoveArchive is private in BundleStorage (only BundleArchive may
-            // call it). gmock can still override and verify it.
-            MOCK_METHOD(bool, RemoveArchive, (BundleArchive const*), (override));
-        };
-    } // namespace test
-} // namespace cppmicroservices
+        // RemoveArchive is private in BundleStorage (only BundleArchive may
+        // call it). gmock can still override and verify it.
+        MOCK_METHOD(bool, RemoveArchive, (BundleArchive const*), (override));
+    };
+
+} // namespace cppmicroservices::test
 
 #endif // CPPMICROSERVICES_TEST_MOCKBUNDLESTORAGE_H

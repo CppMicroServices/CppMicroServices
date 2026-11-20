@@ -484,16 +484,16 @@ namespace cppmicroservices
         }
 
         /**
-         * Compares this Any with another Any.
+         * Compares this Any with another Any. We accomplish this by forwarding the call to a virtual
+         * compare function on the Holder of the value in the _content field. The Placeholder subclass of
+         * Holder provides an implementation that invokes the above operator== with the underlying value
+         * of ValueType.
          *
-         * Two empty Anys compare equal; an empty Any never equals a non-empty one.
-         * Otherwise the call is forwarded to a virtual compare function on the Holder of
-         * the value in the _content field, which invokes the above operator== with the
-         * underlying value of ValueType.
+         * @note Two empty Anys compare equal, and an empty Any never compares equal to a non-empty one.
          *
          * @param rhs an Any to compare against
-         * @return bool return true if both Anys are empty, or if rhs compares equal to *this
-         *              AND the underlying ValueType has an operator==; return false otherwise.
+         * @return bool return true if rhs compares equal to *this AND the underlying ValueType has an
+         *              operator==, and return false otherwise.
          */
         bool
         operator==(Any const& rhs) const

@@ -483,6 +483,13 @@ TEST(AnyTest, AnyMapWithEmptyValuesCompares)
 
 TEST(AnyTest, AnyMove)
 {
+    // MyType's counters are static, so they keep their values across runs of this test in the
+    // same process (e.g. --gtest_repeat). Reset them so the expected counts below stay correct.
+    MyType::defaults = 0;
+    MyType::dtors = 0;
+    MyType::copies = 0;
+    MyType::moves = 0;
+
     cppmicroservices::AnyMap anyMap;
     anyMap.emplace("key1", MyType {});
 

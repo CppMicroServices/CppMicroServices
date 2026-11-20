@@ -1,0 +1,16 @@
+{
+    "bundle.symbolic_name" : "TestBundleDSStopOrder",
+    "bundle.name" : "TestBundleDSStopOrder",
+    "bundle.activator" : true,
+    "scr" : {
+        "version" : 1,
+        "components" : [{
+            "enabled": true,
+            "immediate" : true,
+            "implementation-class": "sample::ServiceComponentStopOrder",
+            "service" : {
+                "interfaces" : ["test::Interface1"]
+            }
+        }]
+    }
+}

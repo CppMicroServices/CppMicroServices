@@ -83,6 +83,7 @@ set(_declarativeservices_tests
   TestRegistrationManager.cpp
   TestSCRBundleExtension.cpp
   TestSCRExtensionRegistry.cpp
+  TestSCRShutdownOrdering.cpp
   TestServiceComponentRuntimeImpl.cpp
   TestServiceMetadataParserV1.cpp
   TestSetConfiguration.cpp
@@ -204,6 +205,7 @@ set(_test_bundles
   TestBundleDSTOI20
   TestBundleDSTOI21
   TestBundleDSTOI22
+  TestBundleDSStopOrder
   TestBundleDSCA01
   TestBundleDSCA02
   TestBundleDSCA03

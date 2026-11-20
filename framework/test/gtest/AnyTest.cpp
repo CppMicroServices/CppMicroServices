@@ -426,8 +426,59 @@ TEST(AnyTest, AnyEquality)
     rhs["int"] = 1;
     EXPECT_EQ(lhs, rhs); // now they should be equal again
     rhs.erase("int");
-    EXPECT_NE(lhs, rhs); // and finally, with the "int" element erased, they should not be equal 
+    EXPECT_NE(lhs, rhs); // and finally, with the "int" element erased, they should not be equal
                          // anymore.
+}
+
+/**
+ * @test Two empty Anys compare equal and are not unequal.
+ */
+TEST(AnyTest, EmptyAnysAreEqual)
+{
+    // Arrange
+    Any const lhs;
+    Any const rhs;
+
+    // Act / Assert
+    EXPECT_TRUE(lhs == rhs);
+    EXPECT_FALSE(lhs != rhs);
+}
+
+/**
+ * @test An empty Any never equals a non-empty Any, regardless of operand order.
+ */
+TEST(AnyTest, EmptyAnyNotEqualToNonEmptyAny)
+{
+    // Arrange
+    Any const empty;
+    Any const nonEmpty(1);
+
+    // Act / Assert
+    EXPECT_FALSE(empty == nonEmpty);
+    EXPECT_FALSE(nonEmpty == empty);
+    EXPECT_TRUE(empty != nonEmpty);
+    EXPECT_TRUE(nonEmpty != empty);
+}
+
+/**
+ * @test AnyMaps whose mapped values are empty Anys compare by value: equal when
+ *       both values are empty, unequal once one of them holds a value. This is
+ *       the container path (AnyMap equality compares mapped values with
+ *       Any::operator==) through which empty Anys are most likely to be compared.
+ */
+TEST(AnyTest, AnyMapWithEmptyValuesCompares)
+{
+    // Arrange
+    AnyMap lhs(AnyMap::UNORDERED_MAP);
+    AnyMap rhs(AnyMap::UNORDERED_MAP);
+    lhs["k"] = Any();
+    rhs["k"] = Any();
+
+    // Act / Assert
+    EXPECT_EQ(lhs, rhs);
+
+    rhs["k"] = 1;
+    EXPECT_NE(lhs, rhs);
 }
 
 TEST(AnyTest, AnyMove)

@@ -488,6 +488,9 @@ namespace cppmicroservices
          * compare function on the Holder of the value in the _content field. The Placeholder subclass of
          * Holder provides an implementation that invokes the above operator== with the underlying value
          * of ValueType.
+         *
+         * @note Two empty Anys compare equal, and an empty Any never compares equal to a non-empty one.
+         *
          * @param rhs an Any to compare against
          * @return bool return true if rhs compares equal to *this AND the underlying ValueType has an
          *              operator==, and return false otherwise.
@@ -495,6 +498,16 @@ namespace cppmicroservices
         bool
         operator==(Any const& rhs) const
         {
+            // An empty Any reports typeid(void), which no held value can have, so this one
+            // check rejects both type mismatches and empty-vs-non-empty comparisons.
+            if (Type() != rhs.Type())
+            {
+                return false;
+            }
+            if (Empty())
+            {
+                return true; // both are empty
+            }
             return rhs._content->compare(*this);
         }
 

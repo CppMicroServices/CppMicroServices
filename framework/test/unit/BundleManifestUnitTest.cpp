@@ -39,6 +39,10 @@ namespace cppmicroservices
 {
     namespace
     {
+        // Must match the "int" and "double" values in ParsesScalarHeaders.
+        constexpr int kExpectedInt = 5;
+        constexpr double kExpectedDouble = 1.5;
+
         std::unique_ptr<BundleManifest>
         Parse(std::string const& json)
         {
@@ -63,8 +67,8 @@ namespace cppmicroservices
         EXPECT_EQ("test_bundle", any_cast<std::string>(m->GetValue("bundle.symbolic_name")));
         EXPECT_EQ("1.2.3", any_cast<std::string>(m->GetValue("bundle.version")));
         EXPECT_TRUE(any_cast<bool>(m->GetValue("flag")));
-        EXPECT_EQ(5, any_cast<int>(m->GetValue("int")));
-        EXPECT_DOUBLE_EQ(1.5, any_cast<double>(m->GetValue("double")));
+        EXPECT_EQ(kExpectedInt, any_cast<int>(m->GetValue("int")));
+        EXPECT_DOUBLE_EQ(kExpectedDouble, any_cast<double>(m->GetValue("double")));
         EXPECT_FALSE(m->Contains("missing"));
         EXPECT_TRUE(m->GetValue("missing").Empty());
     }

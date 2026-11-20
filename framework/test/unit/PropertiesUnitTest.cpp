@@ -37,11 +37,13 @@ namespace cppmicroservices
 {
     namespace
     {
+        constexpr int kRanking = 5;
+
         AnyMap
         MakeMap(AnyMap::map_type type)
         {
             AnyMap m(type);
-            m["Service.Ranking"] = 5;
+            m["Service.Ranking"] = kRanking;
             m["objectclass"] = std::string("IFoo");
             return m;
         }
@@ -57,8 +59,8 @@ namespace cppmicroservices
 
         auto [value, found] = props.Value_unlocked("Service.Ranking", true);
         EXPECT_TRUE(found);
-        EXPECT_EQ(5, any_cast<int>(value));
-        EXPECT_EQ(5, any_cast<int>(props.ValueByRef_unlocked("Service.Ranking", true)));
+        EXPECT_EQ(kRanking, any_cast<int>(value));
+        EXPECT_EQ(kRanking, any_cast<int>(props.ValueByRef_unlocked("Service.Ranking", true)));
     }
 
     TEST_P(PropertiesMapTypeTest, CaseInsensitiveLookupByDefault)
@@ -67,7 +69,7 @@ namespace cppmicroservices
 
         auto [value, found] = props.Value_unlocked("SERVICE.RANKING");
         EXPECT_TRUE(found);
-        EXPECT_EQ(5, any_cast<int>(value));
+        EXPECT_EQ(kRanking, any_cast<int>(value));
         EXPECT_EQ("IFoo", any_cast<std::string>(props.ValueByRef_unlocked("ObjectClass")));
     }
 

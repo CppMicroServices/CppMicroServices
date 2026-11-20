@@ -56,7 +56,10 @@ namespace cppmicroservices
         }
     } // namespace
 
-    BundleContext::BundleContext(std::shared_ptr<BundleContextPrivate> ctx) : d(std::move(ctx)) {}
+    BundleContext::BundleContext(std::shared_ptr<BundleContextPrivate> ctx)
+        : d(std::move(ctx))
+    {
+    }
 
     BundleContext::BundleContext() = default;
 
@@ -146,7 +149,7 @@ namespace cppmicroservices
         auto b = GetAndCheckBundlePrivate(d);
 
         // if the requesting bundle is NOT the system bundle, filter
-        if (b->id != 0)
+        if (b->sharedState->id != 0)
         {
             return b->coreCtx->bundleHooks.FilterBundle(*this, MakeBundle(b->coreCtx->bundleRegistry.GetBundle(id)));
         }
@@ -189,7 +192,7 @@ namespace cppmicroservices
             bus.emplace_back(MakeBundle(bu));
         }
         // if the requesting bundle is NOT the system bundle, filter
-        if (b->id != 0)
+        if (b->sharedState->id != 0)
         {
             b->coreCtx->bundleHooks.FilterBundles(*this, bus);
         }

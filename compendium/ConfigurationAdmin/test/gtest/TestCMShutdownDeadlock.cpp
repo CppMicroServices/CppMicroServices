@@ -165,8 +165,10 @@ TEST(CMShutdownDeadlockTest, testFrameworkStopWhileManagedServiceFactoryRemovedS
 
     auto sync = std::make_shared<Sync>();
 
-    // If an assertion fails, don't leave a CA worker blocked in the hook or the
-    // framework running into later tests.
+    // If an assertion fails, release the threads held by the test and stop the framework,
+    // so later tests aren't affected. This can't recover from a real deadlock:
+    // Framework::WaitForStop and the Framework destructor both join the stuck shutdown
+    // thread, so the test then hangs until the ctest timeout.
     struct Cleanup
     {
         std::shared_ptr<Sync> sync;
@@ -230,8 +232,7 @@ TEST(CMShutdownDeadlockTest, testFrameworkStopWhileManagedServiceFactoryRemovedS
     // Shut down while the Removed() task is still running. Before the fix this blocks
     // forever in CMActivator::Stop.
     // Framework::WaitForStop joins the shutdown thread even when it times out, so poll
-    // the state instead. A deadlock then shows up as a failure here rather than only
-    // as the ctest timeout.
+    // the state instead. A deadlock is then reported here before the test hangs in Cleanup.
     framework.Stop();
     auto const stopping = [&framework]
     {

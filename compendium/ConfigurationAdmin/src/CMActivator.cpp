@@ -83,7 +83,7 @@ namespace cppmicroservices
                 configAdminReg.Unregister();
                 // clear bundle registry
                 {
-                    std::lock_guard<std::mutex> l(bundleRegMutex);
+                    std::lock_guard<std::mutex> regLock(bundleRegMutex);
                     bundleRegistry.clear();
                 }
                 // Every extension is gone, so a BUNDLE_STOPPING notification still in flight

@@ -153,26 +153,25 @@ TEST(SCRShutdownOrderingTest, testBundleStoppingDuringSCRStopIsDisposedBeforeItS
 
     auto sync = std::make_shared<Sync>();
 
-    // If an assertion fails, don't leave threads blocked or the framework running
-    // into later tests.
+    // Declared before Cleanup so that its destructor, which waits for the bundle stop to
+    // finish, runs after Cleanup has released the threads held by the test.
     std::future<void> stopBundle;
+    // If an assertion fails, release the threads held by the test and stop the framework,
+    // so later tests aren't affected. This can't recover from a real deadlock:
+    // Framework::WaitForStop and the Framework destructor both join the stuck shutdown
+    // thread, so the test then hangs until the ctest timeout.
     struct Cleanup
     {
         std::shared_ptr<Sync> sync;
         cppmicroservices::Framework& framework;
-        std::future<void>& stopBundle;
         ~Cleanup()
         {
             sync->ReleaseHook();
             sync->ReleaseScr();
-            if (stopBundle.valid())
-            {
-                stopBundle.wait_for(kWaitTimeout);
-            }
             framework.Stop();
             framework.WaitForStop(kWaitTimeout);
         }
-    } cleanup { sync, framework, stopBundle };
+    } cleanup { sync, framework };
 
     sync->bundleToStop = test::InstallAndStartBundle(context, "TestBundleDSStopOrder");
     ASSERT_TRUE(sync->bundleToStop);

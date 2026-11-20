@@ -52,6 +52,7 @@ set(_configurationadmin_tests
   TestCMBundleExtension.cpp
   TestCMLogger.cpp
   TestCMShutdownDeadlock.cpp
+  TestCMShutdownOrdering.cpp
   TestConfigAdmin.cpp
   TestConfigAdminConfigRace.cpp
   TestConfigurationAdminImpl.cpp

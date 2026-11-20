@@ -78,12 +78,20 @@ namespace cppmicroservices
                 framework.WaitForStop(std::chrono::milliseconds::zero());
             }
 
+            Framework&
+            GetFramework()
+            {
+                return framework;
+            }
+
+          private:
             Framework framework = FrameworkFactory().NewFramework();
         };
     } // namespace
 
     TEST_F(SystemBundleUnitTest, SystemBundleHasNoArchive)
     {
+        auto& framework = GetFramework();
         EXPECT_EQ(nullptr, GetPrivate(framework)->GetBundleArchive());
         EXPECT_FALSE(framework.GetResource("/manifest.json"));
         EXPECT_TRUE(framework.FindResources("/", "*", true).empty());
@@ -91,6 +99,7 @@ namespace cppmicroservices
 
     TEST_F(SystemBundleUnitTest, HeadersComeFromCodeNotFromAnEmbeddedManifest)
     {
+        auto& framework = GetFramework();
         auto const& headers = framework.GetHeaders();
         EXPECT_EQ(Constants::SYSTEM_BUNDLE_SYMBOLICNAME,
                   any_cast<std::string>(headers.at(Constants::BUNDLE_SYMBOLICNAME)));
@@ -101,6 +110,7 @@ namespace cppmicroservices
 
     TEST_F(SystemBundleUnitTest, TestExecutableIsNotAutoInstalledAsABundle)
     {
+        auto& framework = GetFramework();
         auto* coreCtx = GetPrivate(framework)->coreCtx;
 
         EXPECT_TRUE(coreCtx->bundleRegistry.GetBundles(util::GetExecutablePath()).empty());

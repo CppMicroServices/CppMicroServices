@@ -37,6 +37,9 @@ namespace cppmicroservices
 {
     namespace
     {
+        constexpr long kPurgedBundleId = 7;
+        constexpr long kAccessorBundleId = 42;
+
         std::shared_ptr<BundleArchive>
         MakeArchive(BundleStorage* storage, long id)
         {
@@ -54,7 +57,7 @@ namespace cppmicroservices
     TEST(BundleArchiveUnitTest, PurgeRemovesArchiveFromOwningStorage)
     {
         StrictMock<test::MockBundleStorage> storage;
-        auto archive = MakeArchive(&storage, 7);
+        auto archive = MakeArchive(&storage, kPurgedBundleId);
 
         EXPECT_CALL(storage, RemoveArchive(archive.get())).WillOnce(Return(true));
         archive->Purge();
@@ -63,10 +66,10 @@ namespace cppmicroservices
     TEST(BundleArchiveUnitTest, AccessorsReflectConstructionArguments)
     {
         StrictMock<test::MockBundleStorage> storage;
-        auto archive = MakeArchive(&storage, 42);
+        auto archive = MakeArchive(&storage, kAccessorBundleId);
 
         EXPECT_TRUE(archive->IsValid());
-        EXPECT_EQ(42, archive->GetBundleId());
+        EXPECT_EQ(kAccessorBundleId, archive->GetBundleId());
         EXPECT_EQ("/path/to/mock_bundle.dll", archive->GetBundleLocation());
         EXPECT_EQ("mock_bundle", archive->GetResourcePrefix());
         EXPECT_EQ(-1, archive->GetAutostartSetting());

@@ -46,6 +46,11 @@ namespace cppmicroservices
     {
         struct IUnitTestService
         {
+            IUnitTestService() = default;
+            IUnitTestService(IUnitTestService const&) = default;
+            IUnitTestService(IUnitTestService&&) = default;
+            IUnitTestService& operator=(IUnitTestService const&) = default;
+            IUnitTestService& operator=(IUnitTestService&&) = default;
             virtual ~IUnitTestService() = default;
         };
 

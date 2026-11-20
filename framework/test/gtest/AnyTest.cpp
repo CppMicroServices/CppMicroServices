@@ -460,6 +460,27 @@ TEST(AnyTest, EmptyAnyNotEqualToNonEmptyAny)
     EXPECT_TRUE(nonEmpty != empty);
 }
 
+/**
+ * @test AnyMaps whose mapped values are empty Anys compare by value: equal when
+ *       both values are empty, unequal once one of them holds a value. This is
+ *       the container path (AnyMap equality compares mapped values with
+ *       Any::operator==) through which empty Anys are most likely to be compared.
+ */
+TEST(AnyTest, AnyMapWithEmptyValuesCompares)
+{
+    // Arrange
+    AnyMap lhs(AnyMap::UNORDERED_MAP);
+    AnyMap rhs(AnyMap::UNORDERED_MAP);
+    lhs["k"] = Any();
+    rhs["k"] = Any();
+
+    // Act / Assert
+    EXPECT_EQ(lhs, rhs);
+
+    rhs["k"] = 1;
+    EXPECT_NE(lhs, rhs);
+}
+
 TEST(AnyTest, AnyMove)
 {
     cppmicroservices::AnyMap anyMap;

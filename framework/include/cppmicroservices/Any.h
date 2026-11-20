@@ -498,28 +498,17 @@ namespace cppmicroservices
         bool
         operator==(Any const& rhs) const
         {
-            if (Empty() || rhs.Empty())
+            // An empty Any reports typeid(void), which no held value can have, so this one
+            // check rejects both type mismatches and empty-vs-non-empty comparisons.
+            if (Type() != rhs.Type())
             {
-                return Empty() && rhs.Empty();
+                return false;
+            }
+            if (Empty())
+            {
+                return true; // both are empty
             }
             return rhs._content->compare(*this);
-        }
-
-        /**
-         * Compares this Any with another Any for inequality.
-         *
-         * This is the same as
-         * \code
-         * !this->operator==(rhs)
-         * \endcode
-         *
-         * @param rhs an Any to compare against
-         * @return bool the negation of operator==(Any const&).
-         */
-        bool
-        operator!=(Any const& rhs) const
-        {
-            return !operator==(rhs);
         }
 
         /**

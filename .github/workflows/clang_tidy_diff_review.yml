@@ -22,13 +22,23 @@ jobs:
       with:
         split_workflow: true
         build_dir: build
-        config_file: ".clang-tidy"
+        # Leave both empty so that clang-tidy uses the closest .clang-tidy to
+        # each file (the root config, plus the test-directory configs that
+        # inherit from it). Setting config_file passes --config-file, and
+        # setting clang_tidy_checks passes --checks; either disables
+        # per-directory lookup.
+        config_file: ''
+        clang_tidy_checks: ''
         max_comments: '100'
         exclude: "third_party/*"
+        # US_BUILD_TESTING=ON puts the test targets in compile_commands.json,
+        # so test sources are analysed with their real include paths (gtest,
+        # gmock, private framework headers) instead of failing with
+        # "file not found".
         cmake_command: |
           cmake --version && \
           git config --global --add safe.directory "$GITHUB_WORKSPACE" && \
-          cmake . -DCMAKE_EXPORT_COMPILE_COMMANDS=on
+          cmake . -DCMAKE_EXPORT_COMPILE_COMMANDS=on -DUS_BUILD_TESTING=ON
           
     # Uploads an artefact containing clang_fixes.json
     - uses: ZedThree/clang-tidy-review/upload@v0.20.1

@@ -582,6 +582,16 @@ if(MSVC)
     set(disabled_warnings ${disabled_warnings} 4503 4996)
   endif()
 
+  if (CMAKE_CXX_COMPILER_ARCHITECTURE_ID STREQUAL "ARM64"
+      AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 19.52)
+    # MSVC 19.52 (toolset 14.52) for ARM64 emits a false-positive C4789
+    # ("buffer of size 32 bytes will be overrun") from <__msvc_string_view.hpp>
+    # when constructing a std::string from a long literal. 32 bytes is
+    # sizeof(std::string); long strings live on the heap. With /WX this
+    # fails the build. Remove once the compiler bug is fixed.
+    set(disabled_warnings ${disabled_warnings} 4789)
+  endif()
+
   foreach(wd ${disabled_warnings})
     set(US_CXX_FLAGS "/wd${wd} ${US_CXX_FLAGS}")
   endforeach()

@@ -1,0 +1,14 @@
+---
+# Test sources inherit the repository root configuration, minus checks that
+# fire on code expanded from googletest/googlemock macros (TEST, TEST_P,
+# EXPECT_THROW, INSTANTIATE_TEST_SUITE_P, MOCK_METHOD, ...) rather than on the
+# test code itself, and avoid-magic-numbers, because literal expected values
+# are usually clearer in tests than named constants.
+InheritParentConfig: true
+Checks: >
+  -cppcoreguidelines-owning-memory,
+  -cppcoreguidelines-avoid-goto,
+  -cppcoreguidelines-avoid-non-const-global-variables,
+  -cppcoreguidelines-avoid-magic-numbers,
+  -modernize-type-traits
+...

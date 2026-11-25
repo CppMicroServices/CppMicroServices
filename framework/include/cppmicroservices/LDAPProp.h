@@ -34,17 +34,77 @@
 namespace cppmicroservices
 {
 
-    /// \cond
+    /**
+     * \ingroup MicroServicesUtils
+     * \ingroup gr_ldap
+     *
+     * An LDAP filter expression, as created by the LDAPProp fluent API.
+     *
+     * LDAPPropExpr objects are usually not created directly. They are returned by
+     * the LDAPProp operators and can be combined with the logical operators
+     * <code>&&</code>, <code>||</code> and <code>!</code>.
+     *
+     * An LDAPPropExpr is implicitly convertible to <code>std::string</code>, which yields
+     * the LDAP filter string. This allows passing it anywhere a filter string is expected,
+     * such as the LDAPFilter constructor or BundleContext::GetServiceReferences:
+     * \code
+     * LDAPPropExpr expr = LDAPProp("name") == "Ben" && LDAPProp("count") >= 2;
+     *
+     * std::string filterString = expr; // "(&(name=Ben)(count>=2))"
+     * LDAPFilter filter(expr);
+     * \endcode
+     *
+     * \sa LDAPProp
+     * \sa LDAPFilter
+     */
     class US_Framework_EXPORT LDAPPropExpr
     {
       public:
+        /**
+         * Create a null (empty) expression.
+         *
+         * \sa IsNull
+         */
         LDAPPropExpr();
+
+        /**
+         * Create an expression from an LDAP filter string.
+         *
+         * The string is stored as-is; it is not validated.
+         *
+         * @param expr An LDAP filter string.
+         */
         explicit LDAPPropExpr(std::string expr);
 
+        /**
+         * Negates this expression in place.
+         *
+         * Wraps the expression as "(!expr)" and returns a reference to this object;
+         * the expression itself is modified. A null expression is left unchanged.
+         *
+         * @return A reference to this LDAP expression object.
+         */
         LDAPPropExpr& operator!();
 
+        /**
+         * Converts this expression to its LDAP filter string.
+         *
+         * The conversion is implicit, so an LDAPPropExpr can be used wherever a
+         * <code>std::string</code> is expected:
+         * \code
+         * std::string filter = LDAPProp("key1") == "value1"; // "(key1=value1)"
+         * \endcode
+         *
+         * @return The LDAP filter string, or an empty string if the expression is null.
+         */
         operator std::string() const;
 
+        /**
+         * Checks whether this expression is null.
+         *
+         * @return <code>true</code> if the expression is empty (converts to an empty
+         *         string), <code>false</code> otherwise.
+         */
         bool IsNull() const;
 
         /**
@@ -96,7 +156,6 @@ namespace cppmicroservices
       private:
         std::string m_ldapExpr;
     };
-    /// \endcond
 
     /**
      * \ingroup MicroServicesUtils
@@ -151,6 +210,13 @@ namespace cppmicroservices
         }
         /// @}
 
+        /**
+         * States the presence of the LDAP property.
+         *
+         * Converting <code>LDAPProp("attr")</code> to an LDAPPropExpr yields "(attr=*)".
+         *
+         * @return A LDAP expression object.
+         */
         operator LDAPPropExpr() const;
 
         /**

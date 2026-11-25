@@ -93,7 +93,32 @@ namespace cppmicroservices
 
                 /**
                  * Used to list all of the available configurations. An LDAP filter expression can be used to filter
-                 * based on any property of the configuration, including service.pid and service.factoryPid
+                 * based on any property of the configuration.
+                 *
+                 * In addition to the configuration's own properties, the filter is evaluated against a
+                 * <code>pid</code> attribute whose value is the PID of the configuration. Note that the attribute is
+                 * named <code>pid</code>, not <code>service.pid</code>, and that it replaces any configuration
+                 * property that is also named <code>pid</code>. There is no separate attribute for the factory PID;
+                 * configurations created with GetFactoryConfiguration have a PID of the form
+                 * <code>$factoryPid~$instanceName</code>, so they can be matched with a substring filter on
+                 * <code>pid</code>.
+                 *
+                 * Examples:
+                 * \code
+                 * // the configuration whose PID is "com.example.service"
+                 * configAdmin->ListConfigurations("(pid=com.example.service)");
+                 *
+                 * // all factory configurations created for the factory PID "com.example.factory"
+                 * configAdmin->ListConfigurations("(pid=com.example.factory~*)");
+                 *
+                 * // all configurations which have a property "color" with value "blue"
+                 * configAdmin->ListConfigurations("(color=blue)");
+                 *
+                 * // this does NOT match by PID, unless the configuration has a property named "service.pid"
+                 * configAdmin->ListConfigurations("(service.pid=com.example.service)");
+                 * \endcode
+                 *
+                 * Configurations which have been created but not yet updated are never returned.
                  *
                  * @param filter An optional filter expression to limit the Configurations which are returned, or empty
                  * for all.

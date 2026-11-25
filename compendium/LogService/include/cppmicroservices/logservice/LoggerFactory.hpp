@@ -57,18 +57,24 @@ namespace cppmicroservices::logservice
 
 		/**
                  * Return the Logger named with the specified name.
-                 * @param name The name to use for the logger name. 
-                 * 
-		 * If the name parameter is equal to ROOT_LOGGER_NAME, then the root logger is returned.
+                 * Each call creates and returns a new Logger instance.
+                 *
+                 * @param name The name to use for the logger name. Defaults to ROOT_LOGGER_NAME.
+                 *
+                 * If the name parameter is equal to ROOT_LOGGER_NAME, then the logger returned is
+                 * named ROOT, representing the root logger of the logging hierarchy.
                  */
                 [[nodiscard]] virtual std::shared_ptr<Logger> getLogger(std::string const& name = ROOT_LOGGER_NAME) const = 0;
 
 		 /**
                  * Return the Logger for the specified bundle, named with the specified name.
-		 * @param bundle The bundle associated with the Logger. 
-                 * @param name The name to use for the logger name.
+                 * Each call creates and returns a new Logger instance.
                  *
-                 * If the name parameter is equal to ROOT_LOGGER_NAME, then the root logger is returned.
+		 * @param bundle The bundle associated with the Logger. 
+                 * @param name The name to use for the logger name. Defaults to ROOT_LOGGER_NAME.
+                 *
+                 * If the name parameter is equal to ROOT_LOGGER_NAME, then the logger returned is
+                 * named <bundle-symbolic-name>.ROOT, representing the root logger of the bundle's logging hierarchy.
                  */
                 [[nodiscard]] virtual std::shared_ptr<Logger> getLogger(const cppmicroservices::Bundle& bundle, std::string const& name = ROOT_LOGGER_NAME) const = 0; 
         };

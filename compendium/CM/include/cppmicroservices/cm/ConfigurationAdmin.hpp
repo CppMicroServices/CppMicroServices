@@ -93,7 +93,8 @@ namespace cppmicroservices
 
                 /**
                  * Used to list all of the available configurations. An LDAP filter expression can be used to filter
-                 * based on any property of the configuration, including service.pid and service.factoryPid
+                 * based on any property of the configuration, and on the configuration's PID using the key "pid"
+                 * (not "service.pid"). There is no separate key for the factory PID.
                  *
                  * @param filter An optional filter expression to limit the Configurations which are returned, or empty
                  * for all.

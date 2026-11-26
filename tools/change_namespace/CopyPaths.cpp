@@ -25,12 +25,19 @@ ChangeNamespace::write_file_content(fs::path const& file_path, std::string const
 std::string
 ChangeNamespace::replace_source_patterns(std::string const& content)
 {
-    const std::vector<std::string> patterns = { R"((namespace\s+)cppmicroservices(_\w+)?)",
+    // Each pattern matches the whole identifier `cppmicroservices` or
+    // `cppmicroservices_<suffix>`, never a part of a longer one such as
+    // `mycppmicroservices` or `cppmicroservicesExtra`: the name either follows
+    // a non-identifier character or a `\b`, and is followed by one or a `\b`.
+    //
+    // The patterns are textual. They do not know about comments or string
+    // literals, so a match inside either is rewritten as well.
+    std::vector<std::string> const patterns = { R"((namespace\s+)cppmicroservices(_\w+)?\b)",
                                                 R"((<)cppmicroservices((?:_\w+)?\s*(?:::)))",
-                                                R"((namespace\s+\w+\s*=\s*(?:::\s*)?)cppmicroservices(_\w+)?)",
+                                                R"((namespace\s+\w+\s*=\s*(?:::\s*)?)cppmicroservices(_\w+)?\b)",
                                                 R"((^\s*#\s*define\s+\w+\s+)cppmicroservices((?:_\w+)?\s*)$)",
                                                 R"((\(\s*)cppmicroservices(\s*\)))",
-                                                R"(()cppmicroservices((?:_\w+)?(?:::)))" };
+                                                R"((\b)cppmicroservices((?:_\w+)?(?:::)))" };
 
     const std::string replacement = "$1" + m_namespace_name + "$2";
     std::string result = content;

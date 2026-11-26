@@ -281,11 +281,51 @@ TEST_F(NamespaceReplacerTest, HandlesHelpFlag)
     EXPECT_EQ(std::system((exePath + " -h").c_str()), 0);
     EXPECT_EQ(std::system((exePath + " --help").c_str()), 0);
 
-    // Test No arguments passed
-    EXPECT_EQ(std::system((exePath).c_str()), 0);
+    // Test No arguments passed: the required options are missing
+    EXPECT_NE(std::system((exePath).c_str()), 0);
 
     // Test null argument
     EXPECT_NE(std::system((exePath + " --cppms_src").c_str()), 0);
+}
+
+// Tests that a file that cannot be written is an error, not a silent success
+TEST_F(NamespaceReplacerTest, ReportsWriteFailure)
+{
+    // The source has sub/input.cpp, but "sub" in the destination is a regular
+    // file, so output/sub/input.cpp cannot be opened.
+    fs::create_directories(inputDir / "sub");
+    std::ofstream(inputDir / "sub" / "input.cpp") << "cppmicroservices::Bundle bundle;";
+    std::ofstream(outputDir / "sub") << "not a directory";
+
+    fs::path const errFile = fs::temp_directory_path() / "change_namespace_test_stderr.txt";
+    std::string const command = std::string(EXE_PATH) + " --cppms_src=" + inputDir.string() + " --namespace="
+                                + NEW_NAMESPACE + " " + outputDir.string() + " 2> " + errFile.string();
+    EXPECT_NE(std::system(command.c_str()), 0);
+
+    std::string const err = readOutputFile(errFile);
+    fs::remove(errFile);
+    EXPECT_NE(err.find("Error: cannot open file for writing"), std::string::npos) << err;
+    EXPECT_NE(err.find("input.cpp"), std::string::npos) << err;
+}
+
+// Tests that a filesystem error is reported with the failing path
+TEST_F(NamespaceReplacerTest, ReportsFilesystemError)
+{
+    // input.cpp in the destination is a non-empty directory, which the tool
+    // cannot remove to replace it with the file.
+    std::ofstream(inputDir / "input.cpp") << "cppmicroservices::Bundle bundle;";
+    fs::create_directories(outputDir / "input.cpp");
+    std::ofstream(outputDir / "input.cpp" / "keep.txt") << "keep";
+
+    fs::path const errFile = fs::temp_directory_path() / "change_namespace_test_stderr.txt";
+    std::string const command = std::string(EXE_PATH) + " --cppms_src=" + inputDir.string() + " --namespace="
+                                + NEW_NAMESPACE + " " + outputDir.string() + " 2> " + errFile.string();
+    EXPECT_NE(std::system(command.c_str()), 0);
+
+    std::string const err = readOutputFile(errFile);
+    fs::remove(errFile);
+    EXPECT_NE(err.find("Error: "), std::string::npos) << err;
+    EXPECT_NE(err.find("input.cpp"), std::string::npos) << err;
 }
 
 // Tests handling of Invalid arguments

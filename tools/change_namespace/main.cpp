@@ -44,13 +44,9 @@ int main(int argc, char* argv[])
         ->required()
         ->type_name("DESTINATION")
         ->check(non_empty_non_flag);
-        
-    if(argc == 1) {
-        std::cout <<"Just one argument"<<std::endl;
-        std::cout << app.help() << std::endl;
-        return 0;
-    }
-    
+
+    // No arguments is handled by the parser like any other missing required
+    // option: it reports the option, prints the usage and exits non-zero.
     try {
         app.parse(argc, argv);
     } catch(const CLI::CallForHelp&) {
@@ -68,6 +64,16 @@ int main(int argc, char* argv[])
     cn_app.set_namespace(new_namespace.c_str());
     cn_app.set_namespace_alias(namespace_alias);
     cn_app.set_destination(destination.c_str());
-    
-    return cn_app.run();
+
+    // A failed copy or write must not end in std::terminate or pass as success.
+    // std::filesystem_error::what() names the paths involved.
+    try
+    {
+        return cn_app.run();
+    }
+    catch (std::exception const& e)
+    {
+        std::cerr << "Error: " << e.what() << std::endl;
+        return EXIT_FAILURE;
+    }
 }

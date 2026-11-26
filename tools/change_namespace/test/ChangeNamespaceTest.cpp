@@ -198,6 +198,57 @@ TEST_F(NamespaceReplacerTest, ReplacesNamespacePrefix)
     EXPECT_EQ(result, expected);
 }
 
+// Tests that a namespace with a suffix keeps the suffix
+TEST_F(NamespaceReplacerTest, ReplacesNamespaceWithSuffix)
+{
+    std::string const content = R"(
+namespace cppmicroservices_detail {}
+namespace alias = cppmicroservices_detail;
+cppmicroservices_detail::Helper helper;
+)";
+    std::string const expected = R"(
+namespace newnamespace_detail {}
+namespace alias = newnamespace_detail;
+newnamespace_detail::Helper helper;
+)";
+    ReplacerParams const params = { content, NEW_NAMESPACE, "input.cpp", inputDir, outputDir };
+    std::string const result = runReplacer(params);
+    EXPECT_EQ(result, expected);
+}
+
+// Tests that the namespace is not replaced inside a longer identifier
+TEST_F(NamespaceReplacerTest, LeavesLongerIdentifiersAlone)
+{
+    std::string const content = R"(
+mycppmicroservices::Bar bar;
+my_cppmicroservices::Bar otherBar;
+cppmicroservicesExtra::Baz baz;
+namespace cppmicroservicesExtra {}
+namespace alias = cppmicroservicesExtra;
+std::vector<mycppmicroservices::Bar> bars;
+)";
+    ReplacerParams const params = { content, NEW_NAMESPACE, "input.cpp", inputDir, outputDir };
+    std::string const result = runReplacer(params);
+    EXPECT_EQ(result, content);
+}
+
+// Tests that the replacement is textual: a comment or a string literal that
+// names the namespace is rewritten too
+TEST_F(NamespaceReplacerTest, ReplacesNamespaceInCommentsAndStrings)
+{
+    std::string const content = R"(
+// See cppmicroservices::Bundle.
+const char* name = "cppmicroservices::Bundle";
+)";
+    std::string const expected = R"(
+// See newnamespace::Bundle.
+const char* name = "newnamespace::Bundle";
+)";
+    ReplacerParams const params = { content, NEW_NAMESPACE, "input.cpp", inputDir, outputDir };
+    std::string const result = runReplacer(params);
+    EXPECT_EQ(result, expected);
+}
+
 // Tests error handling for invalid inputs
 TEST_F(NamespaceReplacerTest, ThrowsExceptionOnInvalidInput)
 {

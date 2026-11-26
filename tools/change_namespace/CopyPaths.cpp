@@ -7,11 +7,16 @@
 #include <iostream>
 #include <iterator>
 #include <regex>
+#include <stdexcept>
 
 std::string
 ChangeNamespace::read_file_content(fs::path const& file_path)
 {
     std::ifstream is(file_path);
+    if (!is)
+    {
+        throw std::runtime_error("cannot open file for reading: " + file_path.string());
+    }
     return std::string(std::istreambuf_iterator<char>(is), std::istreambuf_iterator<char>());
 }
 
@@ -19,7 +24,17 @@ void
 ChangeNamespace::write_file_content(fs::path const& file_path, std::string const& content)
 {
     std::ofstream os(file_path, std::ios_base::out);
+    if (!os)
+    {
+        throw std::runtime_error("cannot open file for writing: " + file_path.string());
+    }
     os << content;
+    // Flush before checking: a full disk shows up when the buffer is written.
+    os.flush();
+    if (!os)
+    {
+        throw std::runtime_error("cannot write file: " + file_path.string());
+    }
 }
 
 std::string

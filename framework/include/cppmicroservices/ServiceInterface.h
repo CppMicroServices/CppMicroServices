@@ -241,11 +241,16 @@ namespace cppmicroservices
      *
      * Example usage:
      * \code
-     * std::shared_ptr<MyService> service; // implementes I1 and I2
-     * InterfaceMap im = MakeInterfaceMap<I1,I2>(service);
+     * std::shared_ptr<MyService> service; // implements I1 and I2
+     * InterfaceMapConstPtr im = MakeInterfaceMap<I1,I2>(service);
+     * ServiceRegistrationU reg = context.RegisterService(im);
      * \endcode
      *
+     * A MakeInterfaceMap object converts to InterfaceMapPtr or
+     * InterfaceMapConstPtr, not to InterfaceMap itself.
+     *
      * @see InterfaceMap
+     * @see BundleContext::RegisterService
      */
     template <class... Interfaces>
     class MakeInterfaceMap

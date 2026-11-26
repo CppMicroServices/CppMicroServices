@@ -475,8 +475,97 @@ namespace cppmicroservices
 
         map_type GetType() const;
 
+        /**
+         * Get a key's value, using a compound key notation.
+         *
+         * A compound key consists of one or more key names, concatenated with
+         * the '.' (dot) character. Each key except the last requires the referenced
+         * Any object to be of type \c AnyMap or \c std::vector<Any>. Containers
+         * of type \c std::vector<Any> are indexed using 0-based numerical key names.
+         * A negative index counts from the end of the vector, so \c -1 is its
+         * last element.
+         *
+         * For example, a \c AnyMap object holding data of the following layout
+         * \code{.json}
+         * {
+         *   one: 1,
+         *   two: "two",
+         *   three: {
+         *     a: "anton",
+         *     b: [ 3, 8 ]
+         *   }
+         * }
+         * \endcode
+         * can be queried using the following notation:
+         * \code
+         * map.AtCompoundKey("one");        // returns Any(1)
+         * map.AtCompoundKey("three.a");    // returns Any(std::string("anton"))
+         * map.AtCompoundKey("three.b.1");  // returns Any(8)
+         * map.AtCompoundKey("three.b.-1"); // returns Any(8)
+         * \endcode
+         *
+         * @param key The key hierarchy to query.
+         * @return A reference to the key's value.
+         *
+         * @throws std::invalid_argument if the \c Any value for a key other than the last is not of type \c AnyMap or
+         * \c std::vector<Any>, or if the key name used to index a \c std::vector<Any> is not a number.
+         * @throws std::out_of_range if a key is not found, or if a numerical index is outside the vector or does not
+         * fit in an \c int.
+         */
         mapped_type const& AtCompoundKey(key_type const& key) const;
 
+        /**
+         * Return a key's value, using a compound key notation, if the key is found in the map, or
+         * return the provided default value if it is not.
+         *
+         * A compound key consists of one or more key names, concatenated with
+         * the '.' (dot) character. Each key except the last requires the referenced
+         * Any object to be of type \c AnyMap or \c std::vector<Any>. Containers
+         * of type \c std::vector<Any> are indexed using 0-based numerical key names.
+         * A negative index counts from the end of the vector, so \c -1 is its
+         * last element.
+         *
+         * This overload never throws. It returns \c defaultValue in every case where
+         * the other overload would throw:
+         * - a key is not found;
+         * - the \c Any value for a key other than the last is not of type \c AnyMap
+         *   or \c std::vector<Any>;
+         * - the key name used to index a \c std::vector<Any> is not a number, or the
+         *   index is outside the vector.
+         *
+         * A key that is present with an empty \c Any value is found, so that empty
+         * \c Any is returned and not \c defaultValue. This is the case for an explicit
+         * JSON \c null in a bundle manifest, which is stored as an empty \c Any.
+         *
+         * For example, a \c AnyMap object holding data of the following layout
+         * \code{.json}
+         * {
+         *   one: 1,
+         *   two: "two",
+         *   three: {
+         *     a: "anton",
+         *     b: [ 3, 8 ]
+         *   },
+         *   four: null
+         * }
+         * \endcode
+         * can be queried using the following notation:
+         * \code
+         * map.AtCompoundKey("one", Any(0));        // returns Any(1)
+         * map.AtCompoundKey("five", Any(0));       // returns Any(0), key not found
+         * map.AtCompoundKey("three.a", Any(0));    // returns Any(std::string("anton"))
+         * map.AtCompoundKey("three.c", Any(0));    // returns Any(0), key not found
+         * map.AtCompoundKey("three.b.1", Any(0));  // returns Any(8)
+         * map.AtCompoundKey("three.b.4", Any(0));  // returns Any(0), index outside the vector
+         * map.AtCompoundKey("three.b.x", Any(0));  // returns Any(0), index is not a number
+         * map.AtCompoundKey("one.a", Any(0));      // returns Any(0), "one" is not a container
+         * map.AtCompoundKey("four", Any(0));       // returns Any(), the key is present
+         * \endcode
+         *
+         * @param key The key hierarchy to query.
+         * @param defaultValue The value to return if the key is not found.
+         * @return A copy of the key's value, or \c defaultValue.
+         */
         mapped_type AtCompoundKey(key_type const& key, mapped_type defaultValue) const noexcept;
 
         template <typename MapT>

@@ -222,3 +222,101 @@ TEST_F(LoggerImplTests, ThreadSafety)
     ASSERT_TRUE(num_found == iterations);
 }
 
+namespace
+{
+    // A LoggerImpl with an extra sink that captures the output and uses the logger's own formatter.
+    struct CapturedLogger
+    {
+        CapturedLogger() : logger("cppmicroservices::testing::logger")
+        {
+            sink = std::make_shared<spdlog::sinks::ostream_sink_mt>(oss);
+            sink->set_formatter(ls::LoggerImpl::MakeFormatter());
+            logger.AddSink(sink);
+        }
+
+        std::ptrdiff_t
+        Count(std::string const& needle) const
+        {
+            std::string const text = oss.str();
+            std::ptrdiff_t count = 0;
+            for (auto pos = text.find(needle); pos != std::string::npos; pos = text.find(needle, pos + needle.size()))
+            {
+                ++count;
+            }
+            return count;
+        }
+
+        std::ostringstream oss;
+        spdlog::sink_ptr sink;
+        ls::LoggerImpl logger;
+    };
+} // namespace
+
+TEST(LoggerImplLevelTests, AuditIsLabelledAudit)
+{
+    CapturedLogger captured;
+
+    captured.logger.audit("Audit record");
+    captured.logger.audit("Audit {}", "argument");
+    captured.logger.error("Error record");
+    captured.logger.trace("Trace record");
+
+    EXPECT_EQ(captured.Count("(audit): Audit record"), 1);
+    EXPECT_EQ(captured.Count("(audit): Audit argument"), 1);
+    EXPECT_EQ(captured.Count("(error): Error record"), 1);
+    EXPECT_EQ(captured.Count("(trace): Trace record"), 1);
+}
+
+TEST(LoggerImplLevelTests, AuditSurvivesLevelFilter)
+{
+    CapturedLogger captured;
+    captured.sink->set_level(spdlog::level::err);
+
+    captured.logger.info("Info record");
+    captured.logger.warn("Warn record");
+    captured.logger.audit("Audit record");
+    captured.logger.error("Error record");
+
+    EXPECT_EQ(captured.Count("Info record"), 0);
+    EXPECT_EQ(captured.Count("Warn record"), 0);
+    EXPECT_EQ(captured.Count("Audit record"), 1);
+    EXPECT_EQ(captured.Count("Error record"), 1);
+}
+
+// Logging calls used to set the logger's level before logging. With threads logging at
+// different levels, a debug message was dropped whenever another thread had just raised
+// the level to error.
+TEST(LoggerImplLevelTests, MixedLevelsFromThreadsAreAllLogged)
+{
+    CapturedLogger captured;
+
+    int const threadCount = 8;
+    int const iterations = 500;
+    std::vector<std::thread> threads;
+    for (int i = 0; i < threadCount; i++)
+    {
+        threads.emplace_back(
+            [&captured, i, iterations]()
+            {
+                for (int j = 0; j < iterations; j++)
+                {
+                    if (i % 2 == 0)
+                    {
+                        captured.logger.debug("Mixed debug record");
+                    }
+                    else
+                    {
+                        captured.logger.error("Mixed error record");
+                    }
+                }
+            });
+    }
+
+    for (auto& thread : threads)
+    {
+        thread.join();
+    }
+
+    EXPECT_EQ(captured.Count("Mixed debug record"), (threadCount / 2) * iterations);
+    EXPECT_EQ(captured.Count("Mixed error record"), (threadCount / 2) * iterations);
+}

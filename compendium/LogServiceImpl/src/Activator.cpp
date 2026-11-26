@@ -1,18 +1,19 @@
 #include "Activator.hpp"
-#include "LoggerFactoryImpl.hpp"
-#include "LogServiceImpl.hpp"
+#include "LogServiceFactory.hpp"
+
+#include "cppmicroservices/logservice/LogService.hpp"
+#include "cppmicroservices/logservice/LoggerFactory.hpp"
 
 namespace cppmicroservices::logservice::impl
 {
     void
     Activator::Start(cppmicroservices::BundleContext bc)
     {
-        const cppmicroservices::Bundle bundle = bc.GetBundle();
-        const std::string bsn = bundle.GetSymbolicName();
-        const std::string logger_name = "LogService." + bsn;
-        auto svc = std::make_shared<cppmicroservices::logservice::LogServiceImpl>(logger_name);
+        // Registered as a ServiceFactory so that each bundle obtaining the LogService gets an
+        // instance which logs to "LogService.<bsn>", <bsn> being that bundle's symbolic name.
+        std::shared_ptr<cppmicroservices::ServiceFactory> factory = std::make_shared<LogServiceFactory>();
         bc.RegisterService<cppmicroservices::logservice::LogService, cppmicroservices::logservice::LoggerFactory>(
-            std::move(svc));
+            std::move(factory));
     }
 
     void

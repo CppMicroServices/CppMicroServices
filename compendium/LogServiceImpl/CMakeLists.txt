@@ -1,5 +1,6 @@
 # sources and headers
 set(_srcs
+  src/LogServiceFactory.cpp
   src/LogServiceImpl.cpp
   src/LoggerFactoryImpl.cpp
   src/LoggerImpl.cpp
@@ -7,6 +8,7 @@ set(_srcs
 
 set(_hdrs
   src/Activator.hpp
+  src/LogServiceFactory.hpp
   src/LogServiceImpl.hpp
   src/LoggerFactoryImpl.hpp
   src/LoggerImpl.hpp

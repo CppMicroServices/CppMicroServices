@@ -9,6 +9,7 @@ namespace sinks
 namespace spdlog
 {
     class logger;
+    class formatter;
     using sink_ptr = std::shared_ptr<sinks::sink>;
 } // namespace spdlog
 
@@ -94,8 +95,15 @@ namespace cppmicroservices::logservice
                   * function and should only be used for testing. This is NOT thread-safe.
                   */
 		void AddSink(spdlog::sink_ptr& sink);
- 
-            private:
-                std::shared_ptr<::spdlog::logger> m_Logger;
+
+        /**
+         * Returns the formatter the logger's own sink uses. It prints audit records with the
+         * level name "audit". Sinks added with AddSink keep their own formatter, so a test
+         * that checks the audit label has to set this one.
+         */
+        static std::unique_ptr<spdlog::formatter> MakeFormatter();
+
+      private:
+        std::shared_ptr<::spdlog::logger> m_Logger;
         };
 } // namespace cppmicroservices::logservice

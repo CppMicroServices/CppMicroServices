@@ -198,6 +198,66 @@ TEST_F(NamespaceReplacerTest, ReplacesNamespacePrefix)
     EXPECT_EQ(result, expected);
 }
 
+// Tests that only complete cppmicroservices identifiers are replaced
+TEST_F(NamespaceReplacerTest, ReplacesOnlyWholeNamespaceIdentifiers)
+{
+    const ReplacerParams params = { R"(
+namespace mycppmicroservices {
+}
+
+namespace cppmicroservicesExtra {
+}
+
+mycppmicroservices::Bar first;
+cppmicroservicesExtra::Bar second;
+cppmicroservices::Bundle bundle;
+cppmicroservices_detail::Service service;
+std::vector<cppmicroservices_detail::Service> services;
+std::vector<cppmicroservicesExtra::Service> otherServices;
+)",
+                                    NEW_NAMESPACE,
+                                    "input.cpp",
+                                    inputDir,
+                                    outputDir };
+    const std::string expected = R"(
+namespace mycppmicroservices {
+}
+
+namespace cppmicroservicesExtra {
+}
+
+mycppmicroservices::Bar first;
+cppmicroservicesExtra::Bar second;
+newnamespace::Bundle bundle;
+newnamespace_detail::Service service;
+std::vector<newnamespace_detail::Service> services;
+std::vector<cppmicroservicesExtra::Service> otherServices;
+)";
+
+    const std::string result = runReplacer(params);
+    EXPECT_EQ(result, expected);
+}
+
+// Tests the documented behaviour that textual matches in comments and string literals are replaced
+TEST_F(NamespaceReplacerTest, ReplacesMatchesInsideCommentsAndStringLiterals)
+{
+    const ReplacerParams params = { R"(
+// cppmicroservices::Bundle appears in this comment.
+const char* typeName = "cppmicroservices::Bundle";
+)",
+                                    NEW_NAMESPACE,
+                                    "input.cpp",
+                                    inputDir,
+                                    outputDir };
+    const std::string expected = R"(
+// newnamespace::Bundle appears in this comment.
+const char* typeName = "newnamespace::Bundle";
+)";
+
+    const std::string result = runReplacer(params);
+    EXPECT_EQ(result, expected);
+}
+
 // Tests error handling for invalid inputs
 TEST_F(NamespaceReplacerTest, ThrowsExceptionOnInvalidInput)
 {
@@ -420,4 +480,3 @@ namespace newnamespace {} namespace cppmicroservices = newnamespace; namespace n
     const std::string result = runReplacer(params);
     EXPECT_EQ(result, expectedContent);
 }
-

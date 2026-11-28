@@ -74,7 +74,8 @@ namespace cppmicroservices
 
             if (state == Bundle::STATE_UNINSTALLED)
             {
-                throw std::logic_error("Bundle " + symbolicName + " (location=" + location + ") is uninstalled");
+                throw std::logic_error("Bundle " + sharedState->symbolicName + " (location=" + location
+                                       + ") is uninstalled");
             }
 
             if ((options & Bundle::STOP_TRANSIENT) == 0)
@@ -136,7 +137,7 @@ namespace cppmicroservices
             catch (...)
             {
                 res = std::make_exception_ptr(
-                    std::runtime_error("Bundle " + symbolicName + " (location=" + location
+                    std::runtime_error("Bundle " + sharedState->symbolicName + " (location=" + location
                                        + "), BundleActivator::Stop() failed: " + util::GetLastExceptionStr()));
             }
 
@@ -165,8 +166,8 @@ namespace cppmicroservices
                 }
                 if (!cause.empty())
                 {
-                    res = std::make_exception_ptr(std::runtime_error("Bundle " + symbolicName + " (location=" + location
-                                                                     + ") stop failed: " + cause));
+                    res = std::make_exception_ptr(std::runtime_error(
+                        "Bundle " + sharedState->symbolicName + " (location=" + location + ") stop failed: " + cause));
                 }
             }
             bactivator = nullptr;
@@ -286,10 +287,10 @@ namespace cppmicroservices
                 // This happens if call start from inside the BundleActivator.stop
                 // method.
                 // Don't allow it.
-                throw std::runtime_error("Bundle " + symbolicName + " (location=" + location
+                throw std::runtime_error("Bundle " + sharedState->symbolicName + " (location=" + location
                                          + "), start called from BundleActivator::Stop");
             case Bundle::STATE_UNINSTALLED:
-                throw std::logic_error("Bundle " + symbolicName + " (location=" + location
+                throw std::logic_error("Bundle " + sharedState->symbolicName + " (location=" + location
                                        + ") is in UNINSTALLED state");
         }
     }
@@ -304,7 +305,7 @@ namespace cppmicroservices
             switch (static_cast<Bundle::State>(state.load()))
             {
                 case Bundle::STATE_UNINSTALLED:
-                    throw std::logic_error("Bundle " + symbolicName + " (location=" + location
+                    throw std::logic_error("Bundle " + sharedState->symbolicName + " (location=" + location
                                            + ") is in BUNDLE_UNINSTALLED state");
                 case Bundle::STATE_STARTING: // Lazy start
                 case Bundle::STATE_ACTIVE:
@@ -341,7 +342,7 @@ namespace cppmicroservices
                 case Bundle::STATE_RESOLVED:
                 case Bundle::STATE_INSTALLED:
                 {
-                    coreCtx->bundleRegistry.Remove(location, id);
+                    coreCtx->bundleRegistry.Remove(location, sharedState->id);
                     if (operation != BundlePrivate::OP_UNINSTALLING)
                     {
                         try
@@ -366,7 +367,7 @@ namespace cppmicroservices
                     if (state == Bundle::STATE_UNINSTALLED)
                     {
                         operation = BundlePrivate::OP_IDLE;
-                        throw std::logic_error("Bundle " + symbolicName + " (location=" + location
+                        throw std::logic_error("Bundle " + sharedState->symbolicName + " (location=" + location
                                                + ") is in BUNDLE_UNINSTALLED state");
                     }
 
@@ -423,12 +424,13 @@ namespace cppmicroservices
         auto frameworkBlock = coreCtx->GetFrameworkStateAndBlock();
         if (frameworkBlock->frameworkHasStopped)
         {
-            throw std::runtime_error("Bundle " + symbolicName + " (location=" + location
+            throw std::runtime_error("Bundle " + sharedState->symbolicName + " (location=" + location
                                      + ") belongs to a stopped framework");
         }
         if (state == Bundle::STATE_UNINSTALLED)
         {
-            throw std::logic_error("Bundle " + symbolicName + " (location=" + location + ") is uninstalled");
+            throw std::logic_error("Bundle " + sharedState->symbolicName + " (location=" + location
+                                   + ") is uninstalled");
         }
 
         if (state == Bundle::STATE_ACTIVE)
@@ -497,9 +499,10 @@ namespace cppmicroservices
                     && !coreCtx->validationFunc(thisBundle))
                 {
                     StartFailed();
-                    return std::make_exception_ptr(SecurityException {
-                        "Bundle " + symbolicName + " (location=" + location + ") failed bundle validation.",
-                        thisBundle });
+                    return std::make_exception_ptr(SecurityException { "Bundle " + sharedState->symbolicName
+                                                                           + " (location=" + location
+                                                                           + ") failed bundle validation.",
+                                                                       thisBundle });
                 }
             }
             catch (...)
@@ -525,11 +528,11 @@ namespace cppmicroservices
                     if (!lib.IsLoaded())
                     {
                         coreCtx->logger->Log(logservice::SeverityLevel::LOG_INFO,
-                                             "Loading shared library for Bundle " + symbolicName
+                                             "Loading shared library for Bundle " + sharedState->symbolicName
                                                  + " (location=" + location + ")");
                         lib.Load(coreCtx->libraryLoadOptions);
                         coreCtx->logger->Log(logservice::SeverityLevel::LOG_INFO,
-                                             "Finished loading shared library for Bundle " + symbolicName
+                                             "Finished loading shared library for Bundle " + sharedState->symbolicName
                                                  + " (location=" + location + ")");
                     }
                     libHandle = lib.GetHandle();
@@ -539,7 +542,7 @@ namespace cppmicroservices
 
                 // save this bundle's context so that it can be accessible anywhere
                 // from within this bundle's code.
-                std::string set_bundle_context_func = US_STR(US_SET_CTX_PREFIX) + symbolicName;
+                std::string set_bundle_context_func = US_STR(US_SET_CTX_PREFIX) + sharedState->symbolicName;
                 std::string set_bundle_context_err;
                 BundleUtils::GetSymbol(SetBundleContext, libHandle, set_bundle_context_func, set_bundle_context_err);
 
@@ -553,25 +556,25 @@ namespace cppmicroservices
                 }
 
                 // get the create/destroy activator callbacks
-                std::string create_activator_func = US_STR(US_CREATE_ACTIVATOR_PREFIX) + symbolicName;
+                std::string create_activator_func = US_STR(US_CREATE_ACTIVATOR_PREFIX) + sharedState->symbolicName;
                 std::function<BundleActivator*(void)> createActivatorHook;
                 std::string create_activator_err;
                 BundleUtils::GetSymbol(createActivatorHook, libHandle, create_activator_func, create_activator_err);
 
-                std::string destroy_activator_func = US_STR(US_DESTROY_ACTIVATOR_PREFIX) + symbolicName;
+                std::string destroy_activator_func = US_STR(US_DESTROY_ACTIVATOR_PREFIX) + sharedState->symbolicName;
                 std::string destroy_activator_err;
                 BundleUtils::GetSymbol(destroyActivatorHook, libHandle, destroy_activator_func, destroy_activator_err);
 
                 if (!createActivatorHook)
                 {
                     coreCtx->logger->Log(logservice::SeverityLevel::LOG_ERROR, create_activator_err);
-                    throw std::runtime_error("Bundle " + symbolicName + " (location=" + location
+                    throw std::runtime_error("Bundle " + sharedState->symbolicName + " (location=" + location
                                              + ") activator constructor not found");
                 }
                 if (!destroyActivatorHook)
                 {
                     coreCtx->logger->Log(logservice::SeverityLevel::LOG_ERROR, destroy_activator_err);
-                    throw std::runtime_error("Bundle " + symbolicName + " (location=" + location
+                    throw std::runtime_error("Bundle " + sharedState->symbolicName + " (location=" + location
                                              + ") activator destructor not found");
                 }
 
@@ -590,9 +593,11 @@ namespace cppmicroservices
             catch (...)
             {
                 coreCtx->logger->Log(logservice::SeverityLevel::LOG_INFO,
-                                     "Failed to start Bundle " + symbolicName + " (location=" + location + ")",
+                                     "Failed to start Bundle " + sharedState->symbolicName + " (location=" + location
+                                         + ")",
                                      std::current_exception());
-                res = std::make_exception_ptr(std::runtime_error("Bundle " + symbolicName + " (location= " + location
+                res = std::make_exception_ptr(std::runtime_error("Bundle " + sharedState->symbolicName
+                                                                 + " (location= " + location
                                                                  + ") start failed: " + util::GetLastExceptionStr()));
             }
         }
@@ -629,8 +634,8 @@ namespace cppmicroservices
             }
             if (!cause.empty())
             {
-                res = std::make_exception_ptr(std::runtime_error("Bundle " + symbolicName + " (location= " + location
-                                                                 + ") start failed: " + cause));
+                res = std::make_exception_ptr(std::runtime_error(
+                    "Bundle " + sharedState->symbolicName + " (location= " + location + ") start failed: " + cause));
             }
         }
 
@@ -678,11 +683,11 @@ namespace cppmicroservices
 
     BundlePrivate::BundlePrivate(CoreBundleContext* coreCtx)
         : coreCtx(coreCtx)
-        , id(0)
+        , sharedState(std::make_shared<PersistentStorage>(0, Constants::SYSTEM_BUNDLE_SYMBOLICNAME))
         , location(Constants::SYSTEM_BUNDLE_LOCATION)
         , state(Bundle::STATE_INSTALLED)
         , barchive()
-        , bundleDir(this->coreCtx->GetDataStorage(id))
+        , bundleDir(coreCtx->GetDataStorage(sharedState->id))
         , bundleContext()
         , destroyActivatorHook(nullptr)
         , bactivator(nullptr, nullptr)
@@ -690,7 +695,6 @@ namespace cppmicroservices
         , resolveFailException()
         , wasStarted(false)
         , aborted(static_cast<uint8_t>(Aborted::NONE))
-        , symbolicName(Constants::SYSTEM_BUNDLE_SYMBOLICNAME)
         , version(CppMicroServices_VERSION_MAJOR, CppMicroServices_VERSION_MINOR, CppMicroServices_VERSION_PATCH)
         , timeStamp(std::chrono::steady_clock::now())
         , bundleManifest()
@@ -701,11 +705,11 @@ namespace cppmicroservices
 
     BundlePrivate::BundlePrivate(CoreBundleContext* coreCtx, std::shared_ptr<BundleArchive> const& ba)
         : coreCtx(coreCtx)
-        , id(ba->GetBundleId())
+        , sharedState(std::make_shared<PersistentStorage>(ba->GetBundleId(), ba->GetResourcePrefix()))
         , location(ba->GetBundleLocation())
         , state(Bundle::STATE_INSTALLED)
         , barchive(ba)
-        , bundleDir(coreCtx->GetDataStorage(id))
+        , bundleDir(coreCtx->GetDataStorage(sharedState->id))
         , bundleContext()
         , destroyActivatorHook(nullptr)
         , bactivator(nullptr, nullptr)
@@ -713,7 +717,6 @@ namespace cppmicroservices
         , resolveFailException()
         , wasStarted(false)
         , aborted(static_cast<uint8_t>(Aborted::NONE))
-        , symbolicName(ba->GetResourcePrefix())
         , version()
         , timeStamp(ba->GetLastModified())
         , bundleManifest(ba->GetInjectedManifest())
@@ -774,7 +777,7 @@ namespace cppmicroservices
             if (!errMsg.empty())
             {
                 throw std::invalid_argument(std::string("The Json value for ") + Constants::BUNDLE_VERSION
-                                            + " for bundle " + symbolicName + " (location=" + location
+                                            + " for bundle " + sharedState->symbolicName + " (location=" + location
                                             + ") is not valid: " + errMsg);
             }
         }
@@ -782,23 +785,23 @@ namespace cppmicroservices
         if (!bundleManifest.Contains(Constants::BUNDLE_SYMBOLICNAME))
         {
             throw std::invalid_argument(Constants::BUNDLE_SYMBOLICNAME
-                                        + " is not defined in the bundle manifest for bundle " + symbolicName
-                                        + " (location=" + location + ").");
+                                        + " is not defined in the bundle manifest for bundle "
+                                        + sharedState->symbolicName + " (location=" + location + ").");
         }
 
         Any bsn(bundleManifest.GetValue(Constants::BUNDLE_SYMBOLICNAME));
         if (bsn.Empty() || bsn.ToStringNoExcept().empty())
         {
             throw std::invalid_argument(Constants::BUNDLE_SYMBOLICNAME + " is empty in the bundle manifest for bundle "
-                                        + symbolicName + "(location=" + location + ").");
+                                        + sharedState->symbolicName + "(location=" + location + ").");
         }
 
-        auto snbl = coreCtx->bundleRegistry.GetBundles(symbolicName, version);
+        auto snbl = coreCtx->bundleRegistry.GetBundles(sharedState->symbolicName, version);
         if (!snbl.empty())
         {
-            throw std::invalid_argument("Bundle " + symbolicName + " (location=" + location
+            throw std::invalid_argument("Bundle " + sharedState->symbolicName + " (location=" + location
                                         + "), a bundle with same symbolic name and version " + "is already installed ("
-                                        + symbolicName + ", " + version.ToString() + ")");
+                                        + sharedState->symbolicName + ", " + version.ToString() + ")");
         }
     }
 
@@ -809,7 +812,8 @@ namespace cppmicroservices
     {
         if (state == Bundle::STATE_UNINSTALLED)
         {
-            throw std::logic_error("Bundle " + symbolicName + " (location=" + location + ") is in UNINSTALLED state");
+            throw std::logic_error("Bundle " + sharedState->symbolicName + " (location=" + location
+                                   + ") is in UNINSTALLED state");
         }
     }
 
@@ -848,7 +852,7 @@ namespace cppmicroservices
             catch (...)
             {
                 coreCtx->logger->Log(logservice::SeverityLevel::LOG_WARNING,
-                                     "Some services already unregistered in Bundle " + symbolicName
+                                     "Some services already unregistered in Bundle " + sharedState->symbolicName
                                          + " (location=" + location + ")",
                                      std::current_exception());
             }

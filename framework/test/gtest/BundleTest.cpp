@@ -59,7 +59,8 @@ class BundleTest : public ::testing::Test
     BundleContext context;
 
   public:
-    BundleTest() : framework(FrameworkFactory().NewFramework()) {};
+    BundleTest()
+        : framework(FrameworkFactory().NewFramework()) {};
 
     ~BundleTest() override = default;
 
@@ -89,7 +90,11 @@ class FrameworkTestSuite
     Bundle buA;
 
   public:
-    FrameworkTestSuite(BundleContext const& bc) : bc(bc), bu(bc.GetBundle()) {}
+    FrameworkTestSuite(BundleContext const& bc)
+        : bc(bc)
+        , bu(bc.GetBundle())
+    {
+    }
 
     void
     setup()
@@ -211,7 +216,7 @@ class FrameworkTestSuite
         // Test for valid base storage path
         ASSERT_EQ(buA.GetBundleContext().GetProperty(Constants::FRAMEWORK_STORAGE).ToString(), tempPath);
 
-        const std::string baseStoragePath
+        std::string const baseStoragePath
             = tempPath + util::DIR_SEP + "data" + util::DIR_SEP + util::ToString(buA.GetBundleId()) + util::DIR_SEP;
         // Test for valid data path
         ASSERT_EQ(buA.GetBundleContext().GetDataFile(""), baseStoragePath);
@@ -295,7 +300,7 @@ class FrameworkTestSuite
         ASSERT_FALSE(p1.Empty());
         ASSERT_EQ(p1.ToString(), p2.ToString());
 
-        const std::string baseStoragePath = util::GetCurrentWorkingDirectory();
+        std::string const baseStoragePath = util::GetCurrentWorkingDirectory();
 
         // Test for valid data path
         ASSERT_EQ(buExec.GetBundleContext().GetDataFile("").substr(0, baseStoragePath.size()), baseStoragePath);
@@ -676,9 +681,8 @@ TEST_F(BundleTest, TestBundleStartOptions)
     EXPECT_NO_THROW(bundle.Start(cppmicroservices::Bundle::StartOptions::START_ACTIVATION_POLICY));
 }
 
-TEST_F(BundleTest, TestBundleLessThanOperator)
+TEST_F(BundleTest, BundleLessThanOperator)
 {
-
     auto bundleA = InstallLib(context, "TestBundleA");
     auto bundleB = InstallLib(context, "TestBundleB");
 
@@ -687,6 +691,53 @@ TEST_F(BundleTest, TestBundleLessThanOperator)
     ASSERT_TRUE(bundleA < Bundle());
     ASSERT_TRUE(!(Bundle() < bundleB));
     ASSERT_TRUE(!(Bundle() < Bundle()));
+}
+
+TEST_F(BundleTest, BundleEqualityOperator)
+{
+    auto bundleA = InstallLib(context, "TestBundleA");
+    auto bundleB = InstallLib(context, "TestBundleB");
+
+    // Test equality for the same bundle and different bundles.
+    ASSERT_TRUE(bundleA == bundleA);
+    ASSERT_TRUE(bundleB == bundleB);
+    ASSERT_TRUE(!(bundleA == bundleB));
+    ASSERT_TRUE(!(bundleA == Bundle()));
+    ASSERT_TRUE(Bundle() == Bundle());
+}
+
+TEST_F(BundleTest, BundleEqualityPersistsAfterStop)
+{
+    auto bundleA = InstallLib(context, "TestBundleA");
+    auto bundleB = InstallLib(context, "TestBundleB");
+
+    bundleA.Stop();
+
+    // Stopping a bundle should not affect equality.
+    ASSERT_TRUE(bundleA == bundleA);
+    ASSERT_TRUE(!(bundleA == bundleB));
+    ASSERT_TRUE(!(bundleA == Bundle()));
+}
+
+TEST_F(BundleTest, BundleLessThanOperatorPersistsAfterStop)
+{
+    auto bundleA = InstallLib(context, "TestBundleA");
+    auto bundleB = InstallLib(context, "TestBundleB");
+
+    // Establish ordering before stop
+    ASSERT_TRUE(bundleA < bundleB);
+
+    // Stop one bundle
+    bundleA.Stop();
+
+    // Ordering should be unchanged after stop
+    ASSERT_TRUE(bundleA < bundleB);
+
+    // Stop both bundles
+    bundleB.Stop();
+
+    // Ordering should still be unchanged
+    ASSERT_TRUE(bundleA < bundleB);
 }
 
 TEST_F(BundleTest, TestBundleAssignmentOperator)
@@ -875,9 +926,9 @@ TEST_F(BundleTest, TestBundleActivatorFailures)
     ASSERT_EQ(1, listener.events_received());
     // Test that the correct FrameworkEvent was received
     ASSERT_TRUE(listener.CheckEvents(std::vector<FrameworkEvent> {
-        FrameworkEvent {FrameworkEvent::Type::FRAMEWORK_ERROR,
+        FrameworkEvent { FrameworkEvent::Type::FRAMEWORK_ERROR,
                         bundleStopFail, std::string(),
-                        std::make_exception_ptr(std::runtime_error("whoopsie!"))}
+                        std::make_exception_ptr(std::runtime_error("whoopsie!")) }
     }));
     context.RemoveListener(std::move(token));
     // Test that even if Stop throws, the bundle is uninstalled.
@@ -919,7 +970,7 @@ TEST_F(BundleTest, TestFrameworkAccessDuringFrameworkShutdown)
                          while (keepLooping)
                          {
                              auto token = framework.GetBundleContext().AddBundleListener(
-                                 [](const cppmicroservices::BundleEvent& evt)
+                                 [](cppmicroservices::BundleEvent const& evt)
                                  {
                                      if (evt.GetType() == cppmicroservices::BundleEvent::Type::BUNDLE_STOPPING
                                          && evt.GetBundle().GetBundleId() == 0)
@@ -929,7 +980,7 @@ TEST_F(BundleTest, TestFrameworkAccessDuringFrameworkShutdown)
                                  });
                              auto bundle = InstallLib(framework.GetBundleContext(), "TestBundleA");
                              bundle.Start();
-                             const auto& map = bundle.GetHeaders();
+                             auto const& map = bundle.GetHeaders();
                              ASSERT_TRUE(!map.empty());
                              framework.GetBundleContext().RemoveListener(std::move(token));
                              bundle.Stop();
